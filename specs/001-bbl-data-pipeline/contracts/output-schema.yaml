@@ -1,0 +1,55 @@
+# Pandera Schema Definition for BBL Match Data
+schema_type: dataframe
+version: 1.0.0
+columns:
+  match_id:
+    dtype: string
+    nullable: false
+    unique: false # Not unique in ball-by-ball, but unique per match
+  season:
+    dtype: string
+    nullable: false
+  date:
+    dtype: datetime64[ns]
+    nullable: false
+  venue_id:
+    dtype: string
+    nullable: false
+  batting_team_id:
+    dtype: string
+    nullable: false
+  bowling_team_id:
+    dtype: string
+    nullable: false
+  innings:
+    dtype: int64
+    checks:
+      - ge: 1
+      - le: 4
+  over:
+    dtype: int64
+    checks:
+      - ge: 0
+      - le: 19 # Standard T20, though super overs exist
+  ball:
+    dtype: int64
+    checks:
+      - ge: 1
+  batter_id:
+    dtype: string
+    nullable: false
+  bowler_id:
+    dtype: string
+    nullable: false
+  runs_total:
+    dtype: int64
+    checks:
+      - ge: 0
+  is_super_over:
+    dtype: bool
+    nullable: false
+
+checks:
+  - check_name: "valid_runs"
+    columns: ["runs_total"]
+    condition: "lambda x: x >= 0"

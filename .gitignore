@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+
+# Project Data
+big_bash_model/bbl_male_dataset/
+big_bash_model/bbl_male_json_dataset/
+data/
+output/
+*.parquet
+*.json
+!config/*.json
+!src/**/*.json
+!tests/**/*.json
+
+# Logs
+*.log

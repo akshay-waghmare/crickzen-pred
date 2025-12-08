@@ -1,0 +1,48 @@
+name: bbl-pipeline
+description: CLI for BBL Data Ingestion and Processing
+version: 0.1.0
+
+commands:
+  ingest:
+    description: Ingest Cricsheet JSON files and convert to Parquet.
+    arguments:
+      - name: --input-dir
+        required: true
+        type: path
+        help: Path to directory containing Cricsheet JSON files.
+      - name: --output-dir
+        required: true
+        type: path
+        help: Path to output directory for Parquet files.
+      - name: --incremental
+        required: false
+        type: boolean
+        default: false
+        help: If set, only process new/modified files.
+      - name: --config
+        required: false
+        type: path
+        help: Path to configuration file (schema, error policy).
+
+  resolve:
+    description: Update entity registry with new entities found in data.
+    arguments:
+      - name: --input-dir
+        required: true
+        type: path
+      - name: --registry
+        required: true
+        type: path
+        help: Path to entity registry file.
+      - name: --dry-run
+        required: false
+        type: boolean
+        help: Preview changes without writing to registry.
+
+  validate:
+    description: Validate the processed Parquet dataset against the schema.
+    arguments:
+      - name: --dataset
+        required: true
+        type: path
+        help: Path to the Parquet dataset.

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bbl_pipeline"
+version = "0.1.0"
+description = "BBL Data Ingestion and Processing Pipeline"
+authors = [
+  { name = "Akshay Waghmare", email = "akshay@example.com" },
+]
+dependencies = [
+    "pandas>=2.0.0",
+    "pyarrow>=14.0.0",
+    "pandera>=0.18.0",
+    "rapidfuzz>=3.0.0",
+    "click>=8.0.0",
+    "structlog>=23.0.0",
+    "pyyaml>=6.0.0",
+]
+requires-python = ">=3.10"
+
+[project.scripts]
+bbl-pipeline = "bbl_pipeline.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
