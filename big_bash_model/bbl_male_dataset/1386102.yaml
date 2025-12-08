@@ -1,0 +1,2019 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-12-20'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Perth
+  competition: Big Bash League
+  dates:
+  - '2023-12-20'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Perth Scorchers
+    by:
+      wickets: 9
+  overs: 20
+  player_of_match:
+  - JP Behrendorff
+  players:
+    Hobart Hurricanes:
+    - CP Jewell
+    - BR McDermott
+    - SR Hain
+    - TH David
+    - CJ Anderson
+    - Nikhil Chaudhary
+    - MJ Owen
+    - CJ Jordan
+    - PG Dooley
+    - NT Ellis
+    - B Stanlake
+    Perth Scorchers:
+    - Z Crawley
+    - C Connolly
+    - AM Hardie
+    - JP Inglis
+    - AJ Turner
+    - LJ Evans
+    - AC Agar
+    - JA Richardson
+    - AJ Tye
+    - JP Behrendorff
+    - LR Morris
+  registry:
+    people:
+      AC Agar: a2421394
+      AJ Turner: ff1e12a0
+      AJ Tye: 7c7d63a2
+      AM Hardie: d405c0d5
+      Ashlee Gibbons: b81712f7
+      B Stanlake: 6834d1f2
+      BR McDermott: c41043e6
+      C Connolly: fe366f34
+      CJ Anderson: 8abdf100
+      CJ Jordan: ffe699c0
+      CP Jewell: 806c4e58
+      DM Koch: 6d10c034
+      JA Richardson: 1ee08e9a
+      JP Behrendorff: 4933f499
+      JP Inglis: 989889ff
+      LJ Evans: 1c513d54
+      LR Morris: b08e58e2
+      MJ Owen: f2c936d7
+      MW Graham-Smith: 18aca3ce
+      NT Ellis: 9eb1455b
+      Nikhil Chaudhary: 1f84183a
+      P Wilson: 68304a36
+      PG Dooley: 5e3054d0
+      SD Fry: 6b725ed1
+      SR Hain: 67b9536c
+      TH David: f1f99156
+      Z Crawley: 922e1b19
+  teams:
+  - Hobart Hurricanes
+  - Perth Scorchers
+  toss:
+    winner: Hobart Hurricanes
+    decision: bat
+  umpires:
+  - MW Graham-Smith
+  - P Wilson
+  venue: Perth Stadium
+innings:
+- 1st innings:
+    team: Hobart Hurricanes
+    deliveries:
+    - 0.1:
+        non_striker: BR McDermott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 0.2:
+        non_striker: BR McDermott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 0.3:
+        non_striker: BR McDermott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 0.4:
+        non_striker: BR McDermott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 0.5:
+        non_striker: BR McDermott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 0.6:
+        non_striker: BR McDermott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.1:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BR McDermott
+    - 1.2:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 1.3:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+        wicket:
+          player_out: BR McDermott
+          fielders:
+          - JA Richardson
+          kind: caught
+    - 1.4:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+        wicket:
+          player_out: SR Hain
+          kind: lbw
+    - 1.5:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 1.6:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 2.1:
+        non_striker: TH David
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 2.2:
+        non_striker: TH David
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 2.3:
+        non_striker: TH David
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 2.4:
+        non_striker: CP Jewell
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 2.5:
+        non_striker: CP Jewell
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 2.6:
+        non_striker: CP Jewell
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 3.1:
+        non_striker: TH David
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: CP Jewell
+    - 3.2:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 3.3:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 3.4:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+        wicket:
+          player_out: TH David
+          fielders:
+          - LR Morris
+          kind: caught
+    - 3.5:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 3.6:
+        non_striker: CP Jewell
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 4.1:
+        non_striker: CJ Anderson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+        wicket:
+          player_out: CP Jewell
+          fielders:
+          - AJ Turner
+          kind: caught
+    - 4.2:
+        non_striker: CJ Anderson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 4.3:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 4.4:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 4.5:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 4.6:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 5.1:
+        non_striker: Nikhil Chaudhary
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 5.2:
+        non_striker: Nikhil Chaudhary
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 5.3:
+        non_striker: CJ Anderson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 5.4:
+        non_striker: Nikhil Chaudhary
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 5.5:
+        non_striker: Nikhil Chaudhary
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Anderson
+    - 5.6:
+        non_striker: Nikhil Chaudhary
+        bowler: JP Behrendorff
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CJ Anderson
+    - 5.7:
+        non_striker: Nikhil Chaudhary
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 6.1:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 6.2:
+        non_striker: CJ Anderson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 6.3:
+        non_striker: CJ Anderson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 6.4:
+        non_striker: CJ Anderson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 6.5:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 6.6:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 7.1:
+        non_striker: CJ Anderson
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 7.2:
+        non_striker: CJ Anderson
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 7.3:
+        non_striker: Nikhil Chaudhary
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+    - 7.4:
+        non_striker: Nikhil Chaudhary
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+        wicket:
+          player_out: CJ Anderson
+          fielders:
+          - LJ Evans
+          kind: caught
+    - 7.5:
+        non_striker: Nikhil Chaudhary
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 7.6:
+        non_striker: MJ Owen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 8.1:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 8.2:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Owen
+    - 8.3:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 8.4:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 8.5:
+        non_striker: MJ Owen
+        bowler: LR Morris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Nikhil Chaudhary
+    - 8.6:
+        non_striker: MJ Owen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 8.7:
+        non_striker: MJ Owen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 9.1:
+        non_striker: Nikhil Chaudhary
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 9.2:
+        non_striker: MJ Owen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 9.3:
+        non_striker: MJ Owen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 9.4:
+        non_striker: MJ Owen
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Nikhil Chaudhary
+    - 9.5:
+        non_striker: MJ Owen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 9.6:
+        non_striker: MJ Owen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 9.7:
+        non_striker: Nikhil Chaudhary
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 10.1:
+        non_striker: Nikhil Chaudhary
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 10.2:
+        non_striker: MJ Owen
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 10.3:
+        non_striker: Nikhil Chaudhary
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 10.4:
+        non_striker: Nikhil Chaudhary
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 10.5:
+        non_striker: MJ Owen
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 10.6:
+        non_striker: MJ Owen
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 11.1:
+        non_striker: MJ Owen
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 11.2:
+        non_striker: Nikhil Chaudhary
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        replacements:
+          role:
+          - in: C Connolly
+            out: AJ Turner
+            reason: injury
+            role: bowler
+        batsman: MJ Owen
+    - 11.3:
+        non_striker: Nikhil Chaudhary
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Owen
+    - 11.4:
+        non_striker: Nikhil Chaudhary
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Owen
+    - 11.5:
+        non_striker: Nikhil Chaudhary
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 11.6:
+        non_striker: Nikhil Chaudhary
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Owen
+    - 12.1:
+        non_striker: MJ Owen
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 12.2:
+        non_striker: Nikhil Chaudhary
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 12.3:
+        non_striker: Nikhil Chaudhary
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Owen
+    - 12.4:
+        non_striker: Nikhil Chaudhary
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 12.5:
+        non_striker: MJ Owen
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 12.6:
+        non_striker: MJ Owen
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 13.1:
+        non_striker: MJ Owen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 13.2:
+        non_striker: MJ Owen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 13.3:
+        non_striker: MJ Owen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 13.4:
+        non_striker: MJ Owen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 13.5:
+        non_striker: MJ Owen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 13.6:
+        non_striker: Nikhil Chaudhary
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 14.1:
+        non_striker: MJ Owen
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 14.2:
+        non_striker: Nikhil Chaudhary
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 14.3:
+        non_striker: MJ Owen
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 14.4:
+        non_striker: MJ Owen
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 14.5:
+        non_striker: MJ Owen
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 14.6:
+        non_striker: MJ Owen
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+        wicket:
+          player_out: Nikhil Chaudhary
+          kind: bowled
+    - 15.1:
+        non_striker: CJ Jordan
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Owen
+    - 15.2:
+        non_striker: CJ Jordan
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+        wicket:
+          player_out: MJ Owen
+          fielders:
+          - AM Hardie
+          kind: caught
+    - 15.3:
+        non_striker: CJ Jordan
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PG Dooley
+    - 15.4:
+        non_striker: CJ Jordan
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PG Dooley
+    - 15.5:
+        non_striker: CJ Jordan
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PG Dooley
+    - 15.6:
+        non_striker: PG Dooley
+        bowler: AC Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CJ Jordan
+    - 15.7:
+        non_striker: PG Dooley
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 16.1:
+        non_striker: CJ Jordan
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PG Dooley
+    - 16.2:
+        non_striker: CJ Jordan
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PG Dooley
+    - 16.3:
+        non_striker: PG Dooley
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CJ Jordan
+    - 16.4:
+        non_striker: PG Dooley
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 16.5:
+        non_striker: PG Dooley
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 16.6:
+        non_striker: PG Dooley
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 17.1:
+        non_striker: CJ Jordan
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: PG Dooley
+    - 17.2:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CJ Jordan
+    - 17.3:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 17.4:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Jordan
+    - 17.5:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 17.6:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CJ Jordan
+    - 17.7:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 18.1:
+        non_striker: CJ Jordan
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PG Dooley
+    - 18.2:
+        non_striker: PG Dooley
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 18.3:
+        non_striker: PG Dooley
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 18.4:
+        non_striker: PG Dooley
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 18.5:
+        non_striker: PG Dooley
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 18.6:
+        non_striker: CJ Jordan
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PG Dooley
+    - 19.1:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CJ Jordan
+    - 19.2:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 19.3:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CJ Jordan
+    - 19.4:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CJ Jordan
+    - 19.5:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Jordan
+    - 19.6:
+        non_striker: PG Dooley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+        wicket:
+          player_out: CJ Jordan
+          fielders:
+          - AC Agar
+          kind: caught
+- 2nd innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: C Connolly
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 0.2:
+        non_striker: C Connolly
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 0.3:
+        non_striker: Z Crawley
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 0.4:
+        non_striker: Z Crawley
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: C Connolly
+    - 0.5:
+        non_striker: C Connolly
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 0.6:
+        non_striker: C Connolly
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Z Crawley
+    - 0.7:
+        non_striker: C Connolly
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 1.1:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 1.2:
+        non_striker: C Connolly
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 1.3:
+        non_striker: C Connolly
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 1.4:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 1.5:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 1.6:
+        non_striker: C Connolly
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 2.1:
+        non_striker: Z Crawley
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 2.2:
+        non_striker: Z Crawley
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+        wicket:
+          player_out: C Connolly
+          fielders:
+          - Nikhil Chaudhary
+          kind: caught
+    - 2.3:
+        non_striker: Z Crawley
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 2.4:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Z Crawley
+    - 2.5:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          non_boundary: 1
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 2.6:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 2.7:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 3.1:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 3.2:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 3.3:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: Z Crawley
+    - 3.4:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: AM Hardie
+    - 3.5:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 3.6:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Z Crawley
+    - 3.7:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 4.1:
+        non_striker: AM Hardie
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 4.2:
+        non_striker: Z Crawley
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 4.3:
+        non_striker: Z Crawley
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 4.4:
+        non_striker: Z Crawley
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 4.5:
+        non_striker: Z Crawley
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 4.6:
+        non_striker: AM Hardie
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 5.1:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 5.2:
+        non_striker: AM Hardie
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 5.3:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 5.4:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 5.5:
+        non_striker: AM Hardie
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 5.6:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.1:
+        non_striker: Z Crawley
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 6.2:
+        non_striker: Z Crawley
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 6.3:
+        non_striker: Z Crawley
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 6.4:
+        non_striker: Z Crawley
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 6.5:
+        non_striker: Z Crawley
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.6:
+        non_striker: AM Hardie
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 7.1:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 7.2:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: Z Crawley
+    - 7.3:
+        non_striker: Z Crawley
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 7.4:
+        non_striker: Z Crawley
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 7.5:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Z Crawley
+    - 7.6:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 8.1:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.2:
+        non_striker: AM Hardie
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 8.3:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 8.4:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.5:
+        non_striker: AM Hardie
+        bowler: PG Dooley
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: Z Crawley
+    - 8.6:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.7:
+        non_striker: AM Hardie
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 9.1:
+        non_striker: Z Crawley
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.2:
+        non_striker: Z Crawley
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 9.3:
+        non_striker: Z Crawley
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: AM Hardie
+    - 9.4:
+        non_striker: AM Hardie
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 9.5:
+        non_striker: AM Hardie
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 9.6:
+        non_striker: AM Hardie
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 10.1:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 10.2:
+        non_striker: Z Crawley
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 10.3:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 10.4:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 10.5:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 10.6:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 11.1:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 11.2:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 11.3:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 11.4:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          legbyes: 4
+        batsman: AM Hardie
+    - 11.5:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 11.6:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 12.1:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 12.2:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 12.3:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 12.4:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 12.5:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 12.6:
+        non_striker: Z Crawley
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 13.1:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Z Crawley
+    - 13.2:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: Z Crawley
+    - 13.3:
+        non_striker: Z Crawley
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: AM Hardie
+    - 13.4:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Z Crawley
+    - 13.5:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 13.6:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: Z Crawley
+    - 13.7:
+        non_striker: Z Crawley
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 13.8:
+        non_striker: AM Hardie
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 14.1:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 14.2:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 14.3:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 14.4:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 14.5:
+        non_striker: AM Hardie
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 14.6:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 15.1:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 15.2:
+        non_striker: AM Hardie
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 15.3:
+        non_striker: Z Crawley
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 15.4:
+        non_striker: Z Crawley
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 15.5:
+        non_striker: Z Crawley
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 15.6:
+        non_striker: Z Crawley
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 16.1:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 16.2:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AM Hardie
+    - 16.3:
+        non_striker: Z Crawley
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: AM Hardie

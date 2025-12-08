@@ -1,0 +1,1487 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-27'
+  revision: 3
+info:
+  balls_per_over: 6
+  city: Sydney
+  competition: Big Bash League
+  dates:
+  - '2023-01-27'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Brisbane Heat
+    by:
+      runs: 8
+    method: D/L
+  overs: 20
+  player_of_match:
+  - UT Khawaja
+  players:
+    Brisbane Heat:
+    - J Brown
+    - UT Khawaja
+    - M Labuschagne
+    - MT Renshaw
+    - SR Hain
+    - JJ Peirson
+    - JJ Bazley
+    - MG Neser
+    - SH Johnson
+    - MJ Swepson
+    - MP Kuhnemann
+    Sydney Thunder:
+    - DA Warner
+    - M Gilkes
+    - JJS Sangha
+    - O Davies
+    - AI Ross
+    - DR Sams
+    - BCJ Cutting
+    - N McAndrew
+    - CJ Green
+    - RR Pawson
+    - Usman Qadir
+  registry:
+    people:
+      AI Ross: fb0d68b4
+      BC Treloar: f7e8ee52
+      BCJ Cutting: 2e11c706
+      BNJ Oxenford: c1add349
+      CJ Green: 19b9f399
+      DA Warner: dcce6f09
+      DR Sams: caf69bf7
+      GA Abood: a4af5528
+      J Brown: 647e7d44
+      JJ Bazley: 003d49e6
+      JJ Peirson: 2b55c3b4
+      JJS Sangha: 8e3cb0e9
+      M Gilkes: d85b0f8b
+      M Labuschagne: fa433be6
+      MG Neser: 0164b064
+      MJ Swepson: 86b4bf88
+      MP Kuhnemann: 7b953689
+      MT Renshaw: 218d4d78
+      N McAndrew: 38c276e1
+      O Davies: 0ea54eca
+      PJ Gillespie: 3e253a50
+      RR Pawson: '016188b4'
+      SH Johnson: 83c3e8e3
+      SJ Davis: bc71b0b2
+      SR Hain: 67b9536c
+      UT Khawaja: 331ea488
+      Usman Qadir: 33742f04
+  teams:
+  - Brisbane Heat
+  - Sydney Thunder
+  toss:
+    winner: Sydney Thunder
+    decision: field
+  umpires:
+  - GA Abood
+  - PJ Gillespie
+  venue: Sydney Showground Stadium
+innings:
+- 1st innings:
+    team: Brisbane Heat
+    deliveries:
+    - 0.1:
+        non_striker: UT Khawaja
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 0.2:
+        non_striker: J Brown
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 0.3:
+        non_striker: J Brown
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 0.4:
+        non_striker: J Brown
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 0.5:
+        non_striker: J Brown
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 0.6:
+        non_striker: J Brown
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 1.1:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: J Brown
+    - 1.2:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 1.3:
+        non_striker: J Brown
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 1.4:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 1.5:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: J Brown
+    - 1.6:
+        non_striker: J Brown
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 1.7:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.1:
+        non_striker: J Brown
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 2.2:
+        non_striker: J Brown
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 2.3:
+        non_striker: UT Khawaja
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 2.4:
+        non_striker: J Brown
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 2.5:
+        non_striker: J Brown
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 2.6:
+        non_striker: J Brown
+        bowler: RR Pawson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: UT Khawaja
+    - 2.7:
+        non_striker: J Brown
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 3.1:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+        wicket:
+          player_out: J Brown
+          fielders:
+          - N McAndrew
+          kind: caught
+    - 3.2:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Labuschagne
+    - 3.3:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 3.4:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 3.5:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: UT Khawaja
+    - 3.6:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 3.7:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 3.8:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 4.1:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 4.2:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 4.3:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 4.4:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 4.5:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 4.6:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 5.1:
+        non_striker: M Labuschagne
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 5.2:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 5.3:
+        non_striker: M Labuschagne
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 5.4:
+        non_striker: M Labuschagne
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 5.5:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 5.6:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 6.1:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 6.2:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 6.3:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 6.4:
+        non_striker: UT Khawaja
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 6.5:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 6.6:
+        non_striker: UT Khawaja
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 7.1:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 7.2:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 7.3:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 7.4:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 7.5:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 7.6:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 8.1:
+        non_striker: M Labuschagne
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 8.2:
+        non_striker: M Labuschagne
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 8.3:
+        non_striker: M Labuschagne
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 8.4:
+        non_striker: M Labuschagne
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 8.5:
+        non_striker: UT Khawaja
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 8.6:
+        non_striker: M Labuschagne
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 9.1:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 9.2:
+        non_striker: M Labuschagne
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 9.3:
+        non_striker: M Labuschagne
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 9.4:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 9.5:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 9.6:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 10.1:
+        non_striker: UT Khawaja
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 10.2:
+        non_striker: M Labuschagne
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: UT Khawaja
+    - 10.3:
+        non_striker: M Labuschagne
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 10.4:
+        non_striker: UT Khawaja
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 10.5:
+        non_striker: M Labuschagne
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: UT Khawaja
+    - 10.6:
+        non_striker: M Labuschagne
+        bowler: RR Pawson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 11.1:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 11.2:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 11.3:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 11.4:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 11.5:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 11.6:
+        non_striker: UT Khawaja
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 12.1:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 12.2:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: UT Khawaja
+    - 12.3:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 12.4:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 12.5:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 12.6:
+        non_striker: UT Khawaja
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 13.1:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 13.2:
+        non_striker: M Labuschagne
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 13.3:
+        non_striker: M Labuschagne
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 13.4:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 13.5:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 13.6:
+        non_striker: M Labuschagne
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 14.1:
+        non_striker: UT Khawaja
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 14.2:
+        non_striker: M Labuschagne
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 14.3:
+        non_striker: UT Khawaja
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 14.4:
+        non_striker: UT Khawaja
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 14.5:
+        non_striker: UT Khawaja
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 14.6:
+        non_striker: M Labuschagne
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 15.1:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 15.2:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 15.3:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 15.4:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 15.5:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 15.6:
+        non_striker: UT Khawaja
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 16.1:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 16.2:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 16.3:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 16.4:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+        wicket:
+          player_out: UT Khawaja
+          fielders:
+          - M Gilkes
+          kind: caught
+    - 16.5:
+        non_striker: M Labuschagne
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 16.6:
+        non_striker: MT Renshaw
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 17.1:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 17.2:
+        non_striker: MT Renshaw
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 17.3:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 17.4:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 17.5:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 17.6:
+        non_striker: M Labuschagne
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 18.1:
+        non_striker: MT Renshaw
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 18.2:
+        non_striker: MT Renshaw
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 18.3:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 18.4:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+        wicket:
+          player_out: MT Renshaw
+          kind: bowled
+    - 18.5:
+        non_striker: M Labuschagne
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 18.6:
+        non_striker: SR Hain
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 19.1:
+        non_striker: M Labuschagne
+        bowler: DR Sams
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: SR Hain
+    - 19.2:
+        non_striker: SR Hain
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Labuschagne
+    - 19.3:
+        non_striker: SR Hain
+        bowler: DR Sams
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Labuschagne
+    - 19.4:
+        non_striker: SR Hain
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 19.5:
+        non_striker: SR Hain
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Labuschagne
+    - 19.6:
+        non_striker: SR Hain
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+        wicket:
+          player_out: M Labuschagne
+          fielders:
+          - CJ Green
+          kind: caught
+    - 19.7:
+        non_striker: SR Hain
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+        wicket:
+          player_out: JJ Peirson
+          fielders:
+          - M Gilkes
+          - AI Ross
+          kind: run out
+- 2nd innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: M Gilkes
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.2:
+        non_striker: M Gilkes
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DA Warner
+    - 0.3:
+        non_striker: M Gilkes
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.4:
+        non_striker: M Gilkes
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 0.5:
+        non_striker: M Gilkes
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 0.6:
+        non_striker: DA Warner
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.7:
+        non_striker: DA Warner
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 1.1:
+        non_striker: M Gilkes
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 1.2:
+        non_striker: M Gilkes
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 1.3:
+        non_striker: DA Warner
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 1.4:
+        non_striker: M Gilkes
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 1.5:
+        non_striker: M Gilkes
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 1.6:
+        non_striker: M Gilkes
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 2.1:
+        non_striker: DA Warner
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 2.2:
+        non_striker: DA Warner
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 2.3:
+        non_striker: DA Warner
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 2.4:
+        non_striker: DA Warner
+        bowler: JJ Bazley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Gilkes
+    - 2.5:
+        non_striker: DA Warner
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 2.6:
+        non_striker: DA Warner
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+        wicket:
+          player_out: M Gilkes
+          fielders:
+          - MP Kuhnemann
+          kind: caught
+    - 2.7:
+        non_striker: DA Warner
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 3.1:
+        non_striker: JJS Sangha
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 3.2:
+        non_striker: JJS Sangha
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 3.3:
+        non_striker: JJS Sangha
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: DA Warner
+    - 3.4:
+        non_striker: DA Warner
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 3.5:
+        non_striker: DA Warner
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JJS Sangha
+    - 3.6:
+        non_striker: JJS Sangha
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 4.1:
+        non_striker: DA Warner
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJS Sangha
+    - 4.2:
+        non_striker: DA Warner
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 4.3:
+        non_striker: JJS Sangha
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: DA Warner
+    - 4.4:
+        non_striker: DA Warner
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 4.5:
+        non_striker: DA Warner
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 4.6:
+        non_striker: JJS Sangha
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 5.1:
+        non_striker: JJS Sangha
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 5.2:
+        non_striker: JJS Sangha
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 5.3:
+        non_striker: DA Warner
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 5.4:
+        non_striker: DA Warner
+        bowler: MJ Swepson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: JJS Sangha
+    - 5.5:
+        non_striker: JJS Sangha
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 5.6:
+        non_striker: JJS Sangha
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 6.1:
+        non_striker: DA Warner
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 6.2:
+        non_striker: DA Warner
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJS Sangha
+    - 6.3:
+        non_striker: DA Warner
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 6.4:
+        non_striker: DA Warner
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 6.5:
+        non_striker: JJS Sangha
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner

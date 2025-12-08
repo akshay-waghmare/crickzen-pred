@@ -1,0 +1,2158 @@
+---
+meta:
+  data_version: 0.92
+  created: '2022-12-16'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Canberra
+  competition: Big Bash League
+  dates:
+  - '2022-12-13'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Sydney Thunder
+    by:
+      wickets: 1
+  overs: 20
+  player_of_match:
+  - GS Sandhu
+  players:
+    Melbourne Stars:
+    - JM Clarke
+    - TF Rogers
+    - JA Burns
+    - NCR Larkin
+    - MP Stoinis
+    - HWR Cartwright
+    - BJ Webster
+    - L Wood
+    - NM Coulter-Nile
+    - TA Boult
+    - A Zampa
+    Sydney Thunder:
+    - M Gilkes
+    - AD Hales
+    - RR Rossouw
+    - JJS Sangha
+    - AI Ross
+    - DR Sams
+    - O Davies
+    - CJ Green
+    - GS Sandhu
+    - Fazalhaq Farooqi
+    - B Doggett
+  registry:
+    people:
+      A Zampa: 14f96089
+      AD Hales: 92aeac25
+      AI Ross: fb0d68b4
+      B Doggett: 898e628d
+      BJ Webster: 56b93d46
+      BL Couch: be69e09d
+      CJ Green: 19b9f399
+      DR Sams: caf69bf7
+      Dinusha Bandara: 98bbc5a2
+      Fazalhaq Farooqi: e9c7f0d0
+      GA Abood: a4af5528
+      GS Sandhu: 1558d83b
+      HWR Cartwright: ab965cad
+      JA Burns: 7a5f232a
+      JJS Sangha: 8e3cb0e9
+      JM Clarke: 2eca67f5
+      L Wood: 65b6943c
+      M Gilkes: d85b0f8b
+      MP Stoinis: d9273ee7
+      NCR Larkin: 02bce9a8
+      NM Coulter-Nile: 56ab442f
+      O Davies: 0ea54eca
+      P Wilson: 68304a36
+      RR Rossouw: cad00a4d
+      RW Stratford: '85489579'
+      SAJ Craig: 689f2eed
+      TA Boult: a818c1be
+      TF Rogers: 7f232d46
+  teams:
+  - Melbourne Stars
+  - Sydney Thunder
+  toss:
+    winner: Sydney Thunder
+    decision: field
+  umpires:
+  - GA Abood
+  - P Wilson
+  venue: Manuka Oval, Canberra
+innings:
+- 1st innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: TF Rogers
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 0.2:
+        non_striker: TF Rogers
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 0.3:
+        non_striker: TF Rogers
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.4:
+        non_striker: TF Rogers
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.5:
+        non_striker: TF Rogers
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.6:
+        non_striker: TF Rogers
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 1.1:
+        non_striker: JM Clarke
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 1.2:
+        non_striker: TF Rogers
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 1.3:
+        non_striker: TF Rogers
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 1.4:
+        non_striker: TF Rogers
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 1.5:
+        non_striker: JM Clarke
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 1.6:
+        non_striker: TF Rogers
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 2.1:
+        non_striker: JM Clarke
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TF Rogers
+    - 2.2:
+        non_striker: JM Clarke
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 2.3:
+        non_striker: JM Clarke
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 2.4:
+        non_striker: JM Clarke
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 2.5:
+        non_striker: JM Clarke
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 2.6:
+        non_striker: TF Rogers
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+        wicket:
+          player_out: JM Clarke
+          fielders:
+          - JJS Sangha
+          kind: caught
+    - 3.1:
+        non_striker: JA Burns
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TF Rogers
+    - 3.2:
+        non_striker: TF Rogers
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 3.3:
+        non_striker: JA Burns
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 3.4:
+        non_striker: TF Rogers
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Burns
+    - 3.5:
+        non_striker: TF Rogers
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Burns
+    - 3.6:
+        non_striker: TF Rogers
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JA Burns
+    - 4.1:
+        non_striker: JA Burns
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+        wicket:
+          player_out: TF Rogers
+          fielders:
+          - CJ Green
+          kind: caught
+    - 4.2:
+        non_striker: JA Burns
+        bowler: DR Sams
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: NCR Larkin
+    - 4.3:
+        non_striker: NCR Larkin
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 4.4:
+        non_striker: JA Burns
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 4.5:
+        non_striker: NCR Larkin
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Burns
+    - 4.6:
+        non_striker: NCR Larkin
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 5.1:
+        non_striker: NCR Larkin
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 5.2:
+        non_striker: JA Burns
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 5.3:
+        non_striker: NCR Larkin
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Burns
+    - 5.4:
+        non_striker: NCR Larkin
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 5.5:
+        non_striker: JA Burns
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 5.6:
+        non_striker: NCR Larkin
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JA Burns
+    - 6.1:
+        non_striker: JA Burns
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 6.2:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 6.3:
+        non_striker: JA Burns
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 6.4:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 6.5:
+        non_striker: JA Burns
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 6.6:
+        non_striker: JA Burns
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 7.1:
+        non_striker: NCR Larkin
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 7.2:
+        non_striker: JA Burns
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 7.3:
+        non_striker: NCR Larkin
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 7.4:
+        non_striker: JA Burns
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 7.5:
+        non_striker: NCR Larkin
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Burns
+    - 7.6:
+        non_striker: JA Burns
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+        wicket:
+          player_out: JA Burns
+          kind: retired hurt
+    - 8.1:
+        non_striker: MP Stoinis
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 8.2:
+        non_striker: MP Stoinis
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 8.3:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+        wicket:
+          player_out: MP Stoinis
+          fielders:
+          - Fazalhaq Farooqi
+          kind: caught
+    - 8.4:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 8.5:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 8.6:
+        non_striker: HWR Cartwright
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 9.1:
+        non_striker: HWR Cartwright
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 9.2:
+        non_striker: NCR Larkin
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 9.3:
+        non_striker: HWR Cartwright
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 9.4:
+        non_striker: NCR Larkin
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 9.5:
+        non_striker: HWR Cartwright
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 9.6:
+        non_striker: HWR Cartwright
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 10.1:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HWR Cartwright
+    - 10.2:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 10.3:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 10.4:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 10.5:
+        non_striker: HWR Cartwright
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 10.6:
+        non_striker: NCR Larkin
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 11.1:
+        non_striker: NCR Larkin
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 11.2:
+        non_striker: HWR Cartwright
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 11.3:
+        non_striker: NCR Larkin
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 11.4:
+        non_striker: HWR Cartwright
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: NCR Larkin
+    - 11.5:
+        non_striker: HWR Cartwright
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 11.6:
+        non_striker: HWR Cartwright
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 11.7:
+        non_striker: HWR Cartwright
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 12.1:
+        non_striker: NCR Larkin
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 12.2:
+        non_striker: HWR Cartwright
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 12.3:
+        non_striker: NCR Larkin
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+        wicket:
+          player_out: HWR Cartwright
+          kind: bowled
+    - 12.4:
+        non_striker: NCR Larkin
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 12.5:
+        non_striker: BJ Webster
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+        wicket:
+          player_out: NCR Larkin
+          fielders:
+          - AI Ross
+          kind: caught
+    - 12.6:
+        non_striker: BJ Webster
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Wood
+    - 13.1:
+        non_striker: L Wood
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 13.2:
+        non_striker: L Wood
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 13.3:
+        non_striker: BJ Webster
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Wood
+    - 13.4:
+        non_striker: BJ Webster
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Wood
+    - 13.5:
+        non_striker: L Wood
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 13.6:
+        non_striker: L Wood
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 14.1:
+        non_striker: BJ Webster
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Wood
+    - 14.2:
+        non_striker: L Wood
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 14.3:
+        non_striker: BJ Webster
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Wood
+    - 14.4:
+        non_striker: L Wood
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 14.5:
+        non_striker: BJ Webster
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Wood
+    - 14.6:
+        non_striker: BJ Webster
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Wood
+    - 15.1:
+        non_striker: BJ Webster
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Wood
+    - 15.2:
+        non_striker: BJ Webster
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Wood
+    - 15.3:
+        non_striker: BJ Webster
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: L Wood
+    - 15.4:
+        non_striker: BJ Webster
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Wood
+        wicket:
+          player_out: L Wood
+          fielders:
+          - RR Rossouw
+          kind: caught
+    - 15.5:
+        non_striker: BJ Webster
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NM Coulter-Nile
+    - 15.6:
+        non_striker: NM Coulter-Nile
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 16.1:
+        non_striker: BJ Webster
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NM Coulter-Nile
+    - 16.2:
+        non_striker: BJ Webster
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NM Coulter-Nile
+    - 16.3:
+        non_striker: NM Coulter-Nile
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+        wicket:
+          player_out: BJ Webster
+          fielders:
+          - CJ Green
+          kind: caught
+    - 16.4:
+        non_striker: NM Coulter-Nile
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TA Boult
+    - 16.5:
+        non_striker: NM Coulter-Nile
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TA Boult
+    - 16.6:
+        non_striker: NM Coulter-Nile
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TA Boult
+    - 16.7:
+        non_striker: NM Coulter-Nile
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TA Boult
+    - 16.8:
+        non_striker: NM Coulter-Nile
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TA Boult
+    - 16.9:
+        non_striker: TA Boult
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NM Coulter-Nile
+    - 17.1:
+        non_striker: TA Boult
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NM Coulter-Nile
+    - 17.2:
+        non_striker: TA Boult
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NM Coulter-Nile
+    - 17.3:
+        non_striker: NM Coulter-Nile
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TA Boult
+    - 17.4:
+        non_striker: NM Coulter-Nile
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TA Boult
+    - 17.5:
+        non_striker: TA Boult
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NM Coulter-Nile
+    - 17.6:
+        non_striker: NM Coulter-Nile
+        bowler: Fazalhaq Farooqi
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TA Boult
+    - 18.1:
+        non_striker: NM Coulter-Nile
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TA Boult
+    - 18.2:
+        non_striker: TA Boult
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: NM Coulter-Nile
+    - 18.3:
+        non_striker: TA Boult
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NM Coulter-Nile
+    - 18.4:
+        non_striker: TA Boult
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NM Coulter-Nile
+    - 18.5:
+        non_striker: TA Boult
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NM Coulter-Nile
+        wicket:
+          player_out: NM Coulter-Nile
+          fielders:
+          - B Doggett
+          kind: caught
+    - 18.6:
+        non_striker: TA Boult
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: A Zampa
+    - 19.1:
+        non_striker: TA Boult
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: A Zampa
+    - 19.2:
+        non_striker: TA Boult
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: A Zampa
+    - 19.3:
+        non_striker: TA Boult
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: A Zampa
+    - 19.4:
+        non_striker: TA Boult
+        bowler: GS Sandhu
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          byes: 2
+        batsman: A Zampa
+    - 19.5:
+        non_striker: TA Boult
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: A Zampa
+    - 19.6:
+        non_striker: A Zampa
+        bowler: GS Sandhu
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: TA Boult
+- 2nd innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.2:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+        wicket:
+          player_out: M Gilkes
+          fielders:
+          - BL Couch (sub)
+          kind: caught
+    - 0.3:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RR Rossouw
+        wicket:
+          player_out: RR Rossouw
+          fielders:
+          - NM Coulter-Nile
+          kind: caught
+    - 0.4:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 0.5:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJS Sangha
+    - 0.6:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJS Sangha
+    - 1.1:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AD Hales
+    - 1.2:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AD Hales
+    - 1.3:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AD Hales
+    - 1.4:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AD Hales
+    - 1.5:
+        non_striker: AD Hales
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 1.6:
+        non_striker: AD Hales
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 2.1:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 2.2:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JJS Sangha
+    - 2.3:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 2.4:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 2.5:
+        non_striker: JJS Sangha
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AD Hales
+    - 2.6:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJS Sangha
+    - 2.7:
+        non_striker: AD Hales
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 3.1:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AD Hales
+    - 3.2:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AD Hales
+    - 3.3:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AD Hales
+    - 3.4:
+        non_striker: AD Hales
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 3.5:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AD Hales
+    - 3.6:
+        non_striker: JJS Sangha
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: AD Hales
+    - 4.1:
+        non_striker: JJS Sangha
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AD Hales
+    - 4.2:
+        non_striker: JJS Sangha
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AD Hales
+        wicket:
+          player_out: AD Hales
+          kind: bowled
+    - 4.3:
+        non_striker: JJS Sangha
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 4.4:
+        non_striker: JJS Sangha
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 4.5:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 4.6:
+        non_striker: JJS Sangha
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 5.1:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 5.2:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 5.3:
+        non_striker: JJS Sangha
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 5.4:
+        non_striker: JJS Sangha
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 5.5:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 5.6:
+        non_striker: JJS Sangha
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 6.1:
+        non_striker: JJS Sangha
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 6.2:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 6.3:
+        non_striker: JJS Sangha
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 6.4:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJS Sangha
+    - 6.5:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 6.6:
+        non_striker: JJS Sangha
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 7.1:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 7.2:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJS Sangha
+    - 7.3:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 7.4:
+        non_striker: JJS Sangha
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 7.5:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 7.6:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 8.1:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 8.2:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+        wicket:
+          player_out: JJS Sangha
+          kind: bowled
+    - 8.3:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Sams
+    - 8.4:
+        non_striker: DR Sams
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 8.5:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Sams
+    - 8.6:
+        non_striker: DR Sams
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 9.1:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DR Sams
+    - 9.2:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Sams
+    - 9.3:
+        non_striker: DR Sams
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 9.4:
+        non_striker: DR Sams
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 9.5:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+    - 9.6:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+        wicket:
+          player_out: DR Sams
+          fielders:
+          - TF Rogers
+          kind: caught
+    - 9.7:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 10.1:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 10.2:
+        non_striker: O Davies
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 10.3:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 10.4:
+        non_striker: O Davies
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 10.5:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.6:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.1:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 11.2:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.3:
+        non_striker: O Davies
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 11.4:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 11.5:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: O Davies
+    - 11.6:
+        non_striker: AI Ross
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+        wicket:
+          player_out: O Davies
+          kind: bowled
+    - 12.1:
+        non_striker: CJ Green
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 12.2:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 12.3:
+        non_striker: AI Ross
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 12.4:
+        non_striker: CJ Green
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 12.5:
+        non_striker: CJ Green
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 12.6:
+        non_striker: CJ Green
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.1:
+        non_striker: CJ Green
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.2:
+        non_striker: AI Ross
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 13.3:
+        non_striker: CJ Green
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 13.4:
+        non_striker: CJ Green
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.5:
+        non_striker: AI Ross
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 13.6:
+        non_striker: CJ Green
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 14.1:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 14.2:
+        non_striker: CJ Green
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 14.3:
+        non_striker: AI Ross
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 14.4:
+        non_striker: CJ Green
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+        wicket:
+          player_out: AI Ross
+          kind: bowled
+    - 14.5:
+        non_striker: CJ Green
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+    - 14.6:
+        non_striker: CJ Green
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GS Sandhu
+    - 15.1:
+        non_striker: GS Sandhu
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Green
+    - 15.2:
+        non_striker: GS Sandhu
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 15.3:
+        non_striker: CJ Green
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+    - 15.4:
+        non_striker: CJ Green
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GS Sandhu
+    - 15.5:
+        non_striker: GS Sandhu
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 15.6:
+        non_striker: GS Sandhu
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 16.1:
+        non_striker: GS Sandhu
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 16.2:
+        non_striker: CJ Green
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+    - 16.3:
+        non_striker: CJ Green
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GS Sandhu
+    - 16.4:
+        non_striker: GS Sandhu
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 16.5:
+        non_striker: CJ Green
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GS Sandhu
+    - 16.6:
+        non_striker: GS Sandhu
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 17.1:
+        non_striker: GS Sandhu
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 17.2:
+        non_striker: GS Sandhu
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 17.3:
+        non_striker: CJ Green
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GS Sandhu
+    - 17.4:
+        non_striker: GS Sandhu
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 17.5:
+        non_striker: CJ Green
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GS Sandhu
+    - 17.6:
+        non_striker: GS Sandhu
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 18.1:
+        non_striker: GS Sandhu
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 18.2:
+        non_striker: CJ Green
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GS Sandhu
+    - 18.3:
+        non_striker: GS Sandhu
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 18.4:
+        non_striker: CJ Green
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+    - 18.5:
+        non_striker: CJ Green
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GS Sandhu
+    - 18.6:
+        non_striker: CJ Green
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+    - 19.1:
+        non_striker: GS Sandhu
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+        wicket:
+          player_out: CJ Green
+          fielders:
+          - BL Couch (sub)
+          kind: caught
+    - 19.2:
+        non_striker: GS Sandhu
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Fazalhaq Farooqi
+        wicket:
+          player_out: Fazalhaq Farooqi
+          kind: bowled
+    - 19.3:
+        non_striker: GS Sandhu
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 19.4:
+        non_striker: B Doggett
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GS Sandhu
+    - 19.5:
+        non_striker: B Doggett
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+    - 19.6:
+        non_striker: B Doggett
+        bowler: BJ Webster
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: GS Sandhu

@@ -1,0 +1,2201 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-04'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Perth
+  competition: Big Bash League
+  dates:
+  - '2025-01-03'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Sydney Thunder
+    by:
+      wickets: 4
+  overs: 20
+  player_of_match:
+  - SE Rutherford
+  players:
+    Perth Scorchers:
+    - MF Hurst
+    - FH Allen
+    - AM Hardie
+    - C Connolly
+    - AJ Turner
+    - NR Hobson
+    - M Spoors
+    - M Kelly
+    - AJ Tye
+    - JP Behrendorff
+    - LR Morris
+    Sydney Thunder:
+    - CT Bancroft
+    - DR Sams
+    - B Nikitaras
+    - DA Warner
+    - M Gilkes
+    - O Davies
+    - SW Billings
+    - SE Rutherford
+    - CJ Green
+    - HD Weibgen
+    - TD Andrews
+    - LH Ferguson
+    - WA Agar
+  registry:
+    people:
+      AJ Turner: ff1e12a0
+      AJ Tye: 7c7d63a2
+      AM Hardie: d405c0d5
+      Andrew Crozier: 00d07580
+      B Nikitaras: d4e39566
+      C Connolly: fe366f34
+      CJ Green: 19b9f399
+      CT Bancroft: 399b0b94
+      D Taylor: b940a2b2
+      DA Warner: dcce6f09
+      DR Sams: caf69bf7
+      FH Allen: bf74b130
+      HD Weibgen: 2535b30f
+      J Thomas: 118c3b91
+      JP Behrendorff: 4933f499
+      LH Ferguson: 2f9d0389
+      LR Morris: b08e58e2
+      M Gilkes: d85b0f8b
+      M Kelly: 68e26ec9
+      M Spoors: da4a1e46
+      MF Hurst: 40e4cf47
+      MW Graham-Smith: 18aca3ce
+      NR Hobson: 4312e0fd
+      O Davies: 0ea54eca
+      SE Rutherford: d014d5ac
+      SJ Davis: bc71b0b2
+      SW Billings: c16d4035
+      TD Andrews: a0f612b6
+      WA Agar: 15de1f5d
+  teams:
+  - Perth Scorchers
+  - Sydney Thunder
+  toss:
+    winner: Sydney Thunder
+    decision: field
+  umpires:
+  - D Taylor
+  - MW Graham-Smith
+  venue: Perth Stadium
+innings:
+- 1st innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: FH Allen
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 0.2:
+        non_striker: FH Allen
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 0.3:
+        non_striker: MF Hurst
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 0.4:
+        non_striker: MF Hurst
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 0.5:
+        non_striker: MF Hurst
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 0.6:
+        non_striker: MF Hurst
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 1.1:
+        non_striker: FH Allen
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 1.2:
+        non_striker: FH Allen
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 1.3:
+        non_striker: FH Allen
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 1.4:
+        non_striker: MF Hurst
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 1.5:
+        non_striker: FH Allen
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 1.6:
+        non_striker: FH Allen
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 2.1:
+        non_striker: MF Hurst
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 2.2:
+        non_striker: MF Hurst
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: FH Allen
+    - 2.3:
+        non_striker: MF Hurst
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 2.4:
+        non_striker: FH Allen
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MF Hurst
+    - 2.5:
+        non_striker: FH Allen
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 2.6:
+        non_striker: FH Allen
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 3.1:
+        non_striker: MF Hurst
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: FH Allen
+    - 3.2:
+        non_striker: MF Hurst
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 3.3:
+        non_striker: FH Allen
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MF Hurst
+    - 3.4:
+        non_striker: FH Allen
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 3.5:
+        non_striker: FH Allen
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MF Hurst
+    - 3.6:
+        non_striker: FH Allen
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MF Hurst
+    - 4.1:
+        non_striker: MF Hurst
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 4.2:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 4.3:
+        non_striker: MF Hurst
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 4.4:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 4.5:
+        non_striker: MF Hurst
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 4.6:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 5.1:
+        non_striker: FH Allen
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 5.2:
+        non_striker: MF Hurst
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 5.3:
+        non_striker: MF Hurst
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: FH Allen
+    - 5.4:
+        non_striker: MF Hurst
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 5.5:
+        non_striker: FH Allen
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MF Hurst
+    - 5.6:
+        non_striker: FH Allen
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 5.7:
+        non_striker: MF Hurst
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 6.1:
+        non_striker: FH Allen
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 6.2:
+        non_striker: MF Hurst
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 6.3:
+        non_striker: FH Allen
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: MF Hurst
+    - 6.4:
+        non_striker: MF Hurst
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 6.5:
+        non_striker: FH Allen
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+        wicket:
+          player_out: MF Hurst
+          fielders:
+          - DA Warner
+          kind: caught
+    - 6.6:
+        non_striker: FH Allen
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 7.1:
+        non_striker: AM Hardie
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 7.2:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 7.3:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 7.4:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 7.5:
+        non_striker: AM Hardie
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 7.6:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.1:
+        non_striker: FH Allen
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 8.2:
+        non_striker: FH Allen
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.3:
+        non_striker: AM Hardie
+        bowler: DR Sams
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: FH Allen
+    - 8.4:
+        non_striker: FH Allen
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 8.5:
+        non_striker: FH Allen
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.6:
+        non_striker: AM Hardie
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 9.1:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.2:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.3:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.4:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AM Hardie
+    - 9.5:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 9.6:
+        non_striker: AM Hardie
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 9.7:
+        non_striker: AM Hardie
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: FH Allen
+    - 10.1:
+        non_striker: FH Allen
+        bowler: SE Rutherford
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 10.2:
+        non_striker: FH Allen
+        bowler: SE Rutherford
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 10.3:
+        non_striker: FH Allen
+        bowler: SE Rutherford
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 10.4:
+        non_striker: AM Hardie
+        bowler: SE Rutherford
+        runs:
+          extras: 5
+          total: 5
+          batsman: 0
+        extras:
+          wides: 5
+        batsman: FH Allen
+    - 10.5:
+        non_striker: AM Hardie
+        bowler: SE Rutherford
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: FH Allen
+    - 10.6:
+        non_striker: AM Hardie
+        bowler: SE Rutherford
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 10.7:
+        non_striker: AM Hardie
+        bowler: SE Rutherford
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: FH Allen
+    - 11.1:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+        wicket:
+          player_out: AM Hardie
+          kind: bowled
+    - 11.2:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 11.3:
+        non_striker: FH Allen
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 11.4:
+        non_striker: C Connolly
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: FH Allen
+    - 11.5:
+        non_striker: C Connolly
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 11.6:
+        non_striker: C Connolly
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 12.1:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+        wicket:
+          player_out: FH Allen
+          fielders:
+          - DR Sams
+          kind: caught
+    - 12.2:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+        wicket:
+          player_out: AJ Turner
+          fielders:
+          - SE Rutherford
+          kind: caught
+    - 12.3:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 12.4:
+        non_striker: NR Hobson
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 12.5:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NR Hobson
+    - 12.6:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 13.1:
+        non_striker: NR Hobson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 13.2:
+        non_striker: C Connolly
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 13.3:
+        non_striker: NR Hobson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 13.4:
+        non_striker: NR Hobson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 13.5:
+        non_striker: NR Hobson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 13.6:
+        non_striker: NR Hobson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 14.1:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 14.2:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 14.3:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 14.4:
+        non_striker: NR Hobson
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 14.5:
+        non_striker: NR Hobson
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 14.6:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 15.1:
+        non_striker: NR Hobson
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 15.2:
+        non_striker: NR Hobson
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 15.3:
+        non_striker: NR Hobson
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Connolly
+    - 15.4:
+        non_striker: NR Hobson
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 15.5:
+        non_striker: C Connolly
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 15.6:
+        non_striker: C Connolly
+        bowler: LH Ferguson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NR Hobson
+    - 15.7:
+        non_striker: C Connolly
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NR Hobson
+    - 16.1:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
+    - 16.2:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 16.3:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
+    - 16.4:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 16.5:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 16.6:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: C Connolly
+    - 16.7:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 17.1:
+        non_striker: NR Hobson
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Connolly
+    - 17.2:
+        non_striker: NR Hobson
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 17.3:
+        non_striker: C Connolly
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 17.4:
+        non_striker: NR Hobson
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 17.5:
+        non_striker: NR Hobson
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 17.6:
+        non_striker: NR Hobson
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 18.1:
+        non_striker: C Connolly
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NR Hobson
+    - 18.2:
+        non_striker: C Connolly
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 18.3:
+        non_striker: NR Hobson
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 18.4:
+        non_striker: NR Hobson
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 18.5:
+        non_striker: NR Hobson
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 18.6:
+        non_striker: C Connolly
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 19.1:
+        non_striker: C Connolly
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: NR Hobson
+    - 19.2:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Connolly
+    - 19.3:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 19.4:
+        non_striker: C Connolly
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 19.5:
+        non_striker: NR Hobson
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: C Connolly
+    - 19.6:
+        non_striker: C Connolly
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NR Hobson
+- 2nd innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        replacements:
+          match:
+          - in: HD Weibgen
+            out: CT Bancroft
+            team: Sydney Thunder
+            reason: concussion_substitute
+          - in: O Davies
+            out: DR Sams
+            team: Sydney Thunder
+            reason: concussion_substitute
+        batsman: B Nikitaras
+    - 0.2:
+        non_striker: B Nikitaras
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.3:
+        non_striker: B Nikitaras
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.4:
+        non_striker: B Nikitaras
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.5:
+        non_striker: B Nikitaras
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 0.6:
+        non_striker: B Nikitaras
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 1.1:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+        wicket:
+          player_out: B Nikitaras
+          kind: lbw
+    - 1.2:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 1.3:
+        non_striker: M Gilkes
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: DA Warner
+    - 1.4:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 1.5:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 1.6:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 2.1:
+        non_striker: M Gilkes
+        bowler: JP Behrendorff
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: DA Warner
+    - 2.2:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 2.3:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Gilkes
+    - 2.4:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 2.5:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 2.6:
+        non_striker: M Gilkes
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DA Warner
+    - 3.1:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 3.2:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: M Gilkes
+    - 3.3:
+        non_striker: M Gilkes
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 3.4:
+        non_striker: M Gilkes
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 3.5:
+        non_striker: M Gilkes
+        bowler: LR Morris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DA Warner
+    - 3.6:
+        non_striker: M Gilkes
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 3.7:
+        non_striker: M Gilkes
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 4.1:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 4.2:
+        non_striker: M Gilkes
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 4.3:
+        non_striker: M Gilkes
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 4.4:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 4.5:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 4.6:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Gilkes
+    - 4.7:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 5.1:
+        non_striker: M Gilkes
+        bowler: AJ Turner
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DA Warner
+    - 5.2:
+        non_striker: M Gilkes
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 5.3:
+        non_striker: M Gilkes
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 5.4:
+        non_striker: M Gilkes
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 5.5:
+        non_striker: M Gilkes
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 5.6:
+        non_striker: M Gilkes
+        bowler: AJ Turner
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: DA Warner
+    - 5.7:
+        non_striker: DA Warner
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 5.8:
+        non_striker: DA Warner
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 6.1:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 6.2:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 6.3:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 6.4:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 6.5:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 6.6:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 7.1:
+        non_striker: M Gilkes
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 7.2:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 7.3:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 7.4:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 7.5:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 7.6:
+        non_striker: M Gilkes
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 8.1:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 8.2:
+        non_striker: M Gilkes
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 8.3:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 8.4:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 8.5:
+        non_striker: M Gilkes
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 8.6:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 2
+          batsman: 1
+        extras:
+          noballs: 1
+        batsman: M Gilkes
+    - 8.7:
+        non_striker: M Gilkes
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 9.1:
+        non_striker: DA Warner
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 9.2:
+        non_striker: M Gilkes
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 9.3:
+        non_striker: M Gilkes
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 9.4:
+        non_striker: M Gilkes
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 9.5:
+        non_striker: DA Warner
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 9.6:
+        non_striker: DA Warner
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 10.1:
+        non_striker: DA Warner
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 10.2:
+        non_striker: DA Warner
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Gilkes
+    - 10.3:
+        non_striker: DA Warner
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 10.4:
+        non_striker: DA Warner
+        bowler: C Connolly
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Gilkes
+        wicket:
+          player_out: M Gilkes
+          fielders:
+          - MF Hurst
+          kind: stumped
+    - 10.5:
+        non_striker: DA Warner
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.6:
+        non_striker: DA Warner
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.7:
+        non_striker: DA Warner
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.1:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.2:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 11.3:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 11.4:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: O Davies
+    - 11.5:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 11.6:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.7:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 12.1:
+        non_striker: O Davies
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 12.2:
+        non_striker: O Davies
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 12.3:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+        wicket:
+          player_out: O Davies
+          fielders:
+          - FH Allen
+          kind: caught
+    - 12.4:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 12.5:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 12.6:
+        non_striker: DA Warner
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 13.1:
+        non_striker: SW Billings
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 13.2:
+        non_striker: SW Billings
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 13.3:
+        non_striker: SW Billings
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+        wicket:
+          player_out: DA Warner
+          fielders:
+          - NR Hobson
+          kind: caught
+    - 13.4:
+        non_striker: SW Billings
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 13.5:
+        non_striker: SE Rutherford
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 13.6:
+        non_striker: SE Rutherford
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 14.1:
+        non_striker: SE Rutherford
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 14.2:
+        non_striker: SW Billings
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Rutherford
+    - 14.3:
+        non_striker: SW Billings
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 14.4:
+        non_striker: SE Rutherford
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 14.5:
+        non_striker: SW Billings
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Rutherford
+    - 14.6:
+        non_striker: SW Billings
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SE Rutherford
+    - 15.1:
+        non_striker: SE Rutherford
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 15.2:
+        non_striker: SE Rutherford
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+        wicket:
+          player_out: SW Billings
+          fielders:
+          - M Kelly
+          kind: caught
+    - 15.3:
+        non_striker: SE Rutherford
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Green
+    - 15.4:
+        non_striker: SE Rutherford
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 15.5:
+        non_striker: SE Rutherford
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 15.6:
+        non_striker: CJ Green
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 16.1:
+        non_striker: CJ Green
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Rutherford
+    - 16.2:
+        non_striker: CJ Green
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SE Rutherford
+    - 16.3:
+        non_striker: CJ Green
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SE Rutherford
+    - 16.4:
+        non_striker: CJ Green
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 16.5:
+        non_striker: SE Rutherford
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Green
+    - 16.6:
+        non_striker: SE Rutherford
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 17.1:
+        non_striker: SE Rutherford
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 17.2:
+        non_striker: SE Rutherford
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 17.3:
+        non_striker: CJ Green
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 17.4:
+        non_striker: SE Rutherford
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+        wicket:
+          player_out: CJ Green
+          fielders:
+          - JP Behrendorff
+          kind: caught
+    - 17.5:
+        non_striker: SE Rutherford
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HD Weibgen
+    - 17.6:
+        non_striker: SE Rutherford
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HD Weibgen
+    - 18.1:
+        non_striker: HD Weibgen
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 18.2:
+        non_striker: SE Rutherford
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HD Weibgen
+    - 18.3:
+        non_striker: HD Weibgen
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 18.4:
+        non_striker: SE Rutherford
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HD Weibgen
+    - 18.5:
+        non_striker: SE Rutherford
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HD Weibgen
+    - 18.6:
+        non_striker: SE Rutherford
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: HD Weibgen
+    - 19.1:
+        non_striker: HD Weibgen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SE Rutherford
+    - 19.2:
+        non_striker: HD Weibgen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Rutherford
+    - 19.3:
+        non_striker: HD Weibgen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Rutherford
+    - 19.4:
+        non_striker: HD Weibgen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Rutherford
+    - 19.5:
+        non_striker: HD Weibgen
+        bowler: AJ Tye
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: SE Rutherford
+    - 19.6:
+        non_striker: HD Weibgen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Rutherford

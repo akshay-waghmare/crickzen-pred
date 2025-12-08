@@ -1,0 +1,1906 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-04'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Adelaide
+  competition: Big Bash League
+  dates:
+  - '2024-12-31'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Perth Scorchers
+    by:
+      wickets: 7
+  overs: 20
+  player_of_match:
+  - C Connolly
+  players:
+    Adelaide Strikers:
+    - DJM Short
+    - OJ Pope
+    - CA Lynn
+    - J Weatherald
+    - AI Ross
+    - J Overton
+    - L Scott
+    - HTRY Thornton
+    - B Doggett
+    - CJ Boyce
+    - L Pope
+    Perth Scorchers:
+    - MF Hurst
+    - FH Allen
+    - AM Hardie
+    - C Connolly
+    - AJ Turner
+    - NR Hobson
+    - AC Agar
+    - JA Richardson
+    - AJ Tye
+    - JP Behrendorff
+    - LR Morris
+  registry:
+    people:
+      AC Agar: a2421394
+      AI Ross: fb0d68b4
+      AJ Turner: ff1e12a0
+      AJ Tye: 7c7d63a2
+      AM Hardie: d405c0d5
+      Andrew Crozier: 00d07580
+      B Doggett: 898e628d
+      C Connolly: fe366f34
+      CA Lynn: 45eda7c8
+      CJ Boyce: 51a60c16
+      DJM Short: 1a156c88
+      Eloise Sheridan: d8d43840
+      FH Allen: bf74b130
+      HTRY Thornton: 055be93a
+      J Overton: 59559bc2
+      J Weatherald: edc7ddb6
+      JA Richardson: 1ee08e9a
+      JP Behrendorff: 4933f499
+      L Pope: 616a8149
+      L Scott: 0ebb3444
+      LR Morris: b08e58e2
+      MF Hurst: 40e4cf47
+      NR Hobson: 4312e0fd
+      OJ Pope: e94bc520
+      PJ Gillespie: 3e253a50
+      SD Fry: 6b725ed1
+      SJ Nogajski: 9b3f9323
+  teams:
+  - Adelaide Strikers
+  - Perth Scorchers
+  toss:
+    winner: Perth Scorchers
+    decision: field
+  umpires:
+  - PJ Gillespie
+  - SJ Nogajski
+  venue: Adelaide Oval
+innings:
+- 1st innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: OJ Pope
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 0.2:
+        non_striker: OJ Pope
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.3:
+        non_striker: OJ Pope
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.4:
+        non_striker: OJ Pope
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.5:
+        non_striker: OJ Pope
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DJM Short
+    - 0.6:
+        non_striker: OJ Pope
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 1.1:
+        non_striker: OJ Pope
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 1.2:
+        non_striker: OJ Pope
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 1.3:
+        non_striker: OJ Pope
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 1.4:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+    - 1.5:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+    - 1.6:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Pope
+    - 2.1:
+        non_striker: DJM Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+    - 2.2:
+        non_striker: DJM Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+        wicket:
+          player_out: OJ Pope
+          fielders:
+          - JP Behrendorff
+          kind: caught
+    - 2.3:
+        non_striker: DJM Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 2.4:
+        non_striker: DJM Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 2.5:
+        non_striker: CA Lynn
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 2.6:
+        non_striker: CA Lynn
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 3.1:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+        wicket:
+          player_out: CA Lynn
+          fielders:
+          - AJ Tye
+          kind: caught
+    - 3.2:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 3.3:
+        non_striker: J Weatherald
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 3.4:
+        non_striker: J Weatherald
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 3.5:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 3.6:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 4.1:
+        non_striker: J Weatherald
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 4.2:
+        non_striker: DJM Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 4.3:
+        non_striker: J Weatherald
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 4.4:
+        non_striker: DJM Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Weatherald
+    - 4.5:
+        non_striker: DJM Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 4.6:
+        non_striker: DJM Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Weatherald
+    - 5.1:
+        non_striker: J Weatherald
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 5.2:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+        wicket:
+          player_out: J Weatherald
+          fielders:
+          - AJ Tye
+          kind: caught
+    - 5.3:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 5.4:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 5.5:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 5.6:
+        non_striker: AI Ross
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 6.1:
+        non_striker: AI Ross
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 6.2:
+        non_striker: DJM Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 6.3:
+        non_striker: DJM Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 6.4:
+        non_striker: DJM Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 6.5:
+        non_striker: AI Ross
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+        wicket:
+          player_out: DJM Short
+          fielders:
+          - MF Hurst
+          kind: caught
+    - 6.6:
+        non_striker: AI Ross
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Overton
+    - 7.1:
+        non_striker: AI Ross
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Overton
+        wicket:
+          player_out: J Overton
+          fielders:
+          - AC Agar
+          kind: caught
+    - 7.2:
+        non_striker: AI Ross
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+        wicket:
+          player_out: L Scott
+          kind: bowled
+    - 7.3:
+        non_striker: AI Ross
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+    - 7.4:
+        non_striker: AI Ross
+        bowler: JA Richardson
+        runs:
+          extras: 1
+          total: 2
+          batsman: 1
+        extras:
+          noballs: 1
+        batsman: HTRY Thornton
+    - 7.5:
+        non_striker: HTRY Thornton
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 7.6:
+        non_striker: AI Ross
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+    - 7.7:
+        non_striker: AI Ross
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+    - 8.1:
+        non_striker: HTRY Thornton
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 8.2:
+        non_striker: AI Ross
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HTRY Thornton
+    - 8.3:
+        non_striker: HTRY Thornton
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 8.4:
+        non_striker: HTRY Thornton
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AI Ross
+    - 8.5:
+        non_striker: HTRY Thornton
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 8.6:
+        non_striker: AI Ross
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+    - 9.1:
+        non_striker: HTRY Thornton
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 9.2:
+        non_striker: HTRY Thornton
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 9.3:
+        non_striker: AI Ross
+        bowler: LR Morris
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: HTRY Thornton
+    - 9.4:
+        non_striker: AI Ross
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+    - 9.5:
+        non_striker: AI Ross
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+        wicket:
+          player_out: HTRY Thornton
+          fielders:
+          - MF Hurst
+          kind: caught
+    - 9.6:
+        non_striker: AI Ross
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 10.1:
+        non_striker: B Doggett
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 10.2:
+        non_striker: B Doggett
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+        wicket:
+          player_out: AI Ross
+          fielders:
+          - MF Hurst
+          kind: caught
+    - 10.3:
+        non_striker: B Doggett
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Boyce
+    - 10.4:
+        non_striker: B Doggett
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 10.5:
+        non_striker: CJ Boyce
+        bowler: JA Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: B Doggett
+    - 10.6:
+        non_striker: B Doggett
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 11.1:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 11.2:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: B Doggett
+    - 11.3:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: B Doggett
+    - 11.4:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 11.5:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: B Doggett
+    - 11.6:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 5
+          batsman: 4
+        extras:
+          noballs: 1
+        batsman: B Doggett
+    - 11.7:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 11.8:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 12.1:
+        non_striker: CJ Boyce
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: B Doggett
+    - 12.2:
+        non_striker: CJ Boyce
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 12.3:
+        non_striker: CJ Boyce
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 12.4:
+        non_striker: CJ Boyce
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 12.5:
+        non_striker: CJ Boyce
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 12.6:
+        non_striker: CJ Boyce
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 13.1:
+        non_striker: B Doggett
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 13.2:
+        non_striker: B Doggett
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 13.3:
+        non_striker: CJ Boyce
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 13.4:
+        non_striker: CJ Boyce
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 13.5:
+        non_striker: B Doggett
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 13.6:
+        non_striker: B Doggett
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 14.1:
+        non_striker: B Doggett
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 14.2:
+        non_striker: B Doggett
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 14.3:
+        non_striker: CJ Boyce
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 14.4:
+        non_striker: CJ Boyce
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 14.5:
+        non_striker: CJ Boyce
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 14.6:
+        non_striker: B Doggett
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Boyce
+    - 15.1:
+        non_striker: CJ Boyce
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: B Doggett
+    - 15.2:
+        non_striker: CJ Boyce
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 15.3:
+        non_striker: CJ Boyce
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: B Doggett
+    - 15.4:
+        non_striker: CJ Boyce
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 15.5:
+        non_striker: CJ Boyce
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 15.6:
+        non_striker: B Doggett
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 16.1:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 16.2:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: B Doggett
+    - 16.3:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CJ Boyce
+    - 16.4:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 16.5:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: B Doggett
+    - 16.6:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 17.1:
+        non_striker: B Doggett
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 17.2:
+        non_striker: CJ Boyce
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 17.3:
+        non_striker: CJ Boyce
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 17.4:
+        non_striker: B Doggett
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 17.5:
+        non_striker: B Doggett
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 17.6:
+        non_striker: CJ Boyce
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 18.1:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Boyce
+    - 18.2:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 18.3:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 18.4:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: B Doggett
+    - 18.5:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: B Doggett
+    - 18.6:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: B Doggett
+    - 18.7:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 18.8:
+        non_striker: CJ Boyce
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 19.1:
+        non_striker: CJ Boyce
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 19.2:
+        non_striker: B Doggett
+        bowler: C Connolly
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: CJ Boyce
+    - 19.3:
+        non_striker: CJ Boyce
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Doggett
+    - 19.4:
+        non_striker: B Doggett
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Boyce
+    - 19.5:
+        non_striker: B Doggett
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 19.6:
+        non_striker: B Doggett
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 19.7:
+        non_striker: CJ Boyce
+        bowler: C Connolly
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: B Doggett
+    - 19.8:
+        non_striker: CJ Boyce
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: B Doggett
+- 2nd innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 0.2:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 0.3:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 0.4:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+    - 0.5:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MF Hurst
+    - 0.6:
+        non_striker: MF Hurst
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 1.1:
+        non_striker: FH Allen
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MF Hurst
+    - 1.2:
+        non_striker: FH Allen
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MF Hurst
+        wicket:
+          player_out: MF Hurst
+          fielders:
+          - B Doggett
+          kind: caught
+    - 1.3:
+        non_striker: FH Allen
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 1.4:
+        non_striker: FH Allen
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 1.5:
+        non_striker: FH Allen
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 1.6:
+        non_striker: FH Allen
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+        wicket:
+          player_out: AM Hardie
+          fielders:
+          - J Weatherald
+          kind: caught
+    - 2.1:
+        non_striker: C Connolly
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 2.2:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 2.3:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Connolly
+    - 2.4:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 2.5:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 2.6:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 3.1:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 3.2:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 3.3:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: FH Allen
+    - 3.4:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          legbyes: 4
+        batsman: FH Allen
+    - 3.5:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 3.6:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: FH Allen
+    - 3.7:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: FH Allen
+    - 4.1:
+        non_striker: C Connolly
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 4.2:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: C Connolly
+    - 4.3:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Connolly
+    - 4.4:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Connolly
+    - 4.5:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 4.6:
+        non_striker: C Connolly
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: FH Allen
+    - 4.7:
+        non_striker: C Connolly
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 5.1:
+        non_striker: C Connolly
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 5.2:
+        non_striker: FH Allen
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 5.3:
+        non_striker: C Connolly
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: FH Allen
+    - 5.4:
+        non_striker: C Connolly
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 5.5:
+        non_striker: C Connolly
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 5.6:
+        non_striker: FH Allen
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 6.1:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 6.2:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 6.3:
+        non_striker: FH Allen
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 6.4:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: FH Allen
+    - 6.5:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: FH Allen
+    - 6.6:
+        non_striker: FH Allen
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 7.1:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 7.2:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 7.3:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 7.4:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 7.5:
+        non_striker: FH Allen
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 7.6:
+        non_striker: C Connolly
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: FH Allen
+    - 8.1:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 8.2:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
+    - 8.3:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 8.4:
+        non_striker: C Connolly
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 8.5:
+        non_striker: C Connolly
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: FH Allen
+    - 8.6:
+        non_striker: C Connolly
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+        wicket:
+          player_out: FH Allen
+          kind: bowled
+    - 9.1:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 9.2:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 9.3:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 9.4:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 9.5:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 9.6:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 10.1:
+        non_striker: AJ Turner
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 10.2:
+        non_striker: C Connolly
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 10.3:
+        non_striker: C Connolly
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 10.4:
+        non_striker: AJ Turner
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 10.5:
+        non_striker: C Connolly
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 10.6:
+        non_striker: C Connolly
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 11.1:
+        non_striker: AJ Turner
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 11.2:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: AJ Turner
+    - 11.3:
+        non_striker: AJ Turner
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 11.4:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 11.5:
+        non_striker: AJ Turner
+        bowler: L Pope
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: C Connolly
+    - 11.6:
+        non_striker: AJ Turner
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
+    - 11.7:
+        non_striker: AJ Turner
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 12.1:
+        non_striker: AJ Turner
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 12.2:
+        non_striker: C Connolly
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 12.3:
+        non_striker: AJ Turner
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 12.4:
+        non_striker: AJ Turner
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 12.5:
+        non_striker: AJ Turner
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 12.6:
+        non_striker: AJ Turner
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 13.1:
+        non_striker: AJ Turner
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 13.2:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Turner
+    - 13.3:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 13.4:
+        non_striker: AJ Turner
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 13.5:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 13.6:
+        non_striker: C Connolly
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 14.1:
+        non_striker: C Connolly
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Turner
+    - 14.2:
+        non_striker: C Connolly
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Turner
+    - 14.3:
+        non_striker: C Connolly
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Turner

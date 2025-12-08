@@ -1,0 +1,2075 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-29'
+  revision: 2
+info:
+  balls_per_over: 6
+  city: Melbourne
+  competition: Big Bash League
+  dates:
+  - '2023-01-29'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Brisbane Heat
+    by:
+      wickets: 7
+  overs: 20
+  player_of_match:
+  - XC Bartlett
+  players:
+    Melbourne Renegades:
+    - SE Marsh
+    - MJ Guptill
+    - SB Harper
+    - AJ Finch
+    - MJJ Critchley
+    - W Sutherland
+    - JW Wells
+    - TS Rogers
+    - CJ Rocchiccioli
+    - DJM Moody
+    - Fawad Ahmed
+    Brisbane Heat:
+    - UT Khawaja
+    - J Brown
+    - M Labuschagne
+    - MT Renshaw
+    - SR Hain
+    - JJ Peirson
+    - MG Neser
+    - JJ Bazley
+    - XC Bartlett
+    - SH Johnson
+    - MP Kuhnemann
+  registry:
+    people:
+      AJ Finch: b8d490fd
+      BC Treloar: f7e8ee52
+      BNJ Oxenford: c1add349
+      CJ Rocchiccioli: aa3c7a7a
+      DJM Moody: e1a867df
+      David Johnston: 92cef862
+      Fawad Ahmed: 22ae3041
+      GA Abood: a4af5528
+      J Brown: 647e7d44
+      JJ Bazley: 003d49e6
+      JJ Peirson: 2b55c3b4
+      JW Wells: 8bdac857
+      M Labuschagne: fa433be6
+      MG Neser: 0164b064
+      MJ Guptill: 2be41edb
+      MJJ Critchley: c5cc48bc
+      MP Kuhnemann: 7b953689
+      MT Renshaw: 218d4d78
+      PJ Gillespie: 3e253a50
+      SB Harper: a756e61a
+      SE Marsh: 508a1ea7
+      SH Johnson: 83c3e8e3
+      SR Hain: 67b9536c
+      TS Rogers: 1b04e02b
+      UT Khawaja: 331ea488
+      W Sutherland: bc2d4f2e
+      XC Bartlett: 3b53243a
+  teams:
+  - Melbourne Renegades
+  - Brisbane Heat
+  toss:
+    winner: Brisbane Heat
+    decision: field
+  umpires:
+  - BNJ Oxenford
+  - PJ Gillespie
+  venue: Docklands Stadium, Melbourne
+innings:
+- 1st innings:
+    team: Melbourne Renegades
+    deliveries:
+    - 0.1:
+        non_striker: MJ Guptill
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 0.2:
+        non_striker: MJ Guptill
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 0.3:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 0.4:
+        non_striker: MJ Guptill
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 0.5:
+        non_striker: MJ Guptill
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 0.6:
+        non_striker: MJ Guptill
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 1.1:
+        non_striker: MJ Guptill
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 1.2:
+        non_striker: MJ Guptill
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 1.3:
+        non_striker: MJ Guptill
+        bowler: XC Bartlett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SE Marsh
+    - 1.4:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+        wicket:
+          player_out: MJ Guptill
+          fielders:
+          - MT Renshaw
+          kind: caught
+    - 1.5:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 1.6:
+        non_striker: SB Harper
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 2.1:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 2.2:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 2.3:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 2.4:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 2.5:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 2.6:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.1:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 3.2:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 3.3:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 3.4:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 3.5:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 3.6:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SE Marsh
+    - 3.7:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 4.1:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 4.2:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 4.3:
+        non_striker: SB Harper
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 4.4:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 4.5:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 4.6:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 5.1:
+        non_striker: SB Harper
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 5.2:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 5.3:
+        non_striker: SB Harper
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SE Marsh
+    - 5.4:
+        non_striker: SB Harper
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 5.5:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 5.6:
+        non_striker: SB Harper
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SE Marsh
+    - 6.1:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 6.2:
+        non_striker: SB Harper
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 6.3:
+        non_striker: SB Harper
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 6.4:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 6.5:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 6.6:
+        non_striker: SB Harper
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 7.1:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 7.2:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 7.3:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 7.4:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SB Harper
+    - 7.5:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SE Marsh
+    - 7.6:
+        non_striker: SB Harper
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 8.1:
+        non_striker: SB Harper
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 8.2:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          fielders:
+          - J Brown
+          kind: caught
+    - 8.3:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 8.4:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 8.5:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 8.6:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 9.1:
+        non_striker: AJ Finch
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 9.2:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 9.3:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 9.4:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 9.5:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 9.6:
+        non_striker: AJ Finch
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 10.1:
+        non_striker: AJ Finch
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 10.2:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 10.3:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 10.4:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 10.5:
+        non_striker: AJ Finch
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 10.6:
+        non_striker: AJ Finch
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 11.1:
+        non_striker: AJ Finch
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 11.2:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+        wicket:
+          player_out: AJ Finch
+          fielders:
+          - UT Khawaja
+          kind: caught
+    - 11.3:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 11.4:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.5:
+        non_striker: MJJ Critchley
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 11.6:
+        non_striker: MJJ Critchley
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 12.1:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 12.2:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 12.3:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 12.4:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 12.5:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 12.6:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MJJ Critchley
+    - 13.1:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 13.2:
+        non_striker: MJJ Critchley
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 13.3:
+        non_striker: MJJ Critchley
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 13.4:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 13.5:
+        non_striker: MJJ Critchley
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 13.6:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 14.1:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJJ Critchley
+    - 14.2:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJJ Critchley
+    - 14.3:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJJ Critchley
+    - 14.4:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 14.5:
+        non_striker: MJJ Critchley
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 14.6:
+        non_striker: SE Marsh
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 15.1:
+        non_striker: MJJ Critchley
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 15.2:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 15.3:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+        wicket:
+          player_out: MJJ Critchley
+          fielders:
+          - UT Khawaja
+          kind: caught
+    - 15.4:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 15.5:
+        non_striker: W Sutherland
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 15.6:
+        non_striker: SE Marsh
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 16.1:
+        non_striker: SE Marsh
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 16.2:
+        non_striker: W Sutherland
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 16.3:
+        non_striker: SE Marsh
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 16.4:
+        non_striker: SE Marsh
+        bowler: MT Renshaw
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: W Sutherland
+    - 16.5:
+        non_striker: SE Marsh
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 16.6:
+        non_striker: W Sutherland
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 16.7:
+        non_striker: W Sutherland
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 17.1:
+        non_striker: SE Marsh
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 17.2:
+        non_striker: W Sutherland
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SE Marsh
+    - 17.3:
+        non_striker: W Sutherland
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SE Marsh
+    - 17.4:
+        non_striker: W Sutherland
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 17.5:
+        non_striker: W Sutherland
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SE Marsh
+    - 17.6:
+        non_striker: W Sutherland
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 18.1:
+        non_striker: W Sutherland
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SE Marsh
+    - 18.2:
+        non_striker: W Sutherland
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 18.3:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 18.4:
+        non_striker: W Sutherland
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SE Marsh
+    - 18.5:
+        non_striker: W Sutherland
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 18.6:
+        non_striker: SE Marsh
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 19.1:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 19.2:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+        wicket:
+          player_out: W Sutherland
+          kind: caught and bowled
+    - 19.3:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 19.4:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 19.5:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 19.6:
+        non_striker: SE Marsh
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JW Wells
+- 2nd innings:
+    team: Brisbane Heat
+    deliveries:
+    - 0.1:
+        non_striker: J Brown
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 0.2:
+        non_striker: J Brown
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 0.3:
+        non_striker: J Brown
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 0.4:
+        non_striker: J Brown
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 0.5:
+        non_striker: J Brown
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 0.6:
+        non_striker: J Brown
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 1.1:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 1.2:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 1.3:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 1.4:
+        non_striker: UT Khawaja
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 1.5:
+        non_striker: UT Khawaja
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 1.6:
+        non_striker: UT Khawaja
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.1:
+        non_striker: J Brown
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 2.2:
+        non_striker: J Brown
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 2.3:
+        non_striker: UT Khawaja
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.4:
+        non_striker: UT Khawaja
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.5:
+        non_striker: UT Khawaja
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.6:
+        non_striker: UT Khawaja
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 3.1:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 3.2:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 3.3:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 3.4:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 3.5:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 3.6:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 4.1:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 4.2:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 4.3:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 4.4:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: J Brown
+    - 4.5:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 4.6:
+        non_striker: J Brown
+        bowler: W Sutherland
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: UT Khawaja
+    - 4.7:
+        non_striker: J Brown
+        bowler: W Sutherland
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: UT Khawaja
+    - 4.8:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 5.1:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 5.2:
+        non_striker: J Brown
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 5.3:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 5.4:
+        non_striker: J Brown
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 5.5:
+        non_striker: J Brown
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 5.6:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 6.1:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 6.2:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 6.3:
+        non_striker: J Brown
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 6.4:
+        non_striker: J Brown
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 6.5:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 6.6:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 7.1:
+        non_striker: J Brown
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 7.2:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 7.3:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 7.4:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 7.5:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 7.6:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 8.1:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 8.2:
+        non_striker: UT Khawaja
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 8.3:
+        non_striker: J Brown
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 8.4:
+        non_striker: UT Khawaja
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 8.5:
+        non_striker: UT Khawaja
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+        wicket:
+          player_out: J Brown
+          fielders:
+          - JW Wells
+          kind: caught
+    - 8.6:
+        non_striker: UT Khawaja
+        bowler: DJM Moody
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Labuschagne
+    - 8.7:
+        non_striker: UT Khawaja
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 9.1:
+        non_striker: UT Khawaja
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 9.2:
+        non_striker: M Labuschagne
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 9.3:
+        non_striker: M Labuschagne
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 9.4:
+        non_striker: UT Khawaja
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 9.5:
+        non_striker: M Labuschagne
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 9.6:
+        non_striker: UT Khawaja
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 10.1:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 10.2:
+        non_striker: M Labuschagne
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 10.3:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: M Labuschagne
+    - 10.4:
+        non_striker: M Labuschagne
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 10.5:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 10.6:
+        non_striker: M Labuschagne
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 11.1:
+        non_striker: M Labuschagne
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 11.2:
+        non_striker: M Labuschagne
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 11.3:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 11.4:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 11.5:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 11.6:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 12.1:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 12.2:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 12.3:
+        non_striker: M Labuschagne
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 12.4:
+        non_striker: M Labuschagne
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 12.5:
+        non_striker: UT Khawaja
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 12.6:
+        non_striker: M Labuschagne
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: UT Khawaja
+    - 13.1:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 13.2:
+        non_striker: M Labuschagne
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 13.3:
+        non_striker: M Labuschagne
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 13.4:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 13.5:
+        non_striker: UT Khawaja
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 13.6:
+        non_striker: M Labuschagne
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 14.1:
+        non_striker: M Labuschagne
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 14.2:
+        non_striker: M Labuschagne
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 14.3:
+        non_striker: M Labuschagne
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 14.4:
+        non_striker: M Labuschagne
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 14.5:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 14.6:
+        non_striker: UT Khawaja
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 15.1:
+        non_striker: M Labuschagne
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 15.2:
+        non_striker: M Labuschagne
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 15.3:
+        non_striker: M Labuschagne
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+        wicket:
+          player_out: UT Khawaja
+          fielders:
+          - DJM Moody
+          kind: caught
+    - 15.4:
+        non_striker: M Labuschagne
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 15.5:
+        non_striker: MT Renshaw
+        bowler: TS Rogers
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Labuschagne
+    - 15.6:
+        non_striker: MT Renshaw
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 15.7:
+        non_striker: MT Renshaw
+        bowler: TS Rogers
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Labuschagne
+    - 15.8:
+        non_striker: MT Renshaw
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+        wicket:
+          player_out: M Labuschagne
+          fielders:
+          - MJ Guptill
+          kind: caught
+    - 16.1:
+        non_striker: SR Hain
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 16.2:
+        non_striker: SR Hain
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 16.3:
+        non_striker: MT Renshaw
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 16.4:
+        non_striker: SR Hain
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 16.5:
+        non_striker: SR Hain
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 16.6:
+        non_striker: SR Hain
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 17.1:
+        non_striker: SR Hain
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 17.2:
+        non_striker: SR Hain
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 17.3:
+        non_striker: SR Hain
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 17.4:
+        non_striker: SR Hain
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 17.5:
+        non_striker: MT Renshaw
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SR Hain
+    - 17.6:
+        non_striker: MT Renshaw
+        bowler: Fawad Ahmed
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SR Hain
+    - 18.1:
+        non_striker: MT Renshaw
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 18.2:
+        non_striker: SR Hain
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 18.3:
+        non_striker: SR Hain
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 18.4:
+        non_striker: SR Hain
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 18.5:
+        non_striker: MT Renshaw
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SR Hain

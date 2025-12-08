@@ -1,0 +1,2202 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-17'
+  revision: 2
+info:
+  balls_per_over: 6
+  city: Melbourne
+  competition: Big Bash League
+  dates:
+  - '2023-01-16'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Brisbane Heat
+    by:
+      wickets: 3
+  overs: 20
+  player_of_match:
+  - MT Renshaw
+  players:
+    Melbourne Stars:
+    - JM Clarke
+    - TF Rogers
+    - HWR Cartwright
+    - BJ Webster
+    - NCR Larkin
+    - NM Coulter-Nile
+    - J Seymour
+    - CD Hinchliffe
+    - L Wood
+    - LC Hatcher
+    - A Zampa
+    Brisbane Heat:
+    - J Brown
+    - UT Khawaja
+    - M Labuschagne
+    - MT Renshaw
+    - SR Hain
+    - JJ Peirson
+    - JJ Bazley
+    - MG Neser
+    - MP Kuhnemann
+    - SH Johnson
+    - MJ Swepson
+  registry:
+    people:
+      A Zampa: 14f96089
+      BJ Webster: 56b93d46
+      C Grant: 876ed858
+      CD Hinchliffe: 8891669e
+      DM Koch: 6d10c034
+      GA Abood: a4af5528
+      HWR Cartwright: ab965cad
+      J Brown: 647e7d44
+      J Seymour: cb54a1d6
+      JJ Bazley: 003d49e6
+      JJ Peirson: 2b55c3b4
+      JM Clarke: 2eca67f5
+      Kent Hannam: 8cc171e7
+      L Wood: 65b6943c
+      LC Hatcher: 8f3fde65
+      M Labuschagne: fa433be6
+      MG Neser: 0164b064
+      MJ Swepson: 86b4bf88
+      MP Kuhnemann: 7b953689
+      MT Renshaw: 218d4d78
+      NCR Larkin: 02bce9a8
+      NM Coulter-Nile: 56ab442f
+      SE Dionysius: ac886e6f
+      SH Johnson: 83c3e8e3
+      SR Hain: 67b9536c
+      TF Rogers: 7f232d46
+      UT Khawaja: 331ea488
+  teams:
+  - Melbourne Stars
+  - Brisbane Heat
+  toss:
+    winner: Brisbane Heat
+    decision: field
+  umpires:
+  - DM Koch
+  - GA Abood
+  venue: Melbourne Cricket Ground
+innings:
+- 1st innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JM Clarke
+    - 0.2:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.3:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.4:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.5:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.6:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.7:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 1.1:
+        non_striker: JM Clarke
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.2:
+        non_striker: JM Clarke
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TF Rogers
+    - 1.3:
+        non_striker: JM Clarke
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TF Rogers
+    - 1.4:
+        non_striker: JM Clarke
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 1.5:
+        non_striker: JM Clarke
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.6:
+        non_striker: JM Clarke
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TF Rogers
+    - 1.7:
+        non_striker: JM Clarke
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TF Rogers
+    - 1.8:
+        non_striker: JM Clarke
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 2.1:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 2.2:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 2.3:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+        wicket:
+          player_out: JM Clarke
+          kind: bowled
+    - 2.4:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          non_boundary: 1
+          total: 4
+          batsman: 4
+        batsman: HWR Cartwright
+    - 2.5:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 2.6:
+        non_striker: TF Rogers
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 3.1:
+        non_striker: HWR Cartwright
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 3.2:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: HWR Cartwright
+    - 3.3:
+        non_striker: HWR Cartwright
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 3.4:
+        non_striker: HWR Cartwright
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 3.5:
+        non_striker: HWR Cartwright
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 3.6:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 4.1:
+        non_striker: HWR Cartwright
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 4.2:
+        non_striker: HWR Cartwright
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 4.3:
+        non_striker: TF Rogers
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+        wicket:
+          player_out: HWR Cartwright
+          fielders:
+          - UT Khawaja
+          kind: caught
+    - 4.4:
+        non_striker: TF Rogers
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 4.5:
+        non_striker: BJ Webster
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 4.6:
+        non_striker: BJ Webster
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TF Rogers
+    - 5.1:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 5.2:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 5.3:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 5.4:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 5.5:
+        non_striker: BJ Webster
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 5.6:
+        non_striker: BJ Webster
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 6.1:
+        non_striker: TF Rogers
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 6.2:
+        non_striker: TF Rogers
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 6.3:
+        non_striker: BJ Webster
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.4:
+        non_striker: TF Rogers
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 6.5:
+        non_striker: BJ Webster
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.6:
+        non_striker: TF Rogers
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 7.1:
+        non_striker: TF Rogers
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 7.2:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 7.3:
+        non_striker: TF Rogers
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 7.4:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TF Rogers
+    - 7.5:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 7.6:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 7.7:
+        non_striker: TF Rogers
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 8.1:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BJ Webster
+    - 8.2:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 8.3:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BJ Webster
+    - 8.4:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 8.5:
+        non_striker: BJ Webster
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 8.6:
+        non_striker: TF Rogers
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 9.1:
+        non_striker: BJ Webster
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+        wicket:
+          player_out: TF Rogers
+          fielders:
+          - J Brown
+          kind: caught
+    - 9.2:
+        non_striker: BJ Webster
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 9.3:
+        non_striker: NCR Larkin
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 9.4:
+        non_striker: BJ Webster
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 9.5:
+        non_striker: BJ Webster
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 9.6:
+        non_striker: BJ Webster
+        bowler: MT Renshaw
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 10.1:
+        non_striker: BJ Webster
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 10.2:
+        non_striker: NCR Larkin
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 10.3:
+        non_striker: NCR Larkin
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 10.4:
+        non_striker: NCR Larkin
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 10.5:
+        non_striker: BJ Webster
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 10.6:
+        non_striker: NCR Larkin
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 11.1:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 11.2:
+        non_striker: NCR Larkin
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 11.3:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 11.4:
+        non_striker: NCR Larkin
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 11.5:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 11.6:
+        non_striker: NCR Larkin
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 12.1:
+        non_striker: NCR Larkin
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 12.2:
+        non_striker: NCR Larkin
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 12.3:
+        non_striker: BJ Webster
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 12.4:
+        non_striker: BJ Webster
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 12.5:
+        non_striker: BJ Webster
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 12.6:
+        non_striker: BJ Webster
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 13.1:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 13.2:
+        non_striker: NCR Larkin
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 13.3:
+        non_striker: NCR Larkin
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BJ Webster
+    - 13.4:
+        non_striker: NCR Larkin
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 13.5:
+        non_striker: NCR Larkin
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 13.6:
+        non_striker: BJ Webster
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 14.1:
+        non_striker: BJ Webster
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 14.2:
+        non_striker: BJ Webster
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 14.3:
+        non_striker: BJ Webster
+        bowler: SH Johnson
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: NCR Larkin
+    - 14.4:
+        non_striker: NCR Larkin
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BJ Webster
+    - 14.5:
+        non_striker: NCR Larkin
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: BJ Webster
+    - 14.6:
+        non_striker: BJ Webster
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 14.7:
+        non_striker: BJ Webster
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: NCR Larkin
+    - 15.1:
+        non_striker: NCR Larkin
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+        wicket:
+          player_out: BJ Webster
+          fielders:
+          - M Labuschagne
+          kind: caught
+    - 15.2:
+        non_striker: NCR Larkin
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NM Coulter-Nile
+        wicket:
+          player_out: NM Coulter-Nile
+          fielders:
+          - SH Johnson
+          kind: caught
+    - 15.3:
+        non_striker: NCR Larkin
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Seymour
+    - 15.4:
+        non_striker: J Seymour
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 15.5:
+        non_striker: J Seymour
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 15.6:
+        non_striker: NCR Larkin
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Seymour
+    - 16.1:
+        non_striker: J Seymour
+        bowler: JJ Bazley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NCR Larkin
+    - 16.2:
+        non_striker: J Seymour
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 16.3:
+        non_striker: NCR Larkin
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Seymour
+    - 16.4:
+        non_striker: NCR Larkin
+        bowler: JJ Bazley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: J Seymour
+    - 16.5:
+        non_striker: NCR Larkin
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Seymour
+    - 16.6:
+        non_striker: NCR Larkin
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Seymour
+    - 16.7:
+        non_striker: NCR Larkin
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Seymour
+        wicket:
+          player_out: J Seymour
+          fielders:
+          - J Brown
+          kind: caught
+    - 16.8:
+        non_striker: NCR Larkin
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CD Hinchliffe
+    - 17.1:
+        non_striker: CD Hinchliffe
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 17.2:
+        non_striker: CD Hinchliffe
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 17.3:
+        non_striker: CD Hinchliffe
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 17.4:
+        non_striker: NCR Larkin
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CD Hinchliffe
+    - 17.5:
+        non_striker: NCR Larkin
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CD Hinchliffe
+    - 17.6:
+        non_striker: CD Hinchliffe
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 18.1:
+        non_striker: CD Hinchliffe
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 18.2:
+        non_striker: CD Hinchliffe
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 18.3:
+        non_striker: NCR Larkin
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CD Hinchliffe
+    - 18.4:
+        non_striker: CD Hinchliffe
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 18.5:
+        non_striker: CD Hinchliffe
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 18.6:
+        non_striker: NCR Larkin
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CD Hinchliffe
+    - 19.1:
+        non_striker: CD Hinchliffe
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 19.2:
+        non_striker: CD Hinchliffe
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 19.3:
+        non_striker: CD Hinchliffe
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 19.4:
+        non_striker: CD Hinchliffe
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 19.5:
+        non_striker: CD Hinchliffe
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 19.6:
+        non_striker: CD Hinchliffe
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+        wicket:
+          player_out: NCR Larkin
+          fielders:
+          - JJ Peirson
+          kind: caught
+- 2nd innings:
+    team: Brisbane Heat
+    deliveries:
+    - 0.1:
+        non_striker: UT Khawaja
+        bowler: L Wood
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: J Brown
+    - 0.2:
+        non_striker: UT Khawaja
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 0.3:
+        non_striker: UT Khawaja
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 0.4:
+        non_striker: J Brown
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 0.5:
+        non_striker: J Brown
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 0.6:
+        non_striker: J Brown
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+    - 0.7:
+        non_striker: J Brown
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 1.1:
+        non_striker: UT Khawaja
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 1.2:
+        non_striker: UT Khawaja
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+        wicket:
+          player_out: J Brown
+          fielders:
+          - BJ Webster
+          kind: caught
+    - 1.3:
+        non_striker: UT Khawaja
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 1.4:
+        non_striker: UT Khawaja
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 1.5:
+        non_striker: UT Khawaja
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 1.6:
+        non_striker: UT Khawaja
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 2.1:
+        non_striker: M Labuschagne
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: UT Khawaja
+    - 2.2:
+        non_striker: M Labuschagne
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 2.3:
+        non_striker: M Labuschagne
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 2.4:
+        non_striker: M Labuschagne
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: UT Khawaja
+    - 2.5:
+        non_striker: M Labuschagne
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: UT Khawaja
+    - 2.6:
+        non_striker: UT Khawaja
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 2.7:
+        non_striker: UT Khawaja
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 2.8:
+        non_striker: UT Khawaja
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 3.1:
+        non_striker: M Labuschagne
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+        wicket:
+          player_out: UT Khawaja
+          fielders:
+          - L Wood
+          kind: caught
+    - 3.2:
+        non_striker: M Labuschagne
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 3.3:
+        non_striker: M Labuschagne
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 3.4:
+        non_striker: M Labuschagne
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 3.5:
+        non_striker: MT Renshaw
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 3.6:
+        non_striker: MT Renshaw
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 4.1:
+        non_striker: MT Renshaw
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 4.2:
+        non_striker: M Labuschagne
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 4.3:
+        non_striker: M Labuschagne
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 4.4:
+        non_striker: M Labuschagne
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 4.5:
+        non_striker: M Labuschagne
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 4.6:
+        non_striker: M Labuschagne
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 5.1:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+        wicket:
+          player_out: M Labuschagne
+          kind: caught and bowled
+    - 5.2:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 5.3:
+        non_striker: SR Hain
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 5.4:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 5.5:
+        non_striker: SR Hain
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 5.6:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+    - 6.1:
+        non_striker: SR Hain
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 6.2:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 6.3:
+        non_striker: SR Hain
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 6.4:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 6.5:
+        non_striker: SR Hain
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 6.6:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+    - 7.1:
+        non_striker: SR Hain
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 7.2:
+        non_striker: SR Hain
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 7.3:
+        non_striker: SR Hain
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 7.4:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+    - 7.5:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+    - 7.6:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 8.1:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+        wicket:
+          player_out: SR Hain
+          fielders:
+          - JM Clarke
+          kind: stumped
+    - 8.2:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 8.3:
+        non_striker: JJ Peirson
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 8.4:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJ Peirson
+    - 8.5:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 8.6:
+        non_striker: JJ Peirson
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 9.1:
+        non_striker: JJ Peirson
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 9.2:
+        non_striker: JJ Peirson
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 9.3:
+        non_striker: JJ Peirson
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 9.4:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 9.5:
+        non_striker: JJ Peirson
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 9.6:
+        non_striker: MT Renshaw
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJ Peirson
+    - 10.1:
+        non_striker: JJ Peirson
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 10.2:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+    - 10.3:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 10.4:
+        non_striker: JJ Peirson
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 10.5:
+        non_striker: JJ Peirson
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 10.6:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 11.1:
+        non_striker: MT Renshaw
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 11.2:
+        non_striker: JJ Peirson
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 11.3:
+        non_striker: MT Renshaw
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 11.4:
+        non_striker: JJ Peirson
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 11.5:
+        non_striker: MT Renshaw
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 11.6:
+        non_striker: JJ Peirson
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 12.1:
+        non_striker: JJ Peirson
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 12.2:
+        non_striker: JJ Peirson
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 12.3:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 12.4:
+        non_striker: JJ Peirson
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 12.5:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 12.6:
+        non_striker: JJ Peirson
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 13.1:
+        non_striker: JJ Peirson
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 13.2:
+        non_striker: JJ Peirson
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 13.3:
+        non_striker: JJ Peirson
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 13.4:
+        non_striker: JJ Peirson
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 13.5:
+        non_striker: JJ Peirson
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 13.6:
+        non_striker: JJ Peirson
+        bowler: LC Hatcher
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: MT Renshaw
+    - 13.7:
+        non_striker: MT Renshaw
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 14.1:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: JJ Peirson
+    - 14.2:
+        non_striker: JJ Peirson
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 14.3:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 14.4:
+        non_striker: JJ Peirson
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 14.5:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 14.6:
+        non_striker: JJ Peirson
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 15.1:
+        non_striker: JJ Peirson
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 15.2:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+        wicket:
+          player_out: JJ Peirson
+          fielders:
+          - CD Hinchliffe
+          kind: caught
+    - 15.3:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 15.4:
+        non_striker: JJ Bazley
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 15.5:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+    - 15.6:
+        non_striker: MT Renshaw
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 16.1:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 16.2:
+        non_striker: JJ Bazley
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 16.3:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JJ Bazley
+    - 16.4:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+    - 16.5:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+        wicket:
+          player_out: JJ Bazley
+          fielders:
+          - TF Rogers
+          kind: caught
+    - 16.6:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+    - 17.1:
+        non_striker: MG Neser
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 17.2:
+        non_striker: MG Neser
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 17.3:
+        non_striker: MG Neser
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 17.4:
+        non_striker: MT Renshaw
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MG Neser
+    - 17.5:
+        non_striker: MG Neser
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 17.6:
+        non_striker: MT Renshaw
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+    - 18.1:
+        non_striker: MG Neser
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 18.2:
+        non_striker: MT Renshaw
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+        wicket:
+          player_out: MG Neser
+          fielders:
+          - BJ Webster
+          kind: run out
+    - 18.3:
+        non_striker: MP Kuhnemann
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 18.4:
+        non_striker: MT Renshaw
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Kuhnemann
+    - 18.5:
+        non_striker: MP Kuhnemann
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 18.6:
+        non_striker: MT Renshaw
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Kuhnemann
+    - 19.1:
+        non_striker: MP Kuhnemann
+        bowler: BJ Webster
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MT Renshaw
+    - 19.2:
+        non_striker: MP Kuhnemann
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 19.3:
+        non_striker: MP Kuhnemann
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 19.4:
+        non_striker: MP Kuhnemann
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 19.5:
+        non_striker: MP Kuhnemann
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 19.6:
+        non_striker: MP Kuhnemann
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 19.7:
+        non_striker: MP Kuhnemann
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw

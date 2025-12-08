@@ -1,0 +1,2198 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-07'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Adelaide
+  competition: Big Bash League
+  dates:
+  - '2023-01-05'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Adelaide Strikers
+    by:
+      wickets: 7
+  overs: 20
+  player_of_match:
+  - MW Short
+  players:
+    Hobart Hurricanes:
+    - BR McDermott
+    - CP Jewell
+    - MS Wade
+    - Z Crawley
+    - MJ Owen
+    - TH David
+    - Asif Ali
+    - Faheem Ashraf
+    - NT Ellis
+    - PG Dooley
+    - RP Meredith
+    Adelaide Strikers:
+    - MW Short
+    - RJ Gibson
+    - CA Lynn
+    - AJ Hose
+    - C de Grandhomme
+    - T Kelly
+    - HJ Nielsen
+    - Rashid Khan
+    - WA Agar
+    - HTRY Thornton
+    - HNA Conway
+  registry:
+    people:
+      AJ Hose: 104e88a4
+      Asif Ali: 0a4736eb
+      BNJ Oxenford: c1add349
+      BR McDermott: c41043e6
+      C de Grandhomme: 94d7f855
+      CA Lynn: 45eda7c8
+      CP Jewell: 806c4e58
+      Eloise Sheridan: d8d43840
+      Faheem Ashraf: bd4ea627
+      HJ Nielsen: 0ea1455a
+      HNA Conway: 272fc5ad
+      HTRY Thornton: 055be93a
+      Harsimran Singh: bf4720ce
+      MJ Owen: f2c936d7
+      MS Wade: afa7e784
+      MW Short: a90e53ec
+      NT Ellis: 9eb1455b
+      P Wilson: 68304a36
+      PG Dooley: 5e3054d0
+      RJ Gibson: '50636767'
+      RP Meredith: '64775749'
+      Rashid Khan: 5f547c8b
+      SD Fry: 6b725ed1
+      T Kelly: 6ceb94d0
+      TH David: f1f99156
+      WA Agar: 15de1f5d
+      Z Crawley: 922e1b19
+  teams:
+  - Hobart Hurricanes
+  - Adelaide Strikers
+  toss:
+    winner: Adelaide Strikers
+    decision: field
+  umpires:
+  - BNJ Oxenford
+  - P Wilson
+  venue: Adelaide Oval
+innings:
+- 1st innings:
+    team: Hobart Hurricanes
+    deliveries:
+    - 0.1:
+        non_striker: CP Jewell
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 0.2:
+        non_striker: CP Jewell
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 0.3:
+        non_striker: CP Jewell
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 0.4:
+        non_striker: CP Jewell
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BR McDermott
+    - 0.5:
+        non_striker: CP Jewell
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BR McDermott
+    - 0.6:
+        non_striker: CP Jewell
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BR McDermott
+    - 1.1:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 1.2:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 1.3:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.4:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.5:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.6:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 2.1:
+        non_striker: CP Jewell
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 2.2:
+        non_striker: BR McDermott
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 2.3:
+        non_striker: BR McDermott
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 2.4:
+        non_striker: CP Jewell
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BR McDermott
+    - 2.5:
+        non_striker: CP Jewell
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 2.6:
+        non_striker: BR McDermott
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 3.1:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CP Jewell
+    - 3.2:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 3.3:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CP Jewell
+    - 3.4:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 3.5:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 3.6:
+        non_striker: BR McDermott
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 4.1:
+        non_striker: CP Jewell
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 4.2:
+        non_striker: CP Jewell
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 4.3:
+        non_striker: CP Jewell
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 4.4:
+        non_striker: BR McDermott
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 4.5:
+        non_striker: CP Jewell
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BR McDermott
+    - 4.6:
+        non_striker: CP Jewell
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 5.1:
+        non_striker: BR McDermott
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 5.2:
+        non_striker: BR McDermott
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CP Jewell
+    - 5.3:
+        non_striker: BR McDermott
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 5.4:
+        non_striker: CP Jewell
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BR McDermott
+    - 5.5:
+        non_striker: CP Jewell
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 5.6:
+        non_striker: CP Jewell
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BR McDermott
+    - 6.1:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 6.2:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 6.3:
+        non_striker: CP Jewell
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BR McDermott
+    - 6.4:
+        non_striker: CP Jewell
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 6.5:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 6.6:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 7.1:
+        non_striker: BR McDermott
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 7.2:
+        non_striker: BR McDermott
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+        wicket:
+          player_out: CP Jewell
+          fielders:
+          - CA Lynn
+          kind: caught
+    - 7.3:
+        non_striker: BR McDermott
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 7.4:
+        non_striker: MS Wade
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 7.5:
+        non_striker: BR McDermott
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 7.6:
+        non_striker: BR McDermott
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 8.1:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 8.2:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MS Wade
+    - 8.3:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 8.4:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 8.5:
+        non_striker: MS Wade
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BR McDermott
+    - 8.6:
+        non_striker: MS Wade
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 9.1:
+        non_striker: MS Wade
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BR McDermott
+    - 9.2:
+        non_striker: MS Wade
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 9.3:
+        non_striker: MS Wade
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BR McDermott
+    - 9.4:
+        non_striker: MS Wade
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 9.5:
+        non_striker: BR McDermott
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 9.6:
+        non_striker: MS Wade
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 10.1:
+        non_striker: MS Wade
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: BR McDermott
+    - 10.2:
+        non_striker: BR McDermott
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 10.3:
+        non_striker: MS Wade
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BR McDermott
+    - 10.4:
+        non_striker: MS Wade
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+        wicket:
+          player_out: BR McDermott
+          fielders:
+          - AJ Hose
+          kind: caught
+    - 10.5:
+        non_striker: MS Wade
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 10.6:
+        non_striker: Z Crawley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 11.1:
+        non_striker: MS Wade
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 11.2:
+        non_striker: MS Wade
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 11.3:
+        non_striker: Z Crawley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+        wicket:
+          player_out: MS Wade
+          fielders:
+          - T Kelly
+          kind: caught
+    - 11.4:
+        non_striker: Z Crawley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 11.5:
+        non_striker: MJ Owen
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 11.6:
+        non_striker: Z Crawley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 12.1:
+        non_striker: MJ Owen
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 12.2:
+        non_striker: Z Crawley
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 12.3:
+        non_striker: MJ Owen
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 12.4:
+        non_striker: Z Crawley
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 12.5:
+        non_striker: Z Crawley
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 12.6:
+        non_striker: MJ Owen
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 13.1:
+        non_striker: Z Crawley
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 13.2:
+        non_striker: MJ Owen
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 13.3:
+        non_striker: Z Crawley
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+        wicket:
+          player_out: MJ Owen
+          fielders:
+          - WA Agar
+          kind: caught
+    - 13.4:
+        non_striker: Z Crawley
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 13.5:
+        non_striker: TH David
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 13.6:
+        non_striker: Z Crawley
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 14.1:
+        non_striker: Z Crawley
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 14.2:
+        non_striker: Z Crawley
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 14.3:
+        non_striker: Z Crawley
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 14.4:
+        non_striker: TH David
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 14.5:
+        non_striker: TH David
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 14.6:
+        non_striker: TH David
+        bowler: Rashid Khan
+        runs:
+          extras: 3
+          total: 3
+          batsman: 0
+        extras:
+          legbyes: 3
+        batsman: Z Crawley
+    - 15.1:
+        non_striker: TH David
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 15.2:
+        non_striker: TH David
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 15.3:
+        non_striker: Z Crawley
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 15.4:
+        non_striker: Z Crawley
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 15.5:
+        non_striker: TH David
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 15.6:
+        non_striker: TH David
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Z Crawley
+    - 16.1:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 16.2:
+        non_striker: TH David
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 16.3:
+        non_striker: TH David
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: Z Crawley
+    - 16.4:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 16.5:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 16.6:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 17.1:
+        non_striker: TH David
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 17.2:
+        non_striker: Z Crawley
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 17.3:
+        non_striker: TH David
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Z Crawley
+    - 17.4:
+        non_striker: TH David
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 17.5:
+        non_striker: Z Crawley
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 17.6:
+        non_striker: TH David
+        bowler: Rashid Khan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Z Crawley
+    - 18.1:
+        non_striker: Z Crawley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TH David
+    - 18.2:
+        non_striker: Z Crawley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 18.3:
+        non_striker: Z Crawley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 18.4:
+        non_striker: TH David
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 18.5:
+        non_striker: TH David
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 18.6:
+        non_striker: Z Crawley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 19.1:
+        non_striker: TH David
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 19.2:
+        non_striker: TH David
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Z Crawley
+    - 19.3:
+        non_striker: TH David
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 19.4:
+        non_striker: Z Crawley
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 3
+          batsman: 2
+        extras:
+          noballs: 1
+        batsman: TH David
+    - 19.5:
+        non_striker: Z Crawley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 19.6:
+        non_striker: Z Crawley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 19.7:
+        non_striker: TH David
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 19.8:
+        non_striker: TH David
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Z Crawley
+- 2nd innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: RJ Gibson
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 0.2:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: RJ Gibson
+    - 0.3:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 0.4:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 0.5:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RJ Gibson
+    - 0.6:
+        non_striker: RJ Gibson
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.1:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 1.2:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: RJ Gibson
+    - 1.3:
+        non_striker: RJ Gibson
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.4:
+        non_striker: RJ Gibson
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 1.5:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+        wicket:
+          player_out: RJ Gibson
+          kind: bowled
+    - 1.6:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CA Lynn
+    - 1.7:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 2.1:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 2.2:
+        non_striker: CA Lynn
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 2.3:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CA Lynn
+    - 2.4:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 2.5:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 2.6:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 2.7:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 3.1:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 3.2:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 3.3:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CA Lynn
+    - 3.4:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 3.5:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 3.6:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 3.7:
+        non_striker: CA Lynn
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 4.1:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 4.2:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 4.3:
+        non_striker: CA Lynn
+        bowler: PG Dooley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 4.4:
+        non_striker: CA Lynn
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 4.5:
+        non_striker: CA Lynn
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 4.6:
+        non_striker: CA Lynn
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 4.7:
+        non_striker: CA Lynn
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 5.1:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 5.2:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 5.3:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 5.4:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 5.5:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 5.6:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 5.7:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 6.1:
+        non_striker: CA Lynn
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 6.2:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 6.3:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 6.4:
+        non_striker: CA Lynn
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 6.5:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CA Lynn
+    - 6.6:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 6.7:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 7.1:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 7.2:
+        non_striker: CA Lynn
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 7.3:
+        non_striker: CA Lynn
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 7.4:
+        non_striker: CA Lynn
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 7.5:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 7.6:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 8.1:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 8.2:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 8.3:
+        non_striker: CA Lynn
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 8.4:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 8.5:
+        non_striker: CA Lynn
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 8.6:
+        non_striker: CA Lynn
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 8.7:
+        non_striker: CA Lynn
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MW Short
+    - 9.1:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 9.2:
+        non_striker: MW Short
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 9.3:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 9.4:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 9.5:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 9.6:
+        non_striker: CA Lynn
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 10.1:
+        non_striker: CA Lynn
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 10.2:
+        non_striker: CA Lynn
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 10.3:
+        non_striker: CA Lynn
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 10.4:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 10.5:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 10.6:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 11.1:
+        non_striker: CA Lynn
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 11.2:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 11.3:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CA Lynn
+    - 11.4:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+        wicket:
+          player_out: CA Lynn
+          fielders:
+          - BR McDermott
+          kind: caught
+    - 11.5:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 11.6:
+        non_striker: AJ Hose
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 11.7:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 12.1:
+        non_striker: AJ Hose
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 12.2:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 12.3:
+        non_striker: AJ Hose
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 12.4:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Hose
+    - 12.5:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 12.6:
+        non_striker: AJ Hose
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 12.7:
+        non_striker: AJ Hose
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 13.1:
+        non_striker: MW Short
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 13.2:
+        non_striker: AJ Hose
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 13.3:
+        non_striker: AJ Hose
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 13.4:
+        non_striker: MW Short
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 13.5:
+        non_striker: MW Short
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 13.6:
+        non_striker: AJ Hose
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 14.1:
+        non_striker: MW Short
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 14.2:
+        non_striker: AJ Hose
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 14.3:
+        non_striker: AJ Hose
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 14.4:
+        non_striker: AJ Hose
+        bowler: PG Dooley
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          byes: 4
+        batsman: MW Short
+    - 14.5:
+        non_striker: AJ Hose
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 14.6:
+        non_striker: AJ Hose
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 15.1:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 15.2:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 15.3:
+        non_striker: AJ Hose
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 15.4:
+        non_striker: MW Short
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 15.5:
+        non_striker: AJ Hose
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 15.6:
+        non_striker: AJ Hose
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 16.1:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Hose
+    - 16.2:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Hose
+    - 16.3:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 16.4:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: AJ Hose
+    - 16.5:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Hose
+    - 16.6:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AJ Hose
+    - 16.7:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 16.8:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Hose
+    - 17.1:
+        non_striker: AJ Hose
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 17.2:
+        non_striker: AJ Hose
+        bowler: TH David
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 17.3:
+        non_striker: AJ Hose
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 17.4:
+        non_striker: AJ Hose
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 17.5:
+        non_striker: MW Short
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 17.6:
+        non_striker: MW Short
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Hose
+    - 17.7:
+        non_striker: MW Short
+        bowler: TH David
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AJ Hose
+    - 17.8:
+        non_striker: MW Short
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+        wicket:
+          player_out: AJ Hose
+          kind: lbw
+    - 18.1:
+        non_striker: C de Grandhomme
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 18.2:
+        non_striker: C de Grandhomme
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 18.3:
+        non_striker: C de Grandhomme
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 18.4:
+        non_striker: MW Short
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C de Grandhomme
+    - 18.5:
+        non_striker: C de Grandhomme
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 18.6:
+        non_striker: C de Grandhomme
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 18.7:
+        non_striker: C de Grandhomme
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 19.1:
+        non_striker: MW Short
+        bowler: Faheem Ashraf
+        runs:
+          extras: 1
+          total: 2
+          batsman: 1
+        extras:
+          noballs: 1
+        batsman: C de Grandhomme
+    - 19.2:
+        non_striker: C de Grandhomme
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 19.3:
+        non_striker: C de Grandhomme
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 19.4:
+        non_striker: C de Grandhomme
+        bowler: Faheem Ashraf
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short

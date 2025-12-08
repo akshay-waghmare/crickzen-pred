@@ -1,0 +1,2167 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-04'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Canberra
+  competition: Big Bash League
+  dates:
+  - '2024-12-28'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Sydney Thunder
+    by:
+      runs: 18
+  overs: 20
+  player_of_match:
+  - SW Billings
+  players:
+    Sydney Thunder:
+    - CT Bancroft
+    - DA Warner
+    - JJS Sangha
+    - O Davies
+    - SW Billings
+    - SE Rutherford
+    - CJ Green
+    - DR Sams
+    - TD Andrews
+    - LH Ferguson
+    - WA Agar
+    Melbourne Stars:
+    - SB Harper
+    - BM Duckett
+    - MP Stoinis
+    - GJ Maxwell
+    - HWR Cartwright
+    - BJ Webster
+    - J Merlo
+    - Usama Mir
+    - JS Paris
+    - BL Couch
+    - PM Siddle
+  registry:
+    people:
+      BJ Webster: 56b93d46
+      BL Couch: be69e09d
+      BM Duckett: 5f26f677
+      CA Polosak: 26a360d2
+      CJ Green: 19b9f399
+      CT Bancroft: 399b0b94
+      DA Warner: dcce6f09
+      DR Sams: caf69bf7
+      David Johnston: 92cef862
+      GJ Maxwell: b681e71e
+      HWR Cartwright: ab965cad
+      J Merlo: 02ba80a0
+      JJS Sangha: 8e3cb0e9
+      JS Paris: 7c8f533d
+      LH Ferguson: 2f9d0389
+      ME Claydon: 15101f12
+      MP Stoinis: d9273ee7
+      MW Graham-Smith: 18aca3ce
+      O Davies: 0ea54eca
+      PM Siddle: bd93fea4
+      Roberto Howard: eec90c4b
+      SB Harper: a756e61a
+      SE Rutherford: d014d5ac
+      SW Billings: c16d4035
+      TD Andrews: a0f612b6
+      Usama Mir: 6dd8b88c
+      WA Agar: 15de1f5d
+  teams:
+  - Sydney Thunder
+  - Melbourne Stars
+  toss:
+    winner: Melbourne Stars
+    decision: field
+  umpires:
+  - MW Graham-Smith
+  - Roberto Howard
+  venue: Manuka Oval, Canberra
+innings:
+- 1st innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: DA Warner
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 0.2:
+        non_striker: CT Bancroft
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.3:
+        non_striker: CT Bancroft
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 0.4:
+        non_striker: CT Bancroft
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 0.5:
+        non_striker: CT Bancroft
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.6:
+        non_striker: CT Bancroft
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 1.1:
+        non_striker: DA Warner
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 1.2:
+        non_striker: CT Bancroft
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 1.3:
+        non_striker: DA Warner
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 1.4:
+        non_striker: DA Warner
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 1.5:
+        non_striker: CT Bancroft
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 1.6:
+        non_striker: CT Bancroft
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 2.1:
+        non_striker: DA Warner
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 2.2:
+        non_striker: DA Warner
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CT Bancroft
+    - 2.3:
+        non_striker: DA Warner
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 2.4:
+        non_striker: DA Warner
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 2.5:
+        non_striker: DA Warner
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 2.6:
+        non_striker: DA Warner
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 3.1:
+        non_striker: CT Bancroft
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 3.2:
+        non_striker: CT Bancroft
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: DA Warner
+    - 3.3:
+        non_striker: DA Warner
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 3.4:
+        non_striker: DA Warner
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 3.5:
+        non_striker: DA Warner
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: CT Bancroft
+    - 3.6:
+        non_striker: CT Bancroft
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 4.1:
+        non_striker: CT Bancroft
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DA Warner
+    - 4.2:
+        non_striker: CT Bancroft
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 4.3:
+        non_striker: CT Bancroft
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 4.4:
+        non_striker: DA Warner
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 4.5:
+        non_striker: CT Bancroft
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+        wicket:
+          player_out: DA Warner
+          kind: bowled
+    - 4.6:
+        non_striker: CT Bancroft
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJS Sangha
+    - 5.1:
+        non_striker: JJS Sangha
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 5.2:
+        non_striker: CT Bancroft
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 5.3:
+        non_striker: JJS Sangha
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+        wicket:
+          player_out: CT Bancroft
+          kind: bowled
+    - 5.4:
+        non_striker: JJS Sangha
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+        wicket:
+          player_out: O Davies
+          kind: caught and bowled
+    - 5.5:
+        non_striker: JJS Sangha
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 5.6:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 6.1:
+        non_striker: SW Billings
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 6.2:
+        non_striker: JJS Sangha
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 6.3:
+        non_striker: SW Billings
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 6.4:
+        non_striker: JJS Sangha
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 6.5:
+        non_striker: JJS Sangha
+        bowler: BL Couch
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SW Billings
+    - 6.6:
+        non_striker: SW Billings
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 7.1:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJS Sangha
+    - 7.2:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJS Sangha
+    - 7.3:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 7.4:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 7.5:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 7.6:
+        non_striker: JJS Sangha
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 8.1:
+        non_striker: JJS Sangha
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 8.2:
+        non_striker: SW Billings
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 8.3:
+        non_striker: JJS Sangha
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 8.4:
+        non_striker: JJS Sangha
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 8.5:
+        non_striker: SW Billings
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 8.6:
+        non_striker: JJS Sangha
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 9.1:
+        non_striker: JJS Sangha
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 9.2:
+        non_striker: SW Billings
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 9.3:
+        non_striker: SW Billings
+        bowler: BJ Webster
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JJS Sangha
+    - 9.4:
+        non_striker: SW Billings
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJS Sangha
+    - 9.5:
+        non_striker: SW Billings
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 9.6:
+        non_striker: JJS Sangha
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 9.7:
+        non_striker: SW Billings
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJS Sangha
+    - 10.1:
+        non_striker: JJS Sangha
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 10.2:
+        non_striker: SW Billings
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 10.3:
+        non_striker: JJS Sangha
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 10.4:
+        non_striker: SW Billings
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJS Sangha
+    - 10.5:
+        non_striker: SW Billings
+        bowler: JS Paris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JJS Sangha
+    - 10.6:
+        non_striker: JJS Sangha
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 11.1:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JJS Sangha
+    - 11.2:
+        non_striker: JJS Sangha
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 11.3:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJS Sangha
+    - 11.4:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 11.5:
+        non_striker: JJS Sangha
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 11.6:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 12.1:
+        non_striker: SW Billings
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+    - 12.2:
+        non_striker: SW Billings
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJS Sangha
+    - 12.3:
+        non_striker: JJS Sangha
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 12.4:
+        non_striker: JJS Sangha
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SW Billings
+    - 12.5:
+        non_striker: JJS Sangha
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 12.6:
+        non_striker: SW Billings
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JJS Sangha
+    - 12.7:
+        non_striker: SW Billings
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJS Sangha
+        wicket:
+          player_out: JJS Sangha
+          fielders:
+          - GJ Maxwell
+          kind: caught
+    - 13.1:
+        non_striker: SE Rutherford
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 13.2:
+        non_striker: SE Rutherford
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 13.3:
+        non_striker: SE Rutherford
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 13.4:
+        non_striker: SE Rutherford
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 13.5:
+        non_striker: SE Rutherford
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 13.6:
+        non_striker: SE Rutherford
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 14.1:
+        non_striker: SE Rutherford
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 14.2:
+        non_striker: SE Rutherford
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 14.3:
+        non_striker: SE Rutherford
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 14.4:
+        non_striker: SW Billings
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Rutherford
+    - 14.5:
+        non_striker: SW Billings
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 14.6:
+        non_striker: SE Rutherford
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 15.1:
+        non_striker: SW Billings
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Rutherford
+    - 15.2:
+        non_striker: SE Rutherford
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 15.3:
+        non_striker: SE Rutherford
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 15.4:
+        non_striker: SE Rutherford
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 15.5:
+        non_striker: SW Billings
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Rutherford
+        wicket:
+          player_out: SE Rutherford
+          fielders:
+          - SB Harper
+          kind: caught
+    - 15.6:
+        non_striker: SW Billings
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Green
+    - 16.1:
+        non_striker: CJ Green
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SW Billings
+    - 16.2:
+        non_striker: CJ Green
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 16.3:
+        non_striker: SW Billings
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Green
+    - 16.4:
+        non_striker: SW Billings
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+        wicket:
+          player_out: CJ Green
+          fielders:
+          - HWR Cartwright
+          kind: caught
+    - 16.5:
+        non_striker: SW Billings
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Sams
+    - 16.6:
+        non_striker: DR Sams
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 17.1:
+        non_striker: DR Sams
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 17.2:
+        non_striker: DR Sams
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 17.3:
+        non_striker: DR Sams
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 17.4:
+        non_striker: DR Sams
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SW Billings
+    - 17.5:
+        non_striker: DR Sams
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+        wicket:
+          player_out: SW Billings
+          kind: bowled
+    - 17.6:
+        non_striker: DR Sams
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TD Andrews
+    - 17.7:
+        non_striker: DR Sams
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TD Andrews
+    - 18.1:
+        non_striker: TD Andrews
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DR Sams
+    - 18.2:
+        non_striker: TD Andrews
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DR Sams
+    - 18.3:
+        non_striker: TD Andrews
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+    - 18.4:
+        non_striker: TD Andrews
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Sams
+    - 18.5:
+        non_striker: DR Sams
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TD Andrews
+    - 18.6:
+        non_striker: DR Sams
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TD Andrews
+    - 19.1:
+        non_striker: TD Andrews
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DR Sams
+    - 19.2:
+        non_striker: TD Andrews
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+    - 19.3:
+        non_striker: TD Andrews
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+        wicket:
+          player_out: DR Sams
+          kind: bowled
+    - 19.4:
+        non_striker: TD Andrews
+        bowler: BJ Webster
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: LH Ferguson
+    - 19.5:
+        non_striker: TD Andrews
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: LH Ferguson
+    - 19.6:
+        non_striker: TD Andrews
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: LH Ferguson
+    - 19.7:
+        non_striker: LH Ferguson
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: TD Andrews
+- 2nd innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: BM Duckett
+        bowler: LH Ferguson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SB Harper
+    - 0.2:
+        non_striker: BM Duckett
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 0.3:
+        non_striker: BM Duckett
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 0.4:
+        non_striker: BM Duckett
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          fielders:
+          - DA Warner
+          kind: caught
+    - 0.5:
+        non_striker: BM Duckett
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 0.6:
+        non_striker: BM Duckett
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 0.7:
+        non_striker: BM Duckett
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MP Stoinis
+    - 1.1:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 1.2:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 1.3:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 1.4:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 1.5:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 1.6:
+        non_striker: BM Duckett
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 2.1:
+        non_striker: MP Stoinis
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 2.2:
+        non_striker: MP Stoinis
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 2.3:
+        non_striker: MP Stoinis
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 2.4:
+        non_striker: MP Stoinis
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 2.5:
+        non_striker: MP Stoinis
+        bowler: LH Ferguson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: BM Duckett
+    - 2.6:
+        non_striker: MP Stoinis
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 2.7:
+        non_striker: MP Stoinis
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 3.1:
+        non_striker: MP Stoinis
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 3.2:
+        non_striker: MP Stoinis
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 3.3:
+        non_striker: MP Stoinis
+        bowler: DR Sams
+        runs:
+          extras: 5
+          total: 5
+          batsman: 0
+        extras:
+          wides: 5
+        batsman: BM Duckett
+    - 3.4:
+        non_striker: MP Stoinis
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BM Duckett
+    - 3.5:
+        non_striker: MP Stoinis
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 3.6:
+        non_striker: BM Duckett
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 3.7:
+        non_striker: MP Stoinis
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 4.1:
+        non_striker: MP Stoinis
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 4.2:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 4.3:
+        non_striker: MP Stoinis
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 4.4:
+        non_striker: MP Stoinis
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 4.5:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MP Stoinis
+    - 4.6:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 5.1:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 5.2:
+        non_striker: BM Duckett
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 5.3:
+        non_striker: BM Duckett
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 5.4:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 5.5:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 5.6:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 6.1:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MP Stoinis
+    - 6.2:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 6.3:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MP Stoinis
+    - 6.4:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 6.5:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BM Duckett
+    - 6.6:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 7.1:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MP Stoinis
+    - 7.2:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 7.3:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+        wicket:
+          player_out: MP Stoinis
+          fielders:
+          - LH Ferguson
+          kind: caught
+    - 7.4:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 7.5:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 7.6:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 8.1:
+        non_striker: BM Duckett
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GJ Maxwell
+    - 8.2:
+        non_striker: BM Duckett
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+        wicket:
+          player_out: GJ Maxwell
+          fielders:
+          - WA Agar
+          kind: caught
+    - 8.3:
+        non_striker: BM Duckett
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HWR Cartwright
+    - 8.4:
+        non_striker: BM Duckett
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 8.5:
+        non_striker: HWR Cartwright
+        bowler: JJS Sangha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BM Duckett
+    - 8.6:
+        non_striker: HWR Cartwright
+        bowler: O Davies
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        replacements:
+          role:
+          - in: O Davies
+            out: JJS Sangha
+            reason: injury
+            role: bowler
+        batsman: BM Duckett
+    - 9.1:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 9.2:
+        non_striker: HWR Cartwright
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 9.3:
+        non_striker: HWR Cartwright
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 9.4:
+        non_striker: HWR Cartwright
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 9.5:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HWR Cartwright
+    - 9.6:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HWR Cartwright
+    - 10.1:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BM Duckett
+    - 10.2:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 10.3:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 10.4:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 10.5:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 10.6:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 11.1:
+        non_striker: BM Duckett
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 11.2:
+        non_striker: HWR Cartwright
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 11.3:
+        non_striker: BM Duckett
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 11.4:
+        non_striker: HWR Cartwright
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 11.5:
+        non_striker: BM Duckett
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 11.6:
+        non_striker: HWR Cartwright
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 12.1:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 12.2:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 12.3:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+        wicket:
+          player_out: HWR Cartwright
+          kind: bowled
+    - 12.4:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 12.5:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 12.6:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 13.1:
+        non_striker: BJ Webster
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+    - 13.2:
+        non_striker: BJ Webster
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 13.3:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 13.4:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 13.5:
+        non_striker: BJ Webster
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 13.6:
+        non_striker: BM Duckett
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 14.1:
+        non_striker: BJ Webster
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 14.2:
+        non_striker: BM Duckett
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 14.3:
+        non_striker: BJ Webster
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 14.4:
+        non_striker: BJ Webster
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BM Duckett
+    - 14.5:
+        non_striker: BJ Webster
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BM Duckett
+    - 14.6:
+        non_striker: BJ Webster
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BM Duckett
+    - 15.1:
+        non_striker: BJ Webster
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BM Duckett
+    - 15.2:
+        non_striker: BJ Webster
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+        wicket:
+          player_out: BM Duckett
+          fielders:
+          - SW Billings
+          kind: caught
+    - 15.3:
+        non_striker: BJ Webster
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Merlo
+    - 15.4:
+        non_striker: J Merlo
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 15.5:
+        non_striker: J Merlo
+        bowler: DR Sams
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: BJ Webster
+    - 15.6:
+        non_striker: BJ Webster
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Merlo
+    - 16.1:
+        non_striker: BJ Webster
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Merlo
+    - 16.2:
+        non_striker: J Merlo
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BJ Webster
+    - 16.3:
+        non_striker: J Merlo
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 16.4:
+        non_striker: J Merlo
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 16.5:
+        non_striker: J Merlo
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 16.6:
+        non_striker: J Merlo
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: BJ Webster
+    - 17.1:
+        non_striker: J Merlo
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 17.2:
+        non_striker: BJ Webster
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Merlo
+        wicket:
+          player_out: J Merlo
+          fielders:
+          - SW Billings
+          kind: caught
+    - 17.3:
+        non_striker: BJ Webster
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Usama Mir
+    - 17.4:
+        non_striker: BJ Webster
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Usama Mir
+        wicket:
+          player_out: Usama Mir
+          fielders:
+          - SW Billings
+          kind: caught
+    - 17.5:
+        non_striker: BJ Webster
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JS Paris
+    - 17.6:
+        non_striker: JS Paris
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+        wicket:
+          player_out: BJ Webster
+          fielders:
+          - SW Billings
+          kind: caught
+    - 18.1:
+        non_striker: BL Couch
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JS Paris
+    - 18.2:
+        non_striker: JS Paris
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BL Couch
+    - 18.3:
+        non_striker: JS Paris
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BL Couch
+    - 18.4:
+        non_striker: JS Paris
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BL Couch
+    - 18.5:
+        non_striker: JS Paris
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BL Couch
+    - 18.6:
+        non_striker: BL Couch
+        bowler: LH Ferguson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JS Paris
+    - 19.1:
+        non_striker: JS Paris
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BL Couch
+    - 19.2:
+        non_striker: BL Couch
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JS Paris
+    - 19.3:
+        non_striker: JS Paris
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BL Couch
+    - 19.4:
+        non_striker: JS Paris
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BL Couch
+    - 19.5:
+        non_striker: JS Paris
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BL Couch
+    - 19.6:
+        non_striker: JS Paris
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BL Couch

@@ -1,0 +1,429 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-12-11'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Geelong
+  competition: Big Bash League
+  dates:
+  - '2023-12-10'
+  gender: male
+  match_type: T20
+  outcome:
+    result: no result
+  overs: 20
+  players:
+    Perth Scorchers:
+    - SS Eskinazi
+    - C Connolly
+    - AM Hardie
+    - JP Inglis
+    - AJ Turner
+    - LJ Evans
+    - NR Hobson
+    - JA Richardson
+    - AJ Tye
+    - H McKenzie
+    - JP Behrendorff
+    Melbourne Renegades:
+    - Q de Kock
+    - JM Clarke
+    - J Fraser-McGurk
+    - NJ Maddinson
+    - AJ Finch
+    - JW Wells
+    - W Sutherland
+    - TS Rogers
+    - KW Richardson
+    - PM Siddle
+    - Mujeeb Ur Rahman
+  registry:
+    people:
+      AJ Finch: b8d490fd
+      AJ Turner: ff1e12a0
+      AJ Tye: 7c7d63a2
+      AM Hardie: d405c0d5
+      BC Treloar: f7e8ee52
+      C Connolly: fe366f34
+      C Grant: 876ed858
+      H McKenzie: 5222f5fa
+      J Fraser-McGurk: 9b6e1b3f
+      JA Richardson: 1ee08e9a
+      JM Clarke: 2eca67f5
+      JP Behrendorff: 4933f499
+      JP Inglis: 989889ff
+      JW Wells: 8bdac857
+      KW Richardson: dfc4d8b5
+      Kent Hannam: 8cc171e7
+      LJ Evans: 1c513d54
+      Mujeeb Ur Rahman: 7d92277a
+      NJ Maddinson: 44afbf2d
+      NR Hobson: 4312e0fd
+      PM Siddle: bd93fea4
+      Q de Kock: 372455c4
+      SA Lightbody: 680b8cbf
+      SS Eskinazi: 75cbed9b
+      TS Rogers: 1b04e02b
+      W Sutherland: bc2d4f2e
+  teams:
+  - Perth Scorchers
+  - Melbourne Renegades
+  toss:
+    winner: Melbourne Renegades
+    decision: field
+  umpires:
+  - BC Treloar
+  - SA Lightbody
+  venue: GMHBA Stadium, South Geelong, Victoria
+innings:
+- 1st innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 0.2:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+        wicket:
+          player_out: SS Eskinazi
+          kind: lbw
+    - 0.3:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 0.4:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AM Hardie
+    - 0.5:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 0.6:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 0.7:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 1.1:
+        non_striker: AM Hardie
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 1.2:
+        non_striker: AM Hardie
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 1.3:
+        non_striker: AM Hardie
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 1.4:
+        non_striker: AM Hardie
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 1.5:
+        non_striker: AM Hardie
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 1.6:
+        non_striker: C Connolly
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 2.1:
+        non_striker: AM Hardie
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 2.2:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 2.3:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 2.4:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 2.5:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 2.6:
+        non_striker: C Connolly
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 3.1:
+        non_striker: C Connolly
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 3.2:
+        non_striker: C Connolly
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 3.3:
+        non_striker: C Connolly
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 3.4:
+        non_striker: C Connolly
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 3.5:
+        non_striker: C Connolly
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 3.6:
+        non_striker: AM Hardie
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 4.1:
+        non_striker: C Connolly
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 4.2:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Connolly
+    - 4.3:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+        wicket:
+          player_out: C Connolly
+          fielders:
+          - Q de Kock
+          kind: caught
+    - 4.4:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Inglis
+    - 4.5:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 4.6:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 5.1:
+        non_striker: JP Inglis
+        bowler: Mujeeb Ur Rahman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 5.2:
+        non_striker: JP Inglis
+        bowler: Mujeeb Ur Rahman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 5.3:
+        non_striker: JP Inglis
+        bowler: Mujeeb Ur Rahman
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 5.4:
+        non_striker: JP Inglis
+        bowler: Mujeeb Ur Rahman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 5.5:
+        non_striker: JP Inglis
+        bowler: Mujeeb Ur Rahman
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 5.6:
+        non_striker: JP Inglis
+        bowler: Mujeeb Ur Rahman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 6.1:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 6.2:
+        non_striker: JP Inglis
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.3:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 6.4:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 6.5:
+        non_striker: AM Hardie
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis

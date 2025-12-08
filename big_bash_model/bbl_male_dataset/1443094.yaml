@@ -1,0 +1,2057 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-18'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Melbourne
+  competition: Big Bash League
+  dates:
+  - '2025-01-18'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Melbourne Renegades
+    by:
+      wickets: 3
+  overs: 20
+  player_of_match:
+  - J Fraser-McGurk
+  players:
+    Brisbane Heat:
+    - NA McSweeney
+    - JP Wood
+    - MT Renshaw
+    - DR Drew
+    - TP Alsop
+    - M Bryant
+    - PI Walter
+    - MG Neser
+    - XC Bartlett
+    - SH Johnson
+    - MJ Swepson
+    Melbourne Renegades:
+    - TS Muyeye
+    - Josh Brown
+    - J Fraser-McGurk
+    - OJ Peake
+    - TL Seifert
+    - HT Dixon
+    - W Sutherland
+    - TS Rogers
+    - F O'Neill
+    - A Zampa
+    - C Stow
+  registry:
+    people:
+      A Zampa: 14f96089
+      BC Treloar: f7e8ee52
+      C Grant: 876ed858
+      C Stow: 3f9ec1d2
+      DM Koch: 6d10c034
+      DR Drew: 88684a42
+      F O'Neill: 39d608d4
+      HT Dixon: ecbad6c6
+      J Fraser-McGurk: 9b6e1b3f
+      JP Wood: 3c3adfce
+      Josh Brown: 647e7d44
+      M Bryant: f32012f4
+      MG Neser: 0164b064
+      MJ Swepson: 86b4bf88
+      MT Renshaw: 218d4d78
+      NA McSweeney: e94d2d50
+      OJ Peake: 9c8448ba
+      PI Walter: 57590dbb
+      RL Parry: 86d151dc
+      SAJ Craig: 689f2eed
+      SH Johnson: 83c3e8e3
+      TL Seifert: 4663bd23
+      TP Alsop: 961b8ff1
+      TS Muyeye: 10b79140
+      TS Rogers: 1b04e02b
+      W Sutherland: bc2d4f2e
+      XC Bartlett: 3b53243a
+  teams:
+  - Brisbane Heat
+  - Melbourne Renegades
+  toss:
+    winner: Melbourne Renegades
+    decision: field
+  umpires:
+  - BC Treloar
+  - DM Koch
+  venue: Docklands Stadium, Melbourne
+innings:
+- 1st innings:
+    team: Brisbane Heat
+    deliveries:
+    - 0.1:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 0.2:
+        non_striker: NA McSweeney
+        bowler: TS Rogers
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JP Wood
+    - 0.3:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 0.4:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 0.5:
+        non_striker: NA McSweeney
+        bowler: TS Rogers
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JP Wood
+    - 0.6:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: NA McSweeney
+    - 1.1:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 1.2:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 1.3:
+        non_striker: NA McSweeney
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 1.4:
+        non_striker: NA McSweeney
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 1.5:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NA McSweeney
+    - 1.6:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 1.7:
+        non_striker: NA McSweeney
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 2.1:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 2.2:
+        non_striker: NA McSweeney
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JP Wood
+    - 2.3:
+        non_striker: NA McSweeney
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JP Wood
+    - 2.4:
+        non_striker: NA McSweeney
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JP Wood
+    - 2.5:
+        non_striker: NA McSweeney
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 2.6:
+        non_striker: NA McSweeney
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 3.1:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 3.2:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 3.3:
+        non_striker: NA McSweeney
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 3.4:
+        non_striker: NA McSweeney
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 3.5:
+        non_striker: NA McSweeney
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 3.6:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 4.1:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 4.2:
+        non_striker: NA McSweeney
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 4.3:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 4.4:
+        non_striker: NA McSweeney
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 4.5:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 4.6:
+        non_striker: NA McSweeney
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 5.1:
+        non_striker: JP Wood
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 5.2:
+        non_striker: JP Wood
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 5.3:
+        non_striker: JP Wood
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 5.4:
+        non_striker: NA McSweeney
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 5.5:
+        non_striker: JP Wood
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 5.6:
+        non_striker: JP Wood
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: NA McSweeney
+    - 6.1:
+        non_striker: NA McSweeney
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 6.2:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 6.3:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 6.4:
+        non_striker: NA McSweeney
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 6.5:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NA McSweeney
+    - 6.6:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NA McSweeney
+    - 6.7:
+        non_striker: JP Wood
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 7.1:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 7.2:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 3
+          total: 3
+          batsman: 0
+        extras:
+          wides: 3
+        batsman: NA McSweeney
+    - 7.3:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 7.4:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+        wicket:
+          player_out: NA McSweeney
+          kind: bowled
+    - 7.5:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 7.6:
+        non_striker: JP Wood
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 7.7:
+        non_striker: MT Renshaw
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Wood
+    - 8.1:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 8.2:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 8.3:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 8.4:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 8.5:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 8.6:
+        non_striker: MT Renshaw
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 9.1:
+        non_striker: MT Renshaw
+        bowler: Josh Brown
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          wides: 4
+        batsman: JP Wood
+    - 9.2:
+        non_striker: JP Wood
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 9.3:
+        non_striker: JP Wood
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 9.4:
+        non_striker: MT Renshaw
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Wood
+    - 9.5:
+        non_striker: MT Renshaw
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Wood
+    - 9.6:
+        non_striker: MT Renshaw
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JP Wood
+    - 9.7:
+        non_striker: MT Renshaw
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Wood
+    - 10.1:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 10.2:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 10.3:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 10.4:
+        non_striker: MT Renshaw
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 10.5:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 10.6:
+        non_striker: JP Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 11.1:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 11.2:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 11.3:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 11.4:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 11.5:
+        non_striker: JP Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 11.6:
+        non_striker: JP Wood
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        replacements:
+          role:
+          - in: Josh Brown
+            out: W Sutherland
+            reason: excluded - running on the pitch
+            role: bowler
+        batsman: MT Renshaw
+    - 12.1:
+        non_striker: MT Renshaw
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+        wicket:
+          player_out: JP Wood
+          fielders:
+          - J Fraser-McGurk
+          kind: caught
+    - 12.2:
+        non_striker: MT Renshaw
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Drew
+    - 12.3:
+        non_striker: DR Drew
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 12.4:
+        non_striker: MT Renshaw
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Drew
+    - 12.5:
+        non_striker: DR Drew
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+        wicket:
+          player_out: MT Renshaw
+          fielders:
+          - TS Rogers
+          kind: caught
+    - 12.6:
+        non_striker: DR Drew
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 13.1:
+        non_striker: DR Drew
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 13.2:
+        non_striker: DR Drew
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 13.3:
+        non_striker: DR Drew
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 13.4:
+        non_striker: TP Alsop
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DR Drew
+    - 13.5:
+        non_striker: TP Alsop
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Drew
+    - 13.6:
+        non_striker: DR Drew
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 14.1:
+        non_striker: DR Drew
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 14.2:
+        non_striker: DR Drew
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 14.3:
+        non_striker: TP Alsop
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Drew
+    - 14.4:
+        non_striker: TP Alsop
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Drew
+    - 14.5:
+        non_striker: TP Alsop
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Drew
+    - 14.6:
+        non_striker: DR Drew
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TP Alsop
+    - 15.1:
+        non_striker: TP Alsop
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Drew
+    - 15.2:
+        non_striker: DR Drew
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TP Alsop
+    - 15.3:
+        non_striker: DR Drew
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 15.4:
+        non_striker: TP Alsop
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        replacements:
+          role:
+          - in: Josh Brown
+            out: F O'Neill
+            reason: excluded - running on the pitch
+            role: bowler
+        batsman: DR Drew
+    - 15.5:
+        non_striker: DR Drew
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TP Alsop
+    - 15.6:
+        non_striker: DR Drew
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 16.1:
+        non_striker: DR Drew
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 16.2:
+        non_striker: TP Alsop
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Drew
+    - 16.3:
+        non_striker: TP Alsop
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DR Drew
+    - 16.4:
+        non_striker: TP Alsop
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DR Drew
+    - 16.5:
+        non_striker: TP Alsop
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Drew
+    - 16.6:
+        non_striker: TP Alsop
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Drew
+        wicket:
+          player_out: DR Drew
+          fielders:
+          - TL Seifert
+          kind: stumped
+    - 17.1:
+        non_striker: M Bryant
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TP Alsop
+    - 17.2:
+        non_striker: M Bryant
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 17.3:
+        non_striker: M Bryant
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 17.4:
+        non_striker: TP Alsop
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Bryant
+    - 17.5:
+        non_striker: TP Alsop
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 17.6:
+        non_striker: M Bryant
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 18.1:
+        non_striker: M Bryant
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 18.2:
+        non_striker: M Bryant
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TP Alsop
+    - 18.3:
+        non_striker: M Bryant
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 18.4:
+        non_striker: M Bryant
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 18.5:
+        non_striker: M Bryant
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TP Alsop
+    - 18.6:
+        non_striker: M Bryant
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 19.1:
+        non_striker: M Bryant
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TP Alsop
+    - 19.2:
+        non_striker: M Bryant
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 19.3:
+        non_striker: TP Alsop
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Bryant
+    - 19.4:
+        non_striker: TP Alsop
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Bryant
+    - 19.5:
+        non_striker: TP Alsop
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 19.6:
+        non_striker: M Bryant
+        bowler: Josh Brown
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: TP Alsop
+- 2nd innings:
+    team: Melbourne Renegades
+    deliveries:
+    - 0.1:
+        non_striker: Josh Brown
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Muyeye
+    - 0.2:
+        non_striker: Josh Brown
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Muyeye
+    - 0.3:
+        non_striker: Josh Brown
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Muyeye
+    - 0.4:
+        non_striker: TS Muyeye
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Josh Brown
+    - 0.5:
+        non_striker: Josh Brown
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Muyeye
+    - 0.6:
+        non_striker: TS Muyeye
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Josh Brown
+    - 1.1:
+        non_striker: Josh Brown
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Muyeye
+    - 1.2:
+        non_striker: Josh Brown
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Muyeye
+    - 1.3:
+        non_striker: TS Muyeye
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Josh Brown
+    - 1.4:
+        non_striker: TS Muyeye
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Josh Brown
+    - 1.5:
+        non_striker: TS Muyeye
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Josh Brown
+    - 1.6:
+        non_striker: TS Muyeye
+        bowler: SH Johnson
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          byes: 4
+        batsman: Josh Brown
+    - 2.1:
+        non_striker: Josh Brown
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Muyeye
+        wicket:
+          player_out: TS Muyeye
+          fielders:
+          - PI Walter
+          kind: caught
+    - 2.2:
+        non_striker: Josh Brown
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 2.3:
+        non_striker: Josh Brown
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Fraser-McGurk
+    - 2.4:
+        non_striker: Josh Brown
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 2.5:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Josh Brown
+    - 2.6:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Josh Brown
+    - 2.7:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Josh Brown
+    - 3.1:
+        non_striker: J Fraser-McGurk
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Josh Brown
+    - 3.2:
+        non_striker: J Fraser-McGurk
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Josh Brown
+    - 3.3:
+        non_striker: J Fraser-McGurk
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Josh Brown
+        wicket:
+          player_out: Josh Brown
+          fielders:
+          - NA McSweeney
+          kind: caught
+    - 3.4:
+        non_striker: J Fraser-McGurk
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Peake
+    - 3.5:
+        non_striker: J Fraser-McGurk
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Peake
+    - 3.6:
+        non_striker: J Fraser-McGurk
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Peake
+    - 4.1:
+        non_striker: OJ Peake
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 4.2:
+        non_striker: OJ Peake
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 4.3:
+        non_striker: OJ Peake
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 4.4:
+        non_striker: J Fraser-McGurk
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 4.5:
+        non_striker: OJ Peake
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 4.6:
+        non_striker: J Fraser-McGurk
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 5.1:
+        non_striker: J Fraser-McGurk
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 5.2:
+        non_striker: OJ Peake
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 5.3:
+        non_striker: OJ Peake
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 5.4:
+        non_striker: OJ Peake
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 5.5:
+        non_striker: J Fraser-McGurk
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          non_boundary: 1
+          total: 4
+          batsman: 4
+        batsman: OJ Peake
+    - 5.6:
+        non_striker: J Fraser-McGurk
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 6.1:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 6.2:
+        non_striker: OJ Peake
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 6.3:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 6.4:
+        non_striker: OJ Peake
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 6.5:
+        non_striker: OJ Peake
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Fraser-McGurk
+    - 6.6:
+        non_striker: OJ Peake
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 7.1:
+        non_striker: OJ Peake
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Fraser-McGurk
+    - 7.2:
+        non_striker: OJ Peake
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Fraser-McGurk
+    - 7.3:
+        non_striker: OJ Peake
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 7.4:
+        non_striker: J Fraser-McGurk
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Peake
+    - 7.5:
+        non_striker: J Fraser-McGurk
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 7.6:
+        non_striker: OJ Peake
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 8.1:
+        non_striker: OJ Peake
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Fraser-McGurk
+    - 8.2:
+        non_striker: OJ Peake
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 8.3:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Peake
+    - 8.4:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 8.5:
+        non_striker: OJ Peake
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Fraser-McGurk
+    - 8.6:
+        non_striker: OJ Peake
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Fraser-McGurk
+    - 9.1:
+        non_striker: J Fraser-McGurk
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Peake
+    - 9.2:
+        non_striker: J Fraser-McGurk
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 9.3:
+        non_striker: OJ Peake
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 9.4:
+        non_striker: J Fraser-McGurk
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 9.5:
+        non_striker: OJ Peake
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 9.6:
+        non_striker: OJ Peake
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Fraser-McGurk
+    - 10.1:
+        non_striker: J Fraser-McGurk
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: OJ Peake
+    - 10.2:
+        non_striker: J Fraser-McGurk
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Peake
+    - 10.3:
+        non_striker: OJ Peake
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Fraser-McGurk
+    - 10.4:
+        non_striker: OJ Peake
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Fraser-McGurk
+    - 10.5:
+        non_striker: OJ Peake
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 10.6:
+        non_striker: OJ Peake
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Fraser-McGurk
+    - 11.1:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Peake
+    - 11.2:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Peake
+        wicket:
+          player_out: OJ Peake
+          kind: bowled
+    - 11.3:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TL Seifert
+        wicket:
+          player_out: TL Seifert
+          kind: bowled
+    - 11.4:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HT Dixon
+    - 11.5:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: HT Dixon
+    - 11.6:
+        non_striker: HT Dixon
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 12.1:
+        non_striker: J Fraser-McGurk
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HT Dixon
+    - 12.2:
+        non_striker: J Fraser-McGurk
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HT Dixon
+    - 12.3:
+        non_striker: HT Dixon
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 12.4:
+        non_striker: HT Dixon
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 12.5:
+        non_striker: HT Dixon
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 12.6:
+        non_striker: HT Dixon
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 13.1:
+        non_striker: HT Dixon
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Fraser-McGurk
+    - 13.2:
+        non_striker: HT Dixon
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 13.3:
+        non_striker: J Fraser-McGurk
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HT Dixon
+    - 13.4:
+        non_striker: J Fraser-McGurk
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: HT Dixon
+    - 13.5:
+        non_striker: J Fraser-McGurk
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HT Dixon
+    - 13.6:
+        non_striker: HT Dixon
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 14.1:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HT Dixon
+    - 14.2:
+        non_striker: HT Dixon
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 7
+          batsman: 6
+        extras:
+          noballs: 1
+        batsman: J Fraser-McGurk
+    - 14.3:
+        non_striker: HT Dixon
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 14.4:
+        non_striker: HT Dixon
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 14.5:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HT Dixon
+        wicket:
+          player_out: HT Dixon
+          fielders:
+          - MT Renshaw
+          kind: caught
+    - 14.6:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: W Sutherland
+    - 14.7:
+        non_striker: J Fraser-McGurk
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 15.1:
+        non_striker: W Sutherland
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 15.2:
+        non_striker: W Sutherland
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 15.3:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: W Sutherland
+    - 15.4:
+        non_striker: W Sutherland
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 15.5:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 15.6:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: W Sutherland
+    - 15.7:
+        non_striker: J Fraser-McGurk
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: W Sutherland
+    - 16.1:
+        non_striker: W Sutherland
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 16.2:
+        non_striker: W Sutherland
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 16.3:
+        non_striker: W Sutherland
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+        wicket:
+          player_out: J Fraser-McGurk
+          fielders:
+          - MT Renshaw
+          kind: caught
+    - 16.4:
+        non_striker: W Sutherland
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 16.5:
+        non_striker: TS Rogers
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+        wicket:
+          player_out: W Sutherland
+          fielders:
+          - XC Bartlett
+          kind: caught
+    - 16.6:
+        non_striker: TS Rogers
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: F O'Neill
+    - 17.1:
+        non_striker: TS Rogers
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: F O'Neill
+    - 17.2:
+        non_striker: TS Rogers
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: F O'Neill
+    - 17.3:
+        non_striker: TS Rogers
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: F O'Neill
+    - 17.4:
+        non_striker: F O'Neill
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 17.5:
+        non_striker: TS Rogers
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: F O'Neill
+    - 17.6:
+        non_striker: TS Rogers
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: F O'Neill

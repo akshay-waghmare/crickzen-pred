@@ -1,0 +1,2168 @@
+---
+meta:
+  data_version: 0.92
+  created: '2024-01-05'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Perth
+  competition: Big Bash League
+  dates:
+  - '2024-01-03'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Perth Scorchers
+    by:
+      runs: 42
+  overs: 20
+  player_of_match:
+  - LJ Evans
+  players:
+    Perth Scorchers:
+    - Z Crawley
+    - SM Whiteman
+    - AM Hardie
+    - JP Inglis
+    - LJ Evans
+    - C Connolly
+    - AC Agar
+    - JA Richardson
+    - AJ Tye
+    - JP Behrendorff
+    - LR Morris
+    Adelaide Strikers:
+    - MW Short
+    - DJM Short
+    - CA Lynn
+    - AJ Hose
+    - T Kelly
+    - J Overton
+    - JJ Bazley
+    - HJ Nielsen
+    - HTRY Thornton
+    - DA Payne
+    - CJ Boyce
+  registry:
+    people:
+      AC Agar: a2421394
+      AJ Hose: 104e88a4
+      AJ Tye: 7c7d63a2
+      AM Hardie: d405c0d5
+      Ahmad Khan: a63ceba6
+      BC Treloar: f7e8ee52
+      C Connolly: fe366f34
+      CA Lynn: 45eda7c8
+      CJ Boyce: 51a60c16
+      DA Payne: 6c79c098
+      DJM Short: 1a156c88
+      GA Abood: a4af5528
+      HJ Nielsen: 0ea1455a
+      HTRY Thornton: 055be93a
+      J Overton: 59559bc2
+      JA Richardson: 1ee08e9a
+      JJ Bazley: 003d49e6
+      JP Behrendorff: 4933f499
+      JP Inglis: 989889ff
+      LJ Evans: 1c513d54
+      LR Morris: b08e58e2
+      MW Short: a90e53ec
+      NR Johnstone: ce274b6a
+      SD Fry: 6b725ed1
+      SM Whiteman: f4427cc6
+      T Kelly: 6ceb94d0
+      Z Crawley: 922e1b19
+  teams:
+  - Perth Scorchers
+  - Adelaide Strikers
+  toss:
+    winner: Adelaide Strikers
+    decision: field
+  umpires:
+  - BC Treloar
+  - GA Abood
+  venue: Perth Stadium
+innings:
+- 1st innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: SM Whiteman
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 0.2:
+        non_striker: SM Whiteman
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Z Crawley
+    - 0.3:
+        non_striker: SM Whiteman
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 0.4:
+        non_striker: Z Crawley
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SM Whiteman
+    - 0.5:
+        non_striker: SM Whiteman
+        bowler: DA Payne
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: Z Crawley
+    - 0.6:
+        non_striker: Z Crawley
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SM Whiteman
+    - 1.1:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SM Whiteman
+    - 1.2:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SM Whiteman
+    - 1.3:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 1.4:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 1.5:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SM Whiteman
+    - 1.6:
+        non_striker: SM Whiteman
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: Z Crawley
+    - 2.1:
+        non_striker: SM Whiteman
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 2.2:
+        non_striker: Z Crawley
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SM Whiteman
+    - 2.3:
+        non_striker: SM Whiteman
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 2.4:
+        non_striker: Z Crawley
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 2.5:
+        non_striker: Z Crawley
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SM Whiteman
+    - 2.6:
+        non_striker: Z Crawley
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 3.1:
+        non_striker: SM Whiteman
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 3.2:
+        non_striker: Z Crawley
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SM Whiteman
+    - 3.3:
+        non_striker: SM Whiteman
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 3.4:
+        non_striker: Z Crawley
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 3.5:
+        non_striker: Z Crawley
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 3.6:
+        non_striker: Z Crawley
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SM Whiteman
+    - 4.1:
+        non_striker: SM Whiteman
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 4.2:
+        non_striker: SM Whiteman
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Z Crawley
+    - 4.3:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SM Whiteman
+    - 4.4:
+        non_striker: Z Crawley
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SM Whiteman
+    - 4.5:
+        non_striker: SM Whiteman
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+    - 4.6:
+        non_striker: SM Whiteman
+        bowler: HTRY Thornton
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: Z Crawley
+    - 4.7:
+        non_striker: SM Whiteman
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Z Crawley
+        wicket:
+          player_out: Z Crawley
+          fielders:
+          - T Kelly
+          kind: caught
+    - 5.1:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SM Whiteman
+    - 5.2:
+        non_striker: SM Whiteman
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 5.3:
+        non_striker: SM Whiteman
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 5.4:
+        non_striker: SM Whiteman
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 5.5:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 5.6:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 6.1:
+        non_striker: SM Whiteman
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 6.2:
+        non_striker: SM Whiteman
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.3:
+        non_striker: AM Hardie
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SM Whiteman
+    - 6.4:
+        non_striker: AM Hardie
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+        wicket:
+          player_out: SM Whiteman
+          fielders:
+          - HJ Nielsen
+          kind: caught
+    - 6.5:
+        non_striker: AM Hardie
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 6.6:
+        non_striker: AM Hardie
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 7.1:
+        non_striker: JP Inglis
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 7.2:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 7.3:
+        non_striker: JP Inglis
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 7.4:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Inglis
+    - 7.5:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 7.6:
+        non_striker: JP Inglis
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 8.1:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 8.2:
+        non_striker: JP Inglis
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.3:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 8.4:
+        non_striker: JP Inglis
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 8.5:
+        non_striker: JP Inglis
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 8.6:
+        non_striker: JP Inglis
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 9.1:
+        non_striker: JP Inglis
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 9.2:
+        non_striker: JP Inglis
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 9.3:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Inglis
+    - 9.4:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 9.5:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 9.6:
+        non_striker: JP Inglis
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 10.1:
+        non_striker: AM Hardie
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Inglis
+    - 10.2:
+        non_striker: AM Hardie
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 10.3:
+        non_striker: JP Inglis
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 10.4:
+        non_striker: JP Inglis
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 10.5:
+        non_striker: JP Inglis
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 10.6:
+        non_striker: AM Hardie
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Inglis
+    - 11.1:
+        non_striker: JP Inglis
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 11.2:
+        non_striker: AM Hardie
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Inglis
+    - 11.3:
+        non_striker: AM Hardie
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 11.4:
+        non_striker: JP Inglis
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 11.5:
+        non_striker: AM Hardie
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 11.6:
+        non_striker: AM Hardie
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 12.1:
+        non_striker: AM Hardie
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Inglis
+    - 12.2:
+        non_striker: AM Hardie
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+        wicket:
+          player_out: JP Inglis
+          fielders:
+          - AJ Hose
+          kind: caught
+    - 12.3:
+        non_striker: AM Hardie
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: LJ Evans
+    - 12.4:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 12.5:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 12.6:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AM Hardie
+    - 12.7:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 13.1:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: LJ Evans
+    - 13.2:
+        non_striker: LJ Evans
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 13.3:
+        non_striker: LJ Evans
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 13.4:
+        non_striker: LJ Evans
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 13.5:
+        non_striker: AM Hardie
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: LJ Evans
+    - 13.6:
+        non_striker: LJ Evans
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 14.1:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 14.2:
+        non_striker: AM Hardie
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: LJ Evans
+    - 14.3:
+        non_striker: AM Hardie
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: LJ Evans
+    - 14.4:
+        non_striker: AM Hardie
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: LJ Evans
+    - 14.5:
+        non_striker: AM Hardie
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: LJ Evans
+    - 14.6:
+        non_striker: AM Hardie
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: LJ Evans
+    - 15.1:
+        non_striker: LJ Evans
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: AM Hardie
+    - 15.2:
+        non_striker: AM Hardie
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: LJ Evans
+    - 15.3:
+        non_striker: AM Hardie
+        bowler: DA Payne
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: LJ Evans
+    - 15.4:
+        non_striker: AM Hardie
+        bowler: DA Payne
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: LJ Evans
+    - 15.5:
+        non_striker: AM Hardie
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: LJ Evans
+    - 15.6:
+        non_striker: AM Hardie
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: LJ Evans
+    - 15.7:
+        non_striker: AM Hardie
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: LJ Evans
+    - 15.8:
+        non_striker: AM Hardie
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: LJ Evans
+    - 16.1:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: LJ Evans
+    - 16.2:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: LJ Evans
+    - 16.3:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: LJ Evans
+    - 16.4:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: LJ Evans
+    - 16.5:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: LJ Evans
+    - 16.6:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: LJ Evans
+    - 16.7:
+        non_striker: AM Hardie
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: LJ Evans
+    - 17.1:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+        wicket:
+          player_out: AM Hardie
+          fielders:
+          - HTRY Thornton
+          kind: caught
+    - 17.2:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 17.3:
+        non_striker: C Connolly
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: LJ Evans
+    - 17.4:
+        non_striker: C Connolly
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: LJ Evans
+    - 17.5:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 17.6:
+        non_striker: LJ Evans
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 18.1:
+        non_striker: C Connolly
+        bowler: DA Payne
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: LJ Evans
+    - 18.2:
+        non_striker: C Connolly
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: LJ Evans
+    - 18.3:
+        non_striker: LJ Evans
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 18.4:
+        non_striker: LJ Evans
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 18.5:
+        non_striker: C Connolly
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: LJ Evans
+    - 18.6:
+        non_striker: C Connolly
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: LJ Evans
+    - 18.7:
+        non_striker: LJ Evans
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 19.1:
+        non_striker: LJ Evans
+        bowler: JJ Bazley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: C Connolly
+    - 19.2:
+        non_striker: LJ Evans
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
+    - 19.3:
+        non_striker: LJ Evans
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 19.4:
+        non_striker: C Connolly
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: LJ Evans
+    - 19.5:
+        non_striker: C Connolly
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: LJ Evans
+    - 19.6:
+        non_striker: C Connolly
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: LJ Evans
+    - 19.7:
+        non_striker: C Connolly
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: LJ Evans
+- 2nd innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 0.2:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.3:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.4:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 0.5:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.6:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 1.1:
+        non_striker: DJM Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 1.2:
+        non_striker: DJM Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 1.3:
+        non_striker: DJM Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.4:
+        non_striker: DJM Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 1.5:
+        non_striker: DJM Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.6:
+        non_striker: DJM Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 2.1:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 2.2:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 2.3:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DJM Short
+    - 2.4:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 2.5:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+        wicket:
+          player_out: DJM Short
+          fielders:
+          - JP Inglis
+          kind: caught
+    - 2.6:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 2.7:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 3.1:
+        non_striker: CA Lynn
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 3.2:
+        non_striker: MW Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 3.3:
+        non_striker: MW Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 3.4:
+        non_striker: MW Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 3.5:
+        non_striker: MW Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 3.6:
+        non_striker: MW Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 4.1:
+        non_striker: CA Lynn
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 4.2:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 4.3:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 4.4:
+        non_striker: CA Lynn
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 4.5:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CA Lynn
+    - 4.6:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 4.7:
+        non_striker: CA Lynn
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 5.1:
+        non_striker: CA Lynn
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: MW Short
+    - 5.2:
+        non_striker: MW Short
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 5.3:
+        non_striker: MW Short
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 5.4:
+        non_striker: CA Lynn
+        bowler: C Connolly
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 5.5:
+        non_striker: CA Lynn
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 5.6:
+        non_striker: CA Lynn
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 5.7:
+        non_striker: MW Short
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 6.1:
+        non_striker: CA Lynn
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 6.2:
+        non_striker: CA Lynn
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 6.3:
+        non_striker: CA Lynn
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 6.4:
+        non_striker: CA Lynn
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 6.5:
+        non_striker: CA Lynn
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 6.6:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 7.1:
+        non_striker: CA Lynn
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 7.2:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 7.3:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+        wicket:
+          player_out: CA Lynn
+          fielders:
+          - Z Crawley
+          kind: caught
+    - 7.4:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Hose
+    - 7.5:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Hose
+    - 7.6:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 8.1:
+        non_striker: AJ Hose
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 8.2:
+        non_striker: MW Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 8.3:
+        non_striker: MW Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 8.4:
+        non_striker: AJ Hose
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 8.5:
+        non_striker: AJ Hose
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 8.6:
+        non_striker: AJ Hose
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 9.1:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 9.2:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 9.3:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Hose
+    - 9.4:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 9.5:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+        wicket:
+          player_out: AJ Hose
+          fielders:
+          - JP Inglis
+          kind: caught
+    - 9.6:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 10.1:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 10.2:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 10.3:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 10.4:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 10.5:
+        non_striker: T Kelly
+        bowler: AC Agar
+        runs:
+          extras: 0
+          non_boundary: 1
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 10.6:
+        non_striker: T Kelly
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 11.1:
+        non_striker: T Kelly
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 11.2:
+        non_striker: MW Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 11.3:
+        non_striker: MW Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: T Kelly
+    - 11.4:
+        non_striker: MW Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: T Kelly
+    - 11.5:
+        non_striker: MW Short
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 11.6:
+        non_striker: T Kelly
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 12.1:
+        non_striker: T Kelly
+        bowler: JA Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MW Short
+    - 12.2:
+        non_striker: MW Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 12.3:
+        non_striker: T Kelly
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 12.4:
+        non_striker: T Kelly
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 12.5:
+        non_striker: T Kelly
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 12.6:
+        non_striker: MW Short
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 13.1:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: T Kelly
+    - 13.2:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 13.3:
+        non_striker: T Kelly
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 13.4:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 13.5:
+        non_striker: T Kelly
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 13.6:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 14.1:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: T Kelly
+    - 14.2:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 14.3:
+        non_striker: T Kelly
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 14.4:
+        non_striker: T Kelly
+        bowler: AC Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 14.5:
+        non_striker: T Kelly
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 14.6:
+        non_striker: T Kelly
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 14.7:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: T Kelly
+    - 15.1:
+        non_striker: T Kelly
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 15.2:
+        non_striker: T Kelly
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 15.3:
+        non_striker: T Kelly
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 15.4:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 15.5:
+        non_striker: T Kelly
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 15.6:
+        non_striker: T Kelly
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+        wicket:
+          player_out: MW Short
+          fielders:
+          - AM Hardie
+          kind: caught
+    - 16.1:
+        non_striker: J Overton
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 16.2:
+        non_striker: T Kelly
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Overton
+    - 16.3:
+        non_striker: T Kelly
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Overton
+    - 16.4:
+        non_striker: J Overton
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+        wicket:
+          player_out: T Kelly
+          fielders:
+          - AC Agar
+          kind: caught
+    - 16.5:
+        non_striker: J Overton
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+    - 16.6:
+        non_striker: J Overton
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 17.1:
+        non_striker: J Overton
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 17.2:
+        non_striker: JJ Bazley
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Overton
+        wicket:
+          player_out: J Overton
+          fielders:
+          - JA Richardson
+          kind: caught
+    - 17.3:
+        non_striker: JJ Bazley
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 17.4:
+        non_striker: HJ Nielsen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+        wicket:
+          player_out: JJ Bazley
+          fielders:
+          - C Connolly
+          kind: caught
+    - 17.5:
+        non_striker: HJ Nielsen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+    - 17.6:
+        non_striker: HJ Nielsen
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HTRY Thornton
+    - 18.1:
+        non_striker: HTRY Thornton
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 18.2:
+        non_striker: HJ Nielsen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+    - 18.3:
+        non_striker: HJ Nielsen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+        wicket:
+          player_out: HTRY Thornton
+          fielders:
+          - JP Inglis
+          kind: caught
+    - 18.4:
+        non_striker: HJ Nielsen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Payne
+    - 18.5:
+        non_striker: HJ Nielsen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Payne
+    - 18.6:
+        non_striker: HJ Nielsen
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DA Payne
+    - 19.1:
+        non_striker: DA Payne
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+        wicket:
+          player_out: HJ Nielsen
+          fielders:
+          - JP Behrendorff
+          kind: caught
+    - 19.2:
+        non_striker: DA Payne
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+        wicket:
+          player_out: CJ Boyce
+          fielders:
+          - AJ Tye
+          kind: caught

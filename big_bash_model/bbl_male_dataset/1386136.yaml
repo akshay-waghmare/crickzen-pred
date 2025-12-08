@@ -1,0 +1,2132 @@
+---
+meta:
+  data_version: 0.92
+  created: '2024-01-22'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Carrara
+  competition: Big Bash League
+  dates:
+  - '2024-01-22'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Brisbane Heat
+    by:
+      runs: 54
+  overs: 20
+  player_of_match:
+  - J Brown
+  players:
+    Brisbane Heat:
+    - J Brown
+    - CA Wakim
+    - NA McSweeney
+    - MT Renshaw
+    - M Bryant
+    - PI Walter
+    - JJ Peirson
+    - MG Neser
+    - XC Bartlett
+    - SH Johnson
+    - MP Kuhnemann
+    Adelaide Strikers:
+    - MW Short
+    - DJM Short
+    - J Weatherald
+    - T Kelly
+    - HJ Nielsen
+    - BAD Manenti
+    - JJ Bazley
+    - HTRY Thornton
+    - DA Payne
+    - CJ Boyce
+    - L Pope
+  registry:
+    people:
+      BAD Manenti: ab21795b
+      BC Treloar: f7e8ee52
+      CA Wakim: c5e415aa
+      CJ Boyce: 51a60c16
+      DA Payne: 6c79c098
+      DJM Short: 1a156c88
+      GA Abood: a4af5528
+      HJ Nielsen: 0ea1455a
+      HTRY Thornton: 055be93a
+      J Brown: 647e7d44
+      J Weatherald: edc7ddb6
+      JJ Bazley: 003d49e6
+      JJ Peirson: 2b55c3b4
+      L Pope: 616a8149
+      M Bryant: f32012f4
+      MG Neser: 0164b064
+      MP Kuhnemann: 7b953689
+      MT Renshaw: 218d4d78
+      MW Short: a90e53ec
+      NA McSweeney: e94d2d50
+      PI Walter: 57590dbb
+      RW Stratford: '85489579'
+      SAJ Craig: 689f2eed
+      SH Johnson: 83c3e8e3
+      SJ Nogajski: 9b3f9323
+      T Kelly: 6ceb94d0
+      XC Bartlett: 3b53243a
+  teams:
+  - Brisbane Heat
+  - Adelaide Strikers
+  toss:
+    winner: Brisbane Heat
+    decision: bat
+  umpires:
+  - GA Abood
+  - SJ Nogajski
+  venue: Carrara Oval
+innings:
+- 1st innings:
+    team: Brisbane Heat
+    deliveries:
+    - 0.1:
+        non_striker: CA Wakim
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 0.2:
+        non_striker: J Brown
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 0.3:
+        non_striker: J Brown
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 0.4:
+        non_striker: J Brown
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Wakim
+    - 0.5:
+        non_striker: J Brown
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Wakim
+    - 0.6:
+        non_striker: J Brown
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 1.1:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+        wicket:
+          player_out: CA Wakim
+          kind: lbw
+    - 1.2:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 1.3:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 1.4:
+        non_striker: NA McSweeney
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 1.5:
+        non_striker: NA McSweeney
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 1.6:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 2.1:
+        non_striker: NA McSweeney
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 2.2:
+        non_striker: NA McSweeney
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 2.3:
+        non_striker: NA McSweeney
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.4:
+        non_striker: NA McSweeney
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 2.5:
+        non_striker: NA McSweeney
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.6:
+        non_striker: NA McSweeney
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: J Brown
+    - 2.7:
+        non_striker: NA McSweeney
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 3.1:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 3.2:
+        non_striker: NA McSweeney
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 3.3:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 3.4:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 3.5:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NA McSweeney
+    - 3.6:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 4.1:
+        non_striker: NA McSweeney
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 4.2:
+        non_striker: J Brown
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 4.3:
+        non_striker: NA McSweeney
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 4.4:
+        non_striker: J Brown
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 4.5:
+        non_striker: NA McSweeney
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 4.6:
+        non_striker: NA McSweeney
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 5.1:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 5.2:
+        non_striker: NA McSweeney
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 5.3:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NA McSweeney
+    - 5.4:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 5.5:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 5.6:
+        non_striker: NA McSweeney
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 6.1:
+        non_striker: J Brown
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 6.2:
+        non_striker: J Brown
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 6.3:
+        non_striker: J Brown
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 6.4:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 6.5:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: J Brown
+    - 6.6:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 6.7:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 7.1:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 7.2:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 7.3:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 7.4:
+        non_striker: NA McSweeney
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: J Brown
+    - 7.5:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 7.6:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 8.1:
+        non_striker: J Brown
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 8.2:
+        non_striker: J Brown
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 8.3:
+        non_striker: NA McSweeney
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 8.4:
+        non_striker: NA McSweeney
+        bowler: MW Short
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: J Brown
+    - 8.5:
+        non_striker: NA McSweeney
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 8.6:
+        non_striker: NA McSweeney
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 8.7:
+        non_striker: NA McSweeney
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 9.1:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: NA McSweeney
+    - 9.2:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 9.3:
+        non_striker: NA McSweeney
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 9.4:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 9.5:
+        non_striker: NA McSweeney
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 9.6:
+        non_striker: NA McSweeney
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 10.1:
+        non_striker: J Brown
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 10.2:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 10.3:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 10.4:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 10.5:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 10.6:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 11.1:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+        wicket:
+          player_out: NA McSweeney
+          kind: lbw
+    - 11.2:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 11.3:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 11.4:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 11.5:
+        non_striker: J Brown
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 11.6:
+        non_striker: MT Renshaw
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: J Brown
+    - 12.1:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 12.2:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 12.3:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 12.4:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 12.5:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 12.6:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 13.1:
+        non_striker: MT Renshaw
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 13.2:
+        non_striker: MT Renshaw
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 13.3:
+        non_striker: MT Renshaw
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 13.4:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MT Renshaw
+    - 13.5:
+        non_striker: J Brown
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 13.6:
+        non_striker: MT Renshaw
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 13.7:
+        non_striker: MT Renshaw
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 14.1:
+        non_striker: J Brown
+        bowler: JJ Bazley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MT Renshaw
+    - 14.2:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 14.3:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 14.4:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 14.5:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 14.6:
+        non_striker: MT Renshaw
+        bowler: JJ Bazley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 15.1:
+        non_striker: MT Renshaw
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 15.2:
+        non_striker: MT Renshaw
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 15.3:
+        non_striker: MT Renshaw
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 15.4:
+        non_striker: MT Renshaw
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 15.5:
+        non_striker: MT Renshaw
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Brown
+    - 15.6:
+        non_striker: MT Renshaw
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 16.1:
+        non_striker: J Brown
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 16.2:
+        non_striker: MT Renshaw
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 16.3:
+        non_striker: MT Renshaw
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+        wicket:
+          player_out: J Brown
+          fielders:
+          - HJ Nielsen
+          kind: caught
+    - 16.4:
+        non_striker: MT Renshaw
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Bryant
+    - 16.5:
+        non_striker: MT Renshaw
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Bryant
+    - 16.6:
+        non_striker: MT Renshaw
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 17.1:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 17.2:
+        non_striker: MT Renshaw
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 17.3:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+        wicket:
+          player_out: MT Renshaw
+          fielders:
+          - T Kelly
+          kind: caught
+    - 17.4:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PI Walter
+    - 17.5:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PI Walter
+        wicket:
+          player_out: PI Walter
+          fielders:
+          - HJ Nielsen
+          kind: stumped
+    - 17.6:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJ Peirson
+    - 18.1:
+        non_striker: JJ Peirson
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+        wicket:
+          player_out: M Bryant
+          fielders:
+          - MW Short
+          kind: caught
+    - 18.2:
+        non_striker: JJ Peirson
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MG Neser
+    - 18.3:
+        non_striker: MG Neser
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+    - 18.4:
+        non_striker: MG Neser
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJ Peirson
+    - 18.5:
+        non_striker: MG Neser
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+    - 18.6:
+        non_striker: MG Neser
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+        wicket:
+          player_out: JJ Peirson
+          fielders:
+          - MW Short
+          kind: caught
+    - 19.1:
+        non_striker: XC Bartlett
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+    - 19.2:
+        non_striker: XC Bartlett
+        bowler: L Pope
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MG Neser
+    - 19.3:
+        non_striker: MG Neser
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: XC Bartlett
+    - 19.4:
+        non_striker: MG Neser
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: XC Bartlett
+    - 19.5:
+        non_striker: XC Bartlett
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MG Neser
+    - 19.6:
+        non_striker: XC Bartlett
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: MG Neser
+- 2nd innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: DJM Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 0.2:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.3:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 0.4:
+        non_striker: DJM Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 0.5:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.6:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 1.1:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 1.2:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 1.3:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 1.4:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 1.5:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 1.6:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 2.1:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 2.2:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: DJM Short
+    - 2.3:
+        non_striker: DJM Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 2.4:
+        non_striker: DJM Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 2.5:
+        non_striker: DJM Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 2.6:
+        non_striker: DJM Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 3.1:
+        non_striker: DJM Short
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 3.2:
+        non_striker: DJM Short
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 3.3:
+        non_striker: DJM Short
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+        wicket:
+          player_out: MW Short
+          fielders:
+          - PI Walter
+          kind: caught
+    - 3.4:
+        non_striker: DJM Short
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: J Weatherald
+    - 3.5:
+        non_striker: J Weatherald
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+        wicket:
+          player_out: DJM Short
+          fielders:
+          - JJ Peirson
+          kind: caught
+    - 3.6:
+        non_striker: J Weatherald
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 4.1:
+        non_striker: T Kelly
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 4.2:
+        non_striker: J Weatherald
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: T Kelly
+    - 4.3:
+        non_striker: J Weatherald
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 4.4:
+        non_striker: J Weatherald
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: T Kelly
+    - 4.5:
+        non_striker: J Weatherald
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 4.6:
+        non_striker: T Kelly
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 5.1:
+        non_striker: J Weatherald
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 5.2:
+        non_striker: T Kelly
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 5.3:
+        non_striker: T Kelly
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Weatherald
+    - 5.4:
+        non_striker: T Kelly
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 5.5:
+        non_striker: J Weatherald
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 5.6:
+        non_striker: J Weatherald
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 6.1:
+        non_striker: J Weatherald
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 6.2:
+        non_striker: T Kelly
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 6.3:
+        non_striker: J Weatherald
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 6.4:
+        non_striker: T Kelly
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 6.5:
+        non_striker: T Kelly
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 6.6:
+        non_striker: J Weatherald
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 7.1:
+        non_striker: T Kelly
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 7.2:
+        non_striker: J Weatherald
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: T Kelly
+    - 7.3:
+        non_striker: J Weatherald
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: T Kelly
+    - 7.4:
+        non_striker: J Weatherald
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 7.5:
+        non_striker: T Kelly
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 7.6:
+        non_striker: T Kelly
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 8.1:
+        non_striker: T Kelly
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+        wicket:
+          player_out: J Weatherald
+          fielders:
+          - JJ Peirson
+          kind: caught
+    - 8.2:
+        non_striker: T Kelly
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 8.3:
+        non_striker: HJ Nielsen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 8.4:
+        non_striker: T Kelly
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 8.5:
+        non_striker: T Kelly
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 8.6:
+        non_striker: T Kelly
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 9.1:
+        non_striker: T Kelly
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 9.2:
+        non_striker: HJ Nielsen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 9.3:
+        non_striker: T Kelly
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 9.4:
+        non_striker: T Kelly
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HJ Nielsen
+    - 9.5:
+        non_striker: T Kelly
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 9.6:
+        non_striker: HJ Nielsen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: T Kelly
+    - 10.1:
+        non_striker: HJ Nielsen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+    - 10.2:
+        non_striker: HJ Nielsen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 10.3:
+        non_striker: T Kelly
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 10.4:
+        non_striker: HJ Nielsen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+    - 10.5:
+        non_striker: T Kelly
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 10.6:
+        non_striker: T Kelly
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 11.1:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: T Kelly
+    - 11.2:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: T Kelly
+    - 11.3:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: T Kelly
+    - 11.4:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: T Kelly
+        wicket:
+          player_out: T Kelly
+          fielders:
+          - MG Neser
+          kind: caught
+    - 11.5:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BAD Manenti
+    - 11.6:
+        non_striker: BAD Manenti
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HJ Nielsen
+    - 12.1:
+        non_striker: HJ Nielsen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BAD Manenti
+    - 12.2:
+        non_striker: HJ Nielsen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BAD Manenti
+    - 12.3:
+        non_striker: BAD Manenti
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 12.4:
+        non_striker: BAD Manenti
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 12.5:
+        non_striker: HJ Nielsen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BAD Manenti
+    - 12.6:
+        non_striker: BAD Manenti
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 13.1:
+        non_striker: BAD Manenti
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HJ Nielsen
+    - 13.2:
+        non_striker: BAD Manenti
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 13.3:
+        non_striker: HJ Nielsen
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BAD Manenti
+    - 13.4:
+        non_striker: HJ Nielsen
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BAD Manenti
+    - 13.5:
+        non_striker: BAD Manenti
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 13.6:
+        non_striker: HJ Nielsen
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BAD Manenti
+    - 14.1:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BAD Manenti
+    - 14.2:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BAD Manenti
+    - 14.3:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BAD Manenti
+    - 14.4:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BAD Manenti
+    - 14.5:
+        non_striker: BAD Manenti
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HJ Nielsen
+    - 14.6:
+        non_striker: BAD Manenti
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 15.1:
+        non_striker: HJ Nielsen
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BAD Manenti
+    - 15.2:
+        non_striker: HJ Nielsen
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BAD Manenti
+    - 15.3:
+        non_striker: HJ Nielsen
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BAD Manenti
+        wicket:
+          player_out: BAD Manenti
+          fielders:
+          - JJ Peirson
+          kind: stumped
+    - 15.4:
+        non_striker: HJ Nielsen
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JJ Bazley
+    - 15.5:
+        non_striker: HJ Nielsen
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 15.6:
+        non_striker: JJ Bazley
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 16.1:
+        non_striker: JJ Bazley
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HJ Nielsen
+    - 16.2:
+        non_striker: JJ Bazley
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HJ Nielsen
+    - 16.3:
+        non_striker: JJ Bazley
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 16.4:
+        non_striker: HJ Nielsen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+    - 16.5:
+        non_striker: HJ Nielsen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+        wicket:
+          player_out: JJ Bazley
+          fielders:
+          - CA Wakim
+          kind: run out
+    - 16.6:
+        non_striker: HTRY Thornton
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 17.1:
+        non_striker: HTRY Thornton
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 17.2:
+        non_striker: HTRY Thornton
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: HJ Nielsen
+    - 17.3:
+        non_striker: HTRY Thornton
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HJ Nielsen
+    - 17.4:
+        non_striker: HTRY Thornton
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 17.5:
+        non_striker: HJ Nielsen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HTRY Thornton
+        wicket:
+          player_out: HTRY Thornton
+          fielders:
+          - PI Walter
+          kind: caught
+    - 17.6:
+        non_striker: HJ Nielsen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Payne
+    - 18.1:
+        non_striker: DA Payne
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HJ Nielsen
+    - 18.2:
+        non_striker: DA Payne
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 18.3:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DA Payne
+    - 18.4:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Payne
+    - 18.5:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DA Payne
+    - 18.6:
+        non_striker: HJ Nielsen
+        bowler: PI Walter
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Payne
+    - 19.1:
+        non_striker: HJ Nielsen
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Payne
+        wicket:
+          player_out: DA Payne
+          kind: caught and bowled
+    - 19.2:
+        non_striker: HJ Nielsen
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 19.3:
+        non_striker: CJ Boyce
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HJ Nielsen
+    - 19.4:
+        non_striker: CJ Boyce
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+        wicket:
+          player_out: HJ Nielsen
+          fielders:
+          - CA Wakim
+          kind: caught
+    - 19.5:
+        non_striker: CJ Boyce
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Pope
+        wicket:
+          player_out: L Pope
+          kind: caught and bowled

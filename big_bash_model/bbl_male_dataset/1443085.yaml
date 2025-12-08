@@ -1,0 +1,2021 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-10'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Hobart
+  competition: Big Bash League
+  dates:
+  - '2025-01-10'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Hobart Hurricanes
+    by:
+      wickets: 6
+  overs: 20
+  player_of_match:
+  - TH David
+  players:
+    Sydney Thunder:
+    - S Konstas
+    - DA Warner
+    - M Gilkes
+    - O Davies
+    - SW Billings
+    - CJ Green
+    - DT Christian
+    - GHS Garton
+    - TD Andrews
+    - WA Agar
+    - Mohammad Hasnain
+    Hobart Hurricanes:
+    - MJ Owen
+    - MS Wade
+    - CA Wakim
+    - Nikhil Chaudhary
+    - TH David
+    - CJ Jordan
+    - BR McDermott
+    - NT Ellis
+    - P Hatzoglou
+    - RP Meredith
+    - B Stanlake
+  registry:
+    people:
+      B Stanlake: 6834d1f2
+      BR McDermott: c41043e6
+      CA Wakim: c5e415aa
+      CJ Green: 19b9f399
+      CJ Jordan: ffe699c0
+      DA Warner: dcce6f09
+      DT Christian: 2a2e6343
+      David Johnston: 92cef862
+      GHS Garton: be869ccf
+      M Gilkes: d85b0f8b
+      MJ Owen: f2c936d7
+      MS Wade: afa7e784
+      MW Graham-Smith: 18aca3ce
+      Mohammad Hasnain: 8596fe80
+      NT Ellis: 9eb1455b
+      Nikhil Chaudhary: 1f84183a
+      O Davies: 0ea54eca
+      P Hatzoglou: 6f95e5fa
+      RP Meredith: '64775749'
+      S Konstas: 3c34c9e1
+      SE Dionysius: ac886e6f
+      SW Billings: c16d4035
+      Simon Burns: c0741b3f
+      TD Andrews: a0f612b6
+      TH David: f1f99156
+      Troy Penman: 0aa42c26
+      WA Agar: 15de1f5d
+  teams:
+  - Sydney Thunder
+  - Hobart Hurricanes
+  toss:
+    winner: Hobart Hurricanes
+    decision: field
+  umpires:
+  - MW Graham-Smith
+  - Troy Penman
+  venue: Bellerive Oval, Hobart
+innings:
+- 1st innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Konstas
+    - 0.2:
+        non_striker: S Konstas
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 0.3:
+        non_striker: S Konstas
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.4:
+        non_striker: S Konstas
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.5:
+        non_striker: S Konstas
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 0.6:
+        non_striker: S Konstas
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 1.1:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: S Konstas
+    - 1.2:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Konstas
+    - 1.3:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Konstas
+    - 1.4:
+        non_striker: S Konstas
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 1.5:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Konstas
+    - 1.6:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Konstas
+    - 1.7:
+        non_striker: S Konstas
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 2.1:
+        non_striker: S Konstas
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 2.2:
+        non_striker: DA Warner
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Konstas
+    - 2.3:
+        non_striker: S Konstas
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 2.4:
+        non_striker: S Konstas
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 2.5:
+        non_striker: DA Warner
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: S Konstas
+    - 2.6:
+        non_striker: S Konstas
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: DA Warner
+    - 3.1:
+        non_striker: S Konstas
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 3.2:
+        non_striker: S Konstas
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 3.3:
+        non_striker: S Konstas
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 3.4:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Konstas
+    - 3.5:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Konstas
+        wicket:
+          player_out: S Konstas
+          fielders:
+          - MS Wade
+          kind: caught
+    - 3.6:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 4.1:
+        non_striker: M Gilkes
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 4.2:
+        non_striker: M Gilkes
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 4.3:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 4.4:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 4.5:
+        non_striker: M Gilkes
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DA Warner
+    - 4.6:
+        non_striker: M Gilkes
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 4.7:
+        non_striker: M Gilkes
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 5.1:
+        non_striker: M Gilkes
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 5.2:
+        non_striker: M Gilkes
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 5.3:
+        non_striker: M Gilkes
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 5.4:
+        non_striker: M Gilkes
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 5.5:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 5.6:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 6.1:
+        non_striker: DA Warner
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 6.2:
+        non_striker: M Gilkes
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 6.3:
+        non_striker: DA Warner
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+        wicket:
+          player_out: M Gilkes
+          fielders:
+          - MS Wade
+          kind: caught
+    - 6.4:
+        non_striker: DA Warner
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 6.5:
+        non_striker: O Davies
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 6.6:
+        non_striker: DA Warner
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 7.1:
+        non_striker: O Davies
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 7.2:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 7.3:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 7.4:
+        non_striker: O Davies
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 7.5:
+        non_striker: O Davies
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 7.6:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 8.1:
+        non_striker: O Davies
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 8.2:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 8.3:
+        non_striker: O Davies
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 8.4:
+        non_striker: O Davies
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 8.5:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 8.6:
+        non_striker: O Davies
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 9.1:
+        non_striker: O Davies
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 9.2:
+        non_striker: DA Warner
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 9.3:
+        non_striker: O Davies
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 9.4:
+        non_striker: O Davies
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 9.5:
+        non_striker: DA Warner
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 9.6:
+        non_striker: O Davies
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 10.1:
+        non_striker: O Davies
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 10.2:
+        non_striker: O Davies
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 10.3:
+        non_striker: O Davies
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 10.4:
+        non_striker: DA Warner
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.5:
+        non_striker: DA Warner
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 10.6:
+        non_striker: DA Warner
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: O Davies
+    - 11.1:
+        non_striker: O Davies
+        bowler: P Hatzoglou
+        runs:
+          extras: 3
+          total: 3
+          batsman: 0
+        extras:
+          byes: 3
+        batsman: DA Warner
+    - 11.2:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 11.3:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 11.4:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.5:
+        non_striker: O Davies
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 11.6:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 12.1:
+        non_striker: O Davies
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 12.2:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+        wicket:
+          player_out: O Davies
+          kind: caught and bowled
+    - 12.3:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 12.4:
+        non_striker: SW Billings
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 12.5:
+        non_striker: SW Billings
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 12.6:
+        non_striker: DA Warner
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SW Billings
+    - 13.1:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 13.2:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 13.3:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 13.4:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 13.5:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 13.6:
+        non_striker: DA Warner
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 14.1:
+        non_striker: SW Billings
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 14.2:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 14.3:
+        non_striker: SW Billings
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 14.4:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          non_boundary: 1
+          total: 6
+          batsman: 6
+        batsman: SW Billings
+    - 14.5:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SW Billings
+    - 14.6:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 14.7:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 15.1:
+        non_striker: SW Billings
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 15.2:
+        non_striker: DA Warner
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 15.3:
+        non_striker: DA Warner
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 15.4:
+        non_striker: DA Warner
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+        wicket:
+          player_out: SW Billings
+          kind: bowled
+    - 15.5:
+        non_striker: DA Warner
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 15.6:
+        non_striker: CJ Green
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 16.1:
+        non_striker: CJ Green
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 16.2:
+        non_striker: DA Warner
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 16.3:
+        non_striker: CJ Green
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 16.4:
+        non_striker: CJ Green
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 16.5:
+        non_striker: CJ Green
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 16.6:
+        non_striker: CJ Green
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 17.1:
+        non_striker: CJ Green
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 17.2:
+        non_striker: CJ Green
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 17.3:
+        non_striker: CJ Green
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 17.4:
+        non_striker: CJ Green
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 17.5:
+        non_striker: CJ Green
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 17.6:
+        non_striker: DA Warner
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 18.1:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Green
+    - 18.2:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Green
+    - 18.3:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 18.4:
+        non_striker: CJ Green
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 18.5:
+        non_striker: CJ Green
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 18.6:
+        non_striker: DA Warner
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+        wicket:
+          player_out: CJ Green
+          fielders:
+          - NT Ellis
+          kind: caught
+    - 19.1:
+        non_striker: DT Christian
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 19.2:
+        non_striker: DT Christian
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DA Warner
+    - 19.3:
+        non_striker: DT Christian
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 19.4:
+        non_striker: DT Christian
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+        wicket:
+          player_out: DT Christian
+          fielders:
+          - CA Wakim
+          - NT Ellis
+          kind: run out
+    - 19.5:
+        non_striker: GHS Garton
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 5
+          batsman: 4
+        extras:
+          noballs: 1
+        batsman: DA Warner
+    - 19.6:
+        non_striker: GHS Garton
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 19.7:
+        non_striker: GHS Garton
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 19.8:
+        non_striker: GHS Garton
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+- 2nd innings:
+    team: Hobart Hurricanes
+    deliveries:
+    - 0.1:
+        non_striker: MS Wade
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MJ Owen
+    - 0.2:
+        non_striker: MS Wade
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Owen
+    - 0.3:
+        non_striker: MS Wade
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Owen
+    - 0.4:
+        non_striker: MS Wade
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 0.5:
+        non_striker: MS Wade
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 0.6:
+        non_striker: MS Wade
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 0.7:
+        non_striker: MJ Owen
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 1.1:
+        non_striker: MJ Owen
+        bowler: GHS Garton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MS Wade
+    - 1.2:
+        non_striker: MJ Owen
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 1.3:
+        non_striker: MJ Owen
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MS Wade
+    - 1.4:
+        non_striker: MJ Owen
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MS Wade
+    - 1.5:
+        non_striker: MJ Owen
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+        wicket:
+          player_out: MS Wade
+          kind: lbw
+    - 1.6:
+        non_striker: MJ Owen
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 1.7:
+        non_striker: MJ Owen
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Wakim
+    - 2.1:
+        non_striker: CA Wakim
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+        wicket:
+          player_out: MJ Owen
+          fielders:
+          - S Konstas
+          kind: caught
+    - 2.2:
+        non_striker: CA Wakim
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 2.3:
+        non_striker: Nikhil Chaudhary
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 2.4:
+        non_striker: Nikhil Chaudhary
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 2.5:
+        non_striker: Nikhil Chaudhary
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Wakim
+    - 2.6:
+        non_striker: Nikhil Chaudhary
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 3.1:
+        non_striker: CA Wakim
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 3.2:
+        non_striker: CA Wakim
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 3.3:
+        non_striker: CA Wakim
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 3.4:
+        non_striker: CA Wakim
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 3.5:
+        non_striker: Nikhil Chaudhary
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 3.6:
+        non_striker: Nikhil Chaudhary
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Wakim
+    - 4.1:
+        non_striker: CA Wakim
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 4.2:
+        non_striker: CA Wakim
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 4.3:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 4.4:
+        non_striker: CA Wakim
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 4.5:
+        non_striker: CA Wakim
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 4.6:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 5.1:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 5.2:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 5.3:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 5.4:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 5.5:
+        non_striker: CA Wakim
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 5.6:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 6.1:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+        wicket:
+          player_out: CA Wakim
+          kind: bowled
+    - 6.2:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 6.3:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 6.4:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 6.5:
+        non_striker: TH David
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 6.6:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 7.1:
+        non_striker: TH David
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 7.2:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 7.3:
+        non_striker: TH David
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 7.4:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 7.5:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 7.6:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TH David
+    - 7.7:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 8.1:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 8.2:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 8.3:
+        non_striker: TH David
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 8.4:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 8.5:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 8.6:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 9.1:
+        non_striker: TH David
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 9.2:
+        non_striker: Nikhil Chaudhary
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 9.3:
+        non_striker: TH David
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 9.4:
+        non_striker: TH David
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 9.5:
+        non_striker: Nikhil Chaudhary
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 9.6:
+        non_striker: Nikhil Chaudhary
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 10.1:
+        non_striker: TH David
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 10.2:
+        non_striker: TH David
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 10.3:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 10.4:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 10.5:
+        non_striker: TH David
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 10.6:
+        non_striker: Nikhil Chaudhary
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 11.1:
+        non_striker: TH David
+        bowler: CJ Green
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: Nikhil Chaudhary
+    - 11.2:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TH David
+    - 11.3:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 11.4:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 11.5:
+        non_striker: TH David
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 11.6:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 11.7:
+        non_striker: Nikhil Chaudhary
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 11.8:
+        non_striker: TH David
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 12.1:
+        non_striker: TH David
+        bowler: GHS Garton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Nikhil Chaudhary
+    - 12.2:
+        non_striker: TH David
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+        wicket:
+          player_out: Nikhil Chaudhary
+          fielders:
+          - SW Billings
+          kind: caught
+    - 12.3:
+        non_striker: TH David
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Jordan
+    - 12.4:
+        non_striker: TH David
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 12.5:
+        non_striker: CJ Jordan
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TH David
+    - 12.6:
+        non_striker: CJ Jordan
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 12.7:
+        non_striker: TH David
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 13.1:
+        non_striker: TH David
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 13.2:
+        non_striker: CJ Jordan
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 13.3:
+        non_striker: CJ Jordan
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TH David
+    - 13.4:
+        non_striker: TH David
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 13.5:
+        non_striker: CJ Jordan
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 13.6:
+        non_striker: CJ Jordan
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 14.1:
+        non_striker: TH David
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 14.2:
+        non_striker: TH David
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 14.3:
+        non_striker: TH David
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 14.4:
+        non_striker: TH David
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 14.5:
+        non_striker: CJ Jordan
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 14.6:
+        non_striker: CJ Jordan
+        bowler: Mohammad Hasnain
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 15.1:
+        non_striker: TH David
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 15.2:
+        non_striker: TH David
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 15.3:
+        non_striker: CJ Jordan
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 15.4:
+        non_striker: TH David
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 15.5:
+        non_striker: CJ Jordan
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TH David
+    - 15.6:
+        non_striker: CJ Jordan
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 16.1:
+        non_striker: CJ Jordan
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 16.2:
+        non_striker: TH David
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 16.3:
+        non_striker: CJ Jordan
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 16.4:
+        non_striker: CJ Jordan
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 16.5:
+        non_striker: CJ Jordan
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David

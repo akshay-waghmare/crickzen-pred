@@ -1,0 +1,2181 @@
+---
+meta:
+  data_version: 0.92
+  created: '2022-12-16'
+  revision: 2
+info:
+  balls_per_over: 6
+  city: Melbourne
+  competition: Big Bash League
+  dates:
+  - '2022-12-16'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Melbourne Stars
+    by:
+      runs: 38
+  overs: 20
+  player_of_match:
+  - JM Clarke
+  players:
+    Melbourne Stars:
+    - JM Clarke
+    - TF Rogers
+    - BJ Webster
+    - MP Stoinis
+    - HWR Cartwright
+    - NCR Larkin
+    - L Wood
+    - C Kellaway
+    - NM Coulter-Nile
+    - TA Boult
+    - A Zampa
+    Hobart Hurricanes:
+    - BR McDermott
+    - DJM Short
+    - MS Wade
+    - Shadab Khan
+    - TH David
+    - Asif Ali
+    - JDS Neesham
+    - JS Paris
+    - NT Ellis
+    - PG Dooley
+    - RP Meredith
+  registry:
+    people:
+      A Zampa: 14f96089
+      Asif Ali: 0a4736eb
+      BJ Webster: 56b93d46
+      BR McDermott: c41043e6
+      C Kellaway: 60c28835
+      CD Hinchliffe: 8891669e
+      DJM Short: 1a156c88
+      Greg Azzopardi: e950350e
+      HWR Cartwright: ab965cad
+      JDS Neesham: 9219eff0
+      JM Clarke: 2eca67f5
+      JS Paris: 7c8f533d
+      Kent Hannam: 8cc171e7
+      L Wood: 65b6943c
+      MP Stoinis: d9273ee7
+      MS Wade: afa7e784
+      MW Graham-Smith: 18aca3ce
+      NCR Larkin: 02bce9a8
+      NM Coulter-Nile: 56ab442f
+      NR Johnstone: ce274b6a
+      NT Ellis: 9eb1455b
+      PG Dooley: 5e3054d0
+      RP Meredith: '64775749'
+      Shadab Khan: 9de62878
+      TA Boult: a818c1be
+      TF Rogers: 7f232d46
+      TH David: f1f99156
+      TL O'Connell: 859d95bb
+      Troy Penman: 0aa42c26
+  teams:
+  - Melbourne Stars
+  - Hobart Hurricanes
+  toss:
+    winner: Hobart Hurricanes
+    decision: field
+  umpires:
+  - MW Graham-Smith
+  - NR Johnstone
+  venue: Melbourne Cricket Ground
+innings:
+- 1st innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: TF Rogers
+        bowler: JS Paris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JM Clarke
+    - 0.2:
+        non_striker: JM Clarke
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 0.3:
+        non_striker: TF Rogers
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 0.4:
+        non_striker: JM Clarke
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 0.5:
+        non_striker: TF Rogers
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 0.6:
+        non_striker: JM Clarke
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 1.1:
+        non_striker: TF Rogers
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 1.2:
+        non_striker: TF Rogers
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 1.3:
+        non_striker: TF Rogers
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 1.4:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.5:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 1.6:
+        non_striker: TF Rogers
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 2.1:
+        non_striker: JM Clarke
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 2.2:
+        non_striker: JM Clarke
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TF Rogers
+    - 2.3:
+        non_striker: JM Clarke
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 2.4:
+        non_striker: TF Rogers
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 2.5:
+        non_striker: TF Rogers
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 2.6:
+        non_striker: TF Rogers
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 3.1:
+        non_striker: TF Rogers
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 3.2:
+        non_striker: TF Rogers
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 3.3:
+        non_striker: TF Rogers
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 3.4:
+        non_striker: TF Rogers
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: JM Clarke
+    - 3.5:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TF Rogers
+    - 3.6:
+        non_striker: TF Rogers
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 4.1:
+        non_striker: TF Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 4.2:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 4.3:
+        non_striker: TF Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 4.4:
+        non_striker: TF Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 4.5:
+        non_striker: TF Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 4.6:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 5.1:
+        non_striker: TF Rogers
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 5.2:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 5.3:
+        non_striker: TF Rogers
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 5.4:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+        wicket:
+          player_out: TF Rogers
+          fielders:
+          - TH David
+          kind: caught
+    - 5.5:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 5.6:
+        non_striker: BJ Webster
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 6.1:
+        non_striker: BJ Webster
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 6.2:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: BJ Webster
+    - 6.3:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 6.4:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 6.5:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 6.6:
+        non_striker: BJ Webster
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 6.7:
+        non_striker: BJ Webster
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 7.1:
+        non_striker: BJ Webster
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 7.2:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 7.3:
+        non_striker: BJ Webster
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 7.4:
+        non_striker: BJ Webster
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 7.5:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 7.6:
+        non_striker: BJ Webster
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 8.1:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 8.2:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 8.3:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 8.4:
+        non_striker: BJ Webster
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 8.5:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 8.6:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 9.1:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 9.2:
+        non_striker: BJ Webster
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 9.3:
+        non_striker: BJ Webster
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 9.4:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 9.5:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 9.6:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 10.1:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 10.2:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 10.3:
+        non_striker: BJ Webster
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 10.4:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 10.5:
+        non_striker: BJ Webster
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 10.6:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 11.1:
+        non_striker: BJ Webster
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 11.2:
+        non_striker: BJ Webster
+        bowler: RP Meredith
+        runs:
+          extras: 5
+          total: 5
+          batsman: 0
+        extras:
+          legbyes: 5
+        batsman: JM Clarke
+    - 11.3:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 11.4:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BJ Webster
+    - 11.5:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+        wicket:
+          player_out: BJ Webster
+          fielders:
+          - PG Dooley
+          kind: caught
+    - 11.6:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 12.1:
+        non_striker: MP Stoinis
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 12.2:
+        non_striker: MP Stoinis
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 12.3:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+        wicket:
+          player_out: MP Stoinis
+          kind: bowled
+    - 12.4:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 5
+          total: 5
+          batsman: 0
+        extras:
+          wides: 5
+        batsman: HWR Cartwright
+    - 12.5:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 12.6:
+        non_striker: HWR Cartwright
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 12.7:
+        non_striker: JM Clarke
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 13.1:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 13.2:
+        non_striker: HWR Cartwright
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 13.3:
+        non_striker: JM Clarke
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 13.4:
+        non_striker: HWR Cartwright
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 13.5:
+        non_striker: HWR Cartwright
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 13.6:
+        non_striker: HWR Cartwright
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 14.1:
+        non_striker: JM Clarke
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HWR Cartwright
+    - 14.2:
+        non_striker: JM Clarke
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 14.3:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 14.4:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 14.5:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 14.6:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 15.1:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HWR Cartwright
+    - 15.2:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 15.3:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JM Clarke
+    - 15.4:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 15.5:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 15.6:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 15.7:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JM Clarke
+    - 15.8:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 16.1:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 16.2:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 16.3:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 16.4:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 16.5:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 16.6:
+        non_striker: HWR Cartwright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 17.1:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 17.2:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HWR Cartwright
+    - 17.3:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HWR Cartwright
+    - 17.4:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 17.5:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 17.6:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 18.1:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+        wicket:
+          player_out: HWR Cartwright
+          kind: caught and bowled
+    - 18.2:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NCR Larkin
+    - 18.3:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 18.4:
+        non_striker: JM Clarke
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 18.5:
+        non_striker: NCR Larkin
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 18.6:
+        non_striker: NCR Larkin
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 18.7:
+        non_striker: NCR Larkin
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 19.1:
+        non_striker: NCR Larkin
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 19.2:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 19.3:
+        non_striker: NCR Larkin
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 19.4:
+        non_striker: NCR Larkin
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 19.5:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NCR Larkin
+    - 19.6:
+        non_striker: JM Clarke
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+        wicket:
+          player_out: NCR Larkin
+          fielders:
+          - MS Wade
+          kind: run out
+    - 19.7:
+        non_striker: L Wood
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+- 2nd innings:
+    team: Hobart Hurricanes
+    deliveries:
+    - 0.1:
+        non_striker: DJM Short
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 0.2:
+        non_striker: BR McDermott
+        bowler: TA Boult
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DJM Short
+    - 0.3:
+        non_striker: BR McDermott
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 0.4:
+        non_striker: DJM Short
+        bowler: TA Boult
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: BR McDermott
+    - 0.5:
+        non_striker: BR McDermott
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.6:
+        non_striker: BR McDermott
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 0.7:
+        non_striker: DJM Short
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 1.1:
+        non_striker: BR McDermott
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 1.2:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BR McDermott
+    - 1.3:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: BR McDermott
+    - 1.4:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 1.5:
+        non_striker: BR McDermott
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 1.6:
+        non_striker: BR McDermott
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 1.7:
+        non_striker: BR McDermott
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 2.1:
+        non_striker: DJM Short
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BR McDermott
+    - 2.2:
+        non_striker: DJM Short
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BR McDermott
+    - 2.3:
+        non_striker: DJM Short
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BR McDermott
+    - 2.4:
+        non_striker: DJM Short
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BR McDermott
+    - 2.5:
+        non_striker: DJM Short
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 2.6:
+        non_striker: BR McDermott
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 3.1:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+        wicket:
+          player_out: BR McDermott
+          fielders:
+          - NCR Larkin
+          kind: caught
+    - 3.2:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 3.3:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MS Wade
+    - 3.4:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 3.5:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 3.6:
+        non_striker: MS Wade
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 3.7:
+        non_striker: DJM Short
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 4.1:
+        non_striker: DJM Short
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 4.2:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 4.3:
+        non_striker: DJM Short
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 4.4:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 4.5:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 4.6:
+        non_striker: DJM Short
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 5.1:
+        non_striker: DJM Short
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 5.2:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 5.3:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 5.4:
+        non_striker: DJM Short
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 5.5:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+        wicket:
+          player_out: DJM Short
+          fielders:
+          - JM Clarke
+          kind: caught
+    - 5.6:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Shadab Khan
+    - 6.1:
+        non_striker: Shadab Khan
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 6.2:
+        non_striker: Shadab Khan
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MS Wade
+    - 6.3:
+        non_striker: Shadab Khan
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 6.4:
+        non_striker: MS Wade
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 6.5:
+        non_striker: Shadab Khan
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MS Wade
+    - 6.6:
+        non_striker: Shadab Khan
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 7.1:
+        non_striker: Shadab Khan
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MS Wade
+    - 7.2:
+        non_striker: Shadab Khan
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 7.3:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 7.4:
+        non_striker: Shadab Khan
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MS Wade
+    - 7.5:
+        non_striker: Shadab Khan
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 7.6:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 8.1:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 8.2:
+        non_striker: Shadab Khan
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 8.3:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Shadab Khan
+    - 8.4:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 8.5:
+        non_striker: Shadab Khan
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 8.6:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 9.1:
+        non_striker: MS Wade
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 9.2:
+        non_striker: Shadab Khan
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 9.3:
+        non_striker: Shadab Khan
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 9.4:
+        non_striker: Shadab Khan
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 9.5:
+        non_striker: MS Wade
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Shadab Khan
+        wicket:
+          player_out: Shadab Khan
+          fielders:
+          - TF Rogers
+          kind: caught
+    - 9.6:
+        non_striker: MS Wade
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 10.1:
+        non_striker: TH David
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 10.2:
+        non_striker: TH David
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 10.3:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 10.4:
+        non_striker: TH David
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 10.5:
+        non_striker: TH David
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 10.6:
+        non_striker: TH David
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 11.1:
+        non_striker: TH David
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 11.2:
+        non_striker: MS Wade
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 11.3:
+        non_striker: MS Wade
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 11.4:
+        non_striker: TH David
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 11.5:
+        non_striker: MS Wade
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 11.6:
+        non_striker: TH David
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          legbyes: 4
+        batsman: MS Wade
+    - 12.1:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 12.2:
+        non_striker: TH David
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 12.3:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 12.4:
+        non_striker: TH David
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 12.5:
+        non_striker: MS Wade
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 12.6:
+        non_striker: TH David
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 13.1:
+        non_striker: TH David
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+        wicket:
+          player_out: MS Wade
+          fielders:
+          - HWR Cartwright
+          kind: caught
+    - 13.2:
+        non_striker: TH David
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Asif Ali
+    - 13.3:
+        non_striker: Asif Ali
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 13.4:
+        non_striker: TH David
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Asif Ali
+    - 13.5:
+        non_striker: TH David
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Asif Ali
+    - 13.6:
+        non_striker: TH David
+        bowler: NM Coulter-Nile
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Asif Ali
+    - 14.1:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Asif Ali
+    - 14.2:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Asif Ali
+        wicket:
+          player_out: Asif Ali
+          fielders:
+          - HWR Cartwright
+          kind: caught
+    - 14.3:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JDS Neesham
+    - 14.4:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JDS Neesham
+    - 14.5:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JDS Neesham
+    - 14.6:
+        non_striker: JDS Neesham
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 15.1:
+        non_striker: TH David
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JDS Neesham
+    - 15.2:
+        non_striker: JDS Neesham
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TH David
+    - 15.3:
+        non_striker: JDS Neesham
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 15.4:
+        non_striker: JDS Neesham
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 15.5:
+        non_striker: JDS Neesham
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 15.6:
+        non_striker: TH David
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JDS Neesham
+    - 16.1:
+        non_striker: TH David
+        bowler: TA Boult
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: JDS Neesham
+    - 16.2:
+        non_striker: TH David
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JDS Neesham
+    - 16.3:
+        non_striker: TH David
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JDS Neesham
+    - 16.4:
+        non_striker: TH David
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JDS Neesham
+    - 16.5:
+        non_striker: TH David
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JDS Neesham
+    - 16.6:
+        non_striker: JDS Neesham
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 17.1:
+        non_striker: TH David
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JDS Neesham
+        wicket:
+          player_out: JDS Neesham
+          fielders:
+          - NCR Larkin
+          kind: caught
+    - 17.2:
+        non_striker: TH David
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JS Paris
+    - 17.3:
+        non_striker: TH David
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JS Paris
+    - 17.4:
+        non_striker: TH David
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JS Paris
+    - 17.5:
+        non_striker: JS Paris
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 17.6:
+        non_striker: JS Paris
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+        wicket:
+          player_out: TH David
+          fielders:
+          - TL O'Connell (sub)
+          kind: caught
+    - 18.1:
+        non_striker: NT Ellis
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JS Paris
+    - 18.2:
+        non_striker: JS Paris
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+        wicket:
+          player_out: NT Ellis
+          fielders:
+          - TA Boult
+          kind: caught
+    - 18.3:
+        non_striker: JS Paris
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PG Dooley
+    - 18.4:
+        non_striker: JS Paris
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PG Dooley
+    - 18.5:
+        non_striker: JS Paris
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PG Dooley
+    - 18.6:
+        non_striker: PG Dooley
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JS Paris
+    - 19.1:
+        non_striker: PG Dooley
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JS Paris
+        wicket:
+          player_out: JS Paris
+          fielders:
+          - CD Hinchliffe (sub)
+          kind: caught
+    - 19.2:
+        non_striker: PG Dooley
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: RP Meredith
+    - 19.3:
+        non_striker: PG Dooley
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: RP Meredith
+    - 19.4:
+        non_striker: PG Dooley
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RP Meredith
+    - 19.5:
+        non_striker: RP Meredith
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PG Dooley
+    - 19.6:
+        non_striker: RP Meredith
+        bowler: TA Boult
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: PG Dooley

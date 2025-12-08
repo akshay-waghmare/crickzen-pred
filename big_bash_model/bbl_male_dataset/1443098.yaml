@@ -1,0 +1,2039 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-22'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Sydney
+  competition: Big Bash League
+  dates:
+  - '2025-01-22'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Sydney Thunder
+    by:
+      runs: 21
+    method: D/L
+  overs: 20
+  player_of_match:
+  - N McAndrew
+  players:
+    Sydney Thunder:
+    - DA Warner
+    - HD Weibgen
+    - M Gilkes
+    - SW Billings
+    - O Davies
+    - GHS Garton
+    - CJ Green
+    - N McAndrew
+    - TD Andrews
+    - WA Agar
+    - T Sangha
+    Melbourne Stars:
+    - SB Harper
+    - TF Rogers
+    - PSP Handscomb
+    - MP Stoinis
+    - GJ Maxwell
+    - HWR Cartwright
+    - TK Curran
+    - Usama Mir
+    - MT Steketee
+    - D Warren
+    - PM Siddle
+  registry:
+    people:
+      CJ Green: 19b9f399
+      D Warren: ef55b38c
+      DA Warner: dcce6f09
+      DM Koch: 6d10c034
+      GHS Garton: be869ccf
+      GJ Maxwell: b681e71e
+      HD Weibgen: 2535b30f
+      HWR Cartwright: ab965cad
+      M Gilkes: d85b0f8b
+      MP Stoinis: d9273ee7
+      MT Steketee: 903560ed
+      MW Graham-Smith: 18aca3ce
+      N McAndrew: 38c276e1
+      O Davies: 0ea54eca
+      PJ Gillespie: 3e253a50
+      PM Siddle: bd93fea4
+      PSP Handscomb: ada15e88
+      RW Stratford: '85489579'
+      SA Lightbody: 680b8cbf
+      SB Harper: a756e61a
+      SW Billings: c16d4035
+      T Sangha: 52c952d9
+      TD Andrews: a0f612b6
+      TF Rogers: 7f232d46
+      TK Curran: e86754b2
+      Usama Mir: 6dd8b88c
+      WA Agar: 15de1f5d
+  teams:
+  - Sydney Thunder
+  - Melbourne Stars
+  toss:
+    winner: Melbourne Stars
+    decision: field
+  umpires:
+  - DM Koch
+  - PJ Gillespie
+  venue: Sydney Showground Stadium
+innings:
+- 1st innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.2:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DA Warner
+    - 0.3:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+        wicket:
+          player_out: DA Warner
+          fielders:
+          - MP Stoinis
+          kind: caught
+    - 0.4:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.5:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.6:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.7:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 1.1:
+        non_striker: M Gilkes
+        bowler: MT Steketee
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: HD Weibgen
+    - 1.2:
+        non_striker: M Gilkes
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HD Weibgen
+    - 1.3:
+        non_striker: M Gilkes
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HD Weibgen
+    - 1.4:
+        non_striker: M Gilkes
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HD Weibgen
+    - 1.5:
+        non_striker: HD Weibgen
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: M Gilkes
+    - 1.6:
+        non_striker: M Gilkes
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HD Weibgen
+    - 1.7:
+        non_striker: HD Weibgen
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Gilkes
+    - 2.1:
+        non_striker: M Gilkes
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HD Weibgen
+    - 2.2:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 2.3:
+        non_striker: HD Weibgen
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 2.4:
+        non_striker: M Gilkes
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HD Weibgen
+    - 2.5:
+        non_striker: M Gilkes
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HD Weibgen
+    - 2.6:
+        non_striker: M Gilkes
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HD Weibgen
+    - 3.1:
+        non_striker: HD Weibgen
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 3.2:
+        non_striker: HD Weibgen
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 3.3:
+        non_striker: HD Weibgen
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 3.4:
+        non_striker: HD Weibgen
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 3.5:
+        non_striker: M Gilkes
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HD Weibgen
+    - 3.6:
+        non_striker: M Gilkes
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HD Weibgen
+    - 4.1:
+        non_striker: HD Weibgen
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 4.2:
+        non_striker: M Gilkes
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HD Weibgen
+        wicket:
+          player_out: HD Weibgen
+          kind: caught and bowled
+    - 4.3:
+        non_striker: M Gilkes
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 4.4:
+        non_striker: M Gilkes
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 4.5:
+        non_striker: M Gilkes
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 4.6:
+        non_striker: M Gilkes
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 5.1:
+        non_striker: SW Billings
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 5.2:
+        non_striker: M Gilkes
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 5.3:
+        non_striker: M Gilkes
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 5.4:
+        non_striker: M Gilkes
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 5.5:
+        non_striker: SW Billings
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 5.6:
+        non_striker: M Gilkes
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 6.1:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 6.2:
+        non_striker: M Gilkes
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 6.3:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 6.4:
+        non_striker: M Gilkes
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 6.5:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+        wicket:
+          player_out: M Gilkes
+          fielders:
+          - GJ Maxwell
+          kind: caught
+    - 6.6:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 7.1:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 7.2:
+        non_striker: SW Billings
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 7.3:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 7.4:
+        non_striker: SW Billings
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 7.5:
+        non_striker: SW Billings
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 7.6:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 8.1:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 8.2:
+        non_striker: O Davies
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 8.3:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 8.4:
+        non_striker: SW Billings
+        bowler: Usama Mir
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: O Davies
+    - 8.5:
+        non_striker: O Davies
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 8.6:
+        non_striker: O Davies
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 9.1:
+        non_striker: SW Billings
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 9.2:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 9.3:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 9.4:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 9.5:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 9.6:
+        non_striker: SW Billings
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 10.1:
+        non_striker: SW Billings
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.2:
+        non_striker: SW Billings
+        bowler: MP Stoinis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: O Davies
+    - 10.3:
+        non_striker: SW Billings
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 10.4:
+        non_striker: SW Billings
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.5:
+        non_striker: SW Billings
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 10.6:
+        non_striker: O Davies
+        bowler: MP Stoinis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SW Billings
+    - 10.7:
+        non_striker: SW Billings
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.1:
+        non_striker: SW Billings
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.2:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 11.3:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 11.4:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 11.5:
+        non_striker: SW Billings
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.6:
+        non_striker: O Davies
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+        wicket:
+          player_out: SW Billings
+          fielders:
+          - TK Curran
+          kind: caught
+    - 12.1:
+        non_striker: GHS Garton
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 12.2:
+        non_striker: GHS Garton
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 12.3:
+        non_striker: GHS Garton
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 12.4:
+        non_striker: O Davies
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GHS Garton
+    - 12.5:
+        non_striker: GHS Garton
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 12.6:
+        non_striker: GHS Garton
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 13.1:
+        non_striker: GHS Garton
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: O Davies
+    - 13.2:
+        non_striker: GHS Garton
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 13.3:
+        non_striker: GHS Garton
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 13.4:
+        non_striker: O Davies
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GHS Garton
+    - 13.5:
+        non_striker: O Davies
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GHS Garton
+    - 13.6:
+        non_striker: O Davies
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GHS Garton
+    - 14.1:
+        non_striker: GHS Garton
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 14.2:
+        non_striker: GHS Garton
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: O Davies
+    - 14.3:
+        non_striker: GHS Garton
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 14.4:
+        non_striker: GHS Garton
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 14.5:
+        non_striker: O Davies
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GHS Garton
+        wicket:
+          player_out: GHS Garton
+          fielders:
+          - TF Rogers
+          kind: caught
+    - 14.6:
+        non_striker: O Davies
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 15.1:
+        non_striker: O Davies
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CJ Green
+    - 15.2:
+        non_striker: O Davies
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+        wicket:
+          player_out: CJ Green
+          fielders:
+          - HWR Cartwright
+          kind: caught
+    - 15.3:
+        non_striker: O Davies
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: N McAndrew
+    - 15.4:
+        non_striker: N McAndrew
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 15.5:
+        non_striker: N McAndrew
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 15.6:
+        non_striker: N McAndrew
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 16.1:
+        non_striker: N McAndrew
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 16.2:
+        non_striker: O Davies
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 16.3:
+        non_striker: O Davies
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: N McAndrew
+    - 16.4:
+        non_striker: O Davies
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: N McAndrew
+    - 16.5:
+        non_striker: N McAndrew
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: O Davies
+    - 16.6:
+        non_striker: N McAndrew
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 17.1:
+        non_striker: N McAndrew
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+        wicket:
+          player_out: O Davies
+          fielders:
+          - PSP Handscomb
+          kind: caught
+    - 17.2:
+        non_striker: N McAndrew
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TD Andrews
+    - 17.3:
+        non_striker: TD Andrews
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: N McAndrew
+    - 17.4:
+        non_striker: N McAndrew
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TD Andrews
+    - 17.5:
+        non_striker: N McAndrew
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TD Andrews
+    - 17.6:
+        non_striker: N McAndrew
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TD Andrews
+    - 18.1:
+        non_striker: TD Andrews
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: N McAndrew
+    - 18.2:
+        non_striker: N McAndrew
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TD Andrews
+    - 18.3:
+        non_striker: N McAndrew
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TD Andrews
+    - 18.4:
+        non_striker: N McAndrew
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TD Andrews
+    - 18.5:
+        non_striker: TD Andrews
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: N McAndrew
+    - 18.6:
+        non_striker: N McAndrew
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TD Andrews
+- 2nd innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: TF Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 0.2:
+        non_striker: TF Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 0.3:
+        non_striker: TF Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          kind: bowled
+    - 0.4:
+        non_striker: TF Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: PSP Handscomb
+    - 0.5:
+        non_striker: TF Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 0.6:
+        non_striker: TF Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 0.7:
+        non_striker: TF Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 1.1:
+        non_striker: PSP Handscomb
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.2:
+        non_striker: PSP Handscomb
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.3:
+        non_striker: PSP Handscomb
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 1.4:
+        non_striker: TF Rogers
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 1.5:
+        non_striker: TF Rogers
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: PSP Handscomb
+    - 1.6:
+        non_striker: TF Rogers
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: PSP Handscomb
+    - 1.7:
+        non_striker: TF Rogers
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PSP Handscomb
+    - 2.1:
+        non_striker: TF Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PSP Handscomb
+    - 2.2:
+        non_striker: PSP Handscomb
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+        wicket:
+          player_out: TF Rogers
+          fielders:
+          - T Sangha
+          kind: caught
+    - 2.3:
+        non_striker: PSP Handscomb
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 2.4:
+        non_striker: PSP Handscomb
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MP Stoinis
+    - 2.5:
+        non_striker: PSP Handscomb
+        bowler: N McAndrew
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MP Stoinis
+    - 2.6:
+        non_striker: PSP Handscomb
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 2.7:
+        non_striker: PSP Handscomb
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 3.1:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 3.2:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PSP Handscomb
+    - 3.3:
+        non_striker: PSP Handscomb
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 3.4:
+        non_striker: PSP Handscomb
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 3.5:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: PSP Handscomb
+    - 3.6:
+        non_striker: MP Stoinis
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 4.1:
+        non_striker: PSP Handscomb
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 4.2:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 4.3:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 4.4:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+    - 4.5:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PSP Handscomb
+        wicket:
+          player_out: PSP Handscomb
+          kind: lbw
+    - 4.6:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 5.1:
+        non_striker: GJ Maxwell
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 5.2:
+        non_striker: GJ Maxwell
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 5.3:
+        non_striker: GJ Maxwell
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 5.4:
+        non_striker: MP Stoinis
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 5.5:
+        non_striker: MP Stoinis
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 5.6:
+        non_striker: GJ Maxwell
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 6.1:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 6.2:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: GJ Maxwell
+    - 6.3:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GJ Maxwell
+    - 6.4:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GJ Maxwell
+    - 6.5:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GJ Maxwell
+    - 6.6:
+        non_striker: MP Stoinis
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 7.1:
+        non_striker: MP Stoinis
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 7.2:
+        non_striker: GJ Maxwell
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 7.3:
+        non_striker: MP Stoinis
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 7.4:
+        non_striker: MP Stoinis
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 7.5:
+        non_striker: GJ Maxwell
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MP Stoinis
+    - 7.6:
+        non_striker: GJ Maxwell
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 8.1:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 8.2:
+        non_striker: MP Stoinis
+        bowler: CJ Green
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: GJ Maxwell
+    - 8.3:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 8.4:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 8.5:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 8.6:
+        non_striker: MP Stoinis
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 8.7:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 9.1:
+        non_striker: MP Stoinis
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 9.2:
+        non_striker: MP Stoinis
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 9.3:
+        non_striker: GJ Maxwell
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 9.4:
+        non_striker: GJ Maxwell
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 9.5:
+        non_striker: MP Stoinis
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 9.6:
+        non_striker: GJ Maxwell
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 10.1:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 10.2:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+        wicket:
+          player_out: MP Stoinis
+          fielders:
+          - GHS Garton
+          kind: caught
+    - 10.3:
+        non_striker: GJ Maxwell
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 10.4:
+        non_striker: HWR Cartwright
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 10.5:
+        non_striker: HWR Cartwright
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 10.6:
+        non_striker: HWR Cartwright
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 11.1:
+        non_striker: HWR Cartwright
+        bowler: T Sangha
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: GJ Maxwell
+    - 11.2:
+        non_striker: HWR Cartwright
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 11.3:
+        non_striker: HWR Cartwright
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+        wicket:
+          player_out: GJ Maxwell
+          kind: caught and bowled
+    - 11.4:
+        non_striker: HWR Cartwright
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+        wicket:
+          player_out: TK Curran
+          fielders:
+          - TD Andrews
+          kind: caught
+    - 11.5:
+        non_striker: HWR Cartwright
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Usama Mir
+    - 11.6:
+        non_striker: HWR Cartwright
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Usama Mir
+    - 11.7:
+        non_striker: HWR Cartwright
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Usama Mir
+    - 12.1:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Usama Mir
+    - 12.2:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Usama Mir
+    - 12.3:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Usama Mir
+    - 12.4:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Usama Mir
+        wicket:
+          player_out: Usama Mir
+          kind: lbw
+    - 12.5:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Steketee
+    - 12.6:
+        non_striker: HWR Cartwright
+        bowler: TD Andrews
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Steketee
+    - 13.1:
+        non_striker: MT Steketee
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 13.2:
+        non_striker: MT Steketee
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: HWR Cartwright
+    - 13.3:
+        non_striker: MT Steketee
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HWR Cartwright
+    - 13.4:
+        non_striker: MT Steketee
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 13.5:
+        non_striker: MT Steketee
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HWR Cartwright
+    - 13.6:
+        non_striker: MT Steketee
+        bowler: T Sangha
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: HWR Cartwright
+    - 13.7:
+        non_striker: MT Steketee
+        bowler: T Sangha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 14.1:
+        non_striker: HWR Cartwright
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Steketee
+    - 14.2:
+        non_striker: MT Steketee
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 14.3:
+        non_striker: MT Steketee
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 14.4:
+        non_striker: MT Steketee
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 14.5:
+        non_striker: MT Steketee
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+        wicket:
+          player_out: HWR Cartwright
+          fielders:
+          - GHS Garton
+          kind: caught
+    - 14.6:
+        non_striker: MT Steketee
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: D Warren
+    - 15.1:
+        non_striker: D Warren
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Steketee
+    - 15.2:
+        non_striker: D Warren
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Steketee
+    - 15.3:
+        non_striker: D Warren
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Steketee
+    - 15.4:
+        non_striker: D Warren
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Steketee
+    - 15.5:
+        non_striker: MT Steketee
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: D Warren
+    - 15.6:
+        non_striker: MT Steketee
+        bowler: GHS Garton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: D Warren
+    - 16.1:
+        non_striker: MT Steketee
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: D Warren
+    - 16.2:
+        non_striker: D Warren
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Steketee
+    - 16.3:
+        non_striker: D Warren
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Steketee
+    - 16.4:
+        non_striker: D Warren
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Steketee
+    - 16.5:
+        non_striker: D Warren
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Steketee
+    - 16.6:
+        non_striker: D Warren
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Steketee
+    - 17.1:
+        non_striker: MT Steketee
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: D Warren
+    - 17.2:
+        non_striker: MT Steketee
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: D Warren
+    - 17.3:
+        non_striker: D Warren
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Steketee
+        wicket:
+          player_out: MT Steketee
+          fielders:
+          - DA Warner
+          kind: caught
+    - 17.4:
+        non_striker: D Warren
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PM Siddle
+    - 17.5:
+        non_striker: PM Siddle
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: D Warren
+    - 17.6:
+        non_striker: PM Siddle
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: D Warren
+        wicket:
+          player_out: D Warren
+          fielders:
+          - DA Warner
+          kind: caught

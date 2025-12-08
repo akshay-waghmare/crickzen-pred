@@ -1,0 +1,2161 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-11'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Adelaide
+  competition: Big Bash League
+  dates:
+  - '2025-01-11'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Adelaide Strikers
+    by:
+      runs: 56
+  overs: 20
+  player_of_match:
+  - MW Short
+  players:
+    Adelaide Strikers:
+    - MW Short
+    - CA Lynn
+    - AT Carey
+    - OJ Pope
+    - AI Ross
+    - J Overton
+    - DJM Short
+    - B Doggett
+    - JS Buckingham
+    - L Pope
+    - L Haskett
+    Brisbane Heat:
+    - JP Wood
+    - MG Neser
+    - NA McSweeney
+    - MT Renshaw
+    - M Bryant
+    - TP Alsop
+    - C Munro
+    - XC Bartlett
+    - MJ Swepson
+    - MP Kuhnemann
+    - SH Johnson
+  registry:
+    people:
+      AI Ross: fb0d68b4
+      AT Carey: 69d03465
+      B Doggett: 898e628d
+      C Munro: af2c687b
+      CA Lynn: 45eda7c8
+      DJM Short: 1a156c88
+      GJ Davidson: 31ad5973
+      J Overton: 59559bc2
+      JP Wood: 3c3adfce
+      JS Buckingham: 10735e1d
+      L Haskett: '037429dc'
+      L Pope: 616a8149
+      M Bryant: f32012f4
+      MG Neser: 0164b064
+      MJ Swepson: 86b4bf88
+      MP Kuhnemann: 7b953689
+      MT Renshaw: 218d4d78
+      MV Waldron: 2e4f11e9
+      MW Short: a90e53ec
+      NA McSweeney: e94d2d50
+      OJ Pope: e94bc520
+      SA Lightbody: 680b8cbf
+      SD Fry: 6b725ed1
+      SH Johnson: 83c3e8e3
+      SJ Nogajski: 9b3f9323
+      TP Alsop: 961b8ff1
+      XC Bartlett: 3b53243a
+  teams:
+  - Adelaide Strikers
+  - Brisbane Heat
+  toss:
+    winner: Brisbane Heat
+    decision: field
+  umpires:
+  - GJ Davidson
+  - SJ Nogajski
+  venue: Adelaide Oval
+innings:
+- 1st innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: CA Lynn
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 0.2:
+        non_striker: CA Lynn
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 0.3:
+        non_striker: CA Lynn
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 0.4:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 0.5:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 0.6:
+        non_striker: CA Lynn
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.1:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 1.2:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 1.3:
+        non_striker: CA Lynn
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.4:
+        non_striker: CA Lynn
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 1.5:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 1.6:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 2.1:
+        non_striker: CA Lynn
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 2.2:
+        non_striker: CA Lynn
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 2.3:
+        non_striker: CA Lynn
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 2.4:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 2.5:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: CA Lynn
+    - 2.6:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 3.1:
+        non_striker: CA Lynn
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 3.2:
+        non_striker: CA Lynn
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 3.3:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 3.4:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 3.5:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 3.6:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 4.1:
+        non_striker: CA Lynn
+        bowler: SH Johnson
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          legbyes: 4
+        batsman: MW Short
+    - 4.2:
+        non_striker: CA Lynn
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 4.3:
+        non_striker: CA Lynn
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 4.4:
+        non_striker: CA Lynn
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 4.5:
+        non_striker: CA Lynn
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 4.6:
+        non_striker: CA Lynn
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 5.1:
+        non_striker: CA Lynn
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 5.2:
+        non_striker: CA Lynn
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 5.3:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 5.4:
+        non_striker: CA Lynn
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 5.5:
+        non_striker: CA Lynn
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 5.6:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 6.1:
+        non_striker: CA Lynn
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 6.2:
+        non_striker: CA Lynn
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 6.3:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 6.4:
+        non_striker: CA Lynn
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 6.5:
+        non_striker: CA Lynn
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 6.6:
+        non_striker: CA Lynn
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 7.1:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 7.2:
+        non_striker: CA Lynn
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 7.3:
+        non_striker: CA Lynn
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 7.4:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 7.5:
+        non_striker: CA Lynn
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 7.6:
+        non_striker: CA Lynn
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 8.1:
+        non_striker: CA Lynn
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 8.2:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 8.3:
+        non_striker: CA Lynn
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 8.4:
+        non_striker: CA Lynn
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 8.5:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+        wicket:
+          player_out: CA Lynn
+          kind: bowled
+    - 8.6:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 9.1:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 9.2:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 9.3:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 9.4:
+        non_striker: MW Short
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AT Carey
+    - 9.5:
+        non_striker: MW Short
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 9.6:
+        non_striker: MW Short
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 10.1:
+        non_striker: AT Carey
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 10.2:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 10.3:
+        non_striker: AT Carey
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 10.4:
+        non_striker: AT Carey
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 10.5:
+        non_striker: AT Carey
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 10.6:
+        non_striker: MW Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AT Carey
+    - 11.1:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 11.2:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 11.3:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 11.4:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 11.5:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 11.6:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 11.7:
+        non_striker: AT Carey
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MW Short
+    - 11.8:
+        non_striker: MW Short
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 12.1:
+        non_striker: AT Carey
+        bowler: MP Kuhnemann
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 12.2:
+        non_striker: AT Carey
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 12.3:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+        wicket:
+          player_out: AT Carey
+          kind: bowled
+    - 12.4:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+    - 12.5:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Pope
+    - 12.6:
+        non_striker: OJ Pope
+        bowler: MP Kuhnemann
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 12.7:
+        non_striker: OJ Pope
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 12.8:
+        non_striker: MW Short
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Pope
+    - 13.1:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: OJ Pope
+    - 13.2:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+        wicket:
+          player_out: OJ Pope
+          kind: bowled
+    - 13.3:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.4:
+        non_striker: AI Ross
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 13.5:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 13.6:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 14.1:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 14.2:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 14.3:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 14.4:
+        non_striker: MW Short
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 14.5:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 14.6:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 15.1:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AI Ross
+    - 15.2:
+        non_striker: MW Short
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 15.3:
+        non_striker: AI Ross
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+        wicket:
+          player_out: MW Short
+          fielders:
+          - XC Bartlett
+          kind: caught
+    - 15.4:
+        non_striker: AI Ross
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Overton
+    - 15.5:
+        non_striker: J Overton
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AI Ross
+    - 15.6:
+        non_striker: J Overton
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 16.1:
+        non_striker: AI Ross
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Overton
+    - 16.2:
+        non_striker: J Overton
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 16.3:
+        non_striker: J Overton
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 16.4:
+        non_striker: J Overton
+        bowler: SH Johnson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: AI Ross
+    - 16.5:
+        non_striker: AI Ross
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Overton
+    - 16.6:
+        non_striker: J Overton
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 17.1:
+        non_striker: J Overton
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AI Ross
+    - 17.2:
+        non_striker: J Overton
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AI Ross
+    - 17.3:
+        non_striker: J Overton
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 17.4:
+        non_striker: J Overton
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 17.5:
+        non_striker: AI Ross
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Overton
+        wicket:
+          player_out: J Overton
+          kind: bowled
+    - 17.6:
+        non_striker: AI Ross
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 18.1:
+        non_striker: AI Ross
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 18.2:
+        non_striker: AI Ross
+        bowler: XC Bartlett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: DJM Short
+    - 18.3:
+        non_striker: DJM Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AI Ross
+    - 18.4:
+        non_striker: DJM Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 18.5:
+        non_striker: DJM Short
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 18.6:
+        non_striker: AI Ross
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 19.1:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 19.2:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 19.3:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DJM Short
+    - 19.4:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 19.5:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 19.6:
+        non_striker: AI Ross
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+- 2nd innings:
+    team: Brisbane Heat
+    deliveries:
+    - 0.1:
+        non_striker: MG Neser
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 0.2:
+        non_striker: MG Neser
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 0.3:
+        non_striker: MG Neser
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 0.4:
+        non_striker: JP Wood
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+    - 0.5:
+        non_striker: JP Wood
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+    - 0.6:
+        non_striker: JP Wood
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MG Neser
+    - 1.1:
+        non_striker: MG Neser
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 1.2:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MG Neser
+    - 1.3:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+    - 1.4:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MG Neser
+    - 1.5:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MG Neser
+    - 1.6:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+        wicket:
+          player_out: MG Neser
+          fielders:
+          - AI Ross
+          kind: caught
+    - 2.1:
+        non_striker: NA McSweeney
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Wood
+    - 2.2:
+        non_striker: NA McSweeney
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JP Wood
+    - 2.3:
+        non_striker: JP Wood
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 2.4:
+        non_striker: NA McSweeney
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Wood
+    - 2.5:
+        non_striker: NA McSweeney
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 2.6:
+        non_striker: JP Wood
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 3.1:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NA McSweeney
+    - 3.2:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NA McSweeney
+    - 3.3:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: NA McSweeney
+    - 3.4:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NA McSweeney
+    - 3.5:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 3.6:
+        non_striker: JP Wood
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 4.1:
+        non_striker: NA McSweeney
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 4.2:
+        non_striker: NA McSweeney
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 4.3:
+        non_striker: JP Wood
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 4.4:
+        non_striker: JP Wood
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 4.5:
+        non_striker: NA McSweeney
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 4.6:
+        non_striker: NA McSweeney
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Wood
+    - 5.1:
+        non_striker: JP Wood
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 5.2:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 5.3:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Wood
+    - 5.4:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JP Wood
+    - 5.5:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 5.6:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 6.1:
+        non_striker: NA McSweeney
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 6.2:
+        non_striker: JP Wood
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 6.3:
+        non_striker: JP Wood
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 6.4:
+        non_striker: JP Wood
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 6.5:
+        non_striker: NA McSweeney
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 6.6:
+        non_striker: JP Wood
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 7.1:
+        non_striker: NA McSweeney
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 7.2:
+        non_striker: NA McSweeney
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: JP Wood
+    - 7.3:
+        non_striker: JP Wood
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NA McSweeney
+    - 7.4:
+        non_striker: JP Wood
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 7.5:
+        non_striker: NA McSweeney
+        bowler: J Overton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JP Wood
+    - 7.6:
+        non_striker: NA McSweeney
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+    - 7.7:
+        non_striker: NA McSweeney
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Wood
+    - 8.1:
+        non_striker: NA McSweeney
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Wood
+        wicket:
+          player_out: JP Wood
+          kind: lbw
+    - 8.2:
+        non_striker: NA McSweeney
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 8.3:
+        non_striker: MT Renshaw
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 8.4:
+        non_striker: MT Renshaw
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 8.5:
+        non_striker: NA McSweeney
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 8.6:
+        non_striker: NA McSweeney
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 9.1:
+        non_striker: MT Renshaw
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 9.2:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 9.3:
+        non_striker: MT Renshaw
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 9.4:
+        non_striker: MT Renshaw
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 9.5:
+        non_striker: NA McSweeney
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 9.6:
+        non_striker: MT Renshaw
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 10.1:
+        non_striker: MT Renshaw
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+        wicket:
+          player_out: NA McSweeney
+          fielders:
+          - AT Carey
+          - J Overton
+          kind: run out
+    - 10.2:
+        non_striker: MT Renshaw
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 10.3:
+        non_striker: MT Renshaw
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 10.4:
+        non_striker: M Bryant
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 10.5:
+        non_striker: M Bryant
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 10.6:
+        non_striker: MT Renshaw
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Bryant
+    - 11.1:
+        non_striker: M Bryant
+        bowler: J Overton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MT Renshaw
+    - 11.2:
+        non_striker: MT Renshaw
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Bryant
+    - 11.3:
+        non_striker: MT Renshaw
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 11.4:
+        non_striker: M Bryant
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 11.5:
+        non_striker: M Bryant
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 11.6:
+        non_striker: MT Renshaw
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Bryant
+    - 12.1:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 12.2:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MT Renshaw
+    - 12.3:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 12.4:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 12.5:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 12.6:
+        non_striker: MT Renshaw
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 12.7:
+        non_striker: M Bryant
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 13.1:
+        non_striker: MT Renshaw
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 13.2:
+        non_striker: M Bryant
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+        wicket:
+          player_out: MT Renshaw
+          fielders:
+          - MW Short
+          kind: caught
+    - 13.3:
+        non_striker: M Bryant
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 13.4:
+        non_striker: M Bryant
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 13.5:
+        non_striker: M Bryant
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 13.6:
+        non_striker: TP Alsop
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 14.1:
+        non_striker: M Bryant
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 14.2:
+        non_striker: TP Alsop
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+        wicket:
+          player_out: M Bryant
+          fielders:
+          - L Haskett
+          kind: caught
+    - 14.3:
+        non_striker: TP Alsop
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+    - 14.4:
+        non_striker: TP Alsop
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+        wicket:
+          player_out: C Munro
+          fielders:
+          - J Overton
+          kind: caught
+    - 14.5:
+        non_striker: TP Alsop
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: XC Bartlett
+    - 14.6:
+        non_striker: TP Alsop
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: XC Bartlett
+    - 15.1:
+        non_striker: XC Bartlett
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 15.2:
+        non_striker: TP Alsop
+        bowler: L Pope
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: XC Bartlett
+    - 15.3:
+        non_striker: TP Alsop
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: XC Bartlett
+        wicket:
+          player_out: XC Bartlett
+          fielders:
+          - DJM Short
+          kind: caught
+    - 15.4:
+        non_striker: TP Alsop
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Swepson
+    - 15.5:
+        non_striker: MJ Swepson
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 15.6:
+        non_striker: TP Alsop
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Swepson
+        wicket:
+          player_out: MJ Swepson
+          kind: bowled
+    - 15.7:
+        non_striker: TP Alsop
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Kuhnemann
+    - 16.1:
+        non_striker: MP Kuhnemann
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 16.2:
+        non_striker: MP Kuhnemann
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TP Alsop
+    - 16.3:
+        non_striker: MP Kuhnemann
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+        wicket:
+          player_out: TP Alsop
+          fielders:
+          - DJM Short
+          kind: caught
+    - 16.4:
+        non_striker: MP Kuhnemann
+        bowler: L Haskett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SH Johnson
+    - 16.5:
+        non_striker: SH Johnson
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Kuhnemann
+    - 16.6:
+        non_striker: MP Kuhnemann
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SH Johnson
+    - 17.1:
+        non_striker: MP Kuhnemann
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SH Johnson
+    - 17.2:
+        non_striker: MP Kuhnemann
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SH Johnson
+    - 17.3:
+        non_striker: MP Kuhnemann
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SH Johnson
+    - 17.4:
+        non_striker: MP Kuhnemann
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SH Johnson
+    - 17.5:
+        non_striker: MP Kuhnemann
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SH Johnson
+    - 17.6:
+        non_striker: MP Kuhnemann
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SH Johnson
+    - 18.1:
+        non_striker: SH Johnson
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Kuhnemann
+    - 18.2:
+        non_striker: MP Kuhnemann
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SH Johnson
+    - 18.3:
+        non_striker: MP Kuhnemann
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SH Johnson
+    - 18.4:
+        non_striker: MP Kuhnemann
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SH Johnson
+    - 18.5:
+        non_striker: SH Johnson
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Kuhnemann
+    - 18.6:
+        non_striker: SH Johnson
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Kuhnemann
+    - 19.1:
+        non_striker: MP Kuhnemann
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SH Johnson
+    - 19.2:
+        non_striker: SH Johnson
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MP Kuhnemann
+    - 19.3:
+        non_striker: SH Johnson
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Kuhnemann
+    - 19.4:
+        non_striker: SH Johnson
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MP Kuhnemann
+    - 19.5:
+        non_striker: SH Johnson
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Kuhnemann
+    - 19.6:
+        non_striker: MP Kuhnemann
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SH Johnson
+        wicket:
+          player_out: SH Johnson
+          fielders:
+          - JS Buckingham
+          kind: caught

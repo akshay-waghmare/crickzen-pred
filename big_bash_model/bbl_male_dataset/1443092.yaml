@@ -1,0 +1,2191 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-16'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Brisbane
+  competition: Big Bash League
+  dates:
+  - '2025-01-16'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Hobart Hurricanes
+    by:
+      wickets: 5
+  overs: 20
+  player_of_match:
+  - CP Jewell
+  players:
+    Brisbane Heat:
+    - UT Khawaja
+    - NA McSweeney
+    - M Labuschagne
+    - MT Renshaw
+    - M Bryant
+    - TP Alsop
+    - MG Neser
+    - XC Bartlett
+    - SH Johnson
+    - MP Kuhnemann
+    - MJ Swepson
+    Hobart Hurricanes:
+    - CP Jewell
+    - MJ Owen
+    - CA Wakim
+    - Nikhil Chaudhary
+    - TH David
+    - MS Wade
+    - JR Doran
+    - NT Ellis
+    - P Hatzoglou
+    - RP Meredith
+    - M Bean
+  registry:
+    people:
+      CA Wakim: c5e415aa
+      CP Jewell: 806c4e58
+      JR Doran: 9cebb612
+      M Bean: d0eb7868
+      M Bryant: f32012f4
+      M Labuschagne: fa433be6
+      MG Neser: 0164b064
+      MH Wessels: 90f47cf2
+      MJ Owen: f2c936d7
+      MJ Swepson: 86b4bf88
+      MP Kuhnemann: 7b953689
+      MS Wade: afa7e784
+      MT Renshaw: 218d4d78
+      MW Graham-Smith: 18aca3ce
+      NA McSweeney: e94d2d50
+      NT Ellis: 9eb1455b
+      Nikhil Chaudhary: 1f84183a
+      P Hatzoglou: 6f95e5fa
+      RP Meredith: '64775749'
+      SAJ Craig: 689f2eed
+      SE Dionysius: ac886e6f
+      SH Johnson: 83c3e8e3
+      SJ Davis: bc71b0b2
+      TH David: f1f99156
+      TP Alsop: 961b8ff1
+      UT Khawaja: 331ea488
+      XC Bartlett: 3b53243a
+  teams:
+  - Brisbane Heat
+  - Hobart Hurricanes
+  toss:
+    winner: Hobart Hurricanes
+    decision: field
+  umpires:
+  - SAJ Craig
+  - SE Dionysius
+  venue: Brisbane Cricket Ground, Woolloongabba, Brisbane
+innings:
+- 1st innings:
+    team: Brisbane Heat
+    deliveries:
+    - 0.1:
+        non_striker: NA McSweeney
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 0.2:
+        non_striker: UT Khawaja
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 0.3:
+        non_striker: UT Khawaja
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 0.4:
+        non_striker: UT Khawaja
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 0.5:
+        non_striker: NA McSweeney
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 0.6:
+        non_striker: NA McSweeney
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: UT Khawaja
+    - 1.1:
+        non_striker: UT Khawaja
+        bowler: M Bean
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NA McSweeney
+    - 1.2:
+        non_striker: UT Khawaja
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+        wicket:
+          player_out: NA McSweeney
+          fielders:
+          - CP Jewell
+          kind: caught
+    - 1.3:
+        non_striker: UT Khawaja
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 1.4:
+        non_striker: UT Khawaja
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 1.5:
+        non_striker: UT Khawaja
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 1.6:
+        non_striker: UT Khawaja
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 1.7:
+        non_striker: UT Khawaja
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 2.1:
+        non_striker: M Labuschagne
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 2.2:
+        non_striker: UT Khawaja
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 2.3:
+        non_striker: M Labuschagne
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 2.4:
+        non_striker: M Labuschagne
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: UT Khawaja
+    - 2.5:
+        non_striker: UT Khawaja
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 2.6:
+        non_striker: UT Khawaja
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 3.1:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: UT Khawaja
+    - 3.2:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: UT Khawaja
+    - 3.3:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: UT Khawaja
+        wicket:
+          player_out: UT Khawaja
+          fielders:
+          - JR Doran
+          kind: caught
+    - 3.4:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 3.5:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: MT Renshaw
+    - 3.6:
+        non_striker: MT Renshaw
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 4.1:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 4.2:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 4.3:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 4.4:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 4.5:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MT Renshaw
+    - 4.6:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 4.7:
+        non_striker: MT Renshaw
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 5.1:
+        non_striker: M Labuschagne
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 5.2:
+        non_striker: MT Renshaw
+        bowler: P Hatzoglou
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: M Labuschagne
+    - 5.3:
+        non_striker: MT Renshaw
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 5.4:
+        non_striker: MT Renshaw
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 5.5:
+        non_striker: M Labuschagne
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 5.6:
+        non_striker: MT Renshaw
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 5.7:
+        non_striker: M Labuschagne
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 6.1:
+        non_striker: MT Renshaw
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 6.2:
+        non_striker: M Labuschagne
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 6.3:
+        non_striker: M Labuschagne
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MT Renshaw
+    - 6.4:
+        non_striker: M Labuschagne
+        bowler: TH David
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          byes: 4
+        batsman: MT Renshaw
+    - 6.5:
+        non_striker: M Labuschagne
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 6.6:
+        non_striker: MT Renshaw
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 7.1:
+        non_striker: MT Renshaw
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 7.2:
+        non_striker: M Labuschagne
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 7.3:
+        non_striker: M Labuschagne
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 7.4:
+        non_striker: MT Renshaw
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 7.5:
+        non_striker: M Labuschagne
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MT Renshaw
+    - 7.6:
+        non_striker: M Labuschagne
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 8.1:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 8.2:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Renshaw
+    - 8.3:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Renshaw
+    - 8.4:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MT Renshaw
+    - 8.5:
+        non_striker: MT Renshaw
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 8.6:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MT Renshaw
+    - 9.1:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+    - 9.2:
+        non_striker: MT Renshaw
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 9.3:
+        non_striker: MT Renshaw
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 9.4:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Renshaw
+        wicket:
+          player_out: MT Renshaw
+          fielders:
+          - TH David
+          - MS Wade
+          kind: run out
+    - 9.5:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 9.6:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 10.1:
+        non_striker: M Bryant
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 10.2:
+        non_striker: M Labuschagne
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 10.3:
+        non_striker: M Labuschagne
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 10.4:
+        non_striker: M Bryant
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: M Labuschagne
+    - 10.5:
+        non_striker: M Labuschagne
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Bryant
+    - 10.6:
+        non_striker: M Labuschagne
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 11.1:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 11.2:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+        wicket:
+          player_out: M Bryant
+          fielders:
+          - RP Meredith
+          kind: caught
+    - 11.3:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 11.4:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TP Alsop
+    - 11.5:
+        non_striker: TP Alsop
+        bowler: MJ Owen
+        runs:
+          extras: 1
+          total: 2
+          batsman: 1
+        extras:
+          noballs: 1
+        batsman: M Labuschagne
+    - 11.6:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 11.7:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TP Alsop
+    - 12.1:
+        non_striker: TP Alsop
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 12.2:
+        non_striker: M Labuschagne
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 12.3:
+        non_striker: TP Alsop
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 12.4:
+        non_striker: M Labuschagne
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 12.5:
+        non_striker: TP Alsop
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 12.6:
+        non_striker: M Labuschagne
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 13.1:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 13.2:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 13.3:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 13.4:
+        non_striker: TP Alsop
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 13.5:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TP Alsop
+    - 13.6:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TP Alsop
+    - 14.1:
+        non_striker: TP Alsop
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 14.2:
+        non_striker: TP Alsop
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 14.3:
+        non_striker: M Labuschagne
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 14.4:
+        non_striker: TP Alsop
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 14.5:
+        non_striker: TP Alsop
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 14.6:
+        non_striker: TP Alsop
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Labuschagne
+    - 15.1:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TP Alsop
+    - 15.2:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TP Alsop
+    - 15.3:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 15.4:
+        non_striker: TP Alsop
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 15.5:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 15.6:
+        non_striker: TP Alsop
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 16.1:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TP Alsop
+    - 16.2:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 16.3:
+        non_striker: TP Alsop
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 16.4:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 16.5:
+        non_striker: TP Alsop
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 16.6:
+        non_striker: M Labuschagne
+        bowler: M Bean
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+    - 17.1:
+        non_striker: TP Alsop
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+    - 17.2:
+        non_striker: TP Alsop
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Labuschagne
+    - 17.3:
+        non_striker: TP Alsop
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 17.4:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: TP Alsop
+    - 17.5:
+        non_striker: TP Alsop
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 17.6:
+        non_striker: M Labuschagne
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TP Alsop
+    - 18.1:
+        non_striker: TP Alsop
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Labuschagne
+    - 18.2:
+        non_striker: TP Alsop
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Labuschagne
+    - 18.3:
+        non_striker: M Labuschagne
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TP Alsop
+    - 18.4:
+        non_striker: M Labuschagne
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TP Alsop
+    - 18.5:
+        non_striker: M Labuschagne
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TP Alsop
+    - 18.6:
+        non_striker: TP Alsop
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Labuschagne
+    - 19.1:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TP Alsop
+        wicket:
+          player_out: TP Alsop
+          fielders:
+          - TH David
+          kind: caught
+    - 19.2:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MG Neser
+    - 19.3:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MG Neser
+    - 19.4:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+    - 19.5:
+        non_striker: M Labuschagne
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MG Neser
+    - 19.6:
+        non_striker: MG Neser
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Labuschagne
+        wicket:
+          player_out: M Labuschagne
+          kind: caught and bowled
+- 2nd innings:
+    team: Hobart Hurricanes
+    deliveries:
+    - 0.1:
+        non_striker: MJ Owen
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 0.2:
+        non_striker: MJ Owen
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 0.3:
+        non_striker: MJ Owen
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 0.4:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 0.5:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 0.6:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 1.1:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.2:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CP Jewell
+    - 1.3:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.4:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 1.5:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 1.6:
+        non_striker: CP Jewell
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 1.7:
+        non_striker: CP Jewell
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Owen
+    - 2.1:
+        non_striker: MJ Owen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: CP Jewell
+    - 2.2:
+        non_striker: CP Jewell
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 2.3:
+        non_striker: CP Jewell
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 2.4:
+        non_striker: CP Jewell
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 2.5:
+        non_striker: CP Jewell
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 2.6:
+        non_striker: CP Jewell
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 3.1:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 3.2:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 3.3:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 3.4:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 3.5:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 3.6:
+        non_striker: MJ Owen
+        bowler: XC Bartlett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: CP Jewell
+    - 4.1:
+        non_striker: MJ Owen
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 4.2:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 4.3:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 4.4:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 4.5:
+        non_striker: MJ Owen
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 4.6:
+        non_striker: MJ Owen
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 5.1:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 5.2:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 5.3:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 5.4:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 5.5:
+        non_striker: MJ Owen
+        bowler: MJ Swepson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: CP Jewell
+    - 5.6:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 6.1:
+        non_striker: MJ Owen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 6.2:
+        non_striker: MJ Owen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 6.3:
+        non_striker: MJ Owen
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 6.4:
+        non_striker: CP Jewell
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Owen
+    - 6.5:
+        non_striker: CP Jewell
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+        wicket:
+          player_out: MJ Owen
+          fielders:
+          - UT Khawaja
+          kind: caught
+    - 6.6:
+        non_striker: CP Jewell
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 7.1:
+        non_striker: CA Wakim
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 7.2:
+        non_striker: CA Wakim
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 7.3:
+        non_striker: CA Wakim
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 7.4:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+        wicket:
+          player_out: CA Wakim
+          fielders:
+          - TP Alsop
+          kind: stumped
+    - 7.5:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 7.6:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 8.1:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 8.2:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 8.3:
+        non_striker: Nikhil Chaudhary
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 8.4:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 8.5:
+        non_striker: Nikhil Chaudhary
+        bowler: MP Kuhnemann
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CP Jewell
+    - 8.6:
+        non_striker: Nikhil Chaudhary
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 8.7:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 9.1:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 9.2:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 9.3:
+        non_striker: Nikhil Chaudhary
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 9.4:
+        non_striker: Nikhil Chaudhary
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 9.5:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 9.6:
+        non_striker: Nikhil Chaudhary
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 10.1:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 10.2:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Nikhil Chaudhary
+    - 10.3:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 10.4:
+        non_striker: Nikhil Chaudhary
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 10.5:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 10.6:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 10.7:
+        non_striker: Nikhil Chaudhary
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 11.1:
+        non_striker: Nikhil Chaudhary
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 11.2:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 11.3:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 11.4:
+        non_striker: Nikhil Chaudhary
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 11.5:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Nikhil Chaudhary
+    - 11.6:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 11.7:
+        non_striker: Nikhil Chaudhary
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 12.1:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 12.2:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 12.3:
+        non_striker: CP Jewell
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 12.4:
+        non_striker: Nikhil Chaudhary
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 12.5:
+        non_striker: Nikhil Chaudhary
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 12.6:
+        non_striker: Nikhil Chaudhary
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 13.1:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 13.2:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 13.3:
+        non_striker: Nikhil Chaudhary
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 13.4:
+        non_striker: Nikhil Chaudhary
+        bowler: MJ Swepson
+        runs:
+          extras: 1
+          total: 5
+          batsman: 4
+        extras:
+          noballs: 1
+        batsman: CP Jewell
+    - 13.5:
+        non_striker: Nikhil Chaudhary
+        bowler: MJ Swepson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CP Jewell
+    - 13.6:
+        non_striker: Nikhil Chaudhary
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 13.7:
+        non_striker: Nikhil Chaudhary
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 13.8:
+        non_striker: CP Jewell
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 14.1:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 14.2:
+        non_striker: Nikhil Chaudhary
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 14.3:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: Nikhil Chaudhary
+    - 14.4:
+        non_striker: Nikhil Chaudhary
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CP Jewell
+    - 14.5:
+        non_striker: Nikhil Chaudhary
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 14.6:
+        non_striker: CP Jewell
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Nikhil Chaudhary
+    - 15.1:
+        non_striker: Nikhil Chaudhary
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 15.2:
+        non_striker: CP Jewell
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 15.3:
+        non_striker: Nikhil Chaudhary
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 15.4:
+        non_striker: Nikhil Chaudhary
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 15.5:
+        non_striker: CP Jewell
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+        wicket:
+          player_out: Nikhil Chaudhary
+          fielders:
+          - NA McSweeney
+          kind: caught
+    - 15.6:
+        non_striker: CP Jewell
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 16.1:
+        non_striker: TH David
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 16.2:
+        non_striker: TH David
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+        wicket:
+          player_out: CP Jewell
+          fielders:
+          - NA McSweeney
+          kind: caught
+    - 16.3:
+        non_striker: TH David
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 16.4:
+        non_striker: MS Wade
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 16.5:
+        non_striker: MS Wade
+        bowler: SH Johnson
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          byes: 4
+        batsman: TH David
+    - 16.6:
+        non_striker: MS Wade
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 17.1:
+        non_striker: TH David
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MS Wade
+    - 17.2:
+        non_striker: TH David
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 17.3:
+        non_striker: MS Wade
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 17.4:
+        non_striker: TH David
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 17.5:
+        non_striker: TH David
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 17.6:
+        non_striker: MS Wade
+        bowler: M Labuschagne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        replacements:
+          role:
+          - in: M Labuschagne
+            out: MP Kuhnemann
+            reason: injury
+            role: bowler
+        batsman: TH David
+    - 18.1:
+        non_striker: TH David
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 18.2:
+        non_striker: MS Wade
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 18.3:
+        non_striker: MS Wade
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TH David
+    - 18.4:
+        non_striker: MS Wade
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 18.5:
+        non_striker: MS Wade
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+        wicket:
+          player_out: TH David
+          fielders:
+          - MJ Swepson
+          kind: caught
+    - 18.6:
+        non_striker: MS Wade
+        bowler: SH Johnson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JR Doran
+    - 19.1:
+        non_striker: JR Doran
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MS Wade
+    - 19.2:
+        non_striker: JR Doran
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 19.3:
+        non_striker: MS Wade
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JR Doran
+    - 19.4:
+        non_striker: MS Wade
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JR Doran
+    - 19.5:
+        non_striker: MS Wade
+        bowler: XC Bartlett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: JR Doran
+    - 19.6:
+        non_striker: JR Doran
+        bowler: XC Bartlett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MS Wade

@@ -1,0 +1,1597 @@
+---
+meta:
+  data_version: 0.92
+  created: '2022-12-22'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Sydney
+  competition: Big Bash League
+  dates:
+  - '2022-12-22'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Sydney Sixers
+    by:
+      runs: 6
+  overs: 20
+  player_of_match:
+  - JR Philippe
+  players:
+    Sydney Sixers:
+    - KR Patterson
+    - JR Philippe
+    - JM Vince
+    - MC Henriques
+    - JC Silk
+    - DT Christian
+    - H Kerr
+    - SA Abbott
+    - SNJ O'Keefe
+    - Naveen-ul-Haq
+    - T Murphy
+    Hobart Hurricanes:
+    - BR McDermott
+    - DJM Short
+    - MS Wade
+    - Shadab Khan
+    - TH David
+    - JDS Neesham
+    - Asif Ali
+    - JS Paris
+    - NT Ellis
+    - PG Dooley
+    - RP Meredith
+  registry:
+    people:
+      Asif Ali: 0a4736eb
+      BC Treloar: f7e8ee52
+      BR McDermott: c41043e6
+      CA Polosak: 26a360d2
+      DJM Short: 1a156c88
+      DT Christian: 2a2e6343
+      H Kerr: f422728b
+      JC Silk: 7a6dc294
+      JDS Neesham: 9219eff0
+      JM Vince: a15618fe
+      JR Philippe: '39086549'
+      JS Paris: 7c8f533d
+      KR Patterson: e3bf8356
+      MC Henriques: 32198ae0
+      MS Wade: afa7e784
+      MW Graham-Smith: 18aca3ce
+      NT Ellis: 9eb1455b
+      Naveen-ul-Haq: c0c411cb
+      PG Dooley: 5e3054d0
+      RP Meredith: '64775749'
+      RW Stratford: '85489579'
+      SA Abbott: 1a2676c5
+      SNJ O'Keefe: 3540beff
+      Shadab Khan: 9de62878
+      T Murphy: ac2e7ec0
+      TH David: f1f99156
+      Troy Penman: 0aa42c26
+  teams:
+  - Sydney Sixers
+  - Hobart Hurricanes
+  toss:
+    winner: Sydney Sixers
+    decision: bat
+  umpires:
+  - CA Polosak
+  - MW Graham-Smith
+  venue: Sydney Cricket Ground
+innings:
+- 1st innings:
+    team: Sydney Sixers
+    deliveries:
+    - 0.1:
+        non_striker: JR Philippe
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 0.2:
+        non_striker: JR Philippe
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 0.3:
+        non_striker: KR Patterson
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JR Philippe
+    - 0.4:
+        non_striker: KR Patterson
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: JR Philippe
+    - 0.5:
+        non_striker: JR Philippe
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 0.6:
+        non_striker: JR Philippe
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 1.1:
+        non_striker: JR Philippe
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 1.2:
+        non_striker: KR Patterson
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JR Philippe
+    - 1.3:
+        non_striker: KR Patterson
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: JR Philippe
+    - 1.4:
+        non_striker: JR Philippe
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 1.5:
+        non_striker: KR Patterson
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 1.6:
+        non_striker: JR Philippe
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 2.1:
+        non_striker: KR Patterson
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 2.2:
+        non_striker: JR Philippe
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: KR Patterson
+    - 2.3:
+        non_striker: JR Philippe
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 2.4:
+        non_striker: JR Philippe
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: KR Patterson
+    - 2.5:
+        non_striker: JR Philippe
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: KR Patterson
+    - 2.6:
+        non_striker: JR Philippe
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: KR Patterson
+    - 3.1:
+        non_striker: KR Patterson
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+    - 3.2:
+        non_striker: KR Patterson
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+    - 3.3:
+        non_striker: KR Patterson
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 3.4:
+        non_striker: JR Philippe
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 3.5:
+        non_striker: JR Philippe
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 3.6:
+        non_striker: KR Patterson
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JR Philippe
+    - 4.1:
+        non_striker: JR Philippe
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 4.2:
+        non_striker: JR Philippe
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: KR Patterson
+    - 4.3:
+        non_striker: JR Philippe
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 4.4:
+        non_striker: KR Patterson
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 4.5:
+        non_striker: JR Philippe
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: KR Patterson
+    - 4.6:
+        non_striker: JR Philippe
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 5.1:
+        non_striker: JR Philippe
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 5.2:
+        non_striker: JR Philippe
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 5.3:
+        non_striker: KR Patterson
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JR Philippe
+    - 5.4:
+        non_striker: KR Patterson
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JR Philippe
+    - 5.5:
+        non_striker: KR Patterson
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 5.6:
+        non_striker: JR Philippe
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 6.1:
+        non_striker: JR Philippe
+        bowler: JDS Neesham
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: KR Patterson
+    - 6.2:
+        non_striker: JR Philippe
+        bowler: JDS Neesham
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: KR Patterson
+    - 6.3:
+        non_striker: KR Patterson
+        bowler: JDS Neesham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 6.4:
+        non_striker: JR Philippe
+        bowler: JDS Neesham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+        wicket:
+          player_out: KR Patterson
+          fielders:
+          - MS Wade
+          kind: caught
+    - 6.5:
+        non_striker: JR Philippe
+        bowler: JDS Neesham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 6.6:
+        non_striker: JM Vince
+        bowler: JDS Neesham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 7.1:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JR Philippe
+    - 7.2:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JR Philippe
+    - 7.3:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JR Philippe
+    - 7.4:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JR Philippe
+    - 7.5:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+        wicket:
+          player_out: JR Philippe
+          fielders:
+          - Asif Ali
+          kind: caught
+    - 7.6:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+        wicket:
+          player_out: MC Henriques
+          kind: caught and bowled
+    - 8.1:
+        non_striker: JC Silk
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 8.2:
+        non_striker: JC Silk
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 8.3:
+        non_striker: JM Vince
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+        wicket:
+          player_out: JC Silk
+          kind: bowled
+    - 8.4:
+        non_striker: JM Vince
+        bowler: PG Dooley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DT Christian
+    - 8.5:
+        non_striker: JM Vince
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DT Christian
+    - 8.6:
+        non_striker: JM Vince
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DT Christian
+        wicket:
+          player_out: DT Christian
+          fielders:
+          - MS Wade
+          kind: caught
+    - 8.7:
+        non_striker: JM Vince
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 9.1:
+        non_striker: H Kerr
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 9.2:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 9.3:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 9.4:
+        non_striker: H Kerr
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 9.5:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: H Kerr
+    - 9.6:
+        non_striker: JM Vince
+        bowler: Shadab Khan
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: H Kerr
+    - 10.1:
+        non_striker: H Kerr
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Vince
+    - 10.2:
+        non_striker: H Kerr
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JM Vince
+    - 10.3:
+        non_striker: H Kerr
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 10.4:
+        non_striker: JM Vince
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 10.5:
+        non_striker: JM Vince
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 10.6:
+        non_striker: JM Vince
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: H Kerr
+    - 10.7:
+        non_striker: JM Vince
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 11.1:
+        non_striker: JM Vince
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 11.2:
+        non_striker: JM Vince
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: H Kerr
+    - 11.3:
+        non_striker: JM Vince
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 11.4:
+        non_striker: H Kerr
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 11.5:
+        non_striker: H Kerr
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 11.6:
+        non_striker: JM Vince
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 12.1:
+        non_striker: H Kerr
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 12.2:
+        non_striker: JM Vince
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: H Kerr
+    - 12.3:
+        non_striker: JM Vince
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: H Kerr
+    - 12.4:
+        non_striker: JM Vince
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: H Kerr
+    - 12.5:
+        non_striker: JM Vince
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 12.6:
+        non_striker: H Kerr
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Vince
+    - 13.1:
+        non_striker: JM Vince
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 7
+          batsman: 6
+        extras:
+          noballs: 1
+        batsman: H Kerr
+    - 13.2:
+        non_striker: JM Vince
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 13.3:
+        non_striker: H Kerr
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JM Vince
+    - 13.4:
+        non_striker: H Kerr
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 13.5:
+        non_striker: JM Vince
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 13.6:
+        non_striker: H Kerr
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Vince
+    - 13.7:
+        non_striker: H Kerr
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JM Vince
+    - 13.8:
+        non_striker: H Kerr
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Vince
+    - 13.9:
+        non_striker: H Kerr
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+        wicket:
+          player_out: H Kerr
+          fielders:
+          - JDS Neesham
+          - RP Meredith
+          kind: run out
+- 2nd innings:
+    team: Hobart Hurricanes
+    deliveries:
+    - 0.1:
+        non_striker: DJM Short
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 0.2:
+        non_striker: BR McDermott
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.3:
+        non_striker: BR McDermott
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.4:
+        non_striker: BR McDermott
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DJM Short
+    - 0.5:
+        non_striker: BR McDermott
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 0.6:
+        non_striker: BR McDermott
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 1.1:
+        non_striker: BR McDermott
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 1.2:
+        non_striker: DJM Short
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 1.3:
+        non_striker: DJM Short
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: BR McDermott
+    - 1.4:
+        non_striker: BR McDermott
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 1.5:
+        non_striker: BR McDermott
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DJM Short
+    - 1.6:
+        non_striker: BR McDermott
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 1.7:
+        non_striker: DJM Short
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 2.1:
+        non_striker: DJM Short
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BR McDermott
+    - 2.2:
+        non_striker: DJM Short
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BR McDermott
+    - 2.3:
+        non_striker: DJM Short
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BR McDermott
+    - 2.4:
+        non_striker: BR McDermott
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 2.5:
+        non_striker: BR McDermott
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 2.6:
+        non_striker: BR McDermott
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+        wicket:
+          player_out: DJM Short
+          kind: bowled
+    - 3.1:
+        non_striker: MS Wade
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 3.2:
+        non_striker: MS Wade
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 3.3:
+        non_striker: MS Wade
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 3.4:
+        non_striker: MS Wade
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BR McDermott
+    - 3.5:
+        non_striker: MS Wade
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+    - 3.6:
+        non_striker: MS Wade
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BR McDermott
+        wicket:
+          player_out: BR McDermott
+          kind: bowled
+    - 4.1:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 4.2:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MS Wade
+    - 4.3:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 4.4:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 4.5:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MS Wade
+    - 4.6:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 5.1:
+        non_striker: Shadab Khan
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 5.2:
+        non_striker: Shadab Khan
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 5.3:
+        non_striker: MS Wade
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Shadab Khan
+    - 5.4:
+        non_striker: MS Wade
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Shadab Khan
+    - 5.5:
+        non_striker: MS Wade
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Shadab Khan
+    - 5.6:
+        non_striker: MS Wade
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Shadab Khan
+    - 6.1:
+        non_striker: Shadab Khan
+        bowler: SA Abbott
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MS Wade
+    - 6.2:
+        non_striker: MS Wade
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 6.3:
+        non_striker: Shadab Khan
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 6.4:
+        non_striker: Shadab Khan
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MS Wade
+    - 6.5:
+        non_striker: Shadab Khan
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 6.6:
+        non_striker: MS Wade
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 7.1:
+        non_striker: MS Wade
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Shadab Khan
+    - 7.2:
+        non_striker: MS Wade
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 7.3:
+        non_striker: Shadab Khan
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 7.4:
+        non_striker: Shadab Khan
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 7.5:
+        non_striker: Shadab Khan
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 7.6:
+        non_striker: Shadab Khan
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MS Wade
+    - 8.1:
+        non_striker: MS Wade
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Shadab Khan
+    - 8.2:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+        wicket:
+          player_out: MS Wade
+          fielders:
+          - JC Silk
+          kind: caught
+    - 8.3:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 8.4:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 8.5:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TH David
+    - 8.6:
+        non_striker: Shadab Khan
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TH David
+    - 9.1:
+        non_striker: TH David
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Shadab Khan
+    - 9.2:
+        non_striker: TH David
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Shadab Khan
+        wicket:
+          player_out: Shadab Khan
+          fielders:
+          - KR Patterson
+          kind: caught
+    - 9.3:
+        non_striker: TH David
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JDS Neesham
+    - 9.4:
+        non_striker: JDS Neesham
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 9.5:
+        non_striker: TH David
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JDS Neesham
+    - 9.6:
+        non_striker: TH David
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JDS Neesham
+    - 10.1:
+        non_striker: JDS Neesham
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 10.2:
+        non_striker: TH David
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JDS Neesham
+    - 10.3:
+        non_striker: TH David
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JDS Neesham
+        wicket:
+          player_out: JDS Neesham
+          fielders:
+          - JR Philippe
+          kind: caught
+    - 10.4:
+        non_striker: TH David
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Asif Ali
+    - 10.5:
+        non_striker: Asif Ali
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 10.6:
+        non_striker: TH David
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Asif Ali
+    - 11.1:
+        non_striker: TH David
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Asif Ali
+    - 11.2:
+        non_striker: TH David
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Asif Ali
+    - 11.3:
+        non_striker: Asif Ali
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TH David
+    - 11.4:
+        non_striker: Asif Ali
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TH David
+    - 11.5:
+        non_striker: Asif Ali
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 11.6:
+        non_striker: TH David
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Asif Ali
+    - 11.7:
+        non_striker: TH David
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: Asif Ali
+    - 11.8:
+        non_striker: TH David
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Asif Ali
+    - 11.9:
+        non_striker: TH David
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Asif Ali
+    - 12.1:
+        non_striker: Asif Ali
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+        wicket:
+          player_out: TH David
+          fielders:
+          - JC Silk
+          kind: caught
+    - 12.2:
+        non_striker: Asif Ali
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JS Paris
+    - 12.3:
+        non_striker: JS Paris
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Asif Ali
+    - 12.4:
+        non_striker: JS Paris
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Asif Ali
+    - 12.5:
+        non_striker: JS Paris
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Asif Ali
+    - 12.6:
+        non_striker: JS Paris
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Asif Ali
+    - 13.1:
+        non_striker: Asif Ali
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: JS Paris
+    - 13.2:
+        non_striker: JS Paris
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Asif Ali
+    - 13.3:
+        non_striker: JS Paris
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Asif Ali
+        wicket:
+          player_out: Asif Ali
+          fielders:
+          - JC Silk
+          kind: caught
+    - 13.4:
+        non_striker: JS Paris
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 13.5:
+        non_striker: JS Paris
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NT Ellis
+    - 13.6:
+        non_striker: JS Paris
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NT Ellis
+    - 13.7:
+        non_striker: NT Ellis
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JS Paris

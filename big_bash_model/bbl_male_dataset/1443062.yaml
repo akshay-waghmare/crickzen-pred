@@ -1,0 +1,2182 @@
+---
+meta:
+  data_version: 0.92
+  created: '2024-12-23'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Adelaide
+  competition: Big Bash League
+  dates:
+  - '2024-12-20'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Adelaide Strikers
+    by:
+      runs: 15
+  overs: 20
+  player_of_match:
+  - L Pope
+  players:
+    Adelaide Strikers:
+    - MW Short
+    - J Weatherald
+    - DJM Short
+    - OJ Pope
+    - AI Ross
+    - JJ Bazley
+    - J Overton
+    - L Scott
+    - HTRY Thornton
+    - CJ Boyce
+    - L Pope
+    Melbourne Stars:
+    - SB Harper
+    - BM Duckett
+    - MP Stoinis
+    - GJ Maxwell
+    - TF Rogers
+    - HWR Cartwright
+    - BJ Webster
+    - TK Curran
+    - AF Milne
+    - D Warren
+    - PM Siddle
+  registry:
+    people:
+      AF Milne: 350bb1b1
+      AI Ross: fb0d68b4
+      Andrew Crozier: 00d07580
+      BJ Webster: 56b93d46
+      BM Duckett: 5f26f677
+      CJ Boyce: 51a60c16
+      D Warren: ef55b38c
+      DJM Short: 1a156c88
+      GA Abood: a4af5528
+      GJ Maxwell: b681e71e
+      HTRY Thornton: 055be93a
+      HWR Cartwright: ab965cad
+      J Overton: 59559bc2
+      J Weatherald: edc7ddb6
+      JJ Bazley: 003d49e6
+      L Pope: 616a8149
+      L Scott: 0ebb3444
+      MP Stoinis: d9273ee7
+      MW Graham-Smith: 18aca3ce
+      MW Short: a90e53ec
+      OJ Pope: e94bc520
+      PM Siddle: bd93fea4
+      PR George: b76e2583
+      SB Harper: a756e61a
+      SJ Davis: bc71b0b2
+      TF Rogers: 7f232d46
+      TK Curran: e86754b2
+  teams:
+  - Adelaide Strikers
+  - Melbourne Stars
+  toss:
+    winner: Melbourne Stars
+    decision: field
+  umpires:
+  - GA Abood
+  - MW Graham-Smith
+  venue: Adelaide Oval
+innings:
+- 1st innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 0.2:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 0.3:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 0.4:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: MW Short
+    - 0.5:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 0.6:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 0.7:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 1.1:
+        non_striker: MW Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 1.2:
+        non_striker: J Weatherald
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.3:
+        non_striker: J Weatherald
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 1.4:
+        non_striker: MW Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 1.5:
+        non_striker: MW Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Weatherald
+    - 1.6:
+        non_striker: MW Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+    - 2.1:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+        wicket:
+          player_out: MW Short
+          kind: bowled
+    - 2.2:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 2.3:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 2.4:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 2.5:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 2.6:
+        non_striker: J Weatherald
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 3.1:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 3.2:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 3.3:
+        non_striker: DJM Short
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 3.4:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DJM Short
+    - 3.5:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 3.6:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 3.7:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 4.1:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 4.2:
+        non_striker: J Weatherald
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 4.3:
+        non_striker: J Weatherald
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 4.4:
+        non_striker: J Weatherald
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DJM Short
+    - 4.5:
+        non_striker: J Weatherald
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 4.6:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 5.1:
+        non_striker: DJM Short
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Weatherald
+    - 5.2:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 5.3:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 5.4:
+        non_striker: J Weatherald
+        bowler: GJ Maxwell
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: DJM Short
+    - 5.5:
+        non_striker: DJM Short
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Weatherald
+    - 5.6:
+        non_striker: DJM Short
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Weatherald
+        wicket:
+          player_out: J Weatherald
+          fielders:
+          - HWR Cartwright
+          kind: caught
+    - 6.1:
+        non_striker: OJ Pope
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 6.2:
+        non_striker: OJ Pope
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 6.3:
+        non_striker: OJ Pope
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 6.4:
+        non_striker: OJ Pope
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 6.5:
+        non_striker: OJ Pope
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 6.6:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: OJ Pope
+    - 7.1:
+        non_striker: DJM Short
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+    - 7.2:
+        non_striker: DJM Short
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Pope
+    - 7.3:
+        non_striker: OJ Pope
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 7.4:
+        non_striker: DJM Short
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Pope
+    - 7.5:
+        non_striker: OJ Pope
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 7.6:
+        non_striker: OJ Pope
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 8.1:
+        non_striker: OJ Pope
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 8.2:
+        non_striker: OJ Pope
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 8.3:
+        non_striker: OJ Pope
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 8.4:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: OJ Pope
+    - 8.5:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+    - 8.6:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Pope
+    - 9.1:
+        non_striker: DJM Short
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+    - 9.2:
+        non_striker: DJM Short
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Pope
+    - 9.3:
+        non_striker: OJ Pope
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 9.4:
+        non_striker: OJ Pope
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 9.5:
+        non_striker: OJ Pope
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 9.6:
+        non_striker: OJ Pope
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 10.1:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+        wicket:
+          player_out: OJ Pope
+          fielders:
+          - SB Harper
+          kind: caught
+    - 10.2:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AI Ross
+    - 10.3:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 10.4:
+        non_striker: AI Ross
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 10.5:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 10.6:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AI Ross
+    - 10.7:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 10.8:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 11.1:
+        non_striker: AI Ross
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 11.2:
+        non_striker: DJM Short
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 11.3:
+        non_striker: DJM Short
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 11.4:
+        non_striker: AI Ross
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 11.5:
+        non_striker: DJM Short
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 11.6:
+        non_striker: DJM Short
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 12.1:
+        non_striker: DJM Short
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 12.2:
+        non_striker: DJM Short
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AI Ross
+    - 12.3:
+        non_striker: DJM Short
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 12.4:
+        non_striker: DJM Short
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 12.5:
+        non_striker: AI Ross
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 12.6:
+        non_striker: DJM Short
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.1:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AI Ross
+    - 13.2:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.3:
+        non_striker: AI Ross
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 13.4:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AI Ross
+    - 13.5:
+        non_striker: DJM Short
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.6:
+        non_striker: AI Ross
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 13.7:
+        non_striker: AI Ross
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DJM Short
+    - 14.1:
+        non_striker: DJM Short
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 14.2:
+        non_striker: AI Ross
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 14.3:
+        non_striker: AI Ross
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 14.4:
+        non_striker: AI Ross
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+        wicket:
+          player_out: DJM Short
+          fielders:
+          - BM Duckett
+          kind: caught
+    - 14.5:
+        non_striker: AI Ross
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 14.6:
+        non_striker: JJ Bazley
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 15.1:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+    - 15.2:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+    - 15.3:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJ Bazley
+    - 15.4:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 15.5:
+        non_striker: JJ Bazley
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 15.6:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 16.1:
+        non_striker: AI Ross
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 16.2:
+        non_striker: JJ Bazley
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 16.3:
+        non_striker: JJ Bazley
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 16.4:
+        non_striker: AI Ross
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+    - 16.5:
+        non_striker: AI Ross
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJ Bazley
+    - 16.6:
+        non_striker: AI Ross
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 17.1:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Bazley
+    - 17.2:
+        non_striker: JJ Bazley
+        bowler: D Warren
+        runs:
+          extras: 1
+          total: 7
+          batsman: 6
+        extras:
+          noballs: 1
+        batsman: AI Ross
+    - 17.3:
+        non_striker: JJ Bazley
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AI Ross
+    - 17.4:
+        non_striker: JJ Bazley
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 17.5:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJ Bazley
+    - 17.6:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Bazley
+        wicket:
+          player_out: JJ Bazley
+          kind: bowled
+    - 17.7:
+        non_striker: AI Ross
+        bowler: D Warren
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Overton
+    - 18.1:
+        non_striker: J Overton
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 18.2:
+        non_striker: J Overton
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+        wicket:
+          player_out: AI Ross
+          kind: bowled
+    - 18.3:
+        non_striker: J Overton
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 18.4:
+        non_striker: L Scott
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Overton
+    - 18.5:
+        non_striker: J Overton
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 18.6:
+        non_striker: L Scott
+        bowler: AF Milne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Overton
+    - 19.1:
+        non_striker: J Overton
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: L Scott
+    - 19.2:
+        non_striker: J Overton
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 19.3:
+        non_striker: L Scott
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Overton
+    - 19.4:
+        non_striker: L Scott
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Overton
+    - 19.5:
+        non_striker: J Overton
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 19.6:
+        non_striker: L Scott
+        bowler: TK Curran
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Overton
+- 2nd innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: BM Duckett
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 0.2:
+        non_striker: BM Duckett
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 0.3:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BM Duckett
+        wicket:
+          player_out: BM Duckett
+          kind: lbw
+    - 0.4:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MP Stoinis
+    - 0.5:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 0.6:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MP Stoinis
+    - 0.7:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 1.1:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MP Stoinis
+    - 1.2:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 1.3:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 1.4:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 1.5:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 1.6:
+        non_striker: MP Stoinis
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 2.1:
+        non_striker: MP Stoinis
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 2.2:
+        non_striker: SB Harper
+        bowler: J Overton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MP Stoinis
+    - 2.3:
+        non_striker: SB Harper
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MP Stoinis
+    - 2.4:
+        non_striker: SB Harper
+        bowler: J Overton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MP Stoinis
+    - 2.5:
+        non_striker: SB Harper
+        bowler: J Overton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MP Stoinis
+    - 2.6:
+        non_striker: MP Stoinis
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 2.7:
+        non_striker: MP Stoinis
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 2.8:
+        non_striker: SB Harper
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 3.1:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 3.2:
+        non_striker: MP Stoinis
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.3:
+        non_striker: MP Stoinis
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.4:
+        non_striker: MP Stoinis
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SB Harper
+    - 3.5:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 3.6:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 4.1:
+        non_striker: MP Stoinis
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 4.2:
+        non_striker: SB Harper
+        bowler: L Scott
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MP Stoinis
+    - 4.3:
+        non_striker: MP Stoinis
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 4.4:
+        non_striker: SB Harper
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MP Stoinis
+    - 4.5:
+        non_striker: SB Harper
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MP Stoinis
+    - 4.6:
+        non_striker: SB Harper
+        bowler: L Scott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MP Stoinis
+    - 5.1:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+        wicket:
+          player_out: MP Stoinis
+          kind: bowled
+    - 5.2:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 5.3:
+        non_striker: GJ Maxwell
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 5.4:
+        non_striker: GJ Maxwell
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 5.5:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 5.6:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 6.1:
+        non_striker: GJ Maxwell
+        bowler: HTRY Thornton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SB Harper
+    - 6.2:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: GJ Maxwell
+    - 6.3:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+        wicket:
+          player_out: GJ Maxwell
+          kind: lbw
+    - 6.4:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.5:
+        non_striker: TF Rogers
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 6.6:
+        non_striker: TF Rogers
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 7.1:
+        non_striker: TF Rogers
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 7.2:
+        non_striker: TF Rogers
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 7.3:
+        non_striker: TF Rogers
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 7.4:
+        non_striker: TF Rogers
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 7.5:
+        non_striker: TF Rogers
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 7.6:
+        non_striker: TF Rogers
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 8.1:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 8.2:
+        non_striker: TF Rogers
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 8.3:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+        wicket:
+          player_out: TF Rogers
+          kind: bowled
+    - 8.4:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 8.5:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 8.6:
+        non_striker: HWR Cartwright
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 9.1:
+        non_striker: SB Harper
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 9.2:
+        non_striker: SB Harper
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 9.3:
+        non_striker: HWR Cartwright
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 9.4:
+        non_striker: HWR Cartwright
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 9.5:
+        non_striker: HWR Cartwright
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 9.6:
+        non_striker: HWR Cartwright
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 10.1:
+        non_striker: HWR Cartwright
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 10.2:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 10.3:
+        non_striker: HWR Cartwright
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 10.4:
+        non_striker: HWR Cartwright
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 10.5:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 10.6:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 11.1:
+        non_striker: HWR Cartwright
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 11.2:
+        non_striker: SB Harper
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 11.3:
+        non_striker: HWR Cartwright
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 11.4:
+        non_striker: SB Harper
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+        wicket:
+          player_out: HWR Cartwright
+          kind: bowled
+    - 11.5:
+        non_striker: SB Harper
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 11.6:
+        non_striker: SB Harper
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 12.1:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 12.2:
+        non_striker: BJ Webster
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 12.3:
+        non_striker: BJ Webster
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 12.4:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 12.5:
+        non_striker: BJ Webster
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 12.6:
+        non_striker: BJ Webster
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 13.1:
+        non_striker: BJ Webster
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 13.2:
+        non_striker: BJ Webster
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 13.3:
+        non_striker: BJ Webster
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 13.4:
+        non_striker: BJ Webster
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 13.5:
+        non_striker: SB Harper
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+        wicket:
+          player_out: BJ Webster
+          fielders:
+          - OJ Pope
+          kind: caught
+    - 13.6:
+        non_striker: SB Harper
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TK Curran
+    - 14.1:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 14.2:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TK Curran
+    - 14.3:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TK Curran
+    - 14.4:
+        non_striker: TK Curran
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 14.5:
+        non_striker: TK Curran
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 14.6:
+        non_striker: SB Harper
+        bowler: HTRY Thornton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TK Curran
+    - 15.1:
+        non_striker: SB Harper
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TK Curran
+    - 15.2:
+        non_striker: TK Curran
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          kind: bowled
+    - 15.3:
+        non_striker: TK Curran
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AF Milne
+    - 15.4:
+        non_striker: AF Milne
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TK Curran
+    - 15.5:
+        non_striker: TK Curran
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AF Milne
+    - 15.6:
+        non_striker: TK Curran
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AF Milne
+    - 16.1:
+        non_striker: AF Milne
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 16.2:
+        non_striker: AF Milne
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 16.3:
+        non_striker: AF Milne
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 16.4:
+        non_striker: AF Milne
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TK Curran
+    - 16.5:
+        non_striker: AF Milne
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TK Curran
+    - 16.6:
+        non_striker: AF Milne
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TK Curran
+    - 17.1:
+        non_striker: AF Milne
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 17.2:
+        non_striker: AF Milne
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TK Curran
+    - 17.3:
+        non_striker: TK Curran
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AF Milne
+        wicket:
+          player_out: AF Milne
+          fielders:
+          - J Overton
+          kind: caught
+    - 17.4:
+        non_striker: TK Curran
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: D Warren
+    - 17.5:
+        non_striker: D Warren
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 17.6:
+        non_striker: D Warren
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TK Curran
+    - 18.1:
+        non_striker: TK Curran
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: D Warren
+    - 18.2:
+        non_striker: D Warren
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 18.3:
+        non_striker: D Warren
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 18.4:
+        non_striker: D Warren
+        bowler: J Overton
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TK Curran
+    - 18.5:
+        non_striker: D Warren
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TK Curran
+    - 18.6:
+        non_striker: D Warren
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+    - 18.7:
+        non_striker: D Warren
+        bowler: J Overton
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TK Curran
+        wicket:
+          player_out: TK Curran
+          fielders:
+          - AI Ross
+          kind: caught
+    - 19.1:
+        non_striker: PM Siddle
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: D Warren
+    - 19.2:
+        non_striker: D Warren
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PM Siddle
+    - 19.3:
+        non_striker: D Warren
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: PM Siddle
+    - 19.4:
+        non_striker: D Warren
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: PM Siddle
+    - 19.5:
+        non_striker: D Warren
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: PM Siddle
+    - 19.6:
+        non_striker: D Warren
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: PM Siddle

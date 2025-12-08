@@ -1,0 +1,1995 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-07'
+  revision: 2
+info:
+  balls_per_over: 6
+  city: Perth
+  competition: Big Bash League
+  dates:
+  - '2023-01-07'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Perth Scorchers
+    by:
+      wickets: 7
+  overs: 20
+  player_of_match:
+  - CT Bancroft
+  players:
+    Brisbane Heat:
+    - C Munro
+    - J Brown
+    - NA McSweeney
+    - SW Billings
+    - JJ Peirson
+    - M Bryant
+    - RA Whiteley
+    - MG Neser
+    - MT Steketee
+    - MJ Swepson
+    - MP Kuhnemann
+    Perth Scorchers:
+    - SS Eskinazi
+    - CT Bancroft
+    - AM Hardie
+    - JP Inglis
+    - AJ Turner
+    - NR Hobson
+    - C Connolly
+    - M Kelly
+    - AJ Tye
+    - JP Behrendorff
+    - LR Morris
+  registry:
+    people:
+      AJ Turner: ff1e12a0
+      AJ Tye: 7c7d63a2
+      AM Hardie: d405c0d5
+      Ashlee Gibbons: b81712f7
+      BC Treloar: f7e8ee52
+      BNJ Oxenford: c1add349
+      C Connolly: fe366f34
+      C Munro: af2c687b
+      CT Bancroft: 399b0b94
+      David Johnston: 92cef862
+      J Brown: 647e7d44
+      JJ Peirson: 2b55c3b4
+      JP Behrendorff: 4933f499
+      JP Inglis: 989889ff
+      LR Morris: b08e58e2
+      M Bryant: f32012f4
+      M Kelly: 68e26ec9
+      MG Neser: 0164b064
+      MJ Swepson: 86b4bf88
+      MP Kuhnemann: 7b953689
+      MT Steketee: 903560ed
+      NA McSweeney: e94d2d50
+      NR Hobson: 4312e0fd
+      RA Whiteley: d346d939
+      SA Lightbody: 680b8cbf
+      SS Eskinazi: 75cbed9b
+      SW Billings: c16d4035
+  teams:
+  - Brisbane Heat
+  - Perth Scorchers
+  toss:
+    winner: Perth Scorchers
+    decision: field
+  umpires:
+  - BC Treloar
+  - SA Lightbody
+  venue: Perth Stadium
+innings:
+- 1st innings:
+    team: Brisbane Heat
+    deliveries:
+    - 0.1:
+        non_striker: J Brown
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 0.2:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 0.3:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 0.4:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 0.5:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 0.6:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 1.1:
+        non_striker: J Brown
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+    - 1.2:
+        non_striker: J Brown
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Munro
+    - 1.3:
+        non_striker: J Brown
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+    - 1.4:
+        non_striker: J Brown
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+    - 1.5:
+        non_striker: J Brown
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Munro
+    - 1.6:
+        non_striker: J Brown
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Munro
+    - 2.1:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.2:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 2.3:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 2.4:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 2.5:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 2.6:
+        non_striker: C Munro
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 3.1:
+        non_striker: J Brown
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C Munro
+    - 3.2:
+        non_striker: J Brown
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+    - 3.3:
+        non_striker: J Brown
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Munro
+    - 3.4:
+        non_striker: J Brown
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+    - 3.5:
+        non_striker: J Brown
+        bowler: LR Morris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: C Munro
+    - 3.6:
+        non_striker: C Munro
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 4.1:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: C Munro
+    - 4.2:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+    - 4.3:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Munro
+    - 4.4:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 4.5:
+        non_striker: C Munro
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 4.6:
+        non_striker: C Munro
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 4.7:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 5.1:
+        non_striker: J Brown
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 5.2:
+        non_striker: C Munro
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 5.3:
+        non_striker: J Brown
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 5.4:
+        non_striker: C Munro
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Brown
+    - 5.5:
+        non_striker: C Munro
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 5.6:
+        non_striker: J Brown
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 6.1:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Munro
+    - 6.2:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Munro
+    - 6.3:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 6.4:
+        non_striker: C Munro
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 6.5:
+        non_striker: J Brown
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 6.6:
+        non_striker: C Munro
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 7.1:
+        non_striker: J Brown
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Munro
+    - 7.2:
+        non_striker: J Brown
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Munro
+    - 7.3:
+        non_striker: C Munro
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 7.4:
+        non_striker: C Munro
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+        wicket:
+          player_out: J Brown
+          fielders:
+          - SS Eskinazi
+          kind: caught
+    - 7.5:
+        non_striker: C Munro
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 7.6:
+        non_striker: C Munro
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+    - 8.1:
+        non_striker: NA McSweeney
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Munro
+        wicket:
+          player_out: C Munro
+          fielders:
+          - C Connolly
+          kind: caught
+    - 8.2:
+        non_striker: NA McSweeney
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 8.3:
+        non_striker: NA McSweeney
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 8.4:
+        non_striker: NA McSweeney
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 8.5:
+        non_striker: NA McSweeney
+        bowler: LR Morris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SW Billings
+    - 8.6:
+        non_striker: NA McSweeney
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 8.7:
+        non_striker: SW Billings
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 9.1:
+        non_striker: SW Billings
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NA McSweeney
+    - 9.2:
+        non_striker: SW Billings
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NA McSweeney
+    - 9.3:
+        non_striker: NA McSweeney
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 9.4:
+        non_striker: NA McSweeney
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 9.5:
+        non_striker: SW Billings
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NA McSweeney
+        wicket:
+          player_out: NA McSweeney
+          fielders:
+          - JP Behrendorff
+          kind: caught
+    - 9.6:
+        non_striker: SW Billings
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+    - 10.1:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 10.2:
+        non_striker: SW Billings
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 10.3:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 10.4:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 10.5:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 10.6:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 11.1:
+        non_striker: SW Billings
+        bowler: M Kelly
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JJ Peirson
+    - 11.2:
+        non_striker: JJ Peirson
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 11.3:
+        non_striker: SW Billings
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+    - 11.4:
+        non_striker: SW Billings
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 11.5:
+        non_striker: JJ Peirson
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 11.6:
+        non_striker: SW Billings
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 12.1:
+        non_striker: SW Billings
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 12.2:
+        non_striker: JJ Peirson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SW Billings
+    - 12.3:
+        non_striker: JJ Peirson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 12.4:
+        non_striker: JJ Peirson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 12.5:
+        non_striker: JJ Peirson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 12.6:
+        non_striker: JJ Peirson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SW Billings
+    - 13.1:
+        non_striker: SW Billings
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 13.2:
+        non_striker: JJ Peirson
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+    - 13.3:
+        non_striker: JJ Peirson
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 13.4:
+        non_striker: SW Billings
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JJ Peirson
+    - 13.5:
+        non_striker: SW Billings
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JJ Peirson
+    - 13.6:
+        non_striker: SW Billings
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+    - 14.1:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SW Billings
+    - 14.2:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SW Billings
+    - 14.3:
+        non_striker: SW Billings
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 14.4:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SW Billings
+    - 14.5:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SW Billings
+        wicket:
+          player_out: SW Billings
+          fielders:
+          - NR Hobson
+          kind: caught
+    - 14.6:
+        non_striker: JJ Peirson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 14.7:
+        non_striker: M Bryant
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 15.1:
+        non_striker: M Bryant
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JJ Peirson
+    - 15.2:
+        non_striker: M Bryant
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 15.3:
+        non_striker: JJ Peirson
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Bryant
+    - 15.4:
+        non_striker: JJ Peirson
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 15.5:
+        non_striker: M Bryant
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 15.6:
+        non_striker: JJ Peirson
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 16.1:
+        non_striker: M Bryant
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 16.2:
+        non_striker: JJ Peirson
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 16.3:
+        non_striker: JJ Peirson
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 16.4:
+        non_striker: JJ Peirson
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+    - 16.5:
+        non_striker: JJ Peirson
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Bryant
+    - 16.6:
+        non_striker: JJ Peirson
+        bowler: AJ Turner
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Bryant
+    - 17.1:
+        non_striker: M Bryant
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JJ Peirson
+    - 17.2:
+        non_striker: JJ Peirson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Bryant
+    - 17.3:
+        non_striker: JJ Peirson
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 17.4:
+        non_striker: M Bryant
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JJ Peirson
+        wicket:
+          player_out: JJ Peirson
+          fielders:
+          - CT Bancroft
+          kind: caught
+    - 17.5:
+        non_striker: M Bryant
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RA Whiteley
+    - 17.6:
+        non_striker: RA Whiteley
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Bryant
+    - 18.1:
+        non_striker: RA Whiteley
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Bryant
+        wicket:
+          player_out: M Bryant
+          kind: bowled
+    - 18.2:
+        non_striker: RA Whiteley
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MG Neser
+    - 18.3:
+        non_striker: MG Neser
+        bowler: M Kelly
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: RA Whiteley
+    - 18.4:
+        non_striker: MG Neser
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RA Whiteley
+    - 18.5:
+        non_striker: RA Whiteley
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MG Neser
+    - 18.6:
+        non_striker: MG Neser
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RA Whiteley
+    - 18.7:
+        non_striker: RA Whiteley
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MG Neser
+    - 19.1:
+        non_striker: RA Whiteley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MG Neser
+        wicket:
+          player_out: MG Neser
+          fielders:
+          - C Connolly
+          kind: caught
+    - 19.2:
+        non_striker: RA Whiteley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MT Steketee
+    - 19.3:
+        non_striker: MT Steketee
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: RA Whiteley
+    - 19.4:
+        non_striker: RA Whiteley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MT Steketee
+    - 19.5:
+        non_striker: RA Whiteley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MT Steketee
+        wicket:
+          player_out: MT Steketee
+          fielders:
+          - AM Hardie
+          kind: caught
+    - 19.6:
+        non_striker: RA Whiteley
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Swepson
+        wicket:
+          player_out: MJ Swepson
+          fielders:
+          - JP Inglis
+          - AJ Tye
+          kind: run out
+- 2nd innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SS Eskinazi
+    - 0.2:
+        non_striker: SS Eskinazi
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 0.3:
+        non_striker: SS Eskinazi
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 0.4:
+        non_striker: SS Eskinazi
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CT Bancroft
+    - 0.5:
+        non_striker: SS Eskinazi
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 0.6:
+        non_striker: SS Eskinazi
+        bowler: MG Neser
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          legbyes: 4
+        batsman: CT Bancroft
+    - 1.1:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+        wicket:
+          player_out: SS Eskinazi
+          fielders:
+          - MP Kuhnemann
+          kind: caught
+    - 1.2:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AM Hardie
+    - 1.3:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 1.4:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 1.5:
+        non_striker: AM Hardie
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 1.6:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 1.7:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 2.1:
+        non_striker: AM Hardie
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 2.2:
+        non_striker: AM Hardie
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: CT Bancroft
+    - 2.3:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 2.4:
+        non_striker: AM Hardie
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 2.5:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 2.6:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 3.1:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 3.2:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 3.3:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 3.4:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 3.5:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 3.6:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 4.1:
+        non_striker: AM Hardie
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 4.2:
+        non_striker: CT Bancroft
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 4.3:
+        non_striker: CT Bancroft
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 4.4:
+        non_striker: AM Hardie
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 4.5:
+        non_striker: CT Bancroft
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 4.6:
+        non_striker: CT Bancroft
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 5.1:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 5.2:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 5.3:
+        non_striker: AM Hardie
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 5.4:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 5.5:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 5.6:
+        non_striker: AM Hardie
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 6.1:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.2:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 6.3:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 6.4:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.5:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 6.6:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 7.1:
+        non_striker: AM Hardie
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 7.2:
+        non_striker: AM Hardie
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 7.3:
+        non_striker: AM Hardie
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 7.4:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 7.5:
+        non_striker: AM Hardie
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 7.6:
+        non_striker: AM Hardie
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 8.1:
+        non_striker: AM Hardie
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 8.2:
+        non_striker: AM Hardie
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 8.3:
+        non_striker: AM Hardie
+        bowler: RA Whiteley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CT Bancroft
+    - 8.4:
+        non_striker: AM Hardie
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 8.5:
+        non_striker: AM Hardie
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 8.6:
+        non_striker: AM Hardie
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 8.7:
+        non_striker: CT Bancroft
+        bowler: RA Whiteley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AM Hardie
+    - 8.8:
+        non_striker: CT Bancroft
+        bowler: RA Whiteley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 9.1:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 9.2:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.3:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.4:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 9.5:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.6:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 10.1:
+        non_striker: AM Hardie
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 10.2:
+        non_striker: CT Bancroft
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 10.3:
+        non_striker: AM Hardie
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 10.4:
+        non_striker: CT Bancroft
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 10.5:
+        non_striker: AM Hardie
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 10.6:
+        non_striker: AM Hardie
+        bowler: NA McSweeney
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 11.1:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 11.2:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 11.3:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 11.4:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 11.5:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 11.6:
+        non_striker: AM Hardie
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+        wicket:
+          player_out: AM Hardie
+          fielders:
+          - SW Billings
+          - MP Kuhnemann
+          kind: run out
+    - 12.1:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 12.2:
+        non_striker: JP Inglis
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 12.3:
+        non_striker: JP Inglis
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 12.4:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 12.5:
+        non_striker: JP Inglis
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 12.6:
+        non_striker: JP Inglis
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 13.1:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Inglis
+    - 13.2:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+        wicket:
+          player_out: JP Inglis
+          fielders:
+          - MG Neser
+          kind: caught
+    - 13.3:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 13.4:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 13.5:
+        non_striker: AJ Turner
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 13.6:
+        non_striker: CT Bancroft
+        bowler: MP Kuhnemann
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 14.1:
+        non_striker: AJ Turner
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 14.2:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 14.3:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Turner
+    - 14.4:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AJ Turner
+    - 14.5:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 14.6:
+        non_striker: CT Bancroft
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 14.7:
+        non_striker: AJ Turner
+        bowler: MG Neser
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 15.1:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Turner
+    - 15.2:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 15.3:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Turner
+    - 15.4:
+        non_striker: CT Bancroft
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 15.5:
+        non_striker: AJ Turner
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 15.6:
+        non_striker: AJ Turner
+        bowler: MJ Swepson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 16.1:
+        non_striker: AJ Turner
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CT Bancroft
+    - 16.2:
+        non_striker: AJ Turner
+        bowler: MT Steketee
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: CT Bancroft
+    - 16.3:
+        non_striker: CT Bancroft
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Turner

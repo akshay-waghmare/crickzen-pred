@@ -1,0 +1,2117 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-10'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Adelaide
+  competition: Big Bash League
+  dates:
+  - '2023-01-10'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Adelaide Strikers
+    by:
+      runs: 20
+  overs: 20
+  player_of_match:
+  - CA Lynn
+  players:
+    Adelaide Strikers:
+    - MW Short
+    - RJ Gibson
+    - CA Lynn
+    - AJ Hose
+    - C de Grandhomme
+    - T Kelly
+    - HJ Nielsen
+    - BAD Manenti
+    - CJ Boyce
+    - WA Agar
+    - HNA Conway
+    Melbourne Renegades:
+    - MJ Guptill
+    - MS Harris
+    - SB Harper
+    - AJ Finch
+    - JW Wells
+    - MJJ Critchley
+    - W Sutherland
+    - RP Kellepotha
+    - TS Rogers
+    - KW Richardson
+    - DJM Moody
+  registry:
+    people:
+      AJ Finch: b8d490fd
+      AJ Hose: 104e88a4
+      BAD Manenti: ab21795b
+      C de Grandhomme: 94d7f855
+      CA Lynn: 45eda7c8
+      CA Polosak: 26a360d2
+      CJ Boyce: 51a60c16
+      D Bhatt: b34f743c
+      DJM Moody: e1a867df
+      HJ Nielsen: 0ea1455a
+      HNA Conway: 272fc5ad
+      JW Wells: 8bdac857
+      KW Richardson: dfc4d8b5
+      MJ Guptill: 2be41edb
+      MJJ Critchley: c5cc48bc
+      MS Harris: 9e85455c
+      MW Short: a90e53ec
+      RJ Gibson: '50636767'
+      RP Kellepotha: d13d1dd0
+      SAJ Craig: 689f2eed
+      SB Harper: a756e61a
+      SD Fry: 6b725ed1
+      SJ Nogajski: 9b3f9323
+      T Kelly: 6ceb94d0
+      TS Rogers: 1b04e02b
+      W Sutherland: bc2d4f2e
+      WA Agar: 15de1f5d
+  teams:
+  - Adelaide Strikers
+  - Melbourne Renegades
+  toss:
+    winner: Melbourne Renegades
+    decision: field
+  umpires:
+  - CA Polosak
+  - SAJ Craig
+  venue: Adelaide Oval
+innings:
+- 1st innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 0.2:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 0.3:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 0.4:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 0.5:
+        non_striker: MW Short
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 0.6:
+        non_striker: MW Short
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 1.1:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.2:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.3:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 1.4:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 1.5:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 1.6:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 2.1:
+        non_striker: MW Short
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 2.2:
+        non_striker: MW Short
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 2.3:
+        non_striker: MW Short
+        bowler: KW Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: RJ Gibson
+    - 2.4:
+        non_striker: RJ Gibson
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 2.5:
+        non_striker: RJ Gibson
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MW Short
+    - 2.6:
+        non_striker: RJ Gibson
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 3.1:
+        non_striker: MW Short
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: RJ Gibson
+    - 3.2:
+        non_striker: MW Short
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 3.3:
+        non_striker: MW Short
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: RJ Gibson
+    - 3.4:
+        non_striker: MW Short
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RJ Gibson
+    - 3.5:
+        non_striker: RJ Gibson
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 3.6:
+        non_striker: RJ Gibson
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 4.1:
+        non_striker: MW Short
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: RJ Gibson
+    - 4.2:
+        non_striker: MW Short
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RJ Gibson
+    - 4.3:
+        non_striker: RJ Gibson
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 4.4:
+        non_striker: RJ Gibson
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 4.5:
+        non_striker: MW Short
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: RJ Gibson
+    - 4.6:
+        non_striker: MW Short
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RJ Gibson
+    - 5.1:
+        non_striker: MW Short
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RJ Gibson
+    - 5.2:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 5.3:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 5.4:
+        non_striker: RJ Gibson
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 5.5:
+        non_striker: MW Short
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 5.6:
+        non_striker: MW Short
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: RJ Gibson
+    - 6.1:
+        non_striker: RJ Gibson
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 6.2:
+        non_striker: MW Short
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: RJ Gibson
+    - 6.3:
+        non_striker: MW Short
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+        wicket:
+          player_out: RJ Gibson
+          fielders:
+          - MJ Guptill
+          kind: caught
+    - 6.4:
+        non_striker: MW Short
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 6.5:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+        wicket:
+          player_out: MW Short
+          fielders:
+          - JW Wells
+          kind: caught
+    - 6.6:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 7.1:
+        non_striker: AJ Hose
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 7.2:
+        non_striker: AJ Hose
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 7.3:
+        non_striker: AJ Hose
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 7.4:
+        non_striker: CA Lynn
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 7.5:
+        non_striker: CA Lynn
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 7.6:
+        non_striker: CA Lynn
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 8.1:
+        non_striker: AJ Hose
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 8.2:
+        non_striker: AJ Hose
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 8.3:
+        non_striker: CA Lynn
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 8.4:
+        non_striker: CA Lynn
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 8.5:
+        non_striker: CA Lynn
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 8.6:
+        non_striker: CA Lynn
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 9.1:
+        non_striker: CA Lynn
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 9.2:
+        non_striker: AJ Hose
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 9.3:
+        non_striker: CA Lynn
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 9.4:
+        non_striker: CA Lynn
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 9.5:
+        non_striker: AJ Hose
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 9.6:
+        non_striker: CA Lynn
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 10.1:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Hose
+    - 10.2:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Hose
+    - 10.3:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 10.4:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 10.5:
+        non_striker: AJ Hose
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 10.6:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 11.1:
+        non_striker: AJ Hose
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 11.2:
+        non_striker: AJ Hose
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 11.3:
+        non_striker: CA Lynn
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 11.4:
+        non_striker: AJ Hose
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 11.5:
+        non_striker: CA Lynn
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 11.6:
+        non_striker: AJ Hose
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 12.1:
+        non_striker: CA Lynn
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Hose
+    - 12.2:
+        non_striker: CA Lynn
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Hose
+    - 12.3:
+        non_striker: CA Lynn
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 12.4:
+        non_striker: AJ Hose
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 12.5:
+        non_striker: AJ Hose
+        bowler: DJM Moody
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CA Lynn
+    - 12.6:
+        non_striker: AJ Hose
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 12.7:
+        non_striker: CA Lynn
+        bowler: DJM Moody
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Hose
+    - 13.1:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: CA Lynn
+    - 13.2:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 13.3:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 13.4:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Hose
+    - 13.5:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+        wicket:
+          player_out: AJ Hose
+          fielders:
+          - AJ Finch
+          kind: caught
+    - 13.6:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: C de Grandhomme
+    - 13.7:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C de Grandhomme
+    - 14.1:
+        non_striker: C de Grandhomme
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 14.2:
+        non_striker: C de Grandhomme
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 14.3:
+        non_striker: C de Grandhomme
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 14.4:
+        non_striker: CA Lynn
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C de Grandhomme
+    - 14.5:
+        non_striker: CA Lynn
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C de Grandhomme
+    - 14.6:
+        non_striker: CA Lynn
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C de Grandhomme
+    - 15.1:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C de Grandhomme
+    - 15.2:
+        non_striker: C de Grandhomme
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 15.3:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C de Grandhomme
+    - 15.4:
+        non_striker: CA Lynn
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C de Grandhomme
+    - 15.5:
+        non_striker: C de Grandhomme
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Lynn
+    - 15.6:
+        non_striker: C de Grandhomme
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CA Lynn
+    - 16.1:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C de Grandhomme
+    - 16.2:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C de Grandhomme
+    - 16.3:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C de Grandhomme
+    - 16.4:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C de Grandhomme
+    - 16.5:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: C de Grandhomme
+    - 16.6:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C de Grandhomme
+    - 16.7:
+        non_striker: C de Grandhomme
+        bowler: KW Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CA Lynn
+    - 16.8:
+        non_striker: C de Grandhomme
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 17.1:
+        non_striker: C de Grandhomme
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 17.2:
+        non_striker: C de Grandhomme
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 17.3:
+        non_striker: C de Grandhomme
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 17.4:
+        non_striker: C de Grandhomme
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 17.5:
+        non_striker: CA Lynn
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C de Grandhomme
+    - 17.6:
+        non_striker: C de Grandhomme
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 18.1:
+        non_striker: C de Grandhomme
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 18.2:
+        non_striker: C de Grandhomme
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 18.3:
+        non_striker: CA Lynn
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C de Grandhomme
+    - 18.4:
+        non_striker: C de Grandhomme
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 18.5:
+        non_striker: CA Lynn
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C de Grandhomme
+    - 18.6:
+        non_striker: CA Lynn
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C de Grandhomme
+        wicket:
+          player_out: C de Grandhomme
+          fielders:
+          - TS Rogers
+          kind: caught
+    - 19.1:
+        non_striker: T Kelly
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 19.2:
+        non_striker: T Kelly
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 19.3:
+        non_striker: T Kelly
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Lynn
+    - 19.4:
+        non_striker: T Kelly
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CA Lynn
+    - 19.5:
+        non_striker: T Kelly
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Lynn
+    - 19.6:
+        non_striker: CA Lynn
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: T Kelly
+- 2nd innings:
+    team: Melbourne Renegades
+    deliveries:
+    - 0.1:
+        non_striker: MS Harris
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 0.2:
+        non_striker: MS Harris
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 0.3:
+        non_striker: MJ Guptill
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+    - 0.4:
+        non_striker: MJ Guptill
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+    - 0.5:
+        non_striker: MJ Guptill
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MS Harris
+    - 0.6:
+        non_striker: MJ Guptill
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Harris
+    - 1.1:
+        non_striker: MJ Guptill
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+    - 1.2:
+        non_striker: MJ Guptill
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+    - 1.3:
+        non_striker: MJ Guptill
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Harris
+    - 1.4:
+        non_striker: MS Harris
+        bowler: HNA Conway
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MJ Guptill
+    - 1.5:
+        non_striker: MJ Guptill
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Harris
+    - 1.6:
+        non_striker: MS Harris
+        bowler: HNA Conway
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MJ Guptill
+    - 1.7:
+        non_striker: MS Harris
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Guptill
+    - 2.1:
+        non_striker: MJ Guptill
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Harris
+    - 2.2:
+        non_striker: MS Harris
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 2.3:
+        non_striker: MS Harris
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Guptill
+    - 2.4:
+        non_striker: MS Harris
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 2.5:
+        non_striker: MJ Guptill
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+        wicket:
+          player_out: MS Harris
+          fielders:
+          - T Kelly
+          kind: caught
+    - 2.6:
+        non_striker: MJ Guptill
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 3.1:
+        non_striker: MJ Guptill
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.2:
+        non_striker: MJ Guptill
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 3.3:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 3.4:
+        non_striker: MJ Guptill
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 3.5:
+        non_striker: MJ Guptill
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 3.6:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 4.1:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 4.2:
+        non_striker: MJ Guptill
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 4.3:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 4.4:
+        non_striker: MJ Guptill
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 4.5:
+        non_striker: MJ Guptill
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 4.6:
+        non_striker: MJ Guptill
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 5.1:
+        non_striker: MJ Guptill
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 5.2:
+        non_striker: MJ Guptill
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 5.3:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+        wicket:
+          player_out: MJ Guptill
+          fielders:
+          - MW Short
+          kind: caught
+    - 5.4:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 5.5:
+        non_striker: AJ Finch
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 5.6:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 6.1:
+        non_striker: AJ Finch
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 6.2:
+        non_striker: SB Harper
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 6.3:
+        non_striker: SB Harper
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 6.4:
+        non_striker: AJ Finch
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 6.5:
+        non_striker: SB Harper
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+        wicket:
+          player_out: AJ Finch
+          kind: lbw
+    - 6.6:
+        non_striker: SB Harper
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 7.1:
+        non_striker: JW Wells
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 7.2:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 7.3:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 7.4:
+        non_striker: JW Wells
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 7.5:
+        non_striker: SB Harper
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 7.6:
+        non_striker: JW Wells
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 8.1:
+        non_striker: JW Wells
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 8.2:
+        non_striker: JW Wells
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 8.3:
+        non_striker: SB Harper
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 8.4:
+        non_striker: JW Wells
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 8.5:
+        non_striker: SB Harper
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 8.6:
+        non_striker: SB Harper
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 9.1:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 9.2:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: SB Harper
+    - 9.3:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 9.4:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 9.5:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 9.6:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 10.1:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 10.2:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 10.3:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 10.4:
+        non_striker: JW Wells
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 10.5:
+        non_striker: JW Wells
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 10.6:
+        non_striker: JW Wells
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 11.1:
+        non_striker: JW Wells
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 11.2:
+        non_striker: SB Harper
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 11.3:
+        non_striker: JW Wells
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 11.4:
+        non_striker: JW Wells
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 11.5:
+        non_striker: JW Wells
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 11.6:
+        non_striker: SB Harper
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 12.1:
+        non_striker: SB Harper
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 12.2:
+        non_striker: JW Wells
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 12.3:
+        non_striker: JW Wells
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 12.4:
+        non_striker: JW Wells
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 12.5:
+        non_striker: JW Wells
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 12.6:
+        non_striker: JW Wells
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          fielders:
+          - RJ Gibson
+          kind: caught
+    - 13.1:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 13.2:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 13.3:
+        non_striker: JW Wells
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 13.4:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 13.5:
+        non_striker: JW Wells
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 13.6:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 14.1:
+        non_striker: MJJ Critchley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 14.2:
+        non_striker: JW Wells
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 14.3:
+        non_striker: JW Wells
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 14.4:
+        non_striker: JW Wells
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 14.5:
+        non_striker: MJJ Critchley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+        wicket:
+          player_out: JW Wells
+          fielders:
+          - WA Agar
+          kind: caught
+    - 14.6:
+        non_striker: MJJ Critchley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 15.1:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 15.2:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 15.3:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 15.4:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 15.5:
+        non_striker: W Sutherland
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 15.6:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 16.1:
+        non_striker: W Sutherland
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJJ Critchley
+    - 16.2:
+        non_striker: W Sutherland
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 16.3:
+        non_striker: W Sutherland
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 16.4:
+        non_striker: MJJ Critchley
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: W Sutherland
+    - 16.5:
+        non_striker: MJJ Critchley
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: W Sutherland
+    - 16.6:
+        non_striker: MJJ Critchley
+        bowler: BAD Manenti
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 17.1:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: W Sutherland
+    - 17.2:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 17.3:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: W Sutherland
+    - 17.4:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: W Sutherland
+    - 17.5:
+        non_striker: W Sutherland
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 17.6:
+        non_striker: W Sutherland
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 18.1:
+        non_striker: W Sutherland
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 18.2:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+        wicket:
+          player_out: W Sutherland
+          fielders:
+          - MW Short
+          kind: caught
+    - 18.3:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RP Kellepotha
+    - 18.4:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RP Kellepotha
+    - 18.5:
+        non_striker: RP Kellepotha
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 18.6:
+        non_striker: RP Kellepotha
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 19.1:
+        non_striker: RP Kellepotha
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 19.2:
+        non_striker: RP Kellepotha
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 19.3:
+        non_striker: RP Kellepotha
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJJ Critchley
+    - 19.4:
+        non_striker: RP Kellepotha
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 19.5:
+        non_striker: RP Kellepotha
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 19.6:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RP Kellepotha

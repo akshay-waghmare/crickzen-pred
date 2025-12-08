@@ -1,0 +1,2113 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-17'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Melbourne
+  competition: Big Bash League
+  dates:
+  - '2023-01-14'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Melbourne Renegades
+    by:
+      runs: 6
+  overs: 20
+  player_of_match:
+  - KW Richardson
+  players:
+    Melbourne Renegades:
+    - MJ Guptill
+    - J Fraser-McGurk
+    - SB Harper
+    - AJ Finch
+    - MJJ Critchley
+    - JW Wells
+    - TS Rogers
+    - W Sutherland
+    - RP Kellepotha
+    - KW Richardson
+    - Fawad Ahmed
+    Melbourne Stars:
+    - JM Clarke
+    - TF Rogers
+    - HWR Cartwright
+    - BJ Webster
+    - NCR Larkin
+    - J Seymour
+    - CD Hinchliffe
+    - L Wood
+    - BL Couch
+    - LC Hatcher
+    - A Zampa
+  registry:
+    people:
+      A Zampa: 14f96089
+      AJ Finch: b8d490fd
+      BJ Webster: 56b93d46
+      BL Couch: be69e09d
+      C Grant: 876ed858
+      CD Hinchliffe: 8891669e
+      DM Koch: 6d10c034
+      Fawad Ahmed: 22ae3041
+      GJ Davidson: 31ad5973
+      HWR Cartwright: ab965cad
+      J Fraser-McGurk: 9b6e1b3f
+      J Seymour: cb54a1d6
+      JM Clarke: 2eca67f5
+      JW Wells: 8bdac857
+      KW Richardson: dfc4d8b5
+      L Wood: 65b6943c
+      LC Hatcher: 8f3fde65
+      MJ Guptill: 2be41edb
+      MJJ Critchley: c5cc48bc
+      MW Graham-Smith: 18aca3ce
+      NCR Larkin: 02bce9a8
+      RL Parry: 86d151dc
+      RP Kellepotha: d13d1dd0
+      SB Harper: a756e61a
+      TF Rogers: 7f232d46
+      TS Rogers: 1b04e02b
+      W Sutherland: bc2d4f2e
+  teams:
+  - Melbourne Renegades
+  - Melbourne Stars
+  toss:
+    winner: Melbourne Stars
+    decision: field
+  umpires:
+  - GJ Davidson
+  - MW Graham-Smith
+  venue: Docklands Stadium, Melbourne
+innings:
+- 1st innings:
+    team: Melbourne Renegades
+    deliveries:
+    - 0.1:
+        non_striker: J Fraser-McGurk
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 0.2:
+        non_striker: MJ Guptill
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 0.3:
+        non_striker: MJ Guptill
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 0.4:
+        non_striker: MJ Guptill
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 0.5:
+        non_striker: MJ Guptill
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 0.6:
+        non_striker: J Fraser-McGurk
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 1.1:
+        non_striker: J Fraser-McGurk
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 1.2:
+        non_striker: MJ Guptill
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 1.3:
+        non_striker: MJ Guptill
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 1.4:
+        non_striker: MJ Guptill
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+        wicket:
+          player_out: J Fraser-McGurk
+          kind: bowled
+    - 1.5:
+        non_striker: MJ Guptill
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 1.6:
+        non_striker: SB Harper
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 2.1:
+        non_striker: SB Harper
+        bowler: L Wood
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: MJ Guptill
+    - 2.2:
+        non_striker: SB Harper
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 2.3:
+        non_striker: SB Harper
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Guptill
+    - 2.4:
+        non_striker: SB Harper
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 2.5:
+        non_striker: SB Harper
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 2.6:
+        non_striker: SB Harper
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 3.1:
+        non_striker: MJ Guptill
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 3.2:
+        non_striker: MJ Guptill
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.3:
+        non_striker: MJ Guptill
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.4:
+        non_striker: MJ Guptill
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 3.5:
+        non_striker: SB Harper
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Guptill
+    - 3.6:
+        non_striker: SB Harper
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 4.1:
+        non_striker: MJ Guptill
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 4.2:
+        non_striker: SB Harper
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 4.3:
+        non_striker: MJ Guptill
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 4.4:
+        non_striker: MJ Guptill
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 4.5:
+        non_striker: MJ Guptill
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 4.6:
+        non_striker: MJ Guptill
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 5.1:
+        non_striker: SB Harper
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+        wicket:
+          player_out: MJ Guptill
+          fielders:
+          - BJ Webster
+          kind: caught
+    - 5.2:
+        non_striker: SB Harper
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 5.3:
+        non_striker: AJ Finch
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 5.4:
+        non_striker: AJ Finch
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 5.5:
+        non_striker: SB Harper
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 5.6:
+        non_striker: SB Harper
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 6.1:
+        non_striker: AJ Finch
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 6.2:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 6.3:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 6.4:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+        wicket:
+          player_out: AJ Finch
+          fielders:
+          - TF Rogers
+          kind: caught
+    - 6.5:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 6.6:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 7.1:
+        non_striker: SB Harper
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 7.2:
+        non_striker: MJJ Critchley
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 7.3:
+        non_striker: MJJ Critchley
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 7.4:
+        non_striker: MJJ Critchley
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 7.5:
+        non_striker: MJJ Critchley
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 7.6:
+        non_striker: MJJ Critchley
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 8.1:
+        non_striker: MJJ Critchley
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 8.2:
+        non_striker: SB Harper
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 8.3:
+        non_striker: MJJ Critchley
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 8.4:
+        non_striker: MJJ Critchley
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 8.5:
+        non_striker: SB Harper
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 8.6:
+        non_striker: SB Harper
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 9.1:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 9.2:
+        non_striker: MJJ Critchley
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 9.3:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 9.4:
+        non_striker: MJJ Critchley
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 9.5:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 9.6:
+        non_striker: MJJ Critchley
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 10.1:
+        non_striker: MJJ Critchley
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 10.2:
+        non_striker: MJJ Critchley
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 10.3:
+        non_striker: SB Harper
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 10.4:
+        non_striker: SB Harper
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: MJJ Critchley
+    - 10.5:
+        non_striker: MJJ Critchley
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 10.6:
+        non_striker: SB Harper
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.1:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.2:
+        non_striker: MJJ Critchley
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 11.3:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MJJ Critchley
+    - 11.4:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 11.5:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.6:
+        non_striker: MJJ Critchley
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 11.7:
+        non_striker: SB Harper
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 12.1:
+        non_striker: SB Harper
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJJ Critchley
+    - 12.2:
+        non_striker: SB Harper
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 12.3:
+        non_striker: SB Harper
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 12.4:
+        non_striker: MJJ Critchley
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 12.5:
+        non_striker: MJJ Critchley
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 12.6:
+        non_striker: SB Harper
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJJ Critchley
+    - 13.1:
+        non_striker: MJJ Critchley
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SB Harper
+    - 13.2:
+        non_striker: MJJ Critchley
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 13.3:
+        non_striker: SB Harper
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+        wicket:
+          player_out: MJJ Critchley
+          fielders:
+          - JM Clarke
+          kind: caught
+    - 13.4:
+        non_striker: SB Harper
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 13.5:
+        non_striker: JW Wells
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 13.6:
+        non_striker: JW Wells
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SB Harper
+    - 14.1:
+        non_striker: SB Harper
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 14.2:
+        non_striker: JW Wells
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          fielders:
+          - HWR Cartwright
+          kind: caught
+    - 14.3:
+        non_striker: JW Wells
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Rogers
+    - 14.4:
+        non_striker: JW Wells
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 14.5:
+        non_striker: TS Rogers
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 14.6:
+        non_striker: TS Rogers
+        bowler: CD Hinchliffe
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 15.1:
+        non_striker: JW Wells
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 15.2:
+        non_striker: TS Rogers
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 15.3:
+        non_striker: TS Rogers
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 15.4:
+        non_striker: JW Wells
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Rogers
+    - 15.5:
+        non_striker: JW Wells
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 15.6:
+        non_striker: TS Rogers
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 16.1:
+        non_striker: TS Rogers
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JW Wells
+    - 16.2:
+        non_striker: TS Rogers
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 16.3:
+        non_striker: TS Rogers
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 16.4:
+        non_striker: TS Rogers
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 16.5:
+        non_striker: JW Wells
+        bowler: BL Couch
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TS Rogers
+    - 16.6:
+        non_striker: JW Wells
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TS Rogers
+    - 16.7:
+        non_striker: JW Wells
+        bowler: BL Couch
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Rogers
+        wicket:
+          player_out: TS Rogers
+          fielders:
+          - BJ Webster
+          kind: caught
+    - 17.1:
+        non_striker: W Sutherland
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 17.2:
+        non_striker: W Sutherland
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 17.3:
+        non_striker: JW Wells
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 17.4:
+        non_striker: W Sutherland
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 17.5:
+        non_striker: W Sutherland
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 17.6:
+        non_striker: W Sutherland
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 18.1:
+        non_striker: W Sutherland
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 18.2:
+        non_striker: W Sutherland
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 18.3:
+        non_striker: W Sutherland
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 18.4:
+        non_striker: JW Wells
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 18.5:
+        non_striker: W Sutherland
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 18.6:
+        non_striker: W Sutherland
+        bowler: L Wood
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 19.1:
+        non_striker: JW Wells
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 19.2:
+        non_striker: W Sutherland
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 19.3:
+        non_striker: W Sutherland
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JW Wells
+    - 19.4:
+        non_striker: W Sutherland
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+        wicket:
+          player_out: JW Wells
+          fielders:
+          - NCR Larkin
+          kind: caught
+    - 19.5:
+        non_striker: W Sutherland
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RP Kellepotha
+    - 19.6:
+        non_striker: RP Kellepotha
+        bowler: LC Hatcher
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: W Sutherland
+- 2nd innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.2:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 0.3:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 0.4:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 0.5:
+        non_striker: JM Clarke
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 0.6:
+        non_striker: JM Clarke
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.1:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: JM Clarke
+    - 1.2:
+        non_striker: JM Clarke
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.3:
+        non_striker: JM Clarke
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.4:
+        non_striker: JM Clarke
+        bowler: KW Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TF Rogers
+    - 1.5:
+        non_striker: JM Clarke
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 1.6:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 1.7:
+        non_striker: JM Clarke
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 2.1:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 2.2:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 2.3:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 2.4:
+        non_striker: JM Clarke
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 2.5:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 2.6:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 3.1:
+        non_striker: JM Clarke
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 3.2:
+        non_striker: JM Clarke
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 3.3:
+        non_striker: JM Clarke
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 3.4:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 3.5:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 3.6:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: JM Clarke
+    - 4.1:
+        non_striker: TF Rogers
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 4.2:
+        non_striker: JM Clarke
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 4.3:
+        non_striker: TF Rogers
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 4.4:
+        non_striker: JM Clarke
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 4.5:
+        non_striker: TF Rogers
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 4.6:
+        non_striker: JM Clarke
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TF Rogers
+    - 5.1:
+        non_striker: TF Rogers
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 5.2:
+        non_striker: JM Clarke
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 5.3:
+        non_striker: TF Rogers
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 5.4:
+        non_striker: JM Clarke
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 5.5:
+        non_striker: JM Clarke
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TF Rogers
+    - 5.6:
+        non_striker: JM Clarke
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.1:
+        non_striker: JM Clarke
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.2:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 6.3:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 6.4:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 6.5:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 6.6:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 7.1:
+        non_striker: JM Clarke
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 7.2:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 7.3:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Clarke
+    - 7.4:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JM Clarke
+    - 7.5:
+        non_striker: TF Rogers
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 7.6:
+        non_striker: JM Clarke
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 8.1:
+        non_striker: JM Clarke
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 8.2:
+        non_striker: TF Rogers
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Clarke
+    - 8.3:
+        non_striker: TF Rogers
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 8.4:
+        non_striker: JM Clarke
+        bowler: Fawad Ahmed
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: TF Rogers
+    - 8.5:
+        non_striker: JM Clarke
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+        wicket:
+          player_out: TF Rogers
+          fielders:
+          - W Sutherland
+          kind: caught
+    - 8.6:
+        non_striker: JM Clarke
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 9.1:
+        non_striker: JM Clarke
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HWR Cartwright
+    - 9.2:
+        non_striker: HWR Cartwright
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 9.3:
+        non_striker: HWR Cartwright
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 9.4:
+        non_striker: HWR Cartwright
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 9.5:
+        non_striker: HWR Cartwright
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Clarke
+    - 9.6:
+        non_striker: JM Clarke
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: HWR Cartwright
+    - 10.1:
+        non_striker: HWR Cartwright
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 10.2:
+        non_striker: HWR Cartwright
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+    - 10.3:
+        non_striker: HWR Cartwright
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Clarke
+        wicket:
+          player_out: JM Clarke
+          fielders:
+          - J Fraser-McGurk
+          kind: caught
+    - 10.4:
+        non_striker: HWR Cartwright
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 10.5:
+        non_striker: BJ Webster
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 10.6:
+        non_striker: BJ Webster
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HWR Cartwright
+    - 11.1:
+        non_striker: HWR Cartwright
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 11.2:
+        non_striker: HWR Cartwright
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BJ Webster
+    - 11.3:
+        non_striker: HWR Cartwright
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 11.4:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 11.5:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 11.6:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+        wicket:
+          player_out: HWR Cartwright
+          fielders:
+          - MJ Guptill
+          kind: caught
+    - 12.1:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 12.2:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 12.3:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 12.4:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 12.5:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 12.6:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 13.1:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 13.2:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 13.3:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 13.4:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 13.5:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 13.6:
+        non_striker: BJ Webster
+        bowler: RP Kellepotha
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 14.1:
+        non_striker: NCR Larkin
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 14.2:
+        non_striker: BJ Webster
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 14.3:
+        non_striker: NCR Larkin
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 14.4:
+        non_striker: NCR Larkin
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 14.5:
+        non_striker: BJ Webster
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NCR Larkin
+    - 14.6:
+        non_striker: BJ Webster
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 15.1:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BJ Webster
+    - 15.2:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BJ Webster
+    - 15.3:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 15.4:
+        non_striker: BJ Webster
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 15.5:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: BJ Webster
+    - 15.6:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+        wicket:
+          player_out: BJ Webster
+          fielders:
+          - W Sutherland
+          kind: caught
+    - 16.1:
+        non_striker: J Seymour
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 16.2:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Seymour
+    - 16.3:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Seymour
+    - 16.4:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Seymour
+    - 16.5:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Seymour
+    - 16.6:
+        non_striker: NCR Larkin
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Seymour
+    - 17.1:
+        non_striker: NCR Larkin
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Seymour
+    - 17.2:
+        non_striker: NCR Larkin
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Seymour
+        wicket:
+          player_out: J Seymour
+          fielders:
+          - J Fraser-McGurk
+          kind: caught
+    - 17.3:
+        non_striker: NCR Larkin
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CD Hinchliffe
+    - 17.4:
+        non_striker: NCR Larkin
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CD Hinchliffe
+    - 17.5:
+        non_striker: NCR Larkin
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CD Hinchliffe
+    - 17.6:
+        non_striker: CD Hinchliffe
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 18.1:
+        non_striker: CD Hinchliffe
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 18.2:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CD Hinchliffe
+    - 18.3:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CD Hinchliffe
+        wicket:
+          player_out: CD Hinchliffe
+          fielders:
+          - SB Harper
+          kind: caught
+    - 18.4:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Wood
+    - 18.5:
+        non_striker: NCR Larkin
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Wood
+    - 18.6:
+        non_striker: L Wood
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 19.1:
+        non_striker: L Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 19.2:
+        non_striker: L Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin
+    - 19.3:
+        non_striker: L Wood
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NCR Larkin
+    - 19.4:
+        non_striker: NCR Larkin
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Wood
+        wicket:
+          player_out: L Wood
+          fielders:
+          - W Sutherland
+          kind: run out
+    - 19.5:
+        non_striker: BL Couch
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NCR Larkin
+    - 19.6:
+        non_striker: BL Couch
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NCR Larkin

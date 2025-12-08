@@ -1,0 +1,1696 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-17'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Sydney
+  competition: Big Bash League
+  dates:
+  - '2023-01-13'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Perth Scorchers
+    by:
+      wickets: 9
+  overs: 20
+  player_of_match:
+  - AJ Tye
+  players:
+    Sydney Thunder:
+    - M Gilkes
+    - DA Warner
+    - SM Whiteman
+    - O Davies
+    - AI Ross
+    - DR Sams
+    - BCJ Cutting
+    - N McAndrew
+    - CJ Green
+    - B Doggett
+    - Usman Qadir
+    Perth Scorchers:
+    - SS Eskinazi
+    - CT Bancroft
+    - AM Hardie
+    - JP Inglis
+    - AJ Turner
+    - NR Hobson
+    - AC Agar
+    - M Kelly
+    - AJ Tye
+    - DA Payne
+    - LR Morris
+  registry:
+    people:
+      AC Agar: a2421394
+      AI Ross: fb0d68b4
+      AJ Turner: ff1e12a0
+      AJ Tye: 7c7d63a2
+      AM Hardie: d405c0d5
+      AR Hamilton: 95d26c59
+      B Doggett: 898e628d
+      BCJ Cutting: 2e11c706
+      CJ Green: 19b9f399
+      CT Bancroft: 399b0b94
+      DA Payne: 6c79c098
+      DA Warner: dcce6f09
+      DR Sams: caf69bf7
+      Dave Gilbert: aa782370
+      GA Abood: a4af5528
+      JP Inglis: 989889ff
+      LR Morris: b08e58e2
+      M Gilkes: d85b0f8b
+      M Kelly: 68e26ec9
+      N McAndrew: 38c276e1
+      NR Hobson: 4312e0fd
+      O Davies: 0ea54eca
+      P Wilson: 68304a36
+      SA Lightbody: 680b8cbf
+      SM Whiteman: f4427cc6
+      SS Eskinazi: 75cbed9b
+      Usman Qadir: 33742f04
+  teams:
+  - Sydney Thunder
+  - Perth Scorchers
+  toss:
+    winner: Perth Scorchers
+    decision: field
+  umpires:
+  - P Wilson
+  - SA Lightbody
+  venue: Sydney Showground Stadium
+innings:
+- 1st innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.2:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+        wicket:
+          player_out: M Gilkes
+          fielders:
+          - JP Inglis
+          kind: caught
+    - 0.3:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 0.4:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 0.5:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+    - 0.6:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SM Whiteman
+    - 1.1:
+        non_striker: SM Whiteman
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 1.2:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SM Whiteman
+        wicket:
+          player_out: SM Whiteman
+          fielders:
+          - AM Hardie
+          kind: caught
+    - 1.3:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 1.4:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 1.5:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 1.6:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 2.1:
+        non_striker: O Davies
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 2.2:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: O Davies
+    - 2.3:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 2.4:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: O Davies
+    - 2.5:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 2.6:
+        non_striker: DA Warner
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 3.1:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: O Davies
+    - 3.2:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 3.3:
+        non_striker: DA Warner
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 3.4:
+        non_striker: O Davies
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 3.5:
+        non_striker: O Davies
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 3.6:
+        non_striker: O Davies
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 4.1:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 4.2:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 4.3:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 4.4:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 4.5:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: O Davies
+    - 4.6:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 5.1:
+        non_striker: DA Warner
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 5.2:
+        non_striker: DA Warner
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 5.3:
+        non_striker: DA Warner
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 5.4:
+        non_striker: O Davies
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 5.5:
+        non_striker: O Davies
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 5.6:
+        non_striker: O Davies
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 6.1:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 6.2:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 6.3:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 6.4:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 6.5:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 6.6:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 7.1:
+        non_striker: DA Warner
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 7.2:
+        non_striker: O Davies
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 7.3:
+        non_striker: DA Warner
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: O Davies
+    - 7.4:
+        non_striker: DA Warner
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 7.5:
+        non_striker: O Davies
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 7.6:
+        non_striker: DA Warner
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: O Davies
+    - 8.1:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 8.2:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 8.3:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: O Davies
+    - 8.4:
+        non_striker: DA Warner
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 8.5:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 8.6:
+        non_striker: O Davies
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 9.1:
+        non_striker: DA Warner
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 9.2:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+        wicket:
+          player_out: DA Warner
+          fielders:
+          - JP Inglis
+          kind: caught
+    - 9.3:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 9.4:
+        non_striker: AI Ross
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 9.5:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 9.6:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 10.1:
+        non_striker: AI Ross
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.2:
+        non_striker: AI Ross
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.3:
+        non_striker: AI Ross
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 10.4:
+        non_striker: AI Ross
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 10.5:
+        non_striker: O Davies
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 10.6:
+        non_striker: O Davies
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AI Ross
+    - 11.1:
+        non_striker: AI Ross
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: O Davies
+    - 11.2:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 11.3:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 11.4:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+        wicket:
+          player_out: AI Ross
+          fielders:
+          - DA Payne
+          kind: caught
+    - 11.5:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+    - 11.6:
+        non_striker: O Davies
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+    - 12.1:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+        wicket:
+          player_out: O Davies
+          fielders:
+          - JP Inglis
+          kind: stumped
+    - 12.2:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+    - 12.3:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BCJ Cutting
+    - 12.4:
+        non_striker: BCJ Cutting
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Sams
+    - 12.5:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+    - 12.6:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BCJ Cutting
+    - 13.1:
+        non_striker: BCJ Cutting
+        bowler: LR Morris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: DR Sams
+    - 13.2:
+        non_striker: DR Sams
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BCJ Cutting
+    - 13.3:
+        non_striker: DR Sams
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+    - 13.4:
+        non_striker: DR Sams
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+    - 13.5:
+        non_striker: DR Sams
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+        wicket:
+          player_out: BCJ Cutting
+          fielders:
+          - CT Bancroft
+          kind: caught
+    - 13.6:
+        non_striker: DR Sams
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 14.1:
+        non_striker: N McAndrew
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Sams
+    - 14.2:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 14.3:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: N McAndrew
+    - 14.4:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 14.5:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: N McAndrew
+    - 14.6:
+        non_striker: DR Sams
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: N McAndrew
+    - 15.1:
+        non_striker: N McAndrew
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+        wicket:
+          player_out: DR Sams
+          fielders:
+          - M Kelly
+          kind: caught
+    - 15.2:
+        non_striker: N McAndrew
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 15.3:
+        non_striker: N McAndrew
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 15.4:
+        non_striker: N McAndrew
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 15.5:
+        non_striker: N McAndrew
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 15.6:
+        non_striker: CJ Green
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 16.1:
+        non_striker: N McAndrew
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 16.2:
+        non_striker: N McAndrew
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+        wicket:
+          player_out: CJ Green
+          fielders:
+          - AC Agar
+          kind: caught
+    - 16.3:
+        non_striker: N McAndrew
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 16.4:
+        non_striker: N McAndrew
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 16.5:
+        non_striker: N McAndrew
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 16.6:
+        non_striker: N McAndrew
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 17.1:
+        non_striker: B Doggett
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 17.2:
+        non_striker: B Doggett
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: N McAndrew
+    - 17.3:
+        non_striker: B Doggett
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 17.4:
+        non_striker: B Doggett
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: N McAndrew
+    - 17.5:
+        non_striker: B Doggett
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 17.6:
+        non_striker: B Doggett
+        bowler: DA Payne
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: N McAndrew
+    - 18.1:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: N McAndrew
+    - 18.2:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+    - 18.3:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: N McAndrew
+    - 18.4:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: N McAndrew
+        wicket:
+          player_out: N McAndrew
+          fielders:
+          - CT Bancroft
+          kind: caught
+    - 18.5:
+        non_striker: B Doggett
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Usman Qadir
+    - 18.6:
+        non_striker: Usman Qadir
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+        wicket:
+          player_out: B Doggett
+          kind: bowled
+- 2nd innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 0.2:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 0.3:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SS Eskinazi
+    - 0.4:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 0.5:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SS Eskinazi
+    - 0.6:
+        non_striker: SS Eskinazi
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: CT Bancroft
+    - 0.7:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 1.1:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 1.2:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 1.3:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 1.4:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 1.5:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 1.6:
+        non_striker: CT Bancroft
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SS Eskinazi
+    - 2.1:
+        non_striker: SS Eskinazi
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 2.2:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SS Eskinazi
+    - 2.3:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SS Eskinazi
+    - 2.4:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SS Eskinazi
+    - 2.5:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SS Eskinazi
+    - 2.6:
+        non_striker: CT Bancroft
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SS Eskinazi
+    - 3.1:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 3.2:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 3.3:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: SS Eskinazi
+    - 3.4:
+        non_striker: SS Eskinazi
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 3.5:
+        non_striker: SS Eskinazi
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 3.6:
+        non_striker: SS Eskinazi
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 4.1:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SS Eskinazi
+    - 4.2:
+        non_striker: SS Eskinazi
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 4.3:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SS Eskinazi
+    - 4.4:
+        non_striker: SS Eskinazi
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 4.5:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 4.6:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 5.1:
+        non_striker: SS Eskinazi
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 5.2:
+        non_striker: SS Eskinazi
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 5.3:
+        non_striker: SS Eskinazi
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 5.4:
+        non_striker: CT Bancroft
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SS Eskinazi
+    - 5.5:
+        non_striker: SS Eskinazi
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 5.6:
+        non_striker: SS Eskinazi
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 6.1:
+        non_striker: SS Eskinazi
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 6.2:
+        non_striker: SS Eskinazi
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 6.3:
+        non_striker: SS Eskinazi
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CT Bancroft
+    - 6.4:
+        non_striker: SS Eskinazi
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 6.5:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SS Eskinazi
+    - 6.6:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SS Eskinazi
+    - 7.1:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 7.2:
+        non_striker: CT Bancroft
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+    - 7.3:
+        non_striker: CT Bancroft
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SS Eskinazi
+    - 7.4:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 7.5:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 7.6:
+        non_striker: SS Eskinazi
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 8.1:
+        non_striker: SS Eskinazi
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 8.2:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SS Eskinazi
+    - 8.3:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SS Eskinazi
+    - 8.4:
+        non_striker: SS Eskinazi
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 8.5:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SS Eskinazi
+        wicket:
+          player_out: SS Eskinazi
+          fielders:
+          - B Doggett
+          kind: caught
+    - 8.6:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.1:
+        non_striker: AM Hardie
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 9.2:
+        non_striker: CT Bancroft
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.3:
+        non_striker: CT Bancroft
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 9.4:
+        non_striker: AM Hardie
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 9.5:
+        non_striker: CT Bancroft
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 9.6:
+        non_striker: AM Hardie
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CT Bancroft
+    - 10.1:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 10.2:
+        non_striker: AM Hardie
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 10.3:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AM Hardie
+    - 10.4:
+        non_striker: CT Bancroft
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 10.5:
+        non_striker: AM Hardie
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 10.6:
+        non_striker: AM Hardie
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 10.7:
+        non_striker: AM Hardie
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 11.1:
+        non_striker: AM Hardie
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: CT Bancroft
+    - 11.2:
+        non_striker: AM Hardie
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CT Bancroft
+    - 11.3:
+        non_striker: AM Hardie
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 11.4:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          byes: 4
+        batsman: AM Hardie
+    - 11.5:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 11.6:
+        non_striker: CT Bancroft
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 12.1:
+        non_striker: AM Hardie
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 12.2:
+        non_striker: CT Bancroft
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 12.3:
+        non_striker: AM Hardie
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CT Bancroft
+    - 12.4:
+        non_striker: AM Hardie
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CT Bancroft
+    - 12.5:
+        non_striker: CT Bancroft
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie

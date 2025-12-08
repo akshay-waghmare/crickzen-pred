@@ -1,0 +1,2090 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-20'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Canberra
+  competition: Big Bash League
+  dates:
+  - '2023-01-19'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Sydney Thunder
+    by:
+      wickets: 8
+  overs: 20
+  player_of_match:
+  - M Gilkes
+  players:
+    Melbourne Renegades:
+    - MJ Guptill
+    - J Fraser-McGurk
+    - SB Harper
+    - AJ Finch
+    - MJJ Critchley
+    - JW Wells
+    - W Sutherland
+    - TS Rogers
+    - CJ Rocchiccioli
+    - KW Richardson
+    - Fawad Ahmed
+    Sydney Thunder:
+    - M Gilkes
+    - DA Warner
+    - O Davies
+    - AI Ross
+    - B Nikitaras
+    - DR Sams
+    - BCJ Cutting
+    - N McAndrew
+    - CJ Green
+    - Usman Qadir
+    - B Doggett
+  registry:
+    people:
+      AI Ross: fb0d68b4
+      AJ Finch: b8d490fd
+      Andrew Crozier: 00d07580
+      B Doggett: 898e628d
+      B Nikitaras: d4e39566
+      BC Treloar: f7e8ee52
+      BCJ Cutting: 2e11c706
+      CJ Green: 19b9f399
+      CJ Rocchiccioli: aa3c7a7a
+      D Taylor: b940a2b2
+      DA Warner: dcce6f09
+      DR Sams: caf69bf7
+      Fawad Ahmed: 22ae3041
+      J Fraser-McGurk: 9b6e1b3f
+      JA Davies: 5cdf8304
+      JW Wells: 8bdac857
+      KW Richardson: dfc4d8b5
+      M Gilkes: d85b0f8b
+      MJ Guptill: 2be41edb
+      MJJ Critchley: c5cc48bc
+      N McAndrew: 38c276e1
+      O Davies: 0ea54eca
+      P Wilson: 68304a36
+      SB Harper: a756e61a
+      SR Bernard: 800187dc
+      TS Rogers: 1b04e02b
+      Usman Qadir: 33742f04
+      W Sutherland: bc2d4f2e
+  teams:
+  - Melbourne Renegades
+  - Sydney Thunder
+  toss:
+    winner: Melbourne Renegades
+    decision: bat
+  umpires:
+  - D Taylor
+  - P Wilson
+  venue: Manuka Oval, Canberra
+innings:
+- 1st innings:
+    team: Melbourne Renegades
+    deliveries:
+    - 0.1:
+        non_striker: J Fraser-McGurk
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MJ Guptill
+    - 0.2:
+        non_striker: J Fraser-McGurk
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MJ Guptill
+    - 0.3:
+        non_striker: J Fraser-McGurk
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MJ Guptill
+    - 0.4:
+        non_striker: J Fraser-McGurk
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 0.5:
+        non_striker: J Fraser-McGurk
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 0.6:
+        non_striker: MJ Guptill
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 0.7:
+        non_striker: MJ Guptill
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 0.8:
+        non_striker: MJ Guptill
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 0.9:
+        non_striker: J Fraser-McGurk
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 1.1:
+        non_striker: MJ Guptill
+        bowler: DR Sams
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: J Fraser-McGurk
+    - 1.2:
+        non_striker: MJ Guptill
+        bowler: DR Sams
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: J Fraser-McGurk
+    - 1.3:
+        non_striker: J Fraser-McGurk
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 1.4:
+        non_striker: J Fraser-McGurk
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Guptill
+    - 1.5:
+        non_striker: J Fraser-McGurk
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Guptill
+    - 1.6:
+        non_striker: J Fraser-McGurk
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 1.7:
+        non_striker: J Fraser-McGurk
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 1.8:
+        non_striker: J Fraser-McGurk
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 2.1:
+        non_striker: MJ Guptill
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Fraser-McGurk
+    - 2.2:
+        non_striker: MJ Guptill
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 2.3:
+        non_striker: MJ Guptill
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+        wicket:
+          player_out: J Fraser-McGurk
+          fielders:
+          - DA Warner
+          kind: caught
+    - 2.4:
+        non_striker: MJ Guptill
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 2.5:
+        non_striker: SB Harper
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Guptill
+    - 2.6:
+        non_striker: SB Harper
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 3.1:
+        non_striker: MJ Guptill
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.2:
+        non_striker: MJ Guptill
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.3:
+        non_striker: MJ Guptill
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 3.4:
+        non_striker: MJ Guptill
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SB Harper
+    - 3.5:
+        non_striker: MJ Guptill
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 3.6:
+        non_striker: SB Harper
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MJ Guptill
+    - 4.1:
+        non_striker: SB Harper
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 4.2:
+        non_striker: MJ Guptill
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 4.3:
+        non_striker: MJ Guptill
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 4.4:
+        non_striker: SB Harper
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 4.5:
+        non_striker: SB Harper
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 4.6:
+        non_striker: MJ Guptill
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 5.1:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          fielders:
+          - CJ Green
+          kind: caught
+    - 5.2:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 5.3:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 5.4:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 5.5:
+        non_striker: AJ Finch
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 5.6:
+        non_striker: AJ Finch
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 6.1:
+        non_striker: AJ Finch
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 6.2:
+        non_striker: MJ Guptill
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 6.3:
+        non_striker: AJ Finch
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Guptill
+    - 6.4:
+        non_striker: AJ Finch
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 6.5:
+        non_striker: AJ Finch
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Guptill
+    - 6.6:
+        non_striker: AJ Finch
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+    - 7.1:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 7.2:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: AJ Finch
+    - 7.3:
+        non_striker: AJ Finch
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 7.4:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 7.5:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Finch
+    - 7.6:
+        non_striker: MJ Guptill
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 8.1:
+        non_striker: MJ Guptill
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 8.2:
+        non_striker: MJ Guptill
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 8.3:
+        non_striker: MJ Guptill
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 8.4:
+        non_striker: AJ Finch
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Guptill
+    - 8.5:
+        non_striker: AJ Finch
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 8.6:
+        non_striker: MJ Guptill
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 9.1:
+        non_striker: MJ Guptill
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 9.2:
+        non_striker: AJ Finch
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Guptill
+    - 9.3:
+        non_striker: MJ Guptill
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 9.4:
+        non_striker: MJ Guptill
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 9.5:
+        non_striker: AJ Finch
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+        wicket:
+          player_out: MJ Guptill
+          kind: bowled
+    - 9.6:
+        non_striker: AJ Finch
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 10.1:
+        non_striker: MJJ Critchley
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 10.2:
+        non_striker: AJ Finch
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 10.3:
+        non_striker: AJ Finch
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 10.4:
+        non_striker: MJJ Critchley
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 10.5:
+        non_striker: AJ Finch
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 10.6:
+        non_striker: MJJ Critchley
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 11.1:
+        non_striker: AJ Finch
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.2:
+        non_striker: MJJ Critchley
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 11.3:
+        non_striker: AJ Finch
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.4:
+        non_striker: MJJ Critchley
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Finch
+    - 11.5:
+        non_striker: MJJ Critchley
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 11.6:
+        non_striker: MJJ Critchley
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+        wicket:
+          player_out: AJ Finch
+          kind: lbw
+    - 12.1:
+        non_striker: JW Wells
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MJJ Critchley
+    - 12.2:
+        non_striker: JW Wells
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 12.3:
+        non_striker: MJJ Critchley
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 12.4:
+        non_striker: MJJ Critchley
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 12.5:
+        non_striker: JW Wells
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 12.6:
+        non_striker: MJJ Critchley
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 12.7:
+        non_striker: MJJ Critchley
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+        wicket:
+          player_out: JW Wells
+          fielders:
+          - B Nikitaras
+          kind: caught
+    - 13.1:
+        non_striker: W Sutherland
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 13.2:
+        non_striker: W Sutherland
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 13.3:
+        non_striker: W Sutherland
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 13.4:
+        non_striker: W Sutherland
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 13.5:
+        non_striker: MJJ Critchley
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 13.6:
+        non_striker: MJJ Critchley
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 14.1:
+        non_striker: W Sutherland
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 14.2:
+        non_striker: MJJ Critchley
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 14.3:
+        non_striker: MJJ Critchley
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 14.4:
+        non_striker: MJJ Critchley
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 14.5:
+        non_striker: W Sutherland
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 14.6:
+        non_striker: MJJ Critchley
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 15.1:
+        non_striker: W Sutherland
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 15.2:
+        non_striker: W Sutherland
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 15.3:
+        non_striker: W Sutherland
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 15.4:
+        non_striker: W Sutherland
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 15.5:
+        non_striker: MJJ Critchley
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 15.6:
+        non_striker: MJJ Critchley
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 16.1:
+        non_striker: MJJ Critchley
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 16.2:
+        non_striker: MJJ Critchley
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 16.3:
+        non_striker: W Sutherland
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+        wicket:
+          player_out: MJJ Critchley
+          fielders:
+          - N McAndrew
+          kind: run out
+    - 16.4:
+        non_striker: TS Rogers
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 16.5:
+        non_striker: W Sutherland
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 16.6:
+        non_striker: TS Rogers
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 17.1:
+        non_striker: W Sutherland
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 17.2:
+        non_striker: TS Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: W Sutherland
+    - 17.3:
+        non_striker: TS Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 17.4:
+        non_striker: W Sutherland
+        bowler: N McAndrew
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TS Rogers
+    - 17.5:
+        non_striker: W Sutherland
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 17.6:
+        non_striker: TS Rogers
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 17.7:
+        non_striker: W Sutherland
+        bowler: N McAndrew
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 18.1:
+        non_striker: W Sutherland
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Rogers
+        wicket:
+          player_out: TS Rogers
+          fielders:
+          - Usman Qadir
+          kind: caught
+    - 18.2:
+        non_striker: W Sutherland
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Rocchiccioli
+    - 18.3:
+        non_striker: CJ Rocchiccioli
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 18.4:
+        non_striker: W Sutherland
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Rocchiccioli
+        wicket:
+          player_out: CJ Rocchiccioli
+          fielders:
+          - JA Davies (sub)
+          kind: caught
+    - 18.5:
+        non_striker: W Sutherland
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KW Richardson
+    - 18.6:
+        non_striker: W Sutherland
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: KW Richardson
+    - 19.1:
+        non_striker: KW Richardson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: W Sutherland
+    - 19.2:
+        non_striker: KW Richardson
+        bowler: DR Sams
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: W Sutherland
+    - 19.3:
+        non_striker: KW Richardson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: W Sutherland
+    - 19.4:
+        non_striker: KW Richardson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: W Sutherland
+    - 19.5:
+        non_striker: KW Richardson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: W Sutherland
+    - 19.6:
+        non_striker: KW Richardson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 19.7:
+        non_striker: KW Richardson
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+        wicket:
+          player_out: KW Richardson
+          fielders:
+          - DR Sams
+          - CJ Green
+          kind: run out
+- 2nd innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: DA Warner
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 0.2:
+        non_striker: DA Warner
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.3:
+        non_striker: DA Warner
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.4:
+        non_striker: DA Warner
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 0.5:
+        non_striker: M Gilkes
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.6:
+        non_striker: M Gilkes
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 1.1:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: M Gilkes
+    - 1.2:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 1.3:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 1.4:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 1.5:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 1.6:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 2.1:
+        non_striker: M Gilkes
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 2.2:
+        non_striker: M Gilkes
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 2.3:
+        non_striker: M Gilkes
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 2.4:
+        non_striker: DA Warner
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 2.5:
+        non_striker: DA Warner
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 2.6:
+        non_striker: DA Warner
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 3.1:
+        non_striker: M Gilkes
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 3.2:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 3.3:
+        non_striker: M Gilkes
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 3.4:
+        non_striker: M Gilkes
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 3.5:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 3.6:
+        non_striker: DA Warner
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 4.1:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 4.2:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 4.3:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 4.4:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 4.5:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 4.6:
+        non_striker: DA Warner
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 5.1:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 5.2:
+        non_striker: DA Warner
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 5.3:
+        non_striker: DA Warner
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 5.4:
+        non_striker: DA Warner
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 5.5:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 5.6:
+        non_striker: DA Warner
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 6.1:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 6.2:
+        non_striker: DA Warner
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 6.3:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 6.4:
+        non_striker: DA Warner
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 6.5:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 6.6:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: DA Warner
+    - 7.1:
+        non_striker: DA Warner
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 7.2:
+        non_striker: DA Warner
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 7.3:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 7.4:
+        non_striker: DA Warner
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 7.5:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DA Warner
+    - 7.6:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 8.1:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+        wicket:
+          player_out: DA Warner
+          fielders:
+          - W Sutherland
+          kind: caught
+    - 8.2:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+        wicket:
+          player_out: O Davies
+          fielders:
+          - MJJ Critchley
+          kind: caught
+    - 8.3:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 8.4:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 8.5:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 8.6:
+        non_striker: AI Ross
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 9.1:
+        non_striker: AI Ross
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 9.2:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 9.3:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AI Ross
+    - 9.4:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 9.5:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 9.6:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 9.7:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 10.1:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: AI Ross
+    - 10.2:
+        non_striker: AI Ross
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 10.3:
+        non_striker: AI Ross
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 10.4:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 10.5:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AI Ross
+    - 10.6:
+        non_striker: M Gilkes
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 11.1:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 11.2:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: AI Ross
+    - 11.3:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 11.4:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 11.5:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 11.6:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 12.1:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 12.2:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 12.3:
+        non_striker: M Gilkes
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 12.4:
+        non_striker: AI Ross
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 12.5:
+        non_striker: AI Ross
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 12.6:
+        non_striker: AI Ross
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 13.1:
+        non_striker: M Gilkes
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.2:
+        non_striker: AI Ross
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 13.3:
+        non_striker: M Gilkes
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 13.4:
+        non_striker: AI Ross
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 13.5:
+        non_striker: AI Ross
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Gilkes
+    - 13.6:
+        non_striker: AI Ross
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 14.1:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 14.2:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 14.3:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 14.4:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 14.5:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 14.6:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 15.1:
+        non_striker: AI Ross
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 15.2:
+        non_striker: M Gilkes
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 15.3:
+        non_striker: AI Ross
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Gilkes
+    - 15.4:
+        non_striker: AI Ross
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 15.5:
+        non_striker: M Gilkes
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 15.6:
+        non_striker: AI Ross
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 16.1:
+        non_striker: M Gilkes
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 16.2:
+        non_striker: M Gilkes
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 16.3:
+        non_striker: AI Ross
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 16.4:
+        non_striker: M Gilkes
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 16.5:
+        non_striker: AI Ross
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 16.6:
+        non_striker: AI Ross
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 17.1:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 17.2:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Gilkes
+    - 17.3:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 17.4:
+        non_striker: AI Ross
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 17.5:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 17.6:
+        non_striker: M Gilkes
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 18.1:
+        non_striker: AI Ross
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 18.2:
+        non_striker: AI Ross
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 18.3:
+        non_striker: M Gilkes
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross

@@ -1,0 +1,1841 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-26'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Sydney
+  competition: Big Bash League
+  dates:
+  - '2023-01-21'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Sydney Sixers
+    by:
+      runs: 125
+  overs: 20
+  player_of_match:
+  - SPD Smith
+  players:
+    Sydney Sixers:
+    - JR Philippe
+    - SPD Smith
+    - KR Patterson
+    - MC Henriques
+    - JC Silk
+    - DT Christian
+    - H Kerr
+    - BJ Dwarshuis
+    - SA Abbott
+    - T Murphy
+    - SNJ O'Keefe
+    Sydney Thunder:
+    - M Gilkes
+    - DA Warner
+    - B Nikitaras
+    - O Davies
+    - AI Ross
+    - DR Sams
+    - BCJ Cutting
+    - JA Davies
+    - CJ Green
+    - GS Sandhu
+    - Usman Qadir
+  registry:
+    people:
+      AI Ross: fb0d68b4
+      B Nikitaras: d4e39566
+      BCJ Cutting: 2e11c706
+      BJ Dwarshuis: e1b9f3a9
+      CJ Green: 19b9f399
+      DA Warner: dcce6f09
+      DR Sams: caf69bf7
+      DT Christian: 2a2e6343
+      GJ Davidson: 31ad5973
+      GS Sandhu: 1558d83b
+      H Kerr: f422728b
+      JA Davies: 5cdf8304
+      JC Silk: 7a6dc294
+      JR Philippe: '39086549'
+      KR Patterson: e3bf8356
+      M Gilkes: d85b0f8b
+      MC Henriques: 32198ae0
+      O Davies: 0ea54eca
+      PJ Gillespie: 3e253a50
+      Roberto Howard: eec90c4b
+      SA Abbott: 1a2676c5
+      SJ Nogajski: 9b3f9323
+      SNJ O'Keefe: 3540beff
+      SPD Smith: 30a45b23
+      SR Bernard: 800187dc
+      T Murphy: ac2e7ec0
+      Usman Qadir: 33742f04
+  teams:
+  - Sydney Sixers
+  - Sydney Thunder
+  toss:
+    winner: Sydney Sixers
+    decision: bat
+  umpires:
+  - GJ Davidson
+  - PJ Gillespie
+  venue: Sydney Cricket Ground
+innings:
+- 1st innings:
+    team: Sydney Sixers
+    deliveries:
+    - 0.1:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JR Philippe
+    - 0.2:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 0.3:
+        non_striker: JR Philippe
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 0.4:
+        non_striker: JR Philippe
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SPD Smith
+    - 0.5:
+        non_striker: JR Philippe
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 0.6:
+        non_striker: JR Philippe
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 1.1:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 1.2:
+        non_striker: JR Philippe
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 1.3:
+        non_striker: JR Philippe
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SPD Smith
+    - 1.4:
+        non_striker: JR Philippe
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 1.5:
+        non_striker: JR Philippe
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 1.6:
+        non_striker: JR Philippe
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 2.1:
+        non_striker: JR Philippe
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 2.2:
+        non_striker: JR Philippe
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 2.3:
+        non_striker: SPD Smith
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JR Philippe
+    - 2.4:
+        non_striker: SPD Smith
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+    - 2.5:
+        non_striker: SPD Smith
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+    - 2.6:
+        non_striker: SPD Smith
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JR Philippe
+    - 3.1:
+        non_striker: JR Philippe
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 3.2:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+        wicket:
+          player_out: JR Philippe
+          kind: bowled
+    - 3.3:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: KR Patterson
+    - 3.4:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 3.5:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: KR Patterson
+    - 3.6:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 3.7:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+        wicket:
+          player_out: KR Patterson
+          fielders:
+          - M Gilkes
+          kind: caught
+    - 4.1:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 4.2:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+    - 4.3:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+    - 4.4:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 4.5:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 4.6:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 5.1:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 5.2:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 5.3:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 5.4:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+    - 5.5:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 5.6:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 6.1:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 6.2:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MC Henriques
+    - 6.3:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 6.4:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 6.5:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+    - 6.6:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 7.1:
+        non_striker: SPD Smith
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+    - 7.2:
+        non_striker: SPD Smith
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 7.3:
+        non_striker: MC Henriques
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 7.4:
+        non_striker: SPD Smith
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 7.5:
+        non_striker: MC Henriques
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 7.6:
+        non_striker: MC Henriques
+        bowler: JA Davies
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SPD Smith
+    - 7.7:
+        non_striker: MC Henriques
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 8.1:
+        non_striker: MC Henriques
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 8.2:
+        non_striker: MC Henriques
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 8.3:
+        non_striker: MC Henriques
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 8.4:
+        non_striker: MC Henriques
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 8.5:
+        non_striker: SPD Smith
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MC Henriques
+    - 8.6:
+        non_striker: SPD Smith
+        bowler: BCJ Cutting
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 9.1:
+        non_striker: SPD Smith
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 9.2:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 9.3:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SPD Smith
+    - 9.4:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 9.5:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 9.6:
+        non_striker: SPD Smith
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 10.1:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+    - 10.2:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 10.3:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 10.4:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MC Henriques
+    - 10.5:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 10.6:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 11.1:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 11.2:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 11.3:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 11.4:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 11.5:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 11.6:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 12.1:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 12.2:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 12.3:
+        non_striker: SPD Smith
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 12.4:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 12.5:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 12.6:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 13.1:
+        non_striker: MC Henriques
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 13.2:
+        non_striker: MC Henriques
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 13.3:
+        non_striker: MC Henriques
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 13.4:
+        non_striker: SPD Smith
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+    - 13.5:
+        non_striker: SPD Smith
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MC Henriques
+    - 13.6:
+        non_striker: SPD Smith
+        bowler: JA Davies
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 14.1:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 14.2:
+        non_striker: MC Henriques
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 14.3:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 14.4:
+        non_striker: MC Henriques
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 14.5:
+        non_striker: MC Henriques
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 14.6:
+        non_striker: MC Henriques
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 15.1:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 15.2:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 15.3:
+        non_striker: MC Henriques
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 15.4:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MC Henriques
+    - 15.5:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+    - 15.6:
+        non_striker: SPD Smith
+        bowler: CJ Green
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MC Henriques
+    - 16.1:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 16.2:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 16.3:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 16.4:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 16.5:
+        non_striker: MC Henriques
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: SPD Smith
+    - 16.6:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MC Henriques
+    - 16.7:
+        non_striker: SPD Smith
+        bowler: Usman Qadir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MC Henriques
+    - 17.1:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 17.2:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: SPD Smith
+    - 17.3:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SPD Smith
+    - 17.4:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 17.5:
+        non_striker: SPD Smith
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 17.6:
+        non_striker: MC Henriques
+        bowler: DR Sams
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SPD Smith
+    - 18.1:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MC Henriques
+    - 18.2:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MC Henriques
+    - 18.3:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 18.4:
+        non_striker: MC Henriques
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+    - 18.5:
+        non_striker: SPD Smith
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MC Henriques
+    - 18.6:
+        non_striker: MC Henriques
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SPD Smith
+    - 18.7:
+        non_striker: MC Henriques
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: SPD Smith
+    - 18.8:
+        non_striker: MC Henriques
+        bowler: GS Sandhu
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SPD Smith
+- 2nd innings:
+    team: Sydney Thunder
+    deliveries:
+    - 0.1:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Gilkes
+    - 0.2:
+        non_striker: M Gilkes
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.3:
+        non_striker: M Gilkes
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 0.4:
+        non_striker: M Gilkes
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 0.5:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 0.6:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+    - 1.1:
+        non_striker: M Gilkes
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 1.2:
+        non_striker: M Gilkes
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 1.3:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Gilkes
+        wicket:
+          player_out: M Gilkes
+          fielders:
+          - JC Silk
+          kind: caught
+    - 1.4:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+    - 1.5:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+    - 1.6:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: B Nikitaras
+    - 2.1:
+        non_striker: B Nikitaras
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 2.2:
+        non_striker: B Nikitaras
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 2.3:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+    - 2.4:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Nikitaras
+    - 2.5:
+        non_striker: B Nikitaras
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 2.6:
+        non_striker: B Nikitaras
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 3.1:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+    - 3.2:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: B Nikitaras
+    - 3.3:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+    - 3.4:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+    - 3.5:
+        non_striker: DA Warner
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: B Nikitaras
+    - 3.6:
+        non_striker: B Nikitaras
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 4.1:
+        non_striker: B Nikitaras
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 4.2:
+        non_striker: B Nikitaras
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 4.3:
+        non_striker: B Nikitaras
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 4.4:
+        non_striker: DA Warner
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+    - 4.5:
+        non_striker: DA Warner
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Nikitaras
+        wicket:
+          player_out: B Nikitaras
+          fielders:
+          - MC Henriques
+          kind: caught
+    - 4.6:
+        non_striker: DA Warner
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+    - 5.1:
+        non_striker: O Davies
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 5.2:
+        non_striker: DA Warner
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: O Davies
+    - 5.3:
+        non_striker: DA Warner
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: O Davies
+        wicket:
+          player_out: O Davies
+          fielders:
+          - JR Philippe
+          kind: caught
+    - 5.4:
+        non_striker: DA Warner
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 5.5:
+        non_striker: AI Ross
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 5.6:
+        non_striker: DA Warner
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 6.1:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 6.2:
+        non_striker: AI Ross
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+    - 6.3:
+        non_striker: AI Ross
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DA Warner
+    - 6.4:
+        non_striker: AI Ross
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 6.5:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 6.6:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 7.1:
+        non_striker: DA Warner
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 7.2:
+        non_striker: AI Ross
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 7.3:
+        non_striker: DA Warner
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 7.4:
+        non_striker: DA Warner
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 7.5:
+        non_striker: AI Ross
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 7.6:
+        non_striker: DA Warner
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 8.1:
+        non_striker: AI Ross
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 8.2:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+        wicket:
+          player_out: AI Ross
+          fielders:
+          - BJ Dwarshuis
+          kind: caught
+    - 8.3:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DR Sams
+    - 8.4:
+        non_striker: DR Sams
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DA Warner
+    - 8.5:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DR Sams
+    - 8.6:
+        non_striker: DA Warner
+        bowler: T Murphy
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+    - 9.1:
+        non_striker: DR Sams
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DA Warner
+        wicket:
+          player_out: DA Warner
+          fielders:
+          - JC Silk
+          kind: caught
+    - 9.2:
+        non_striker: DR Sams
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BCJ Cutting
+    - 9.3:
+        non_striker: BCJ Cutting
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+    - 9.4:
+        non_striker: BCJ Cutting
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DR Sams
+    - 9.5:
+        non_striker: BCJ Cutting
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+    - 9.6:
+        non_striker: BCJ Cutting
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DR Sams
+        wicket:
+          player_out: DR Sams
+          kind: bowled
+    - 9.7:
+        non_striker: BCJ Cutting
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Davies
+    - 10.1:
+        non_striker: JA Davies
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+    - 10.2:
+        non_striker: JA Davies
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: BCJ Cutting
+    - 10.3:
+        non_striker: JA Davies
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BCJ Cutting
+    - 10.4:
+        non_striker: BCJ Cutting
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JA Davies
+    - 10.5:
+        non_striker: BCJ Cutting
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Davies
+    - 10.6:
+        non_striker: BCJ Cutting
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Davies
+    - 10.7:
+        non_striker: JA Davies
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BCJ Cutting
+    - 11.1:
+        non_striker: JA Davies
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+    - 11.2:
+        non_striker: JA Davies
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BCJ Cutting
+    - 11.3:
+        non_striker: BCJ Cutting
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Davies
+    - 11.4:
+        non_striker: JA Davies
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+    - 11.5:
+        non_striker: JA Davies
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BCJ Cutting
+        wicket:
+          player_out: BCJ Cutting
+          fielders:
+          - JC Silk
+          kind: caught
+    - 11.6:
+        non_striker: JA Davies
+        bowler: SNJ O'Keefe
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 12.1:
+        non_striker: CJ Green
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Davies
+    - 12.2:
+        non_striker: JA Davies
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 12.3:
+        non_striker: CJ Green
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Davies
+    - 12.4:
+        non_striker: JA Davies
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+    - 12.5:
+        non_striker: JA Davies
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 12.6:
+        non_striker: CJ Green
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Davies
+    - 13.1:
+        non_striker: CJ Green
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JA Davies
+    - 13.2:
+        non_striker: CJ Green
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Davies
+    - 13.3:
+        non_striker: JA Davies
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 13.4:
+        non_striker: CJ Green
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Davies
+        wicket:
+          player_out: JA Davies
+          fielders:
+          - T Murphy
+          kind: caught
+    - 13.5:
+        non_striker: CJ Green
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: GS Sandhu
+    - 13.6:
+        non_striker: CJ Green
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+    - 13.7:
+        non_striker: CJ Green
+        bowler: BJ Dwarshuis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+    - 14.1:
+        non_striker: GS Sandhu
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Green
+    - 14.2:
+        non_striker: CJ Green
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GS Sandhu
+        wicket:
+          player_out: GS Sandhu
+          fielders:
+          - MC Henriques
+          kind: caught
+    - 14.3:
+        non_striker: CJ Green
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Usman Qadir
+    - 14.4:
+        non_striker: Usman Qadir
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Green
+        wicket:
+          player_out: CJ Green
+          kind: bowled

@@ -1,0 +1,1482 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-12-28'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Hobart
+  competition: Big Bash League
+  dates:
+  - '2023-12-28'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Melbourne Stars
+    by:
+      wickets: 7
+    method: D/L
+  overs: 20
+  player_of_match:
+  - GJ Maxwell
+  players:
+    Hobart Hurricanes:
+    - MS Wade
+    - CP Jewell
+    - M Wright
+    - SR Hain
+    - CJ Anderson
+    - TH David
+    - Nikhil Chaudhary
+    - CJ Jordan
+    - PG Dooley
+    - NT Ellis
+    - RP Meredith
+    Melbourne Stars:
+    - SB Harper
+    - GJ Maxwell
+    - MP Stoinis
+    - HWR Cartwright
+    - TF Rogers
+    - BJ Webster
+    - Imad Wasim
+    - J Merlo
+    - Usama Mir
+    - Haris Rauf
+    - JS Paris
+  registry:
+    people:
+      BC Treloar: f7e8ee52
+      BJ Webster: 56b93d46
+      CJ Anderson: 8abdf100
+      CJ Jordan: ffe699c0
+      CP Jewell: 806c4e58
+      GJ Maxwell: b681e71e
+      HWR Cartwright: ab965cad
+      Haris Rauf: 24bb1c2f
+      Imad Wasim: 9cb8d7a6
+      J Merlo: 02ba80a0
+      JS Paris: 7c8f533d
+      M Wright: bd920a2c
+      MP Stoinis: d9273ee7
+      MS Wade: afa7e784
+      NT Ellis: 9eb1455b
+      Nikhil Chaudhary: 1f84183a
+      P Wilson: 68304a36
+      PG Dooley: 5e3054d0
+      RL Parry: 86d151dc
+      RP Meredith: '64775749'
+      SB Harper: a756e61a
+      SJ Nogajski: 9b3f9323
+      SR Hain: 67b9536c
+      Simon Burns: c0741b3f
+      TF Rogers: 7f232d46
+      TH David: f1f99156
+      Usama Mir: 6dd8b88c
+  teams:
+  - Hobart Hurricanes
+  - Melbourne Stars
+  toss:
+    winner: Melbourne Stars
+    decision: field
+  umpires:
+  - BC Treloar
+  - SJ Nogajski
+  venue: Bellerive Oval, Hobart
+innings:
+- 1st innings:
+    team: Hobart Hurricanes
+    deliveries:
+    - 0.1:
+        non_striker: CP Jewell
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 0.2:
+        non_striker: CP Jewell
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 0.3:
+        non_striker: MS Wade
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 0.4:
+        non_striker: MS Wade
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 0.5:
+        non_striker: MS Wade
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 0.6:
+        non_striker: CP Jewell
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+        wicket:
+          player_out: MS Wade
+          fielders:
+          - HWR Cartwright
+          kind: caught
+    - 1.1:
+        non_striker: M Wright
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.2:
+        non_striker: M Wright
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 1.3:
+        non_striker: CP Jewell
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Wright
+    - 1.4:
+        non_striker: CP Jewell
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Wright
+    - 1.5:
+        non_striker: CP Jewell
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Wright
+    - 1.6:
+        non_striker: CP Jewell
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Wright
+    - 2.1:
+        non_striker: M Wright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 2.2:
+        non_striker: CP Jewell
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Wright
+    - 2.3:
+        non_striker: CP Jewell
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Wright
+    - 2.4:
+        non_striker: CP Jewell
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Wright
+    - 2.5:
+        non_striker: CP Jewell
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Wright
+    - 2.6:
+        non_striker: M Wright
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 3.1:
+        non_striker: CP Jewell
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Wright
+    - 3.2:
+        non_striker: CP Jewell
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Wright
+    - 3.3:
+        non_striker: CP Jewell
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Wright
+    - 3.4:
+        non_striker: CP Jewell
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Wright
+    - 3.5:
+        non_striker: CP Jewell
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Wright
+    - 3.6:
+        non_striker: CP Jewell
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Wright
+    - 4.1:
+        non_striker: M Wright
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 4.2:
+        non_striker: CP Jewell
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Wright
+    - 4.3:
+        non_striker: M Wright
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 4.4:
+        non_striker: CP Jewell
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: M Wright
+    - 4.5:
+        non_striker: CP Jewell
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Wright
+    - 4.6:
+        non_striker: CP Jewell
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Wright
+    - 5.1:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Wright
+        wicket:
+          player_out: M Wright
+          fielders:
+          - MP Stoinis
+          kind: caught
+    - 5.2:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+    - 5.3:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 5.4:
+        non_striker: SR Hain
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 5.5:
+        non_striker: SR Hain
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 5.6:
+        non_striker: SR Hain
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 6.1:
+        non_striker: SR Hain
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 6.2:
+        non_striker: SR Hain
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 6.3:
+        non_striker: SR Hain
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 6.4:
+        non_striker: SR Hain
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 6.5:
+        non_striker: CP Jewell
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 6.6:
+        non_striker: SR Hain
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 7.1:
+        non_striker: SR Hain
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 7.2:
+        non_striker: CP Jewell
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 7.3:
+        non_striker: SR Hain
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 7.4:
+        non_striker: SR Hain
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 7.5:
+        non_striker: SR Hain
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 7.6:
+        non_striker: SR Hain
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 8.1:
+        non_striker: SR Hain
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 8.2:
+        non_striker: CP Jewell
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 8.3:
+        non_striker: SR Hain
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 8.4:
+        non_striker: SR Hain
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 8.5:
+        non_striker: SR Hain
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CP Jewell
+    - 8.6:
+        non_striker: SR Hain
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: CP Jewell
+    - 9.1:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 9.2:
+        non_striker: SR Hain
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 9.3:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 9.4:
+        non_striker: SR Hain
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 9.5:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+    - 9.6:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 10.1:
+        non_striker: CP Jewell
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 10.2:
+        non_striker: SR Hain
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 10.3:
+        non_striker: CP Jewell
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SR Hain
+    - 10.4:
+        non_striker: SR Hain
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 10.5:
+        non_striker: CP Jewell
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: SR Hain
+    - 10.6:
+        non_striker: CP Jewell
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SR Hain
+        wicket:
+          player_out: SR Hain
+          fielders:
+          - TF Rogers
+          kind: caught
+    - 11.1:
+        non_striker: CJ Anderson
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 11.2:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 11.3:
+        non_striker: CJ Anderson
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 11.4:
+        non_striker: CJ Anderson
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 11.5:
+        non_striker: CP Jewell
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 11.6:
+        non_striker: CJ Anderson
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 12.1:
+        non_striker: CJ Anderson
+        bowler: GJ Maxwell
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CP Jewell
+    - 12.2:
+        non_striker: CJ Anderson
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 12.3:
+        non_striker: CP Jewell
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 12.4:
+        non_striker: CJ Anderson
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+        wicket:
+          player_out: CP Jewell
+          kind: lbw
+    - 12.5:
+        non_striker: CJ Anderson
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 12.6:
+        non_striker: TH David
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 12.7:
+        non_striker: CJ Anderson
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+        wicket:
+          player_out: TH David
+          kind: lbw
+    - 13.1:
+        non_striker: Nikhil Chaudhary
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Anderson
+    - 13.2:
+        non_striker: CJ Anderson
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 13.3:
+        non_striker: CJ Anderson
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 13.4:
+        non_striker: CJ Anderson
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 13.5:
+        non_striker: Nikhil Chaudhary
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Anderson
+        wicket:
+          player_out: CJ Anderson
+          fielders:
+          - GJ Maxwell
+          kind: caught
+    - 13.6:
+        non_striker: Nikhil Chaudhary
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 14.1:
+        non_striker: CJ Jordan
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 14.2:
+        non_striker: CJ Jordan
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 14.3:
+        non_striker: CJ Jordan
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 14.4:
+        non_striker: Nikhil Chaudhary
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 14.5:
+        non_striker: CJ Jordan
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Nikhil Chaudhary
+    - 14.6:
+        non_striker: CJ Jordan
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 15.1:
+        non_striker: CJ Jordan
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 15.2:
+        non_striker: CJ Jordan
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 15.3:
+        non_striker: CJ Jordan
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 15.4:
+        non_striker: CJ Jordan
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 15.5:
+        non_striker: CJ Jordan
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 15.6:
+        non_striker: Nikhil Chaudhary
+        bowler: Usama Mir
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 16.1:
+        non_striker: Nikhil Chaudhary
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 16.2:
+        non_striker: Nikhil Chaudhary
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Jordan
+    - 16.3:
+        non_striker: CJ Jordan
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Nikhil Chaudhary
+    - 16.4:
+        non_striker: CJ Jordan
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 16.5:
+        non_striker: CJ Jordan
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+        wicket:
+          player_out: Nikhil Chaudhary
+          fielders:
+          - JS Paris
+          kind: caught
+    - 16.6:
+        non_striker: CJ Jordan
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: PG Dooley
+    - 17.1:
+        non_striker: CJ Jordan
+        bowler: JS Paris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: PG Dooley
+    - 17.2:
+        non_striker: PG Dooley
+        bowler: JS Paris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CJ Jordan
+    - 17.3:
+        non_striker: PG Dooley
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 17.4:
+        non_striker: PG Dooley
+        bowler: JS Paris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CJ Jordan
+    - 17.5:
+        non_striker: PG Dooley
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 17.6:
+        non_striker: PG Dooley
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 17.7:
+        non_striker: PG Dooley
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 17.8:
+        non_striker: PG Dooley
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CJ Jordan
+    - 18.1:
+        non_striker: CJ Jordan
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: PG Dooley
+        wicket:
+          player_out: PG Dooley
+          kind: bowled
+    - 18.2:
+        non_striker: CJ Jordan
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 18.3:
+        non_striker: CJ Jordan
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 18.4:
+        non_striker: CJ Jordan
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NT Ellis
+    - 18.5:
+        non_striker: NT Ellis
+        bowler: Haris Rauf
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: CJ Jordan
+    - 18.6:
+        non_striker: NT Ellis
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+    - 18.7:
+        non_striker: NT Ellis
+        bowler: Haris Rauf
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Jordan
+        wicket:
+          player_out: CJ Jordan
+          fielders:
+          - Imad Wasim
+          kind: caught
+    - 19.1:
+        non_striker: RP Meredith
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NT Ellis
+    - 19.2:
+        non_striker: RP Meredith
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NT Ellis
+    - 19.3:
+        non_striker: RP Meredith
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 19.4:
+        non_striker: RP Meredith
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NT Ellis
+        wicket:
+          player_out: NT Ellis
+          fielders:
+          - SB Harper
+          - TF Rogers
+          kind: run out
+- 2nd innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SB Harper
+    - 0.2:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          fielders:
+          - CJ Anderson
+          kind: caught
+    - 0.3:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 0.4:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+    - 0.5:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MP Stoinis
+        wicket:
+          player_out: MP Stoinis
+          fielders:
+          - MS Wade
+          kind: caught
+    - 0.6:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+    - 0.7:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HWR Cartwright
+    - 1.1:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: GJ Maxwell
+    - 1.2:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 1.3:
+        non_striker: HWR Cartwright
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 1.4:
+        non_striker: GJ Maxwell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HWR Cartwright
+        wicket:
+          player_out: HWR Cartwright
+          kind: bowled
+    - 1.5:
+        non_striker: GJ Maxwell
+        bowler: NT Ellis
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TF Rogers
+    - 1.6:
+        non_striker: TF Rogers
+        bowler: NT Ellis
+        runs:
+          extras: 5
+          total: 5
+          batsman: 0
+        extras:
+          wides: 5
+        batsman: GJ Maxwell
+    - 1.7:
+        non_striker: TF Rogers
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 2.1:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 2.2:
+        non_striker: TF Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 2.3:
+        non_striker: TF Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 2.4:
+        non_striker: TF Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 2.5:
+        non_striker: TF Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 2.6:
+        non_striker: GJ Maxwell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 3.1:
+        non_striker: TF Rogers
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 3.2:
+        non_striker: TF Rogers
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 3.3:
+        non_striker: GJ Maxwell
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 3.4:
+        non_striker: TF Rogers
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 3.5:
+        non_striker: TF Rogers
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: GJ Maxwell
+    - 3.6:
+        non_striker: TF Rogers
+        bowler: CJ Jordan
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 4.1:
+        non_striker: GJ Maxwell
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 4.2:
+        non_striker: GJ Maxwell
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 4.3:
+        non_striker: GJ Maxwell
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 4.4:
+        non_striker: TF Rogers
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 4.5:
+        non_striker: GJ Maxwell
+        bowler: PG Dooley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TF Rogers
+    - 4.6:
+        non_striker: TF Rogers
+        bowler: PG Dooley
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: GJ Maxwell
+    - 4.7:
+        non_striker: TF Rogers
+        bowler: PG Dooley
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 5.1:
+        non_striker: GJ Maxwell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 5.2:
+        non_striker: GJ Maxwell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 5.3:
+        non_striker: GJ Maxwell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 5.4:
+        non_striker: GJ Maxwell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 5.5:
+        non_striker: TF Rogers
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 5.6:
+        non_striker: TF Rogers
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 6.1:
+        non_striker: GJ Maxwell
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 6.2:
+        non_striker: GJ Maxwell
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.3:
+        non_striker: TF Rogers
+        bowler: CJ Anderson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: GJ Maxwell

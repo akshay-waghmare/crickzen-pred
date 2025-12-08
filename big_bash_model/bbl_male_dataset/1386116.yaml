@@ -1,0 +1,1410 @@
+---
+meta:
+  data_version: 0.92
+  created: '2024-01-02'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Melbourne
+  competition: Big Bash League
+  dates:
+  - '2024-01-02'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Melbourne Stars
+    by:
+      wickets: 8
+  overs: 20
+  player_of_match:
+  - GJ Maxwell
+  players:
+    Melbourne Renegades:
+    - Q de Kock
+    - JM Cox
+    - J Fraser-McGurk
+    - SE Marsh
+    - MW Harvey
+    - JW Wells
+    - W Sutherland
+    - TS Rogers
+    - KW Richardson
+    - A Zampa
+    - PM Siddle
+    Melbourne Stars:
+    - TF Rogers
+    - DW Lawrence
+    - BJ Webster
+    - GJ Maxwell
+    - MP Stoinis
+    - HWR Cartwright
+    - Imad Wasim
+    - SB Harper
+    - JS Paris
+    - J Merlo
+    - MT Steketee
+  registry:
+    people:
+      A Zampa: 14f96089
+      BJ Webster: 56b93d46
+      C Grant: 876ed858
+      DW Lawrence: 4b685e2d
+      GJ Maxwell: b681e71e
+      HWR Cartwright: ab965cad
+      Imad Wasim: 9cb8d7a6
+      J Fraser-McGurk: 9b6e1b3f
+      J Merlo: 02ba80a0
+      JM Cox: ff154ecd
+      JS Paris: 7c8f533d
+      JW Wells: 8bdac857
+      KW Richardson: dfc4d8b5
+      MP Stoinis: d9273ee7
+      MT Steketee: 903560ed
+      MW Graham-Smith: 18aca3ce
+      MW Harvey: 47dc9794
+      PM Siddle: bd93fea4
+      Q de Kock: 372455c4
+      RW Stratford: '85489579'
+      SAJ Craig: 689f2eed
+      SB Harper: a756e61a
+      SE Marsh: 508a1ea7
+      SJ Nogajski: 9b3f9323
+      TF Rogers: 7f232d46
+      TS Rogers: 1b04e02b
+      W Sutherland: bc2d4f2e
+  teams:
+  - Melbourne Renegades
+  - Melbourne Stars
+  toss:
+    winner: Melbourne Stars
+    decision: field
+  umpires:
+  - MW Graham-Smith
+  - SJ Nogajski
+  venue: Melbourne Cricket Ground
+innings:
+- 1st innings:
+    team: Melbourne Renegades
+    deliveries:
+    - 0.1:
+        non_striker: JM Cox
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Q de Kock
+    - 0.2:
+        non_striker: JM Cox
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Q de Kock
+    - 0.3:
+        non_striker: JM Cox
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Q de Kock
+    - 0.4:
+        non_striker: JM Cox
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Q de Kock
+    - 0.5:
+        non_striker: JM Cox
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Q de Kock
+    - 0.6:
+        non_striker: JM Cox
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Q de Kock
+    - 1.1:
+        non_striker: JM Cox
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Q de Kock
+    - 1.2:
+        non_striker: Q de Kock
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Cox
+    - 1.3:
+        non_striker: JM Cox
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Q de Kock
+    - 1.4:
+        non_striker: JM Cox
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Q de Kock
+    - 1.5:
+        non_striker: JM Cox
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Q de Kock
+    - 1.6:
+        non_striker: JM Cox
+        bowler: MP Stoinis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Q de Kock
+    - 2.1:
+        non_striker: Q de Kock
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Cox
+    - 2.2:
+        non_striker: Q de Kock
+        bowler: Imad Wasim
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: JM Cox
+    - 2.3:
+        non_striker: Q de Kock
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Cox
+    - 2.4:
+        non_striker: Q de Kock
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Cox
+    - 2.5:
+        non_striker: Q de Kock
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Cox
+        wicket:
+          player_out: JM Cox
+          fielders:
+          - J Merlo
+          kind: caught
+    - 2.6:
+        non_striker: Q de Kock
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 3.1:
+        non_striker: Q de Kock
+        bowler: GJ Maxwell
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: J Fraser-McGurk
+    - 3.2:
+        non_striker: J Fraser-McGurk
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Q de Kock
+    - 3.3:
+        non_striker: J Fraser-McGurk
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Q de Kock
+    - 3.4:
+        non_striker: Q de Kock
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 3.5:
+        non_striker: J Fraser-McGurk
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Q de Kock
+    - 3.6:
+        non_striker: J Fraser-McGurk
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Q de Kock
+    - 4.1:
+        non_striker: Q de Kock
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 4.2:
+        non_striker: Q de Kock
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 4.3:
+        non_striker: Q de Kock
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 4.4:
+        non_striker: Q de Kock
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: J Fraser-McGurk
+    - 4.5:
+        non_striker: Q de Kock
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 4.6:
+        non_striker: Q de Kock
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 5.1:
+        non_striker: J Fraser-McGurk
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Q de Kock
+        wicket:
+          player_out: Q de Kock
+          fielders:
+          - BJ Webster
+          kind: caught
+    - 5.2:
+        non_striker: J Fraser-McGurk
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 5.3:
+        non_striker: J Fraser-McGurk
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+    - 5.4:
+        non_striker: J Fraser-McGurk
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 5.5:
+        non_striker: SE Marsh
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 5.6:
+        non_striker: SE Marsh
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 6.1:
+        non_striker: J Fraser-McGurk
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 6.2:
+        non_striker: SE Marsh
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 6.3:
+        non_striker: SE Marsh
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 6.4:
+        non_striker: SE Marsh
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 6.5:
+        non_striker: J Fraser-McGurk
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 6.6:
+        non_striker: SE Marsh
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 7.1:
+        non_striker: J Fraser-McGurk
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SE Marsh
+    - 7.2:
+        non_striker: SE Marsh
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 7.3:
+        non_striker: J Fraser-McGurk
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+        wicket:
+          player_out: SE Marsh
+          kind: bowled
+    - 7.4:
+        non_striker: J Fraser-McGurk
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Harvey
+    - 7.5:
+        non_striker: MW Harvey
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 7.6:
+        non_striker: J Fraser-McGurk
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Harvey
+    - 8.1:
+        non_striker: MW Harvey
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 8.2:
+        non_striker: J Fraser-McGurk
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Harvey
+    - 8.3:
+        non_striker: MW Harvey
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+        wicket:
+          player_out: J Fraser-McGurk
+          fielders:
+          - GJ Maxwell
+          kind: caught
+    - 8.4:
+        non_striker: MW Harvey
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 8.5:
+        non_striker: MW Harvey
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 8.6:
+        non_striker: MW Harvey
+        bowler: BJ Webster
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JW Wells
+    - 9.1:
+        non_striker: JW Wells
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Harvey
+    - 9.2:
+        non_striker: MW Harvey
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 9.3:
+        non_striker: JW Wells
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Harvey
+    - 9.4:
+        non_striker: JW Wells
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Harvey
+    - 9.5:
+        non_striker: MW Harvey
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 9.6:
+        non_striker: JW Wells
+        bowler: GJ Maxwell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Harvey
+    - 10.1:
+        non_striker: JW Wells
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Harvey
+    - 10.2:
+        non_striker: JW Wells
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Harvey
+    - 10.3:
+        non_striker: JW Wells
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Harvey
+    - 10.4:
+        non_striker: JW Wells
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Harvey
+    - 10.5:
+        non_striker: MW Harvey
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 10.6:
+        non_striker: MW Harvey
+        bowler: Imad Wasim
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 11.1:
+        non_striker: MW Harvey
+        bowler: DW Lawrence
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JW Wells
+    - 11.2:
+        non_striker: JW Wells
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Harvey
+    - 11.3:
+        non_striker: MW Harvey
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+        wicket:
+          player_out: JW Wells
+          kind: lbw
+    - 11.4:
+        non_striker: MW Harvey
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 11.5:
+        non_striker: W Sutherland
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Harvey
+    - 11.6:
+        non_striker: MW Harvey
+        bowler: DW Lawrence
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 12.1:
+        non_striker: MW Harvey
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 12.2:
+        non_striker: MW Harvey
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+        wicket:
+          player_out: W Sutherland
+          fielders:
+          - BJ Webster
+          kind: caught
+    - 12.3:
+        non_striker: MW Harvey
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TS Rogers
+    - 12.4:
+        non_striker: MW Harvey
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 12.5:
+        non_striker: TS Rogers
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Harvey
+    - 12.6:
+        non_striker: TS Rogers
+        bowler: JS Paris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Harvey
+    - 13.1:
+        non_striker: MW Harvey
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 13.2:
+        non_striker: TS Rogers
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Harvey
+        wicket:
+          player_out: MW Harvey
+          fielders:
+          - GJ Maxwell
+          kind: caught
+    - 13.3:
+        non_striker: TS Rogers
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KW Richardson
+    - 13.4:
+        non_striker: KW Richardson
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Rogers
+    - 13.5:
+        non_striker: KW Richardson
+        bowler: MT Steketee
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TS Rogers
+    - 13.6:
+        non_striker: KW Richardson
+        bowler: MT Steketee
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TS Rogers
+- 2nd innings:
+    team: Melbourne Stars
+    deliveries:
+    - 0.1:
+        non_striker: DW Lawrence
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 0.2:
+        non_striker: DW Lawrence
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 0.3:
+        non_striker: DW Lawrence
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 0.4:
+        non_striker: DW Lawrence
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 0.5:
+        non_striker: DW Lawrence
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 0.6:
+        non_striker: DW Lawrence
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 1.1:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: DW Lawrence
+    - 1.2:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DW Lawrence
+    - 1.3:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DW Lawrence
+    - 1.4:
+        non_striker: DW Lawrence
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 1.5:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DW Lawrence
+    - 1.6:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DW Lawrence
+    - 1.7:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DW Lawrence
+    - 2.1:
+        non_striker: DW Lawrence
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 2.2:
+        non_striker: DW Lawrence
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 2.3:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DW Lawrence
+        wicket:
+          player_out: DW Lawrence
+          fielders:
+          - JM Cox
+          kind: caught
+    - 2.4:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 2.5:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 2.6:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 3.1:
+        non_striker: BJ Webster
+        bowler: JW Wells
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 3.2:
+        non_striker: TF Rogers
+        bowler: JW Wells
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 3.3:
+        non_striker: BJ Webster
+        bowler: JW Wells
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 3.4:
+        non_striker: BJ Webster
+        bowler: JW Wells
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 3.5:
+        non_striker: BJ Webster
+        bowler: JW Wells
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 3.6:
+        non_striker: TF Rogers
+        bowler: JW Wells
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 4.1:
+        non_striker: BJ Webster
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 4.2:
+        non_striker: BJ Webster
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 4.3:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 4.4:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 4.5:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 4.6:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 5.1:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 5.2:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: BJ Webster
+    - 5.3:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 5.4:
+        non_striker: BJ Webster
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 5.5:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 5.6:
+        non_striker: BJ Webster
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.1:
+        non_striker: BJ Webster
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.2:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 6.3:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 6.4:
+        non_striker: BJ Webster
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 6.5:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: BJ Webster
+    - 6.6:
+        non_striker: BJ Webster
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 7.1:
+        non_striker: BJ Webster
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 7.2:
+        non_striker: BJ Webster
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 7.3:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+    - 7.4:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: BJ Webster
+        wicket:
+          player_out: BJ Webster
+          fielders:
+          - W Sutherland
+          kind: caught
+    - 7.5:
+        non_striker: TF Rogers
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: GJ Maxwell
+    - 7.6:
+        non_striker: GJ Maxwell
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 8.1:
+        non_striker: GJ Maxwell
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 8.2:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 8.3:
+        non_striker: GJ Maxwell
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 8.4:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 8.5:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GJ Maxwell
+    - 8.6:
+        non_striker: TF Rogers
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 9.1:
+        non_striker: GJ Maxwell
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TF Rogers
+    - 9.2:
+        non_striker: GJ Maxwell
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 9.3:
+        non_striker: GJ Maxwell
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TF Rogers
+    - 9.4:
+        non_striker: GJ Maxwell
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 9.5:
+        non_striker: GJ Maxwell
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 9.6:
+        non_striker: GJ Maxwell
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 10.1:
+        non_striker: GJ Maxwell
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TF Rogers
+    - 10.2:
+        non_striker: GJ Maxwell
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TF Rogers
+    - 10.3:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 10.4:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 10.5:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: GJ Maxwell
+    - 10.6:
+        non_striker: TF Rogers
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: GJ Maxwell
+    - 11.1:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: GJ Maxwell
+    - 11.2:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 11.3:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 11.4:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: GJ Maxwell
+    - 11.5:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: GJ Maxwell
+    - 11.6:
+        non_striker: TF Rogers
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: GJ Maxwell
+    - 12.1:
+        non_striker: GJ Maxwell
+        bowler: KW Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: TF Rogers

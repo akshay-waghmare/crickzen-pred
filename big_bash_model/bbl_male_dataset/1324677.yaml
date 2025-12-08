@@ -1,0 +1,2127 @@
+---
+meta:
+  data_version: 0.92
+  created: '2023-01-26'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Melbourne
+  competition: Big Bash League
+  dates:
+  - '2023-01-24'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Melbourne Renegades
+    by:
+      wickets: 6
+  overs: 20
+  player_of_match:
+  - AJ Finch
+  players:
+    Adelaide Strikers:
+    - MW Short
+    - TM Head
+    - AT Carey
+    - AJ Hose
+    - C de Grandhomme
+    - RJ Gibson
+    - HJ Nielsen
+    - CJ Boyce
+    - WA Agar
+    - HNA Conway
+    - PM Siddle
+    Melbourne Renegades:
+    - MJ Guptill
+    - SE Marsh
+    - SB Harper
+    - AJ Finch
+    - MJJ Critchley
+    - JW Wells
+    - W Sutherland
+    - TS Rogers
+    - CJ Rocchiccioli
+    - KW Richardson
+    - Fawad Ahmed
+  registry:
+    people:
+      AJ Finch: b8d490fd
+      AJ Hose: 104e88a4
+      AT Carey: 69d03465
+      BC Treloar: f7e8ee52
+      C de Grandhomme: 94d7f855
+      CJ Boyce: 51a60c16
+      CJ Rocchiccioli: aa3c7a7a
+      D Brigham: 464daf41
+      Fawad Ahmed: 22ae3041
+      GJ Davidson: 31ad5973
+      HJ Nielsen: 0ea1455a
+      HNA Conway: 272fc5ad
+      JW Wells: 8bdac857
+      KW Richardson: dfc4d8b5
+      Kent Hannam: 8cc171e7
+      MJ Guptill: 2be41edb
+      MJJ Critchley: c5cc48bc
+      MW Short: a90e53ec
+      PJ Gillespie: 3e253a50
+      PM Siddle: bd93fea4
+      RJ Gibson: '50636767'
+      SB Harper: a756e61a
+      SE Marsh: 508a1ea7
+      TM Head: 12b610c2
+      TS Rogers: 1b04e02b
+      W Sutherland: bc2d4f2e
+      WA Agar: 15de1f5d
+  teams:
+  - Adelaide Strikers
+  - Melbourne Renegades
+  toss:
+    winner: Melbourne Renegades
+    decision: field
+  umpires:
+  - BC Treloar
+  - PJ Gillespie
+  venue: Docklands Stadium, Melbourne
+innings:
+- 1st innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: TM Head
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 0.2:
+        non_striker: TM Head
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 0.3:
+        non_striker: TM Head
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+        wicket:
+          player_out: MW Short
+          kind: caught and bowled
+    - 0.4:
+        non_striker: TM Head
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 0.5:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 0.6:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 1.1:
+        non_striker: TM Head
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 1.2:
+        non_striker: TM Head
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 1.3:
+        non_striker: AT Carey
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 1.4:
+        non_striker: AT Carey
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 1.5:
+        non_striker: AT Carey
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TM Head
+    - 1.6:
+        non_striker: TM Head
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 2.1:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 2.2:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 2.3:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 2.4:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 2.5:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 2.6:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 3.1:
+        non_striker: TM Head
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 3.2:
+        non_striker: TM Head
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 3.3:
+        non_striker: TM Head
+        bowler: W Sutherland
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          legbyes: 2
+        batsman: AT Carey
+    - 3.4:
+        non_striker: TM Head
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 3.5:
+        non_striker: AT Carey
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TM Head
+    - 3.6:
+        non_striker: TM Head
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 4.1:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TM Head
+    - 4.2:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TM Head
+    - 4.3:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 4.4:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TM Head
+    - 4.5:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 4.6:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TM Head
+    - 5.1:
+        non_striker: AT Carey
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 5.2:
+        non_striker: AT Carey
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TM Head
+    - 5.3:
+        non_striker: TM Head
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 5.4:
+        non_striker: TM Head
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 5.5:
+        non_striker: AT Carey
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TM Head
+    - 5.6:
+        non_striker: TM Head
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 6.1:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 6.2:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 6.3:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 6.4:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 6.5:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TM Head
+    - 6.6:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 7.1:
+        non_striker: TM Head
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 7.2:
+        non_striker: TM Head
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 7.3:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TM Head
+    - 7.4:
+        non_striker: TM Head
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 7.5:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TM Head
+    - 7.6:
+        non_striker: TM Head
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 8.1:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 8.2:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+    - 8.3:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TM Head
+        wicket:
+          player_out: TM Head
+          fielders:
+          - W Sutherland
+          kind: caught
+    - 8.4:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+    - 8.5:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 8.6:
+        non_striker: AJ Hose
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 9.1:
+        non_striker: AJ Hose
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 9.2:
+        non_striker: AJ Hose
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AT Carey
+    - 9.3:
+        non_striker: AJ Hose
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AT Carey
+    - 9.4:
+        non_striker: AJ Hose
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 9.5:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Hose
+    - 9.6:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 9.7:
+        non_striker: AJ Hose
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 10.1:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AT Carey
+    - 10.2:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 10.3:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AT Carey
+    - 10.4:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 10.5:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 10.6:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AT Carey
+    - 10.7:
+        non_striker: AJ Hose
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 11.1:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Hose
+    - 11.2:
+        non_striker: AJ Hose
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 11.3:
+        non_striker: AJ Hose
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 11.4:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Hose
+    - 11.5:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Hose
+        wicket:
+          player_out: AJ Hose
+          fielders:
+          - W Sutherland
+          kind: caught
+    - 11.6:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: C de Grandhomme
+    - 11.7:
+        non_striker: AT Carey
+        bowler: CJ Rocchiccioli
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C de Grandhomme
+    - 12.1:
+        non_striker: C de Grandhomme
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 12.2:
+        non_striker: C de Grandhomme
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 12.3:
+        non_striker: C de Grandhomme
+        bowler: Fawad Ahmed
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: AT Carey
+    - 12.4:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C de Grandhomme
+    - 12.5:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: C de Grandhomme
+    - 12.6:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C de Grandhomme
+        wicket:
+          player_out: C de Grandhomme
+          fielders:
+          - JW Wells
+          kind: caught
+    - 13.1:
+        non_striker: RJ Gibson
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 13.2:
+        non_striker: RJ Gibson
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 13.3:
+        non_striker: RJ Gibson
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 13.4:
+        non_striker: RJ Gibson
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: AT Carey
+    - 13.5:
+        non_striker: AT Carey
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RJ Gibson
+    - 13.6:
+        non_striker: RJ Gibson
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 14.1:
+        non_striker: AT Carey
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 14.2:
+        non_striker: AT Carey
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: RJ Gibson
+    - 14.3:
+        non_striker: AT Carey
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RJ Gibson
+    - 14.4:
+        non_striker: RJ Gibson
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 14.5:
+        non_striker: RJ Gibson
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 14.6:
+        non_striker: AT Carey
+        bowler: MJJ Critchley
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: RJ Gibson
+    - 15.1:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 15.2:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AT Carey
+    - 15.3:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 15.4:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 15.5:
+        non_striker: AT Carey
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: RJ Gibson
+    - 15.6:
+        non_striker: RJ Gibson
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 16.1:
+        non_striker: RJ Gibson
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+    - 16.2:
+        non_striker: RJ Gibson
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 16.3:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+    - 16.4:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: RJ Gibson
+        wicket:
+          player_out: RJ Gibson
+          fielders:
+          - TS Rogers
+          kind: caught
+    - 16.5:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 16.6:
+        non_striker: AT Carey
+        bowler: Fawad Ahmed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 17.1:
+        non_striker: HJ Nielsen
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+        wicket:
+          player_out: AT Carey
+          fielders:
+          - JW Wells
+          kind: caught
+    - 17.2:
+        non_striker: HJ Nielsen
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CJ Boyce
+    - 17.3:
+        non_striker: CJ Boyce
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 17.4:
+        non_striker: HJ Nielsen
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+    - 17.5:
+        non_striker: HJ Nielsen
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CJ Boyce
+        wicket:
+          player_out: CJ Boyce
+          fielders:
+          - JW Wells
+          - KW Richardson
+          kind: run out
+    - 17.6:
+        non_striker: WA Agar
+        bowler: KW Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 18.1:
+        non_striker: WA Agar
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 18.2:
+        non_striker: HJ Nielsen
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: WA Agar
+    - 18.3:
+        non_striker: HJ Nielsen
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: WA Agar
+    - 18.4:
+        non_striker: WA Agar
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 18.5:
+        non_striker: WA Agar
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Nielsen
+    - 18.6:
+        non_striker: HJ Nielsen
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: WA Agar
+    - 19.1:
+        non_striker: HJ Nielsen
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: WA Agar
+    - 19.2:
+        non_striker: WA Agar
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Nielsen
+    - 19.3:
+        non_striker: WA Agar
+        bowler: W Sutherland
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: HJ Nielsen
+    - 19.4:
+        non_striker: WA Agar
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: HJ Nielsen
+    - 19.5:
+        non_striker: WA Agar
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: HJ Nielsen
+    - 19.6:
+        non_striker: WA Agar
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HJ Nielsen
+    - 19.7:
+        non_striker: WA Agar
+        bowler: W Sutherland
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: HJ Nielsen
+    - 19.8:
+        non_striker: WA Agar
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: HJ Nielsen
+- 2nd innings:
+    team: Melbourne Renegades
+    deliveries:
+    - 0.1:
+        non_striker: SE Marsh
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Guptill
+    - 0.2:
+        non_striker: SE Marsh
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Guptill
+    - 0.3:
+        non_striker: SE Marsh
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Guptill
+        wicket:
+          player_out: MJ Guptill
+          fielders:
+          - AJ Hose
+          kind: caught
+    - 0.4:
+        non_striker: SE Marsh
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+    - 0.5:
+        non_striker: SE Marsh
+        bowler: MW Short
+        runs:
+          extras: 3
+          total: 3
+          batsman: 0
+        extras:
+          legbyes: 2
+          noballs: 1
+        batsman: SB Harper
+    - 0.6:
+        non_striker: SE Marsh
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SB Harper
+    - 0.7:
+        non_striker: SB Harper
+        bowler: MW Short
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: SE Marsh
+    - 1.1:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: SE Marsh
+    - 1.2:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SE Marsh
+        wicket:
+          player_out: SE Marsh
+          fielders:
+          - RJ Gibson
+          kind: caught
+    - 1.3:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 1.4:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 1.5:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AJ Finch
+    - 1.6:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 1.7:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AJ Finch
+    - 1.8:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 1.9:
+        non_striker: SB Harper
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 2.1:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SB Harper
+        wicket:
+          player_out: SB Harper
+          kind: lbw
+    - 2.2:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 2.3:
+        non_striker: MJJ Critchley
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 2.4:
+        non_striker: MJJ Critchley
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: AJ Finch
+    - 2.5:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 2.6:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJJ Critchley
+    - 3.1:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 3.2:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 3.3:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 3.4:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 3.5:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Finch
+    - 3.6:
+        non_striker: MJJ Critchley
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 4.1:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 4.2:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 4.3:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 4.4:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJJ Critchley
+    - 4.5:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 4.6:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 5.1:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: AJ Finch
+    - 5.2:
+        non_striker: AJ Finch
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 5.3:
+        non_striker: AJ Finch
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 5.4:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 5.5:
+        non_striker: AJ Finch
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 5.6:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 6.1:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Finch
+    - 6.2:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 6.3:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 6.4:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 6.5:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 6.6:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 7.1:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AJ Finch
+    - 7.2:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 7.3:
+        non_striker: AJ Finch
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 7.4:
+        non_striker: AJ Finch
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 7.5:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 7.6:
+        non_striker: MJJ Critchley
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 7.7:
+        non_striker: AJ Finch
+        bowler: HNA Conway
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJJ Critchley
+    - 8.1:
+        non_striker: MJJ Critchley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 8.2:
+        non_striker: MJJ Critchley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 8.3:
+        non_striker: MJJ Critchley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 8.4:
+        non_striker: AJ Finch
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 8.5:
+        non_striker: AJ Finch
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 8.6:
+        non_striker: MJJ Critchley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 9.1:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 9.2:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 9.3:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 9.4:
+        non_striker: MJJ Critchley
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 9.5:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJJ Critchley
+    - 9.6:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 10.1:
+        non_striker: AJ Finch
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 10.2:
+        non_striker: MJJ Critchley
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 10.3:
+        non_striker: AJ Finch
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 10.4:
+        non_striker: AJ Finch
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 10.5:
+        non_striker: AJ Finch
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJJ Critchley
+    - 10.6:
+        non_striker: AJ Finch
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.1:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJJ Critchley
+    - 11.2:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.3:
+        non_striker: MJJ Critchley
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 11.4:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+    - 11.5:
+        non_striker: MJJ Critchley
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 11.6:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJJ Critchley
+        wicket:
+          player_out: MJJ Critchley
+          fielders:
+          - AT Carey
+          - CJ Boyce
+          kind: run out
+    - 12.1:
+        non_striker: JW Wells
+        bowler: C de Grandhomme
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: AJ Finch
+    - 12.2:
+        non_striker: AJ Finch
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 12.3:
+        non_striker: JW Wells
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 12.4:
+        non_striker: JW Wells
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 12.5:
+        non_striker: AJ Finch
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 12.6:
+        non_striker: AJ Finch
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 12.7:
+        non_striker: AJ Finch
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 13.1:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 13.2:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 13.3:
+        non_striker: AJ Finch
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 13.4:
+        non_striker: AJ Finch
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 13.5:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 13.6:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 14.1:
+        non_striker: JW Wells
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 14.2:
+        non_striker: AJ Finch
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 14.3:
+        non_striker: JW Wells
+        bowler: C de Grandhomme
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AJ Finch
+    - 14.4:
+        non_striker: JW Wells
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: AJ Finch
+    - 14.5:
+        non_striker: AJ Finch
+        bowler: C de Grandhomme
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          byes: 2
+        batsman: JW Wells
+    - 14.6:
+        non_striker: AJ Finch
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 14.7:
+        non_striker: JW Wells
+        bowler: C de Grandhomme
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 15.1:
+        non_striker: JW Wells
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 15.2:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 15.3:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 15.4:
+        non_striker: AJ Finch
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 15.5:
+        non_striker: JW Wells
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 15.6:
+        non_striker: JW Wells
+        bowler: CJ Boyce
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 16.1:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 16.2:
+        non_striker: JW Wells
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Finch
+    - 16.3:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 16.4:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 16.5:
+        non_striker: JW Wells
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 16.6:
+        non_striker: JW Wells
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 17.1:
+        non_striker: AJ Finch
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JW Wells
+    - 17.2:
+        non_striker: AJ Finch
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JW Wells
+    - 17.3:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 17.4:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Finch
+    - 17.5:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Finch
+    - 17.6:
+        non_striker: JW Wells
+        bowler: WA Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AJ Finch
+    - 18.1:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 18.2:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JW Wells
+    - 18.3:
+        non_striker: AJ Finch
+        bowler: PM Siddle
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JW Wells

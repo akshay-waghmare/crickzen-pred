@@ -1,0 +1,2116 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-15'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Hobart
+  competition: Big Bash League
+  dates:
+  - '2025-01-14'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Hobart Hurricanes
+    by:
+      wickets: 4
+  overs: 20
+  player_of_match:
+  - JG Bethell
+  players:
+    Melbourne Renegades:
+    - J Brown
+    - MS Harris
+    - J Fraser-McGurk
+    - JG Bethell
+    - TL Seifert
+    - W Sutherland
+    - HT Dixon
+    - TS Rogers
+    - F O'Neill
+    - A Zampa
+    - C Stow
+    Hobart Hurricanes:
+    - MJ Owen
+    - CP Jewell
+    - CA Wakim
+    - Nikhil Chaudhary
+    - JR Doran
+    - MS Wade
+    - TH David
+    - NT Ellis
+    - P Hatzoglou
+    - RP Meredith
+    - B Stanlake
+  registry:
+    people:
+      A Zampa: 14f96089
+      Andrew Crozier: 00d07580
+      B Stanlake: 6834d1f2
+      C Stow: 3f9ec1d2
+      CA Wakim: c5e415aa
+      CP Jewell: 806c4e58
+      F O'Neill: 39d608d4
+      GA Abood: a4af5528
+      HT Dixon: ecbad6c6
+      J Brown: 647e7d44
+      J Fraser-McGurk: 9b6e1b3f
+      JG Bethell: 3c55c703
+      JR Doran: 9cebb612
+      M Qureshi: cf34fbef
+      MJ Owen: f2c936d7
+      MS Harris: 9e85455c
+      MS Wade: afa7e784
+      NT Ellis: 9eb1455b
+      Nikhil Chaudhary: 1f84183a
+      P Hatzoglou: 6f95e5fa
+      RL Parry: 86d151dc
+      RP Meredith: '64775749'
+      SJ Nogajski: 9b3f9323
+      TH David: f1f99156
+      TL Seifert: 4663bd23
+      TS Rogers: 1b04e02b
+      W Sutherland: bc2d4f2e
+  teams:
+  - Melbourne Renegades
+  - Hobart Hurricanes
+  toss:
+    winner: Hobart Hurricanes
+    decision: field
+  umpires:
+  - Andrew Crozier
+  - GA Abood
+  venue: Bellerive Oval, Hobart
+innings:
+- 1st innings:
+    team: Melbourne Renegades
+    deliveries:
+    - 0.1:
+        non_striker: MS Harris
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 0.2:
+        non_striker: MS Harris
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 0.3:
+        non_striker: J Brown
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+    - 0.4:
+        non_striker: J Brown
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Harris
+    - 0.5:
+        non_striker: MS Harris
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 0.6:
+        non_striker: MS Harris
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 1.1:
+        non_striker: J Brown
+        bowler: B Stanlake
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: MS Harris
+    - 1.2:
+        non_striker: MS Harris
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 1.3:
+        non_striker: MS Harris
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 1.4:
+        non_striker: MS Harris
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: J Brown
+    - 1.5:
+        non_striker: MS Harris
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+    - 1.6:
+        non_striker: MS Harris
+        bowler: B Stanlake
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Brown
+    - 2.1:
+        non_striker: MS Harris
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Brown
+        wicket:
+          player_out: J Brown
+          fielders:
+          - B Stanlake
+          kind: caught
+    - 2.2:
+        non_striker: MS Harris
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 2.3:
+        non_striker: J Fraser-McGurk
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+    - 2.4:
+        non_striker: J Fraser-McGurk
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+    - 2.5:
+        non_striker: J Fraser-McGurk
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Harris
+        wicket:
+          player_out: MS Harris
+          fielders:
+          - MS Wade
+          kind: caught
+    - 2.6:
+        non_striker: J Fraser-McGurk
+        bowler: RP Meredith
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JG Bethell
+    - 2.7:
+        non_striker: J Fraser-McGurk
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: JG Bethell
+    - 3.1:
+        non_striker: J Fraser-McGurk
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 3.2:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 3.3:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 3.4:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: J Fraser-McGurk
+    - 3.5:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 3.6:
+        non_striker: J Fraser-McGurk
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 4.1:
+        non_striker: J Fraser-McGurk
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 4.2:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: J Fraser-McGurk
+    - 4.3:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: J Fraser-McGurk
+    - 4.4:
+        non_striker: J Fraser-McGurk
+        bowler: P Hatzoglou
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JG Bethell
+    - 4.5:
+        non_striker: J Fraser-McGurk
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 4.6:
+        non_striker: J Fraser-McGurk
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+        wicket:
+          player_out: J Fraser-McGurk
+          fielders:
+          - MS Wade
+          - NT Ellis
+          kind: run out
+    - 4.7:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 5.1:
+        non_striker: JG Bethell
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 5.2:
+        non_striker: TL Seifert
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JG Bethell
+    - 5.3:
+        non_striker: TL Seifert
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JG Bethell
+    - 5.4:
+        non_striker: TL Seifert
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 5.5:
+        non_striker: JG Bethell
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TL Seifert
+    - 5.6:
+        non_striker: JG Bethell
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TL Seifert
+    - 6.1:
+        non_striker: TL Seifert
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 6.2:
+        non_striker: JG Bethell
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 6.3:
+        non_striker: TL Seifert
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 6.4:
+        non_striker: TL Seifert
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 6.5:
+        non_striker: TL Seifert
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 6.6:
+        non_striker: JG Bethell
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 7.1:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 7.2:
+        non_striker: TL Seifert
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 7.3:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TL Seifert
+    - 7.4:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TL Seifert
+    - 7.5:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: TL Seifert
+    - 7.6:
+        non_striker: TL Seifert
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 8.1:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 8.2:
+        non_striker: TL Seifert
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 8.3:
+        non_striker: TL Seifert
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 8.4:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 8.5:
+        non_striker: TL Seifert
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 8.6:
+        non_striker: TL Seifert
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 9.1:
+        non_striker: TL Seifert
+        bowler: TH David
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JG Bethell
+    - 9.2:
+        non_striker: TL Seifert
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JG Bethell
+    - 9.3:
+        non_striker: TL Seifert
+        bowler: TH David
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JG Bethell
+    - 9.4:
+        non_striker: JG Bethell
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TL Seifert
+    - 9.5:
+        non_striker: JG Bethell
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TL Seifert
+    - 9.6:
+        non_striker: JG Bethell
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TL Seifert
+    - 9.7:
+        non_striker: JG Bethell
+        bowler: TH David
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 10.1:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 10.2:
+        non_striker: TL Seifert
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 10.3:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TL Seifert
+    - 10.4:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TL Seifert
+    - 10.5:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TL Seifert
+    - 10.6:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TL Seifert
+    - 11.1:
+        non_striker: JG Bethell
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TL Seifert
+    - 11.2:
+        non_striker: JG Bethell
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TL Seifert
+        wicket:
+          player_out: TL Seifert
+          fielders:
+          - RP Meredith
+          kind: caught
+    - 11.3:
+        non_striker: JG Bethell
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 11.4:
+        non_striker: JG Bethell
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 11.5:
+        non_striker: W Sutherland
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 11.6:
+        non_striker: JG Bethell
+        bowler: MJ Owen
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 12.1:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 12.2:
+        non_striker: W Sutherland
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 12.3:
+        non_striker: W Sutherland
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JG Bethell
+    - 12.4:
+        non_striker: W Sutherland
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JG Bethell
+    - 12.5:
+        non_striker: W Sutherland
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JG Bethell
+    - 12.6:
+        non_striker: W Sutherland
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 13.1:
+        non_striker: W Sutherland
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 13.2:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 13.3:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 13.4:
+        non_striker: JG Bethell
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 13.5:
+        non_striker: W Sutherland
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JG Bethell
+    - 13.6:
+        non_striker: W Sutherland
+        bowler: Nikhil Chaudhary
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 14.1:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 14.2:
+        non_striker: W Sutherland
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 14.3:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: W Sutherland
+    - 14.4:
+        non_striker: JG Bethell
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 14.5:
+        non_striker: W Sutherland
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 14.6:
+        non_striker: W Sutherland
+        bowler: P Hatzoglou
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JG Bethell
+    - 15.1:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: W Sutherland
+    - 15.2:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+    - 15.3:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: W Sutherland
+    - 15.4:
+        non_striker: W Sutherland
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 15.5:
+        non_striker: W Sutherland
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JG Bethell
+    - 15.6:
+        non_striker: W Sutherland
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 16.1:
+        non_striker: W Sutherland
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JG Bethell
+    - 16.2:
+        non_striker: W Sutherland
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 16.3:
+        non_striker: JG Bethell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: W Sutherland
+        wicket:
+          player_out: W Sutherland
+          fielders:
+          - MJ Owen
+          kind: caught
+    - 16.4:
+        non_striker: JG Bethell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HT Dixon
+    - 16.5:
+        non_striker: HT Dixon
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JG Bethell
+    - 16.6:
+        non_striker: HT Dixon
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 17.1:
+        non_striker: HT Dixon
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JG Bethell
+    - 17.2:
+        non_striker: HT Dixon
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JG Bethell
+    - 17.3:
+        non_striker: HT Dixon
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 17.4:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HT Dixon
+    - 17.5:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HT Dixon
+        wicket:
+          player_out: HT Dixon
+          fielders:
+          - MJ Owen
+          kind: caught
+    - 17.6:
+        non_striker: JG Bethell
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 18.1:
+        non_striker: JG Bethell
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 18.2:
+        non_striker: TS Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JG Bethell
+    - 18.3:
+        non_striker: TS Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JG Bethell
+    - 18.4:
+        non_striker: TS Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JG Bethell
+    - 18.5:
+        non_striker: TS Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JG Bethell
+    - 18.6:
+        non_striker: TS Rogers
+        bowler: RP Meredith
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+    - 19.1:
+        non_striker: TS Rogers
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JG Bethell
+        wicket:
+          player_out: JG Bethell
+          fielders:
+          - MJ Owen
+          kind: run out
+    - 19.2:
+        non_striker: TS Rogers
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: F O'Neill
+    - 19.3:
+        non_striker: F O'Neill
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TS Rogers
+    - 19.4:
+        non_striker: TS Rogers
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: F O'Neill
+    - 19.5:
+        non_striker: F O'Neill
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TS Rogers
+    - 19.6:
+        non_striker: F O'Neill
+        bowler: NT Ellis
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TS Rogers
+- 2nd innings:
+    team: Hobart Hurricanes
+    deliveries:
+    - 0.1:
+        non_striker: CP Jewell
+        bowler: JG Bethell
+        runs:
+          extras: 5
+          total: 5
+          batsman: 0
+        extras:
+          wides: 5
+        batsman: MJ Owen
+    - 0.2:
+        non_striker: CP Jewell
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 0.3:
+        non_striker: CP Jewell
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MJ Owen
+    - 0.4:
+        non_striker: CP Jewell
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 0.5:
+        non_striker: CP Jewell
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Owen
+    - 0.6:
+        non_striker: CP Jewell
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 0.7:
+        non_striker: CP Jewell
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 1.1:
+        non_striker: MJ Owen
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.2:
+        non_striker: MJ Owen
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CP Jewell
+    - 1.3:
+        non_striker: CP Jewell
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 1.4:
+        non_striker: MJ Owen
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.5:
+        non_striker: MJ Owen
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 1.6:
+        non_striker: MJ Owen
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+    - 2.1:
+        non_striker: CP Jewell
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 2.2:
+        non_striker: CP Jewell
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 2.3:
+        non_striker: CP Jewell
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MJ Owen
+    - 2.4:
+        non_striker: CP Jewell
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MJ Owen
+    - 2.5:
+        non_striker: MJ Owen
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CP Jewell
+        wicket:
+          player_out: CP Jewell
+          kind: bowled
+    - 2.6:
+        non_striker: MJ Owen
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 3.1:
+        non_striker: MJ Owen
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 3.2:
+        non_striker: MJ Owen
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 3.3:
+        non_striker: MJ Owen
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 3.4:
+        non_striker: CA Wakim
+        bowler: W Sutherland
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          legbyes: 4
+        batsman: MJ Owen
+    - 3.5:
+        non_striker: CA Wakim
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MJ Owen
+    - 3.6:
+        non_striker: CA Wakim
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MJ Owen
+    - 4.1:
+        non_striker: MJ Owen
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+        wicket:
+          player_out: MJ Owen
+          fielders:
+          - TL Seifert
+          - W Sutherland
+          kind: run out
+    - 4.2:
+        non_striker: CA Wakim
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 4.3:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 4.4:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 4.5:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: CA Wakim
+    - 4.6:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 5.1:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 5.2:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 5.3:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 5.4:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 5.5:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+    - 5.6:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: CA Wakim
+    - 6.1:
+        non_striker: Nikhil Chaudhary
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 6.2:
+        non_striker: CA Wakim
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 6.3:
+        non_striker: Nikhil Chaudhary
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: CA Wakim
+    - 6.4:
+        non_striker: CA Wakim
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 6.5:
+        non_striker: CA Wakim
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 6.6:
+        non_striker: CA Wakim
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 7.1:
+        non_striker: Nikhil Chaudhary
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: CA Wakim
+        wicket:
+          player_out: CA Wakim
+          fielders:
+          - TS Rogers
+          kind: caught
+    - 7.2:
+        non_striker: Nikhil Chaudhary
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JR Doran
+    - 7.3:
+        non_striker: Nikhil Chaudhary
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Doran
+    - 7.4:
+        non_striker: JR Doran
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 7.5:
+        non_striker: JR Doran
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 7.6:
+        non_striker: JR Doran
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 8.1:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Doran
+    - 8.2:
+        non_striker: JR Doran
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 8.3:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Doran
+    - 8.4:
+        non_striker: JR Doran
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 8.5:
+        non_striker: JR Doran
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 8.6:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Doran
+        wicket:
+          player_out: JR Doran
+          kind: bowled
+    - 9.1:
+        non_striker: MS Wade
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 9.2:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 9.3:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 9.4:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 9.5:
+        non_striker: MS Wade
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 9.6:
+        non_striker: Nikhil Chaudhary
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 10.1:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 10.2:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 10.3:
+        non_striker: Nikhil Chaudhary
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 10.4:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 10.5:
+        non_striker: Nikhil Chaudhary
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 10.6:
+        non_striker: Nikhil Chaudhary
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 11.1:
+        non_striker: Nikhil Chaudhary
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MS Wade
+    - 11.2:
+        non_striker: Nikhil Chaudhary
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 11.3:
+        non_striker: MS Wade
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Nikhil Chaudhary
+    - 11.4:
+        non_striker: MS Wade
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 11.5:
+        non_striker: MS Wade
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 11.6:
+        non_striker: MS Wade
+        bowler: W Sutherland
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 12.1:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MS Wade
+    - 12.2:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 12.3:
+        non_striker: Nikhil Chaudhary
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 12.4:
+        non_striker: MS Wade
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: Nikhil Chaudhary
+    - 12.5:
+        non_striker: MS Wade
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: Nikhil Chaudhary
+    - 12.6:
+        non_striker: MS Wade
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 13.1:
+        non_striker: MS Wade
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: Nikhil Chaudhary
+    - 13.2:
+        non_striker: MS Wade
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+    - 13.3:
+        non_striker: MS Wade
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Nikhil Chaudhary
+    - 13.4:
+        non_striker: Nikhil Chaudhary
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 13.5:
+        non_striker: MS Wade
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Nikhil Chaudhary
+        wicket:
+          player_out: Nikhil Chaudhary
+          fielders:
+          - J Fraser-McGurk
+          kind: caught
+    - 13.6:
+        non_striker: MS Wade
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 14.1:
+        non_striker: TH David
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MS Wade
+    - 14.2:
+        non_striker: TH David
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: MS Wade
+    - 14.3:
+        non_striker: TH David
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 14.4:
+        non_striker: TH David
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MS Wade
+    - 14.5:
+        non_striker: TH David
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MS Wade
+    - 14.6:
+        non_striker: TH David
+        bowler: F O'Neill
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+    - 15.1:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 15.2:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 15.3:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 15.4:
+        non_striker: MS Wade
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 15.5:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MS Wade
+    - 15.6:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MS Wade
+    - 16.1:
+        non_striker: TH David
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MS Wade
+        wicket:
+          player_out: MS Wade
+          fielders:
+          - MS Harris
+          kind: caught
+    - 16.2:
+        non_striker: TH David
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 16.3:
+        non_striker: TH David
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NT Ellis
+    - 16.4:
+        non_striker: NT Ellis
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 16.5:
+        non_striker: TH David
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 16.6:
+        non_striker: TH David
+        bowler: JG Bethell
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NT Ellis
+    - 17.1:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NT Ellis
+    - 17.2:
+        non_striker: NT Ellis
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 17.3:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NT Ellis
+    - 17.4:
+        non_striker: NT Ellis
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 17.5:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 17.6:
+        non_striker: TH David
+        bowler: A Zampa
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 18.1:
+        non_striker: NT Ellis
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: TH David
+    - 18.2:
+        non_striker: NT Ellis
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 18.3:
+        non_striker: TH David
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NT Ellis
+    - 18.4:
+        non_striker: NT Ellis
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: TH David
+    - 18.5:
+        non_striker: NT Ellis
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David
+    - 18.6:
+        non_striker: TH David
+        bowler: C Stow
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NT Ellis
+    - 19.1:
+        non_striker: NT Ellis
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 19.2:
+        non_striker: NT Ellis
+        bowler: TS Rogers
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: TH David
+    - 19.3:
+        non_striker: NT Ellis
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: TH David
+    - 19.4:
+        non_striker: NT Ellis
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: TH David
+    - 19.5:
+        non_striker: NT Ellis
+        bowler: TS Rogers
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: TH David

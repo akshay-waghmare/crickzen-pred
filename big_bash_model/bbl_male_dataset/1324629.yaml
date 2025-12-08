@@ -1,0 +1,2160 @@
+---
+meta:
+  data_version: 0.92
+  created: '2022-12-22'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Perth
+  competition: Big Bash League
+  dates:
+  - '2022-12-17'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Perth Scorchers
+    by:
+      runs: 38
+  overs: 20
+  player_of_match:
+  - JA Richardson
+  players:
+    Perth Scorchers:
+    - A Lyth
+    - F du Plessis
+    - NR Hobson
+    - JP Inglis
+    - AJ Turner
+    - AM Hardie
+    - AC Agar
+    - JA Richardson
+    - M Kelly
+    - AJ Tye
+    - JP Behrendorff
+    Sydney Sixers:
+    - KR Patterson
+    - JR Philippe
+    - JM Vince
+    - MC Henriques
+    - JC Silk
+    - DT Christian
+    - H Kerr
+    - SA Abbott
+    - JM Bird
+    - Naveen-ul-Haq
+    - Izharulhaq Naveed
+  registry:
+    people:
+      A Lyth: 70b8fd28
+      AC Agar: a2421394
+      AJ Turner: ff1e12a0
+      AJ Tye: 7c7d63a2
+      AM Hardie: d405c0d5
+      Ashlee Gibbons: b81712f7
+      BNJ Oxenford: c1add349
+      DT Christian: 2a2e6343
+      F du Plessis: 3355b542
+      H Kerr: f422728b
+      Izharulhaq Naveed: 2cbdd22f
+      JA Richardson: 1ee08e9a
+      JC Silk: 7a6dc294
+      JM Bird: bc773eeb
+      JM Vince: a15618fe
+      JP Behrendorff: 4933f499
+      JP Inglis: 989889ff
+      JR Philippe: '39086549'
+      KR Patterson: e3bf8356
+      M Kelly: 68e26ec9
+      MC Henriques: 32198ae0
+      NR Hobson: 4312e0fd
+      Naveen-ul-Haq: c0c411cb
+      PJ Gillespie: 3e253a50
+      RL Parry: 86d151dc
+      SA Abbott: 1a2676c5
+      SAJ Craig: 689f2eed
+  teams:
+  - Perth Scorchers
+  - Sydney Sixers
+  toss:
+    winner: Perth Scorchers
+    decision: bat
+  umpires:
+  - BNJ Oxenford
+  - SAJ Craig
+  venue: Perth Stadium
+innings:
+- 1st innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: F du Plessis
+        bowler: JM Bird
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: A Lyth
+    - 0.2:
+        non_striker: F du Plessis
+        bowler: JM Bird
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: A Lyth
+    - 0.3:
+        non_striker: F du Plessis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: A Lyth
+    - 0.4:
+        non_striker: F du Plessis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: A Lyth
+        wicket:
+          player_out: A Lyth
+          kind: lbw
+    - 0.5:
+        non_striker: F du Plessis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 0.6:
+        non_striker: F du Plessis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: NR Hobson
+    - 0.7:
+        non_striker: NR Hobson
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: F du Plessis
+    - 0.8:
+        non_striker: NR Hobson
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: F du Plessis
+    - 1.1:
+        non_striker: F du Plessis
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 1.2:
+        non_striker: F du Plessis
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 1.3:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: F du Plessis
+    - 1.4:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: F du Plessis
+    - 1.5:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: F du Plessis
+    - 1.6:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: F du Plessis
+    - 2.1:
+        non_striker: F du Plessis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 2.2:
+        non_striker: F du Plessis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 2.3:
+        non_striker: NR Hobson
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: F du Plessis
+    - 2.4:
+        non_striker: NR Hobson
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: F du Plessis
+    - 2.5:
+        non_striker: NR Hobson
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: F du Plessis
+    - 2.6:
+        non_striker: NR Hobson
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: F du Plessis
+    - 3.1:
+        non_striker: F du Plessis
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 3.2:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: F du Plessis
+    - 3.3:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: F du Plessis
+        wicket:
+          player_out: F du Plessis
+          kind: bowled
+    - 3.4:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 3.5:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Inglis
+    - 3.6:
+        non_striker: NR Hobson
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 4.1:
+        non_striker: JP Inglis
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 4.2:
+        non_striker: NR Hobson
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 4.3:
+        non_striker: JP Inglis
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 4.4:
+        non_striker: NR Hobson
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 4.5:
+        non_striker: NR Hobson
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Inglis
+    - 4.6:
+        non_striker: NR Hobson
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 5.1:
+        non_striker: NR Hobson
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Inglis
+    - 5.2:
+        non_striker: JP Inglis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 5.3:
+        non_striker: JP Inglis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+        wicket:
+          player_out: NR Hobson
+          kind: bowled
+    - 5.4:
+        non_striker: JP Inglis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 5.5:
+        non_striker: JP Inglis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+        wicket:
+          player_out: AJ Turner
+          fielders:
+          - H Kerr
+          kind: caught
+    - 5.6:
+        non_striker: JP Inglis
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.1:
+        non_striker: JP Inglis
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 6.2:
+        non_striker: JP Inglis
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.3:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JP Inglis
+    - 6.4:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+    - 6.5:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JP Inglis
+        wicket:
+          player_out: JP Inglis
+          kind: bowled
+    - 6.6:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AC Agar
+    - 7.1:
+        non_striker: AC Agar
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 7.2:
+        non_striker: AC Agar
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 7.3:
+        non_striker: AC Agar
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 7.4:
+        non_striker: AC Agar
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 7.5:
+        non_striker: AM Hardie
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 7.6:
+        non_striker: AC Agar
+        bowler: JM Bird
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 8.1:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 8.2:
+        non_striker: AC Agar
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.3:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 8.4:
+        non_striker: AC Agar
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 8.5:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AC Agar
+    - 8.6:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AC Agar
+    - 9.1:
+        non_striker: AC Agar
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 9.2:
+        non_striker: AC Agar
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 9.3:
+        non_striker: AM Hardie
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 9.4:
+        non_striker: AC Agar
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 9.5:
+        non_striker: AC Agar
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 9.6:
+        non_striker: AM Hardie
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 10.1:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 10.2:
+        non_striker: AC Agar
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 10.3:
+        non_striker: AC Agar
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 10.4:
+        non_striker: AC Agar
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 10.5:
+        non_striker: AC Agar
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 10.6:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 11.1:
+        non_striker: AM Hardie
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AC Agar
+    - 11.2:
+        non_striker: AM Hardie
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 11.3:
+        non_striker: AC Agar
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 11.4:
+        non_striker: AM Hardie
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 11.5:
+        non_striker: AC Agar
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 11.6:
+        non_striker: AC Agar
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 12.1:
+        non_striker: AM Hardie
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 12.2:
+        non_striker: AC Agar
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 12.3:
+        non_striker: AC Agar
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 12.4:
+        non_striker: AC Agar
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 12.5:
+        non_striker: AC Agar
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 12.6:
+        non_striker: AC Agar
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 13.1:
+        non_striker: AC Agar
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 13.2:
+        non_striker: AC Agar
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 13.3:
+        non_striker: AM Hardie
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AC Agar
+    - 13.4:
+        non_striker: AM Hardie
+        bowler: SA Abbott
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: AC Agar
+    - 13.5:
+        non_striker: AM Hardie
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 13.6:
+        non_striker: AC Agar
+        bowler: SA Abbott
+        runs:
+          extras: 1
+          total: 5
+          batsman: 4
+        extras:
+          noballs: 1
+        batsman: AM Hardie
+    - 13.7:
+        non_striker: AC Agar
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 13.8:
+        non_striker: AC Agar
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 14.1:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AC Agar
+    - 14.2:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AC Agar
+    - 14.3:
+        non_striker: AM Hardie
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 14.4:
+        non_striker: AC Agar
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+        wicket:
+          player_out: AM Hardie
+          fielders:
+          - JC Silk
+          kind: caught
+    - 14.5:
+        non_striker: AC Agar
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Richardson
+    - 14.6:
+        non_striker: JA Richardson
+        bowler: Izharulhaq Naveed
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AC Agar
+    - 15.1:
+        non_striker: AC Agar
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JA Richardson
+    - 15.2:
+        non_striker: AC Agar
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JA Richardson
+    - 15.3:
+        non_striker: JA Richardson
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 15.4:
+        non_striker: AC Agar
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Richardson
+    - 15.5:
+        non_striker: AC Agar
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JA Richardson
+        wicket:
+          player_out: JA Richardson
+          fielders:
+          - JR Philippe
+          kind: caught
+    - 15.6:
+        non_striker: AC Agar
+        bowler: DT Christian
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Kelly
+    - 16.1:
+        non_striker: M Kelly
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AC Agar
+    - 16.2:
+        non_striker: M Kelly
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AC Agar
+    - 16.3:
+        non_striker: AC Agar
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Kelly
+    - 16.4:
+        non_striker: AC Agar
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Kelly
+    - 16.5:
+        non_striker: AC Agar
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Kelly
+    - 16.6:
+        non_striker: M Kelly
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AC Agar
+        wicket:
+          player_out: AC Agar
+          fielders:
+          - JC Silk
+          kind: caught
+    - 17.1:
+        non_striker: AJ Tye
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Kelly
+    - 17.2:
+        non_striker: M Kelly
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Tye
+    - 17.3:
+        non_striker: M Kelly
+        bowler: SA Abbott
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: AJ Tye
+    - 17.4:
+        non_striker: AJ Tye
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Kelly
+    - 17.5:
+        non_striker: M Kelly
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Tye
+    - 17.6:
+        non_striker: M Kelly
+        bowler: SA Abbott
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Tye
+        wicket:
+          player_out: AJ Tye
+          fielders:
+          - JM Vince
+          kind: caught
+    - 18.1:
+        non_striker: JP Behrendorff
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Kelly
+    - 18.2:
+        non_striker: JP Behrendorff
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Kelly
+    - 18.3:
+        non_striker: JP Behrendorff
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Kelly
+    - 18.4:
+        non_striker: JP Behrendorff
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Kelly
+    - 18.5:
+        non_striker: M Kelly
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Behrendorff
+    - 18.6:
+        non_striker: JP Behrendorff
+        bowler: Naveen-ul-Haq
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Kelly
+    - 19.1:
+        non_striker: JP Behrendorff
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: M Kelly
+    - 19.2:
+        non_striker: M Kelly
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Behrendorff
+    - 19.3:
+        non_striker: JP Behrendorff
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: M Kelly
+    - 19.4:
+        non_striker: M Kelly
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JP Behrendorff
+    - 19.5:
+        non_striker: M Kelly
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JP Behrendorff
+    - 19.6:
+        non_striker: JP Behrendorff
+        bowler: H Kerr
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Kelly
+- 2nd innings:
+    team: Sydney Sixers
+    deliveries:
+    - 0.1:
+        non_striker: JR Philippe
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 0.2:
+        non_striker: JR Philippe
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: KR Patterson
+    - 0.3:
+        non_striker: KR Patterson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+    - 0.4:
+        non_striker: KR Patterson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+    - 0.5:
+        non_striker: KR Patterson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+    - 0.6:
+        non_striker: KR Patterson
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 1.1:
+        non_striker: KR Patterson
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JR Philippe
+    - 1.2:
+        non_striker: JR Philippe
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+    - 1.3:
+        non_striker: JR Philippe
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: KR Patterson
+    - 1.4:
+        non_striker: JR Philippe
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: KR Patterson
+        wicket:
+          player_out: KR Patterson
+          fielders:
+          - AM Hardie
+          kind: caught
+    - 1.5:
+        non_striker: JR Philippe
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 1.6:
+        non_striker: JR Philippe
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 2.1:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JR Philippe
+    - 2.2:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JR Philippe
+        wicket:
+          player_out: JR Philippe
+          fielders:
+          - AJ Tye
+          kind: caught
+    - 2.3:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MC Henriques
+        wicket:
+          player_out: MC Henriques
+          fielders:
+          - JP Inglis
+          kind: caught
+    - 2.4:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JC Silk
+    - 2.5:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 2.6:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 3.1:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 3.2:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 3.3:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 3.4:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 3.5:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 3.6:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 4.1:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 4.2:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 4.3:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 4.4:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JC Silk
+    - 4.5:
+        non_striker: JM Vince
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 4.6:
+        non_striker: JC Silk
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 5.1:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 5.2:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 5.3:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 5.4:
+        non_striker: JM Vince
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 5.5:
+        non_striker: JM Vince
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 5.6:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Vince
+    - 6.1:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+    - 6.2:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: JM Vince
+    - 6.3:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JM Vince
+    - 6.4:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Vince
+        wicket:
+          player_out: JM Vince
+          fielders:
+          - JP Inglis
+          kind: caught
+    - 6.5:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DT Christian
+    - 6.6:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: DT Christian
+    - 7.1:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DT Christian
+    - 7.2:
+        non_striker: DT Christian
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 7.3:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DT Christian
+        wicket:
+          player_out: DT Christian
+          fielders:
+          - A Lyth
+          kind: caught
+    - 7.4:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 7.5:
+        non_striker: H Kerr
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 7.6:
+        non_striker: H Kerr
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 8.1:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 8.2:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 8.3:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: H Kerr
+    - 8.4:
+        non_striker: H Kerr
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 8.5:
+        non_striker: H Kerr
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JC Silk
+    - 8.6:
+        non_striker: H Kerr
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 9.1:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 9.2:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: H Kerr
+    - 9.3:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 9.4:
+        non_striker: H Kerr
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 9.5:
+        non_striker: H Kerr
+        bowler: AC Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: JC Silk
+    - 9.6:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 10.1:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 10.2:
+        non_striker: H Kerr
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 10.3:
+        non_striker: H Kerr
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 10.4:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: H Kerr
+    - 10.5:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 10.6:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 11.1:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: H Kerr
+    - 11.2:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: H Kerr
+    - 11.3:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 11.4:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 11.5:
+        non_striker: H Kerr
+        bowler: AC Agar
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: JC Silk
+    - 11.6:
+        non_striker: H Kerr
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 11.7:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 12.1:
+        non_striker: H Kerr
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 12.2:
+        non_striker: JC Silk
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 12.3:
+        non_striker: JC Silk
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 12.4:
+        non_striker: JC Silk
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 12.5:
+        non_striker: JC Silk
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 12.6:
+        non_striker: H Kerr
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JC Silk
+    - 13.1:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 13.2:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: H Kerr
+    - 13.3:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 13.4:
+        non_striker: H Kerr
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 13.5:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 13.6:
+        non_striker: JC Silk
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 14.1:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: H Kerr
+    - 14.2:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 14.3:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 14.4:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 14.5:
+        non_striker: H Kerr
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 14.6:
+        non_striker: JC Silk
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 15.1:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+    - 15.2:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 1
+          total: 2
+          batsman: 1
+        extras:
+          noballs: 1
+        batsman: H Kerr
+    - 15.3:
+        non_striker: H Kerr
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: JC Silk
+    - 15.4:
+        non_striker: H Kerr
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JC Silk
+    - 15.5:
+        non_striker: H Kerr
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: JC Silk
+    - 15.6:
+        non_striker: H Kerr
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JC Silk
+    - 15.7:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: H Kerr
+    - 16.1:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: H Kerr
+        wicket:
+          player_out: H Kerr
+          fielders:
+          - NR Hobson
+          kind: caught
+    - 16.2:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SA Abbott
+    - 16.3:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SA Abbott
+    - 16.4:
+        non_striker: JC Silk
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: SA Abbott
+    - 16.5:
+        non_striker: SA Abbott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 16.6:
+        non_striker: SA Abbott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+    - 17.1:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SA Abbott
+    - 17.2:
+        non_striker: JC Silk
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SA Abbott
+    - 17.3:
+        non_striker: SA Abbott
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JC Silk
+        wicket:
+          player_out: JC Silk
+          fielders:
+          - AC Agar
+          kind: caught
+    - 17.4:
+        non_striker: SA Abbott
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Bird
+    - 17.5:
+        non_striker: SA Abbott
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Bird
+    - 17.6:
+        non_striker: JM Bird
+        bowler: M Kelly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SA Abbott
+    - 18.1:
+        non_striker: JM Bird
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: SA Abbott
+    - 18.2:
+        non_striker: SA Abbott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Bird
+    - 18.3:
+        non_striker: SA Abbott
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: JM Bird
+    - 18.4:
+        non_striker: JM Bird
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: SA Abbott
+        wicket:
+          player_out: SA Abbott
+          kind: bowled
+    - 18.5:
+        non_striker: JM Bird
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Naveen-ul-Haq
+    - 18.6:
+        non_striker: Naveen-ul-Haq
+        bowler: JA Richardson
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JM Bird
+        wicket:
+          player_out: JM Bird
+          kind: bowled
+    - 19.1:
+        non_striker: Izharulhaq Naveed
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Naveen-ul-Haq
+    - 19.2:
+        non_striker: Izharulhaq Naveed
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Naveen-ul-Haq
+    - 19.3:
+        non_striker: Izharulhaq Naveed
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Naveen-ul-Haq
+    - 19.4:
+        non_striker: Naveen-ul-Haq
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: Izharulhaq Naveed
+    - 19.5:
+        non_striker: Izharulhaq Naveed
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Naveen-ul-Haq
+    - 19.6:
+        non_striker: Izharulhaq Naveed
+        bowler: AJ Tye
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: Naveen-ul-Haq
+        wicket:
+          player_out: Naveen-ul-Haq
+          fielders:
+          - AM Hardie
+          kind: caught

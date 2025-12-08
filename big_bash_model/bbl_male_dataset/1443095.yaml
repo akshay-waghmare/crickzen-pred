@@ -1,0 +1,1965 @@
+---
+meta:
+  data_version: 0.92
+  created: '2025-01-18'
+  revision: 1
+info:
+  balls_per_over: 6
+  city: Perth
+  competition: Big Bash League
+  dates:
+  - '2025-01-18'
+  gender: male
+  match_type: T20
+  outcome:
+    winner: Perth Scorchers
+    by:
+      wickets: 5
+  overs: 20
+  player_of_match:
+  - JP Behrendorff
+  players:
+    Adelaide Strikers:
+    - AT Carey
+    - MW Short
+    - OJ Pope
+    - L Scott
+    - AI Ross
+    - HJ Manenti
+    - DJM Short
+    - B Doggett
+    - L Haskett
+    - L Pope
+    - JS Buckingham
+    Perth Scorchers:
+    - S Fanning
+    - FH Allen
+    - AM Hardie
+    - C Connolly
+    - AJ Turner
+    - NR Hobson
+    - M Spoors
+    - AC Agar
+    - JP Behrendorff
+    - LR Morris
+    - M Beardman
+  registry:
+    people:
+      AC Agar: a2421394
+      AI Ross: fb0d68b4
+      AJ Turner: ff1e12a0
+      AM Hardie: d405c0d5
+      AT Carey: 69d03465
+      B Doggett: 898e628d
+      C Connolly: fe366f34
+      D Taylor: b940a2b2
+      DJM Short: 1a156c88
+      FH Allen: bf74b130
+      GJ Davidson: 31ad5973
+      HJ Manenti: 0e56c514
+      JP Behrendorff: 4933f499
+      JS Buckingham: 10735e1d
+      L Haskett: '037429dc'
+      L Pope: 616a8149
+      L Scott: 0ebb3444
+      LR Morris: b08e58e2
+      M Beardman: b5a12740
+      M Spoors: da4a1e46
+      MW Graham-Smith: 18aca3ce
+      MW Short: a90e53ec
+      NR Hobson: 4312e0fd
+      OJ Pope: e94bc520
+      S Fanning: a9d2dab9
+      S Patel: c4ee6c06
+      SD Fry: 6b725ed1
+  teams:
+  - Adelaide Strikers
+  - Perth Scorchers
+  toss:
+    winner: Perth Scorchers
+    decision: field
+  umpires:
+  - GJ Davidson
+  - MW Graham-Smith
+  venue: Perth Stadium
+innings:
+- 1st innings:
+    team: Adelaide Strikers
+    deliveries:
+    - 0.1:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 0.2:
+        non_striker: AT Carey
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 0.3:
+        non_striker: AT Carey
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 0.4:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AT Carey
+    - 0.5:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 0.6:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AT Carey
+    - 1.1:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AT Carey
+    - 1.2:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AT Carey
+    - 1.3:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AT Carey
+        wicket:
+          player_out: AT Carey
+          fielders:
+          - M Beardman
+          kind: caught
+    - 1.4:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: OJ Pope
+    - 1.5:
+        non_striker: OJ Pope
+        bowler: LR Morris
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: MW Short
+    - 1.6:
+        non_striker: OJ Pope
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 1.7:
+        non_striker: OJ Pope
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 2.1:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+    - 2.2:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          byes: 1
+        batsman: OJ Pope
+    - 2.3:
+        non_striker: OJ Pope
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 2.4:
+        non_striker: OJ Pope
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 2.5:
+        non_striker: OJ Pope
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 3
+          batsman: 3
+        batsman: MW Short
+    - 2.6:
+        non_striker: MW Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: OJ Pope
+        wicket:
+          player_out: OJ Pope
+          fielders:
+          - AC Agar
+          kind: caught
+    - 3.1:
+        non_striker: L Scott
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 3.2:
+        non_striker: L Scott
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 3.3:
+        non_striker: MW Short
+        bowler: LR Morris
+        runs:
+          extras: 2
+          total: 2
+          batsman: 0
+        extras:
+          wides: 2
+        batsman: L Scott
+    - 3.4:
+        non_striker: L Scott
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 3.5:
+        non_striker: L Scott
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 3.6:
+        non_striker: L Scott
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 3.7:
+        non_striker: L Scott
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 4.1:
+        non_striker: MW Short
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 4.2:
+        non_striker: L Scott
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 4.3:
+        non_striker: MW Short
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 4.4:
+        non_striker: MW Short
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 4.5:
+        non_striker: MW Short
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 4.6:
+        non_striker: L Scott
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: MW Short
+    - 5.1:
+        non_striker: MW Short
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: L Scott
+    - 5.2:
+        non_striker: MW Short
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 5.3:
+        non_striker: MW Short
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: L Scott
+    - 5.4:
+        non_striker: MW Short
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 5.5:
+        non_striker: L Scott
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 5.6:
+        non_striker: MW Short
+        bowler: M Spoors
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: L Scott
+    - 6.1:
+        non_striker: L Scott
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 6.2:
+        non_striker: L Scott
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: MW Short
+    - 6.3:
+        non_striker: L Scott
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: MW Short
+    - 6.4:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: L Scott
+    - 6.5:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 6.6:
+        non_striker: MW Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 7.1:
+        non_striker: L Scott
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+    - 7.2:
+        non_striker: L Scott
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: MW Short
+        wicket:
+          player_out: MW Short
+          fielders:
+          - FH Allen
+          kind: stumped
+    - 7.3:
+        non_striker: L Scott
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+    - 7.4:
+        non_striker: L Scott
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 7.5:
+        non_striker: AI Ross
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 7.6:
+        non_striker: AI Ross
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 8.1:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AI Ross
+    - 8.2:
+        non_striker: AI Ross
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 8.3:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AI Ross
+    - 8.4:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AI Ross
+        wicket:
+          player_out: AI Ross
+          kind: bowled
+    - 8.5:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Manenti
+    - 8.6:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Manenti
+    - 9.1:
+        non_striker: L Scott
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Manenti
+    - 9.2:
+        non_striker: HJ Manenti
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 9.3:
+        non_striker: HJ Manenti
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: L Scott
+    - 9.4:
+        non_striker: HJ Manenti
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 9.5:
+        non_striker: L Scott
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: HJ Manenti
+    - 9.6:
+        non_striker: HJ Manenti
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 10.1:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Manenti
+    - 10.2:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: HJ Manenti
+        wicket:
+          player_out: HJ Manenti
+          fielders:
+          - AC Agar
+          kind: caught
+    - 10.3:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 10.4:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 10.5:
+        non_striker: DJM Short
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 10.6:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 11.1:
+        non_striker: DJM Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 11.2:
+        non_striker: L Scott
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 11.3:
+        non_striker: DJM Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: L Scott
+    - 11.4:
+        non_striker: DJM Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: L Scott
+    - 11.5:
+        non_striker: DJM Short
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 11.6:
+        non_striker: L Scott
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 12.1:
+        non_striker: DJM Short
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 12.2:
+        non_striker: DJM Short
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 12.3:
+        non_striker: L Scott
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: DJM Short
+    - 12.4:
+        non_striker: L Scott
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 12.5:
+        non_striker: L Scott
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 12.6:
+        non_striker: DJM Short
+        bowler: AM Hardie
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 13.1:
+        non_striker: DJM Short
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 13.2:
+        non_striker: DJM Short
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: L Scott
+    - 13.3:
+        non_striker: DJM Short
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 13.4:
+        non_striker: L Scott
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: DJM Short
+    - 13.5:
+        non_striker: DJM Short
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 13.6:
+        non_striker: DJM Short
+        bowler: C Connolly
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 14.1:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 14.2:
+        non_striker: DJM Short
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 14.3:
+        non_striker: L Scott
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: DJM Short
+    - 14.4:
+        non_striker: L Scott
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+    - 14.5:
+        non_striker: L Scott
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: DJM Short
+        wicket:
+          player_out: DJM Short
+          fielders:
+          - C Connolly
+          kind: caught
+    - 14.6:
+        non_striker: L Scott
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 15.1:
+        non_striker: B Doggett
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 15.2:
+        non_striker: B Doggett
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: L Scott
+    - 15.3:
+        non_striker: B Doggett
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: L Scott
+    - 15.4:
+        non_striker: B Doggett
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+    - 15.5:
+        non_striker: B Doggett
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: L Scott
+    - 15.6:
+        non_striker: B Doggett
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 16.1:
+        non_striker: B Doggett
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: L Scott
+    - 16.2:
+        non_striker: B Doggett
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Scott
+    - 16.3:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+    - 16.4:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: B Doggett
+    - 16.5:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: B Doggett
+        wicket:
+          player_out: B Doggett
+          fielders:
+          - NR Hobson
+          kind: caught
+    - 16.6:
+        non_striker: L Scott
+        bowler: M Beardman
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Haskett
+    - 17.1:
+        non_striker: L Scott
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Haskett
+    - 17.2:
+        non_striker: L Scott
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Haskett
+    - 17.3:
+        non_striker: L Scott
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Haskett
+    - 17.4:
+        non_striker: L Haskett
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Scott
+        wicket:
+          player_out: L Scott
+          fielders:
+          - AM Hardie
+          kind: caught
+    - 17.5:
+        non_striker: L Haskett
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Pope
+    - 17.6:
+        non_striker: L Pope
+        bowler: AC Agar
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: L Haskett
+    - 18.1:
+        non_striker: L Pope
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: L Haskett
+    - 18.2:
+        non_striker: L Pope
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Haskett
+    - 18.3:
+        non_striker: L Pope
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Haskett
+    - 18.4:
+        non_striker: L Pope
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Haskett
+        wicket:
+          player_out: L Haskett
+          fielders:
+          - FH Allen
+          kind: caught
+    - 18.5:
+        non_striker: L Pope
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JS Buckingham
+    - 18.6:
+        non_striker: L Pope
+        bowler: LR Morris
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: JS Buckingham
+    - 19.1:
+        non_striker: JS Buckingham
+        bowler: JP Behrendorff
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: L Pope
+        wicket:
+          player_out: L Pope
+          fielders:
+          - AJ Turner
+          kind: caught
+- 2nd innings:
+    team: Perth Scorchers
+    deliveries:
+    - 0.1:
+        non_striker: FH Allen
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 0.2:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 0.3:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 0.4:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: FH Allen
+    - 0.5:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 0.6:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+    - 1.1:
+        non_striker: FH Allen
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: S Fanning
+    - 1.2:
+        non_striker: FH Allen
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Fanning
+    - 1.3:
+        non_striker: FH Allen
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: S Fanning
+    - 1.4:
+        non_striker: FH Allen
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: S Fanning
+    - 1.5:
+        non_striker: FH Allen
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: S Fanning
+    - 1.6:
+        non_striker: FH Allen
+        bowler: L Haskett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: S Fanning
+    - 1.7:
+        non_striker: FH Allen
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: S Fanning
+    - 2.1:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: FH Allen
+    - 2.2:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: FH Allen
+    - 2.3:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: FH Allen
+        wicket:
+          player_out: FH Allen
+          fielders:
+          - L Scott
+          kind: caught
+    - 2.4:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 2.5:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 2.6:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 2.7:
+        non_striker: S Fanning
+        bowler: B Doggett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 3.1:
+        non_striker: AM Hardie
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Fanning
+    - 3.2:
+        non_striker: AM Hardie
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Fanning
+    - 3.3:
+        non_striker: AM Hardie
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Fanning
+    - 3.4:
+        non_striker: AM Hardie
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Fanning
+    - 3.5:
+        non_striker: AM Hardie
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 3.6:
+        non_striker: S Fanning
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 4.1:
+        non_striker: AM Hardie
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 4.2:
+        non_striker: S Fanning
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 4.3:
+        non_striker: S Fanning
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 4.4:
+        non_striker: AM Hardie
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 4.5:
+        non_striker: S Fanning
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 4.6:
+        non_striker: AM Hardie
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 5.1:
+        non_striker: AM Hardie
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 5.2:
+        non_striker: S Fanning
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AM Hardie
+    - 5.3:
+        non_striker: S Fanning
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+    - 5.4:
+        non_striker: S Fanning
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 5.5:
+        non_striker: AM Hardie
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 5.6:
+        non_striker: S Fanning
+        bowler: L Haskett
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: AM Hardie
+    - 6.1:
+        non_striker: AM Hardie
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 6.2:
+        non_striker: S Fanning
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AM Hardie
+    - 6.3:
+        non_striker: S Fanning
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 6.4:
+        non_striker: AM Hardie
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: S Fanning
+    - 6.5:
+        non_striker: AM Hardie
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: S Fanning
+    - 6.6:
+        non_striker: S Fanning
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+    - 7.1:
+        non_striker: S Fanning
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AM Hardie
+        wicket:
+          player_out: S Fanning
+          fielders:
+          - AT Carey
+          - B Doggett
+          kind: run out
+    - 7.2:
+        non_striker: AM Hardie
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 7.3:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AM Hardie
+        wicket:
+          player_out: AM Hardie
+          fielders:
+          - AT Carey
+          kind: stumped
+    - 7.4:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 7.5:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 7.6:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 8.1:
+        non_striker: AJ Turner
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 8.2:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 8.3:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: AJ Turner
+    - 8.4:
+        non_striker: AJ Turner
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 8.5:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 8.6:
+        non_striker: AJ Turner
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 9.1:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 9.2:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 9.3:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 9.4:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 9.5:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 9.6:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 10.1:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 10.2:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 10.3:
+        non_striker: AJ Turner
+        bowler: MW Short
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: C Connolly
+    - 10.4:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 10.5:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: AJ Turner
+    - 10.6:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 11.1:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+    - 11.2:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 11.3:
+        non_striker: AJ Turner
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 11.4:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 11.5:
+        non_striker: AJ Turner
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
+    - 11.6:
+        non_striker: AJ Turner
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: C Connolly
+    - 12.1:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: AJ Turner
+    - 12.2:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: AJ Turner
+    - 12.3:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
+    - 12.4:
+        non_striker: AJ Turner
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 12.5:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: AJ Turner
+        wicket:
+          player_out: AJ Turner
+          fielders:
+          - OJ Pope
+          kind: caught
+    - 12.6:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          noballs: 1
+        batsman: NR Hobson
+    - 12.7:
+        non_striker: C Connolly
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: NR Hobson
+    - 13.1:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NR Hobson
+    - 13.2:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: NR Hobson
+    - 13.3:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NR Hobson
+    - 13.4:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NR Hobson
+    - 13.5:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          wides: 1
+        batsman: NR Hobson
+    - 13.6:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: NR Hobson
+    - 13.7:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 13.8:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+    - 13.9:
+        non_striker: C Connolly
+        bowler: JS Buckingham
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: NR Hobson
+    - 14.1:
+        non_striker: NR Hobson
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 14.2:
+        non_striker: NR Hobson
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 14.3:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: NR Hobson
+        wicket:
+          player_out: NR Hobson
+          kind: bowled
+    - 14.4:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Spoors
+    - 14.5:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Spoors
+    - 14.6:
+        non_striker: C Connolly
+        bowler: MW Short
+        runs:
+          extras: 0
+          total: 4
+          batsman: 4
+        batsman: M Spoors
+    - 15.1:
+        non_striker: M Spoors
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: C Connolly
+    - 15.2:
+        non_striker: M Spoors
+        bowler: L Pope
+        runs:
+          extras: 4
+          total: 4
+          batsman: 0
+        extras:
+          wides: 4
+        batsman: C Connolly
+    - 15.3:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Spoors
+    - 15.4:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 2
+          batsman: 2
+        batsman: M Spoors
+    - 15.5:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 1
+          total: 1
+          batsman: 0
+        extras:
+          legbyes: 1
+        batsman: M Spoors
+    - 15.6:
+        non_striker: M Spoors
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 1
+          batsman: 1
+        batsman: C Connolly
+    - 15.7:
+        non_striker: C Connolly
+        bowler: L Pope
+        runs:
+          extras: 0
+          total: 0
+          batsman: 0
+        batsman: M Spoors
+    - 16.1:
+        non_striker: M Spoors
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
+    - 16.2:
+        non_striker: M Spoors
+        bowler: DJM Short
+        runs:
+          extras: 0
+          total: 6
+          batsman: 6
+        batsman: C Connolly
