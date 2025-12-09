@@ -23,6 +23,15 @@ def extract_match_metadata(match_data: Dict[str, Any], match_id: str) -> Dict[st
     team_a = teams[0] if len(teams) > 0 else None
     team_b = teams[1] if len(teams) > 1 else None
     
+    # Winner
+    outcome = info.get('outcome', {})
+    winner = outcome.get('winner', None)
+    
+    # Toss info
+    toss = info.get('toss', {})
+    toss_winner = toss.get('winner', None)
+    toss_decision = toss.get('decision', None)  # 'bat' or 'field'
+    
     return {
         'match_id': match_id,
         'season': str(info.get('season', 'unknown')),
@@ -30,8 +39,11 @@ def extract_match_metadata(match_data: Dict[str, Any], match_id: str) -> Dict[st
         'venue': info.get('venue', 'unknown'),
         'team_a': team_a,
         'team_b': team_b,
+        'winner': winner,
         'gender': info.get('gender', 'unknown'),
         'match_type': info.get('match_type', 'unknown'),
+        'toss_winner': toss_winner,
+        'toss_decision': toss_decision,
     }
 
 def resolve_entity(name: Optional[str], entity_type: str, resolver: Optional['EntityResolver']) -> str:
@@ -75,6 +87,9 @@ def flatten_delivery(
     bowling_team_name = meta['team_b'] if inning_meta['team'] == meta['team_a'] else meta['team_a']
     bowling_team_id = resolve_entity(bowling_team_name, 'team', resolver)
     
+    # Add raw team names for easier debugging/mapping later
+    batting_team_name = inning_meta['team']
+    
     batter_id = resolve_entity(delivery.get('batter'), 'player', resolver)
     bowler_id = resolve_entity(delivery.get('bowler'), 'player', resolver)
     non_striker_id = resolve_entity(delivery.get('non_striker'), 'player', resolver)
@@ -88,6 +103,10 @@ def flatten_delivery(
         'venue_id': venue_id,
         'batting_team_id': batting_team_id,
         'bowling_team_id': bowling_team_id,
+        'batting_team': batting_team_name,
+        'winner': meta['winner'],
+        'toss_winner': meta.get('toss_winner'),
+        'toss_decision': meta.get('toss_decision'),
         
         # Inning Meta
         'innings': inning_meta['innings_num'],

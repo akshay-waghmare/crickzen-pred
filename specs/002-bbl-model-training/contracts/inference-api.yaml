@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: BBL Win Probability Inference API
+  version: 1.0.0
+paths:
+  /predict:
+    post:
+      summary: Predict win probability for a given match state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchState'
+      responses:
+        '200':
+          description: Successful prediction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictionResponse'
+components:
+  schemas:
+    MatchState:
+      type: object
+      required:
+        - venue
+        - batting_team
+        - bowling_team
+        - innings
+        - over
+        - ball
+        - current_score
+        - wickets_lost
+        - batsman_1
+        - batsman_2
+        - bowler
+      properties:
+        match_id:
+          type: string
+        venue:
+          type: string
+        batting_team:
+          type: string
+        bowling_team:
+          type: string
+        innings:
+          type: integer
+          enum: [1, 2]
+        over:
+          type: integer
+          minimum: 0
+          maximum: 19
+        ball:
+          type: integer
+          minimum: 1
+          maximum: 9
+        current_score:
+          type: integer
+          minimum: 0
+        wickets_lost:
+          type: integer
+          minimum: 0
+          maximum: 10
+        batsman_1:
+          type: string
+          description: Name of the striker
+        batsman_2:
+          type: string
+          description: Name of the non-striker
+        bowler:
+          type: string
+          description: Name of the current bowler
+        target_runs:
+          type: integer
+          nullable: true
+          description: Required for 2nd innings
+
+    PredictionResponse:
+      type: object
+      properties:
+        batting_team_win_prob:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: Calibrated probability of batting team winning
+        bowling_team_win_prob:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+        is_calibrated:
+          type: boolean
+        model_version:
+          type: string

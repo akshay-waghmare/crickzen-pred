@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import time
 import json
 import pandas as pd
+import numpy as np
 
 from bbl_pipeline.config import load_config
 from bbl_pipeline.utils.logging import configure_logging
@@ -287,6 +288,232 @@ def validate(ctx, data_dir):
             logger.error(err.failure_cases.head().to_string())
         except Exception as e:
             logger.error(f"Error validating super overs: {e}")
+
+@main.command()
+@click.option('--input-dir', required=True, help="Directory containing raw parquet files (e.g. data/bbl_raw/matches)")
+@click.option('--output-dir', required=True, help="Directory to save training data")
+@click.option('--feature-store-dir', required=True, help="Directory to save feature store artifacts")
+def process(input_dir, output_dir, feature_store_dir):
+    """Process raw data into training features."""
+    from bbl_pipeline.data.processor import process_bbl_data
+    
+    try:
+        process_bbl_data(
+            Path(input_dir), 
+            Path(output_dir), 
+            Path(feature_store_dir)
+        )
+        click.echo("Data processing complete.")
+    except Exception as e:
+        logger.error("Processing failed", error=str(e))
+        raise click.ClickException(str(e))
+
+@main.command()
+@click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
+@click.option('--output-dir', type=click.Path(), required=True, help='Directory to save model artifacts')
+@click.pass_context
+def train(ctx, input_file, output_dir):
+    """Train, calibrate, and select the champion model."""
+    from bbl_pipeline.training.trainer import Trainer
+    from bbl_pipeline.training.selection import select_champion
+    import joblib
+    import json
+    
+    input_path = Path(input_file)
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    logger.info("Loading training data", path=str(input_path))
+    df = pd.read_parquet(input_path)
+    
+    # Assume 'is_winner' is target
+    target_col = 'is_winner'
+    if target_col not in df.columns:
+        raise ValueError(f"Target column '{target_col}' not found in dataset.")
+    
+    y = df[target_col]
+    X = df.drop(columns=[target_col])
+    
+    # TODO: Integrate BBLFeatureTransformer here or in Trainer
+    
+    trainer = Trainer()
+    results = trainer.evaluate_models(X, y)
+    
+    champion_meta = select_champion(results)
+    champion_name = champion_meta['model_name']
+    
+    logger.info(f"Champion selected: {champion_name}")
+    
+    # Train final model
+    final_model = trainer.train_final_model(champion_name, X, y)
+    
+    # Save artifacts
+    model_path = output_path / "champion_model.joblib"
+    joblib.dump(final_model, model_path)
+    
+    # Save metadata
+    # Convert numpy types to python types for JSON serialization
+    def convert_types(obj):
+        if isinstance(obj, (pd.DataFrame, pd.Series)):
+            return obj.to_dict()
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return str(obj)
+
+    meta_path = output_path / "champion_metadata.json"
+    with open(meta_path, 'w') as f:
+        json.dump(champion_meta, f, indent=2, default=convert_types)
+        
+    logger.info("Training complete", output_dir=str(output_path))
+
+@main.command()
+@click.option('--model-dir', type=click.Path(exists=True), required=True)
+@click.option('--venue', required=True)
+@click.option('--batting', required=True)
+@click.option('--bowling', required=True)
+@click.option('--score', required=True, help="Format: runs/wickets e.g. 120/3")
+@click.option('--over', required=True, type=float, help="Format: over.ball e.g. 14.2")
+@click.option('--batsman1', default="Unknown", help="Name of striker")
+@click.option('--batsman2', default="Unknown", help="Name of non-striker")
+@click.option('--bowler', default="Unknown", help="Name of bowler")
+def predict(model_dir, venue, batting, bowling, score, over, batsman1, batsman2, bowler):
+    """Predict win probability."""
+    from bbl_pipeline.inference.predictor import Predictor
+    from bbl_pipeline.inference.schema import MatchState
+    
+    # Parse score
+    try:
+        if '/' in score:
+            runs, wickets = map(int, score.split('/'))
+        else:
+            runs = int(score)
+            wickets = 0
+    except ValueError:
+        raise click.BadParameter("Score must be in format runs/wickets (e.g. 120/3) or runs (e.g. 120)")
+        
+    # Parse over
+    ov = int(over)
+    ball = int(round((over - ov) * 10))
+    if ball > 6: # Allow extras?
+        pass 
+    
+    state = MatchState(
+        match_id="cli_prediction",
+        venue=venue,
+        batting_team=batting,
+        bowling_team=bowling,
+        innings=1, # Default to 1
+        over=ov,
+        ball=ball,
+        current_score=runs,
+        wickets_lost=wickets,
+        batsman_1=batsman1, 
+        batsman_2=batsman2,
+        bowler=bowler
+    )
+    
+    try:
+        predictor = Predictor.load(model_dir)
+        prob = predictor.predict(state)
+        click.echo(f"Win Probability for {batting}: {prob:.2%}")
+    except Exception as e:
+        logger.error(f"Prediction failed: {e}")
+        click.echo(f"Error: {e}")
+
+@main.command()
+@click.option('--model-dir', type=click.Path(exists=True), required=True)
+@click.option('--test-data', type=click.Path(exists=True), required=True)
+def evaluate(model_dir, test_data):
+    """Evaluate model on hold-out test set."""
+    from bbl_pipeline.inference.predictor import Predictor
+    from bbl_pipeline.inference.schema import MatchState
+    from bbl_pipeline.training.evaluation import expected_calibration_error
+    from sklearn.metrics import brier_score_loss, log_loss, roc_auc_score
+    
+    logger.info("Loading model and test data...")
+    predictor = Predictor.load(model_dir)
+    df = pd.read_parquet(test_data)
+    
+    target_col = 'is_winner'
+    if target_col not in df.columns:
+        raise ValueError(f"Target column '{target_col}' not found.")
+    
+    y_true = df[target_col]
+    X = df.drop(columns=[target_col])
+    
+    # Predict
+    # Predictor expects MatchState, but here we have a DataFrame.
+    # We can use the underlying model directly if we hydrate features manually?
+    # Or we construct MatchState for each row? (Slow)
+    # Or we assume X is already features?
+    
+    # If X is raw data, we need hydration.
+    # Predictor._hydrate_features takes MatchState.
+    # We should probably expose a batch prediction method in Predictor that takes DataFrame?
+    # Or assume X is already hydrated features matching training schema?
+    
+    # If 'test-data' is the output of feature engineering, it has features.
+    # But Predictor uses FeatureStore.
+    
+    # If we are evaluating the *model artifact* (which is CalibratedModel), we can just use model.predict_proba(X).
+    # Assuming X has the right columns.
+    
+    try:
+        # We access the underlying model directly for batch evaluation
+        # This assumes X columns match what the model expects.
+        y_prob = predictor.model.predict_proba(X)[:, 1]
+        
+        brier = brier_score_loss(y_true, y_prob)
+        ll = log_loss(y_true, y_prob)
+        auc = roc_auc_score(y_true, y_prob)
+        ece = expected_calibration_error(y_true, y_prob)
+        
+        click.echo(f"Evaluation Results:")
+        click.echo(f"Brier Score: {brier:.4f}")
+        click.echo(f"Log Loss:    {ll:.4f}")
+        click.echo(f"AUC:         {auc:.4f}")
+        click.echo(f"ECE:         {ece:.4f}")
+        
+    except Exception as e:
+        logger.error(f"Evaluation failed: {e}")
+        click.echo(f"Error: {e}")
+
+@main.command()
+@click.option('--input-file', required=True, help='Path to training dataset (parquet)')
+@click.option('--model-name', default='rf', help='Model to analyze (rf, xgboost, logreg)')
+def analyze(input_file, model_name):
+    """Analyze feature importance."""
+    from bbl_pipeline.training.trainer import Trainer
+    
+    df = pd.read_parquet(input_file)
+    target_col = 'is_winner'
+    
+    if target_col not in df.columns:
+        raise click.ClickException(f"Target '{target_col}' not found in dataset")
+        
+    y = df[target_col]
+    X = df.drop(columns=[target_col])
+    
+    trainer = Trainer()
+    try:
+        importance = trainer.get_feature_importance(model_name, X, y)
+        if importance.empty:
+            click.echo("No feature importance available for this model.")
+        else:
+            click.echo(f"\nFeature Importance ({model_name}):")
+            click.echo(importance.to_string(index=False))
+            
+            # Save to CSV
+            output_csv = Path(input_file).parent / f"feature_importance_{model_name}.csv"
+            importance.to_csv(output_csv, index=False)
+            click.echo(f"\nSaved to {output_csv}")
+            
+    except Exception as e:
+        raise click.ClickException(str(e))
 
 if __name__ == '__main__':
     main()
