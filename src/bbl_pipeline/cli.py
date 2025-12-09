@@ -311,9 +311,15 @@ def process(input_dir, output_dir, feature_store_dir):
 @main.command()
 @click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
 @click.option('--output-dir', type=click.Path(), required=True, help='Directory to save model artifacts')
+@click.option('--calibration/--no-calibration', default=False, help='Enable/disable post-hoc calibration. Default: no calibration (best Brier)')
 @click.pass_context
-def train(ctx, input_file, output_dir):
-    """Train, calibrate, and select the champion model."""
+def train(ctx, input_file, output_dir, calibration):
+    """
+    Train, evaluate, and select the champion model.
+    
+    By default, trains WITHOUT post-hoc calibration as this produces the best
+    Brier score (0.1795 vs 0.1854 with isotonic calibration).
+    """
     from bbl_pipeline.training.trainer import Trainer
     from bbl_pipeline.training.selection import select_champion
     import joblib
@@ -334,9 +340,15 @@ def train(ctx, input_file, output_dir):
     y = df[target_col]
     X = df.drop(columns=[target_col])
     
-    # TODO: Integrate BBLFeatureTransformer here or in Trainer
+    # Initialize trainer with calibration setting
+    # Default: no calibration (best Brier score)
+    trainer = Trainer(use_calibration=calibration)
     
-    trainer = Trainer()
+    if not calibration:
+        logger.info("Training without post-hoc calibration (best Brier score)")
+    else:
+        logger.info("Training with post-hoc calibration enabled")
+    
     results = trainer.evaluate_models(X, y)
     
     champion_meta = select_champion(results)

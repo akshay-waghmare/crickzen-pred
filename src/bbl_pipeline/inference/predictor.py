@@ -8,17 +8,20 @@ import structlog
 
 from .schema import MatchState
 from ..features.store import InMemoryFeatureStore
+from ..features.calculator import ResourceFeatureCalculator
 
 logger = structlog.get_logger()
 
 class Predictor:
     """
     Inference engine for BBL win probability.
+    Enhanced with resource-based features for improved calibration.
     """
     def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float]):
         self.model = model
         self.feature_store = feature_store
         self.global_stats = global_stats
+        self.resource_calculator = ResourceFeatureCalculator()
 
     @classmethod
     def load(cls, model_dir: str | Path):
@@ -61,14 +64,15 @@ class Predictor:
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
         Transforms MatchState into a feature vector (DataFrame) using FeatureStore.
+        Enhanced with resource-based features for better calibration.
         """
-        # Get stats
+        # Get player/venue stats
         batsman_1_stats = self.feature_store.get_player_stats(state.batsman_1) or {}
         batsman_2_stats = self.feature_store.get_player_stats(state.batsman_2) or {}
         bowler_stats = self.feature_store.get_player_stats(state.bowler) or {}
         venue_stats = self.feature_store.get_venue_stats(state.venue) or {}
         
-        # Fallbacks
+        # Fallbacks for player/venue stats
         b1_avg = batsman_1_stats.get('batsman_rolling_avg', self.global_stats.get('global_batting_avg', 25.0))
         b1_sr = batsman_1_stats.get('batsman_rolling_sr', self.global_stats.get('global_batting_sr', 125.0))
         
@@ -79,31 +83,52 @@ class Predictor:
         venue_wickets = venue_stats.get('venue_avg_wickets', 6.0)
         venue_win_rate = venue_stats.get('venue_bat_first_win_rate', 0.5)
 
-        # Construct DataFrame
-        # Must match training columns:
-        # ['innings', 'over', 'ball', 'current_score', 'wickets_lost',
-        #  'batsman_rolling_avg', 'batsman_rolling_sr', 
-        #  'bowler_rolling_econ', 'bowler_rolling_sr',
-        #  'venue_avg_score', 'venue_avg_wickets', 'venue_bat_first_win_rate']
-        
+        # Calculate resource-based features
+        resource_features = self.resource_calculator.calculate_all_features(
+            innings=state.innings,
+            over=state.over,
+            ball=state.ball,
+            current_score=state.current_score,
+            wickets_lost=state.wickets_lost,
+            target_runs=state.target_runs
+        )
+
+        # Construct DataFrame with all features
         features = {
+            # Basic match state
             'innings': state.innings,
             'over': state.over,
             'ball': state.ball,
             'current_score': state.current_score,
             'wickets_lost': state.wickets_lost,
+            
+            # Player rolling stats
             'batsman_rolling_avg': b1_avg,
             'batsman_rolling_sr': b1_sr,
             'bowler_rolling_econ': bowler_econ,
             'bowler_rolling_sr': bowler_sr,
+            
+            # Venue stats
             'venue_avg_score': venue_score,
             'venue_avg_wickets': venue_wickets,
-            'venue_bat_first_win_rate': venue_win_rate
+            'venue_bat_first_win_rate': venue_win_rate,
+            
+            # Resource-based features (hybrid cricket domain knowledge)
+            'overs_remaining': resource_features['overs_remaining'],
+            'balls_remaining': resource_features['balls_remaining'],
+            'wickets_remaining': resource_features['wickets_remaining'],
+            'resource_pct': resource_features['resource_pct'],
+            'current_run_rate': resource_features['current_run_rate'],
+            'required_run_rate': resource_features['required_run_rate'],
+            'run_rate_differential': resource_features['run_rate_differential'],
+            'expected_final_score': resource_features['expected_final_score'],
+            'runs_required': resource_features['runs_required'],
+            'is_powerplay': resource_features['is_powerplay'],
+            'is_middle_overs': resource_features['is_middle_overs'],
+            'is_death_overs': resource_features['is_death_overs'],
+            'pressure_index': resource_features['pressure_index'],
+            'resource_win_prob': resource_features['resource_win_prob'],
         }
-        
-        # Note: target_runs and required_run_rate were not in training data for MVP.
-        
-        return pd.DataFrame([features])
         
         return pd.DataFrame([features])
 
@@ -125,5 +150,13 @@ class Predictor:
             return float(prob)
         except Exception as e:
             logger.error(f"Prediction failed: {e}")
-            # Fallback?
-            return 0.5
+            # Fallback: Use resource-based win probability as fallback
+            resource_features = self.resource_calculator.calculate_all_features(
+                innings=state.innings,
+                over=state.over,
+                ball=state.ball,
+                current_score=state.current_score,
+                wickets_lost=state.wickets_lost,
+                target_runs=state.target_runs
+            )
+            return resource_features['resource_win_prob']
