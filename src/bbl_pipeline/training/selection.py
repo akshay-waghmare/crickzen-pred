@@ -24,9 +24,22 @@ def select_champion(results: List[Dict[str, Any]]) -> Dict[str, Any]:
     if not valid_results:
         raise ValueError("No results with 'brier_score' found.")
     
-    sorted_results = sorted(valid_results, key=lambda x: x['brier_score'])
+    # Force XGBoost preference if scores are very close (within 0.005)
+    # XGBoost is generally more robust to non-linearities than LogReg
+    xgboost_result = next((r for r in valid_results if r['model_name'] == 'xgboost'), None)
     
-    champion = sorted_results[0]
+    sorted_results = sorted(valid_results, key=lambda x: x['brier_score'])
+    best_model = sorted_results[0]
+    
+    if xgboost_result and best_model['model_name'] != 'xgboost':
+        diff = xgboost_result['brier_score'] - best_model['brier_score']
+        if diff < 0.005:
+            logger.info(f"Preferring XGBoost over {best_model['model_name']} (diff {diff:.4f} < 0.005)")
+            champion = xgboost_result
+        else:
+            champion = best_model
+    else:
+        champion = best_model
     
     logger.info("Champion selected", 
                 model=champion.get('model_name'), 
