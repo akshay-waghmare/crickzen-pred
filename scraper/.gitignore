@@ -1,0 +1,89 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+url_state.db
+
+# Logs
+*.log
+crex_scraper.log
+logs/
+artifacts/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# CSV data files (optional - uncomment if you don't want to track data)
+# *.csv
+
+# SSH keys
+*.pub
+asd
+asd.pub
+
+# Playwright
+/tmp/playwright/
+
+# Storage
+storage/
+
+# Specify / Spec Kit - Agent credentials and context
+# Uncomment these if you don't want to commit agent-specific files
+# .github/copilot-context.md
+# .github/copilot-instructions.md
+# .specify/memory/agent-*.md

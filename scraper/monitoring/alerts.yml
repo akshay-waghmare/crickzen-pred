@@ -1,0 +1,29 @@
+groups:
+- name: scraper_alerts
+  rules:
+  - alert: ScraperFreshnessLag
+    expr: scraper_freshness_seconds{quantile="0.9"} > 60
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Scraper data is stale (>60s)"
+      description: "90th percentile freshness is {{ $value }}s, exceeding 60s threshold."
+
+  - alert: ScraperStalled
+    expr: scraper_health_score < 40
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Scraper service is stalled or failing"
+      description: "Health score is {{ $value }} (FAILING state)."
+
+  - alert: ScraperHighQueue
+    expr: scraper_queue_depth > 100
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Scraper queue backing up"
+      description: "Queue depth is {{ $value }}, exceeding 100 tasks."

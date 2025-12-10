@@ -81,7 +81,12 @@ class ResourceFeatureCalculator:
         """
         Calculate expected final score based on current state and resource remaining.
         
-        Uses a projection based on current run rate weighted by resources consumed.
+        Uses a projection based on current run rate weighted by resources consumed,
+        WITH regression toward the mean. Early projections are heavily regressed
+        toward par score (160) to avoid unrealistic projections like 400+.
+        
+        The regression factor increases as more overs are bowled (more data = more trust
+        in the current run rate).
         """
         if overs_bowled <= 0:
             return self.PAR_SCORE_T20
@@ -96,13 +101,22 @@ class ResourceFeatureCalculator:
         if resource_used <= 0:
             return self.PAR_SCORE_T20
             
-        # Runs per resource point
+        # Raw projection based on runs per resource
         runs_per_resource = current_score / resource_used
+        raw_projection = current_score + (runs_per_resource * resource_remaining)
         
-        # Expected additional runs
-        expected_additional = runs_per_resource * resource_remaining
+        # Regression toward the mean
+        # Weight: how much to trust the current trajectory vs par score
+        # Early overs (2-3): trust ~20% trajectory, 80% par
+        # Middle overs (10): trust ~60% trajectory, 40% par  
+        # Late overs (17+): trust ~95% trajectory, 5% par
+        trajectory_weight = min(0.95, overs_bowled / 20.0)
         
-        return current_score + expected_additional
+        # Regressed projection
+        regressed_projection = (trajectory_weight * raw_projection) + ((1 - trajectory_weight) * self.PAR_SCORE_T20)
+        
+        # Also cap the projection at reasonable T20 bounds (100-280)
+        return max(100.0, min(280.0, regressed_projection))
     
     def calculate_match_phase(self, over: int) -> Tuple[str, int, int, int]:
         """
@@ -118,64 +132,189 @@ class ResourceFeatureCalculator:
         else:  # Overs 15-19 (16-20 in cricket terms)
             return ('death', 0, 0, 1)
     
-    def calculate_pressure_index(self, innings: int, current_score: int, 
-                                  overs_bowled: float, wickets_lost: int,
-                                  target_runs: int = None) -> float:
+    def calculate_pressure_index(
+        self,
+        innings: int,
+        current_score: int,
+        overs_bowled: float,
+        wickets_lost: int,
+        target_runs: int = None,
+        current_run_rate: float = None
+    ) -> float:
         """
         Calculate a pressure index that captures match situation urgency.
         
-        For 1st innings: Based on scoring rate relative to par
-        For 2nd innings: Based on required rate and resources remaining
+        Key improvements:
+        - Overs-weighted: Early deficits matter less than late deficits
+        - CRR vs RRR ratio: Compares current momentum to required rate
+        - Late wickets hurt more: Wicket pressure scales with match progress
+        
+        For 1st innings: Based on scoring rate relative to par, weighted by overs
+        For 2nd innings: Based on RRR/CRR ratio and resources remaining
         
         Returns:
             Pressure index (0-1 scale, higher = more pressure on batting team)
         """
         overs_remaining = self.TOTAL_OVERS - overs_bowled
-        
+        overs_progress = overs_bowled / self.TOTAL_OVERS  # 0 to 1
+
+        # -------------------------
+        # FIRST INNINGS PRESSURE
+        # -------------------------
         if innings == 1:
-            # First innings: Pressure based on being behind par score
-            expected_at_this_point = self.PAR_SCORE_T20 * (overs_bowled / self.TOTAL_OVERS)
-            score_diff = expected_at_this_point - current_score
-            
-            # Also factor in wickets
-            wicket_pressure = wickets_lost / self.TOTAL_WICKETS
-            
-            # Combine: behind on runs + losing wickets = high pressure
-            run_pressure = max(0, score_diff / 50)  # Normalize to 0-1 range roughly
-            pressure = 0.6 * run_pressure + 0.4 * wicket_pressure
-            
+            # Expected score at this point based on par
+            expected_score_so_far = self.PAR_SCORE_T20 * overs_progress
+            score_diff = expected_score_so_far - current_score
+
+            # Overs-weighted deficit: being 20 behind in over 2 is fine, 
+            # being 20 behind in over 18 is bad
+            run_pressure = max(0, (score_diff / 40) * overs_progress)
+
+            # Wicket pressure weighted by overs (late wickets hurt more)
+            # Losing 3 wickets in powerplay is recoverable, losing 3 in death is devastating
+            wicket_pressure = overs_progress * (wickets_lost / self.TOTAL_WICKETS)
+
+            pressure = (0.65 * run_pressure) + (0.35 * wicket_pressure)
+
             return min(1.0, max(0.0, pressure))
+
+        # -------------------------
+        # SECOND INNINGS PRESSURE
+        # -------------------------
+        if target_runs is None:
+            return 0.5
+
+        runs_required = target_runs - current_score
+
+        if runs_required <= 0:
+            return 0.0  # Already won
+
+        if overs_remaining <= 0:
+            return 1.0  # No overs left and haven't won
+
+        required_rate = runs_required / overs_remaining
+
+        # CRR vs RRR ratio - this is the key insight
+        # If CRR > RRR, team is ahead of the game (low pressure)
+        # If RRR > CRR, team needs to accelerate (high pressure)
+        if current_run_rate is not None and current_run_rate > 0:
+            # rr_ratio > 1 means RRR exceeds CRR (need to speed up)
+            rr_ratio = required_rate / current_run_rate
+            # Map ratio to pressure: 
+            # ratio 1.0 = on track (0.0 pressure)
+            # ratio 1.6 = need 60% more speed (1.0 pressure)
+            rate_pressure = min(1.0, max(0.0, (rr_ratio - 1.0) / 0.6))
         else:
-            # Second innings: Pressure based on required rate
-            if target_runs is None:
-                return 0.5  # Unknown target
-                
-            runs_required = target_runs - current_score
+            # Fallback: absolute RRR-based pressure
+            # RRR 7 = comfortable (0), RRR 15+ = maximum pressure (1)
+            rate_pressure = min(1.0, max(0.0, (required_rate - 7) / 8))
+
+        # Check if chase is even feasible
+        resource_pct = self.calculate_resource_percentage(overs_remaining, wickets_lost)
+        max_gettable = (resource_pct / 100) * self.PAR_SCORE_T20 * 1.3
+
+        if runs_required > max_gettable:
+            return 1.0  # Practically impossible
+
+        # Wickets matter more in late overs
+        # 5 down in over 10 is survivable, 5 down in over 18 is critical
+        wicket_pressure = overs_progress * (wickets_lost / self.TOTAL_WICKETS)
+
+        # Weight more towards run rate in chases (it's the primary constraint)
+        pressure = (0.75 * rate_pressure) + (0.25 * wicket_pressure)
+
+        return min(1.0, max(0.0, pressure))
+    
+    def calculate_resource_win_probability(
+        self,
+        innings: int,
+        expected_final_score: float,
+        target_runs: float,
+        resource_pct: float,
+        current_run_rate: float,
+        required_run_rate: float,
+        current_score: float = 0
+    ) -> float:
+        """
+        Returns a smooth, stable baseline win probability estimate.
+        
+        Args:
+            innings: Current innings (1 or 2)
+            expected_final_score: Projected final score based on current trajectory
+            target_runs: Target to chase (only relevant for 2nd innings)
+            resource_pct: Remaining resource percentage (DLS-style)
+            current_run_rate: Current run rate
+            required_run_rate: Required run rate to win (2nd innings only)
+            current_score: Current score
             
-            if runs_required <= 0:
-                return 0.0  # Already won
-                
-            if overs_remaining <= 0:
-                return 1.0  # No overs left and haven't won
-                
-            required_rate = runs_required / overs_remaining
+        Returns:
+            Win probability estimate (0.05 to 0.98)
+        """
+        # -------------------------------------
+        # INNINGS 1: Team batting first
+        # -------------------------------------
+        if innings == 1:
+            # Score advantage relative to par score
+            score_advantage = (expected_final_score - self.PAR_SCORE_T20) / 50.0
             
-            # Resource-based feasibility
-            resource_remaining = self.calculate_resource_percentage(overs_remaining, wickets_lost)
-            max_gettable = (resource_remaining / 100) * self.PAR_SCORE_T20 * 1.3  # 130% of par as upper bound
-            
-            if runs_required > max_gettable:
-                return 1.0  # Practically impossible
-                
-            # Pressure scales with required rate
-            # RRR of 6 = low pressure, RRR of 12 = moderate, RRR of 18+ = very high
-            rate_pressure = min(1.0, (required_rate - 6) / 12)
-            wicket_pressure = wickets_lost / self.TOTAL_WICKETS
-            
-            # Weight towards run rate pressure in chase
-            pressure = 0.7 * max(0, rate_pressure) + 0.3 * wicket_pressure
-            
-            return min(1.0, max(0.0, pressure))
+            # Smooth bounded output using tanh
+            # ~50% at par score, gently rising/falling with advantage
+            win_prob = 0.5 + 0.2 * np.tanh(score_advantage)
+
+            return float(max(0.05, min(0.98, win_prob)))
+
+        # -------------------------------------
+        # INNINGS 2: Team chasing a target
+        # -------------------------------------
+        if target_runs is None:
+            return 0.5
+
+        runs_required = target_runs - current_score
+
+        # If the chase is already over
+        if runs_required <= 0:
+            return 1.0
+
+        # Estimate the "maximum realistically gettable" runs
+        # Resources * par score * 1.3 factor for T20 explosiveness
+        max_gettable = (resource_pct / 100.0) * self.PAR_SCORE_T20 * 1.3
+
+        # If target is beyond reach given resources, give minimum but non-zero win probability
+        if runs_required > max_gettable:
+            return 0.05
+
+        # -------------------------------------
+        # Difficulty Ratio
+        # -------------------------------------
+        difficulty_ratio = runs_required / max_gettable
+        # Lower ratio = easier chase, higher = tougher
+
+        # -------------------------------------
+        # Run Rate Factor (CRR / RRR)
+        # -------------------------------------
+        if required_run_rate > 0 and current_run_rate > 0:
+            rate_ratio = current_run_rate / required_run_rate
+            # Bound the impact: between 0.7 and 1.3 multiplier
+            rate_factor = min(1.3, max(0.7, rate_ratio))
+        else:
+            rate_factor = 1.0
+
+        # -------------------------------------
+        # Base probability using sigmoid transformation
+        # -------------------------------------
+        # More generous for easy chases:
+        # difficulty_ratio 0.3 → ~99%
+        # difficulty_ratio 0.5 → ~95%
+        # difficulty_ratio 0.7 → ~82%
+        # difficulty_ratio 0.85 → ~50%
+        # difficulty_ratio 0.95 → ~20%
+        base_prob = 1.0 / (1.0 + np.exp(12 * (difficulty_ratio - 0.85)))
+
+        # Combine with run-rate factor
+        win_prob = base_prob * rate_factor
+
+        # Final clamp for sanity
+        return float(max(0.05, min(0.98, win_prob)))
     
     def calculate_all_features(self, innings: int, over: int, ball: int,
                                 current_score: int, wickets_lost: int,
@@ -215,7 +354,8 @@ class ResourceFeatureCalculator:
         if innings == 2 and target_runs is not None:
             runs_required = target_runs - current_score
             required_run_rate = (runs_required / overs_remaining) if overs_remaining > 0 else 99.0
-            run_rate_differential = required_run_rate - current_run_rate
+            # Positive = batting team ahead (scoring faster than required)
+            run_rate_differential = current_run_rate - required_run_rate
         
         # Match phase
         phase_name, is_powerplay, is_middle, is_death = self.calculate_match_phase(over)
@@ -223,33 +363,21 @@ class ResourceFeatureCalculator:
         # Expected score projection
         expected_final_score = self.calculate_expected_score(current_score, overs_bowled, wickets_lost)
         
-        # Pressure index
+        # Pressure index (now using current_run_rate for better CRR vs RRR comparison)
         pressure_index = self.calculate_pressure_index(
-            innings, current_score, overs_bowled, wickets_lost, target_runs
+            innings, current_score, overs_bowled, wickets_lost, target_runs, current_run_rate
         )
         
-        # Win probability estimate (simple resource-based)
-        # This gives the model a baseline "expected" probability from cricket knowledge
-        if innings == 1:
-            # First innings: Win prob based on expected score vs par
-            score_advantage = (expected_final_score - self.PAR_SCORE_T20) / 50
-            resource_win_prob = 0.5 + 0.2 * np.tanh(score_advantage)
-        else:
-            # Second innings: Win prob based on resources vs runs required
-            if target_runs is not None:
-                runs_required = target_runs - current_score
-                max_gettable = (resource_pct / 100) * self.PAR_SCORE_T20 * 1.3
-                
-                if runs_required <= 0:
-                    resource_win_prob = 1.0
-                elif runs_required > max_gettable:
-                    resource_win_prob = 0.0
-                else:
-                    # Probability based on feasibility
-                    feasibility = 1 - (runs_required / max_gettable)
-                    resource_win_prob = 0.3 + 0.6 * feasibility
-            else:
-                resource_win_prob = 0.5
+        # Win probability estimate using the dedicated method
+        resource_win_prob = self.calculate_resource_win_probability(
+            innings=innings,
+            expected_final_score=expected_final_score,
+            target_runs=target_runs,
+            resource_pct=resource_pct,
+            current_run_rate=current_run_rate,
+            required_run_rate=required_run_rate,
+            current_score=current_score
+        )
         
         return {
             # Core resource features

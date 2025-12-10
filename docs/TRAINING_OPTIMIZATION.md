@@ -129,6 +129,75 @@ Best model saved at: `models/champion_uncalibrated/`
 - `champion_model.joblib` - Trained XGBoost model
 - `champion_metadata.json` - Model metadata and Brier score
 
+## Bug Fixes & Improvements (December 2025)
+
+### Issue: Scoring runs (4s/6s) decreased win probability
+
+**Root Cause Analysis:**
+
+1. **`expected_final_score` was projecting unrealistic scores early in innings**
+   - At 23/0 after 2.3 overs, it projected 368-429 runs
+   - This caused the model to think the batting team was "behind" even when ahead
+   
+2. **`run_rate_diff` had wrong sign convention**
+   - Was calculated as `required_run_rate - current_run_rate`
+   - Negative meant ahead, positive meant behind (confusing for ML model)
+
+**Fixes Applied:**
+
+1. **Fixed `calculate_expected_score()` in `src/bbl_pipeline/features/calculator.py`**
+   - Added regression toward par score early in innings
+   - Formula: `weight = overs_bowled / 10` (clipped to [0.2, 1.0])
+   - Blends projection with venue par: `weight * projected + (1-weight) * par`
+
+2. **Flipped `run_rate_diff` sign in calculator and realtime_mapper**
+   - Now: `run_rate_diff = current_run_rate - required_run_rate`
+   - Positive = batting team ahead, Negative = batting team behind
+   - More intuitive for ML model to learn
+
+3. **Regenerated features and retrained models**
+   - ILT20 v2: Brier 0.1886 (25 features)
+   - BBL v2: Brier 0.1775 (25 features)
+
+### Endgame Guardrail
+
+**Issue:** Endgame probabilities seemed too low (e.g., 85% for "need 3 from 4 balls")
+
+**Analysis:** Brier score comparison showed model is better calibrated than DLS-based resource probability in ALL phases, including death overs:
+
+| Phase | Model Brier | Resource Brier |
+|-------|-------------|----------------|
+| Overall | **0.1455** | 0.1850 |
+| Death Overs (16-20) | **0.1306** | 0.1727 |
+| Very Easy (>95%) | **0.0448** | 0.0505 |
+
+**Decision:** Keep minimal guardrail for extreme edge cases only (97%/3% thresholds):
+
+```python
+# In predictor.py
+if resource_prob > 0.97:
+    prob = max(model_prob, 0.92)  # Floor at 92% for near-certain wins
+elif resource_prob < 0.03:
+    prob = min(model_prob, 0.08)  # Cap at 8% for near-certain losses
+```
+
+**Impact:**
+- Brier increase: +0.0006 (negligible, 0.4%)
+- For resource > 97%: Actual win rate = 94.8%, Guardrail moves prediction from 92.1% → 93.4% (closer to truth)
+- Trade-off: Intuitive user experience for extreme endgame scenarios
+
+### Key Feature Importance (Updated)
+
+| Rank | Feature | Importance |
+|------|---------|------------|
+| 1 | resource_win_prob | 13.1% |
+| 2 | run_rate_diff | 11.3% |
+| 3 | score_vs_par | 9.9% |
+| 4 | expected_final_score | 5.2% |
+| 5 | wickets_lost | 4.9% |
+
+---
+
 ## Future Improvements
 
 To push below 0.17 Brier, consider:

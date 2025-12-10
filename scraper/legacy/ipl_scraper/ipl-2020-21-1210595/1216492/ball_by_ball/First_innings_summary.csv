@@ -1,0 +1,21 @@
+batting_team,over_number,ball_number,runs_scored,boundaries,dot_balls,wickets,extras,batsman1_name,batsman1_runs,batsman1_balls_faced,batsman1_fours,batsman1_sixes,batsman2_name,batsman2_runs,batsman2_balls_faced,batsman2_fours,batsman2_sixes,bowler1_name,bowler1_overs_bowled,bowler1_maidens_bowled,bowler1_runs_conceded,bowler1_wickets_taken,bowler2_name,bowler2_overs_bowled,bowler2_maidens_bowled,bowler2_runs_conceded,bowler2_wickets_taken
+CSK,19,19.1,8,2,0,0,0,MS Dhoni,0,2,0,0,Faf du Plessis,50,42,4,0,Jasprit Bumrah,4.0,0,43,1,Krunal Pandya,4.0,0,37,1
+CSK,18,18.1,11,2,2,1,0,Sam Curran,12,4,1,1,Faf du Plessis,45,40,3,0,Krunal Pandya,4.0,0,37,1,James Pattinson,4.0,0,27,1
+CSK,17,17.1,13,2,0,1,0,Ravindra Jadeja,10,4,2,0,Faf du Plessis,44,39,3,0,James Pattinson,4.0,0,27,1,Rahul Chahar,4.0,0,36,1
+CSK,16,16.1,13,2,0,0,0,Faf du Plessis,41,37,3,0,,0,0,0,0,Rahul Chahar,4.0,0,36,1,Jasprit Bumrah,3.0,0,32,0
+CSK,15,15.1,5,0,0,1,0,Ambati Rayudu,69,45,6,3,Faf du Plessis,38,34,3,0,Jasprit Bumrah,3.0,0,32,0,James Pattinson,3.0,0,14,1
+CSK,14,14.1,11,1,1,0,1,Ambati Rayudu,64,41,6,3,Faf du Plessis,33,32,2,0,James Pattinson,3.0,0,14,1,Rahul Chahar,3.0,0,31,0
+CSK,13,13.1,6,0,1,0,0,Faf du Plessis,31,30,2,0,Ambati Rayudu,60,37,6,3,Rahul Chahar,3.0,0,31,0,Jasprit Bumrah,2.0,0,21,0
+CSK,12,12.1,11,1,0,0,0,Ambati Rayudu,52,34,6,2,Faf du Plessis,28,27,2,0,Jasprit Bumrah,2.0,0,21,0,Krunal Pandya,3.0,0,24,0
+CSK,11,11.1,7,1,2,0,0,Faf du Plessis,26,25,2,0,Ambati Rayudu,47,30,5,2,Krunal Pandya,3.0,0,24,0,Rahul Chahar,2.0,0,20,0
+CSK,10,10.1,11,1,0,0,0,Faf du Plessis,23,22,2,0,Ambati Rayudu,39,27,5,1,Rahul Chahar,2.0,0,20,0,Krunal Pandya,2.0,0,13,0
+CSK,9,9.1,12,2,0,0,0,Ambati Rayudu,29,23,3,1,Faf du Plessis,21,20,2,0,Krunal Pandya,2.0,0,13,0,Rahul Chahar,1.0,0,8,0
+CSK,8,8.1,7,0,0,0,1,Faf du Plessis,18,17,2,0,Ambati Rayudu,26,20,3,1,Rahul Chahar,1.0,0,8,0,Krunal Pandya,1.0,0,6,0
+CSK,7,7.1,8,1,1,0,0,Ambati Rayudu,24,18,3,1,Faf du Plessis,12,13,1,0,Krunal Pandya,1.0,0,6,0,Jasprit Bumrah,1.0,0,14,0
+CSK,6,6.1,6,0,1,0,0,Ambati Rayudu,20,14,3,1,Faf du Plessis,10,11,1,0,Jasprit Bumrah,1.0,0,14,0,Trent Boult,3.0,0,15,1
+CSK,5,5.1,14,1,4,0,1,Ambati Rayudu,10,12,2,0,Faf du Plessis,7,6,1,0,Trent Boult,3.0,0,15,1,James Pattinson,2.0,0,8,1
+CSK,4,4.1,4,1,5,0,0,Faf du Plessis,7,6,1,0,Ambati Rayudu,6,6,1,0,James Pattinson,2.0,0,8,1,Trent Boult,2.0,0,11,1
+CSK,3,3.1,7,1,3,0,0,Faf du Plessis,5,4,1,0,Ambati Rayudu,1,2,0,0,Trent Boult,2.0,0,11,1,James Pattinson,1.0,0,1,1
+CSK,2,2.1,6,1,3,0,0,Faf du Plessis,0,0,0,0,,0,0,0,0,James Pattinson,1.0,0,1,1,Trent Boult,1.0,0,5,1
+CSK,1,1.1,1,0,5,1,1,Murali Vijay,1,1,0,0,,0,0,0,0,Trent Boult,1.0,0,5,1,,0,0,0,0
+CSK,0,0.1,5,1,3,1,0,,0,0,0,0,,0,0,0,0,,0,0,0,0,,0,0,0,0

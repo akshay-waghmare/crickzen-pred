@@ -1,0 +1,15 @@
+# Grafana Dashboard Provisioning
+# This file tells Grafana where to find dashboard JSON files
+
+apiVersion: 1
+
+providers:
+  - name: 'Scraper Dashboards'
+    orgId: 1
+    folder: 'Scraper Monitoring'
+    folderUid: 'scraper-monitoring'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

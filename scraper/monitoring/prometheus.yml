@@ -1,0 +1,37 @@
+# Prometheus Configuration for Scraper Monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'scraper-prod'
+    environment: 'production'
+
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "prometheus.rules.yml"
+  - "alerts.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Scraper metrics (Flask /metrics endpoint on port 5000)
+  - job_name: 'scraper'
+    static_configs:
+      - targets: ['scraper:5000']
+        labels:
+          service: 'cricket-scraper'
+    
+  # Backend metrics (Spring Boot Actuator)
+  - job_name: 'backend'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['backend:8099']
+        labels:
+          service: 'cricket-backend'

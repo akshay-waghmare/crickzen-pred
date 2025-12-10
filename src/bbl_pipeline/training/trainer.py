@@ -80,17 +80,18 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         self.xgb_model_ = XGBClassifier(
             objective='binary:logistic', 
             eval_metric='logloss', 
-            n_estimators=700,
+            n_estimators=650,
             max_depth=2,
-            learning_rate=0.01,
-            subsample=0.45,
-            colsample_bytree=0.45,
-            min_child_weight=30,
-            reg_alpha=3.5,
-            reg_lambda=4.5,
+            learning_rate=0.011,
+            subsample=0.5,
+            colsample_bytree=0.5,
+            min_child_weight=28,
+            reg_alpha=2.8,
+            reg_lambda=3.8,
             tree_method='hist',
             n_jobs=-1,
-            verbosity=0
+            verbosity=0,
+            random_state=42
         )
         
         # LogisticRegression model with scaling

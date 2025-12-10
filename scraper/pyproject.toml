@@ -1,0 +1,16 @@
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+extend-exclude = "(storage|__pycache__|\\.venv)"
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["crex_scraper_python"]
+skip = ["storage", "__pycache__"]
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]
+exclude = ["storage", "__pycache__"]
+per-file-ignores = ["__init__.py:F401"]

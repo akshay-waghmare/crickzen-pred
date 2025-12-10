@@ -1,0 +1,183 @@
+openapi: 3.0.3
+info:
+  title: Scraper Observability API
+  version: 1.0.0
+  description: |
+    Endpoints that expose scraper run health, structured logs, and diagnostic artifacts
+    introduced by the Scraper Logging Recovery feature. All responses are JSON and redact
+    sensitive fields according to the constitution.
+servers:
+  - url: /api/v1
+paths:
+  /scraper/jobs/{jobName}/health:
+    get:
+      summary: Retrieve lifecycle snapshot for background scraper job
+      tags: [ScraperHealth]
+      parameters:
+        - in: path
+          name: jobName
+          required: true
+          schema:
+            type: string
+          description: Name of the background scraper job (e.g., `ipl_ingest`)
+      responses:
+        '200':
+          description: Current health snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScraperHealthSnapshot'
+        '404':
+          description: Job not registered
+  /scraper/runs/{correlationId}/logs:
+    get:
+      summary: List structured log events for a specific run
+      tags: [LogEvents]
+      parameters:
+        - in: path
+          name: correlationId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: afterSequence
+          schema:
+            type: integer
+            minimum: 0
+          description: Return events with sequence greater than this value (pagination)
+        - in: query
+          name: level
+          schema:
+            type: string
+            enum: [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+          description: Optional severity filter
+      responses:
+        '200':
+          description: Ordered list of log events
+          headers:
+            X-Log-Page-Size:
+              schema:
+                type: integer
+              description: Count of events in this response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  correlationId:
+                    type: string
+                    format: uuid
+                  events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LogEvent'
+                  nextSequence:
+                    type: integer
+                    nullable: true
+                    description: Pass to `afterSequence` to continue pagination
+        '404':
+          description: Run not found
+  /scraper/runs/{correlationId}/artifacts:
+    get:
+      summary: Enumerate diagnostic artifacts captured for a run
+      tags: [Diagnostics]
+      parameters:
+        - in: path
+          name: correlationId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of artifacts retained within the configured retention window
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  correlationId:
+                    type: string
+                    format: uuid
+                  retention:
+                    type: object
+                    properties:
+                      expiresAt:
+                        type: string
+                        format: date-time
+                  artifacts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DiagnosticArtifact'
+        '410':
+          description: Artifacts aged out per retention policy
+components:
+  schemas:
+    ScraperHealthSnapshot:
+      type: object
+      required: [jobName, state, lastSuccessTs, retryCount, alerts]
+      properties:
+        jobName:
+          type: string
+        state:
+          type: string
+          enum: [starting, running, retrying, stopped, failed]
+        lastSuccessTs:
+          type: string
+          format: date-time
+          nullable: true
+        activeCorrelationId:
+          type: string
+          format: uuid
+          nullable: true
+        retryCount:
+          type: integer
+          minimum: 0
+        alerts:
+          type: array
+          items:
+            type: string
+    LogEvent:
+      type: object
+      required: [timestamp, level, component, event, metadata, correlationId, sequence]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        level:
+          type: string
+          enum: [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+        component:
+          type: string
+          enum: [navigation, dom, extraction, validation, persistence, job_control, network]
+        event:
+          type: string
+        metadata:
+          type: object
+          description: Redacted contextual fields defined by FR-001
+        correlationId:
+          type: string
+          format: uuid
+        sequence:
+          type: integer
+          minimum: 0
+    DiagnosticArtifact:
+      type: object
+      required: [type, path, capturedAt]
+      properties:
+        type:
+          type: string
+          enum: [html_snapshot, screenshot, state_dump]
+        path:
+          type: string
+          description: Relative storage path or signed URL
+        capturedAt:
+          type: string
+          format: date-time
+        sizeBytes:
+          type: integer
+          minimum: 0
+        redacted:
+          type: boolean
+          description: Indicates if sensitive sections were masked prior to storage

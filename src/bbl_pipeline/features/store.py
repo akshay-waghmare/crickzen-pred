@@ -21,8 +21,10 @@ class InMemoryFeatureStore:
         self.venue_stats_path = Path(venue_stats_path)
         self._player_stats: Dict[str, Dict[str, Any]] = {}
         self._venue_stats: Dict[str, Dict[str, Any]] = {}
+        self._team_stats: Dict[str, Dict[str, Any]] = {}
         self._player_names_lower: Dict[str, str] = {}
         self._venue_names_lower: Dict[str, str] = {}
+        self._team_names_lower: Dict[str, str] = {}
         self._loaded = False
 
     def load(self):
@@ -47,8 +49,50 @@ class InMemoryFeatureStore:
             self._venue_names_lower = {k.lower(): k for k in self._venue_stats.keys()}
         else:
             logger.warning(f"Venue stats file not found: {self.venue_stats_path}")
+            
+        # Load team stats
+        team_stats_path = self.player_stats_path.parent / "team_ratings.parquet"
+        if team_stats_path.exists():
+            try:
+                df_team = pd.read_parquet(team_stats_path)
+                # Get latest rating for each team
+                if 'date' in df_team.columns:
+                    df_team = df_team.sort_values('date').groupby('team').last().reset_index()
+                
+                if 'team' in df_team.columns:
+                    df_team = df_team.set_index('team')
+                    
+                self._team_stats = df_team.to_dict(orient='index')
+                self._team_names_lower = {k.lower(): k for k in self._team_stats.keys()}
+            except Exception as e:
+                logger.error(f"Error loading team stats: {e}")
         
         self._loaded = True
+
+    def get_team_stats(self, team_name: str) -> Optional[Dict[str, Any]]:
+        if not self._loaded:
+            self.load()
+            
+        if not team_name:
+            return None
+            
+        # 1. Exact match
+        if team_name in self._team_stats:
+            return self._team_stats[team_name]
+            
+        # 2. Case-insensitive match
+        if team_name.lower() in self._team_names_lower:
+            real_name = self._team_names_lower[team_name.lower()]
+            return self._team_stats[real_name]
+            
+        # 3. Fuzzy match
+        matches = difflib.get_close_matches(team_name, self._team_stats.keys(), n=1, cutoff=0.6)
+        if matches:
+            match = matches[0]
+            logger.info(f"Fuzzy matched team '{team_name}' to '{match}'")
+            return self._team_stats[match]
+            
+        return None
 
     def get_player_stats(self, player_name: str) -> Optional[Dict[str, Any]]:
         if not self._loaded:

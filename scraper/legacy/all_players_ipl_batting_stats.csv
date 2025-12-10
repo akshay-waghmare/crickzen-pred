@@ -1,0 +1,19 @@
+player_name,player_team,player_role,matches,innings,not_outs,runs,balls,fours,sixes,average,strike_rate
+Rohit Sharma (c),MI,batsman,257,252,,6628,5054,,,29.72,131.14
+Quinton de Kock †,MI,batsman,32,29,,643,490,,,22.96,131.22
+Suryakumar Yadav,MI,batsman,150,135,,3594,2473,,,32.08,145.32
+Saurabh Tiwary,MI,batsman,93,74,,1494,1244,,,28.73,120.09
+Hardik Pandya,MI,batsman,137,128,,2525,1734,,,28.69,145.61
+Kieron Pollard,MI,batsman,22,19,,660,402,,,60.00,164.17
+Krunal Pandya,MI,batsman,127,111,,1647,1240,,,22.56,132.82
+Sam Curran,CSK,bowler,15,14,,411,308,,,51.37,133.44
+Ravindra Jadeja,CSK,bowler,240,184,,2959,2280,,,27.39,129.78
+Murali Vijay,CSK,batsman,106,106,,2619,2149,,,25.93,121.87
+Shane Watson,CSK,batsman,145,141,,3874,2809,,,30.99,137.91
+Faf du Plessis,CSK,batsman,33,31,,894,626,,,33.11,142.81
+Ambati Rayudu,CSK,batsman,8,6,,101,101,,,16.83,100.00
+Ravindra Jadeja,CSK,batsman,240,184,,2959,2280,,,27.39,129.78
+Sam Curran,CSK,batsman,15,14,,411,308,,,51.37,133.44
+MS Dhoni (c)†,CSK,batsman,264,229,,5243,3812,,,39.12,137.53
+"Kedar Jadhav,",CSK,batsman,95,81,,1208,981,,,22.37,123.13
+Krunal Pandya,MI,bowler,127,111,,1647,1240,,,22.56,132.82

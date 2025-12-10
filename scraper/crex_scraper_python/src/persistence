@@ -1,0 +1,184 @@
+"""Thread-safe SQLite connection pool for the scraper service."""
+
+from __future__ import annotations
+
+import sqlite3
+import threading
+import time
+from collections import deque
+from contextlib import contextmanager
+from typing import Deque, Dict, Iterator, Optional
+
+from .config import ScraperSettings, get_settings
+
+
+class ConnectionPoolError(RuntimeError):
+    """Raised when the pool cannot provide a connection."""
+
+
+class ConnectionPool:
+    """Simple SQLite connection pool with context-managed checkout."""
+
+    def __init__(
+        self,
+        *,
+        settings: Optional[ScraperSettings] = None,
+        database_path: Optional[str] = None,
+        min_size: Optional[int] = None,
+        max_size: Optional[int] = None,
+        acquire_timeout: Optional[float] = None,
+    ) -> None:
+        self._settings = settings or get_settings()
+        self._database_path = database_path or self._settings.sqlite_db_path
+        self._min_size = min_size if min_size is not None else self._settings.sqlite_pool_min_size
+        self._max_size = max_size if max_size is not None else self._settings.sqlite_pool_max_size
+        self._acquire_timeout = (
+            acquire_timeout if acquire_timeout is not None else self._settings.sqlite_timeout_seconds
+        )
+
+        if self._min_size < 0 or self._max_size < 1:
+            raise ValueError("Pool sizes must be positive")
+        if self._min_size > self._max_size:
+            raise ValueError("min_size cannot exceed max_size")
+
+        self._lock = threading.RLock()
+        self._condition = threading.Condition(self._lock)
+    self._available: Deque[sqlite3.Connection] = deque()
+    self._in_use: set[sqlite3.Connection] = set()
+    self._open_connections = 0
+        self._closed = False
+
+        for _ in range(self._min_size):
+            self._available.append(self._create_connection())
+
+    # ------------------------------------------------------------------
+
+    def _create_connection(self) -> sqlite3.Connection:
+        connection = sqlite3.connect(
+            self._database_path,
+            timeout=self._settings.sqlite_timeout_seconds,
+            check_same_thread=False,
+            detect_types=sqlite3.PARSE_DECLTYPES,
+        )
+        connection.row_factory = sqlite3.Row
+    self._open_connections += 1
+        return connection
+
+    def _is_connection_healthy(self, connection: sqlite3.Connection) -> bool:
+        try:
+            connection.execute("SELECT 1")
+            return True
+        except sqlite3.Error:
+            return False
+
+    def _acquire(self) -> sqlite3.Connection:
+        deadline = time.monotonic() + self._acquire_timeout
+        with self._condition:
+            if self._closed:
+                raise ConnectionPoolError("Connection pool is closed")
+
+            while True:
+                if self._available:
+                    connection = self._available.pop()
+                    if not self._is_connection_healthy(connection):
+                        try:
+                            connection.close()
+                        except sqlite3.Error:
+                            pass
+                        continue
+                    self._in_use.add(connection)
+                    return connection
+
+                current_size = len(self._in_use) + len(self._available)
+                if current_size < self._max_size:
+                    connection = self._create_connection()
+                    self._in_use.add(connection)
+                    return connection
+
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise ConnectionPoolError("Timed out waiting for available database connection")
+                self._condition.wait(timeout=remaining)
+
+    def _release(self, connection: sqlite3.Connection) -> None:
+        with self._condition:
+            self._in_use.discard(connection)
+            if self._closed:
+                try:
+                    connection.close()
+                except sqlite3.Error:
+                    pass
+                self._open_connections = max(0, self._open_connections - 1)
+                self._condition.notify()
+                return
+
+            if not self._is_connection_healthy(connection):
+                try:
+                    connection.close()
+                except sqlite3.Error:
+                    pass
+                self._open_connections -= 1
+                if not self._closed:
+                    current_size = len(self._in_use) + len(self._available)
+                    if current_size < self._min_size:
+                        self._available.append(self._create_connection())
+                self._condition.notify()
+                return
+
+            self._available.append(connection)
+            self._condition.notify()
+
+    # ------------------------------------------------------------------
+
+    @contextmanager
+    def get_connection(self) -> Iterator[sqlite3.Connection]:
+        connection = self._acquire()
+        try:
+            yield connection
+        except Exception:
+            # Ensure we do not leak transactions when an error occurs
+            try:
+                if connection.in_transaction:
+                    connection.rollback()
+            except sqlite3.Error:
+                pass
+            raise
+        else:
+            try:
+                if connection.in_transaction:
+                    connection.commit()
+            except sqlite3.Error:
+                # Connection will be marked unhealthy on release
+                pass
+        finally:
+            self._release(connection)
+
+    # ------------------------------------------------------------------
+
+    def close(self) -> None:
+        with self._condition:
+            if self._closed:
+                return
+            self._closed = True
+            for connection in list(self._available):
+                try:
+                    connection.close()
+                except sqlite3.Error:
+                    pass
+            closed_count = len(self._available)
+            self._available.clear()
+            self._open_connections = max(0, self._open_connections - closed_count)
+            self._condition.notify_all()
+
+    def stats(self) -> Dict[str, int]:
+        with self._condition:
+            return {
+                "open_connections": self._open_connections,
+                "available": len(self._available),
+                "in_use": len(self._in_use),
+                "min_size": self._min_size,
+                "max_size": self._max_size,
+            }
+
+
+__all__ = ["ConnectionPool", "ConnectionPoolError"]

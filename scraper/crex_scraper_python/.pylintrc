@@ -1,0 +1,33 @@
+[MASTER]
+# Pylint configuration file for the project
+
+[MASTER]
+ignore-patterns=tests/*
+
+[FORMAT]
+max-line-length=100
+
+[MESSAGES CONTROL]
+disable=missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring,
+        invalid-name,
+        too-few-public-methods,
+        too-many-arguments,
+        too-many-instance-attributes
+
+[DESIGN]
+max-args=5
+max-locals=15
+max-returns=6
+max-branch=12
+
+[REPORTS]
+output-format=text
+reports=no
+
+[LOGGING]
+logging-modules=logging
+
+[TYPECHECK]
+ignored-modules=flask,requests,playwright

@@ -1,0 +1,76 @@
+# Use the official Ubuntu image from the Docker Hub
+FROM ubuntu:20.04
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Update apt sources to use a different mirror
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|http://mirrors.edge.kernel.org/ubuntu/|g' /etc/apt/sources.list
+
+# Install dependencies and add the deadsnakes PPA for Python 3.11
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y \
+    python3.11 \
+    python3.11-venv \
+    python3-pip \
+    sqlite3 \
+    libsqlite3-dev \
+    libnss3 \
+    libatk1.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxrandr2 \
+    libxkbcommon0 \
+    libgbm1 \
+    libpango-1.0-0 \
+    libgtk-3-0 \
+    libasound2 \
+    curl \
+    && apt-get clean
+
+# Install the latest version of pip
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python3.11 get-pip.py && \
+    rm get-pip.py
+
+# Install Playwright dependencies
+RUN apt-get update && apt-get install -y \
+    fonts-liberation \
+    libenchant-2-2 \
+    libicu66 \
+    libjpeg-turbo8 \
+    libvpx6 \
+    libevent-2.1-7 \
+    && apt-get clean
+
+# Set alternatives to ensure python3.11 is the default python3 and create symbolic links
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
+    ln -sf /usr/bin/python3.11 /usr/bin/python && \
+    ln -sf /usr/bin/pip3 /usr/bin/pip
+
+# Copy the requirements file into the container at /app
+COPY requirements.txt .
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Playwright browsers
+RUN playwright install --with-deps
+
+# Copy the rest of the working directory contents into the container at /app
+COPY . .
+
+# Copy the startup script into the container
+COPY start.sh /app/start.sh
+
+# Make the startup script executable
+RUN chmod +x /app/start.sh
+
+# Expose the port Flask is running on
+EXPOSE 5000
+
+# Set the default command to run the startup script
+CMD ["/app/start.sh"]

@@ -1,0 +1,280 @@
+openapi: 3.0.0
+info:
+  title: Cricket Data API
+  description: API for scraping and managing cricket match data.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+paths:
+  /scrape-live-matches-link:
+    get:
+      summary: Start scraping live matches
+      responses:
+        '200':
+          description: Scraping started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Scraping started
+        '500':
+          description: Error occurred while starting scraping
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Scraping error
+                  error_message:
+                    type: string
+                    example: Error details
+
+  /start-scrape:
+    post:
+      summary: Start scraping for a specific URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  example: https://crex.live/match/123
+      responses:
+        '200':
+          description: Scraping started for the URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Scraping started for url: https://crex.live/match/123
+        '400':
+          description: No URL provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: No url provided
+
+  /stop-scrape:
+    post:
+      summary: Stop scraping for a specific URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  example: https://crex.live/match/123
+      responses:
+        '200':
+          description: Scraping stopped for the URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Stopped scraping for url: https://crex.live/match/123
+        '400':
+          description: No scraping task found for the URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: No scraping task found for url: https://crex.live/match/123
+
+  /add-lead:
+    post:
+      summary: Add a new lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_name:
+                  type: string
+                  example: Cricket Corp
+                website:
+                  type: string
+                  example: https://cricketcorp.com
+                contact_email:
+                  type: string
+                  example: contact@cricketcorp.com
+                phone_number:
+                  type: string
+                  example: +1234567890
+                notes:
+                  type: string
+                  example: Interested in partnership
+      responses:
+        '201':
+          description: Lead added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lead added successfully
+                  lead_id:
+                    type: integer
+                    example: 1
+        '400':
+          description: Company name and website are required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Company name and website are required
+
+  /view-leads:
+    get:
+      summary: Retrieve all leads
+      responses:
+        '200':
+          description: List of leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  leads:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        company_name:
+                          type: string
+                          example: Cricket Corp
+                        website:
+                          type: string
+                          example: https://cricketcorp.com
+                        contact_email:
+                          type: string
+                          example: contact@cricketcorp.com
+                        phone_number:
+                          type: string
+                          example: +1234567890
+                        notes:
+                          type: string
+                          example: Interested in partnership
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: 2023-01-01T12:00:00Z
+
+  /update-lead/{lead_id}:
+    put:
+      summary: Update an existing lead
+      parameters:
+        - name: lead_id
+          in: path
+          required: true
+          description: ID of the lead to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_name:
+                  type: string
+                  example: Updated Cricket Corp
+                website:
+                  type: string
+                  example: https://updatedcricketcorp.com
+                contact_email:
+                  type: string
+                  example: updatedcontact@cricketcorp.com
+                phone_number:
+                  type: string
+                  example: +0987654321
+                notes:
+                  type: string
+                  example: Updated notes
+      responses:
+        '200':
+          description: Lead updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lead updated successfully
+        '404':
+          description: Lead not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Lead not found
+
+  /delete-lead/{lead_id}:
+    delete:
+      summary: Delete a lead
+      parameters:
+        - name: lead_id
+          in: path
+          required: true
+          description: ID of the lead to delete
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lead deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lead deleted successfully
+        '404':
+          description: Lead not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Lead not found

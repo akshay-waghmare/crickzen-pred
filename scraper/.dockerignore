@@ -1,0 +1,52 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Data files (keep only necessary ones)
+*.csv
+*.db
+!url_state.db
+
+# Logs
+*.log
+
+# Playwright cache
+.playwright/
+
+# Environment files
+.env
+.env.local
+
+# Documentation
+*.md
+!README.md
+
+# Specs and tests (if not needed in container)
+specs/
+tests/
+docs/
