@@ -218,6 +218,15 @@ class Predictor:
             # Use RealTimeFeatureMapper to generate all features
             X = self.feature_mapper.create_feature_dataframe(scraped_data)
             
+            # Filter features if model has selected_features_ attribute
+            if hasattr(self.model, 'selected_features_'):
+                # Ensure all required features exist (fill missing with 0)
+                for feat in self.model.selected_features_:
+                    if feat not in X.columns:
+                        X[feat] = 0.0
+                # Select only the required features in the correct order
+                X = X[self.model.selected_features_]
+            
             if debug:
                 print("\n" + "="*70)
                 print("🔍 DEBUG: Features fed to model")
@@ -249,16 +258,48 @@ class Predictor:
             # in all phases, so we only override for near-certain outcomes
             if state.innings == 2 and state.target_runs:
                 runs_needed = state.target_runs - state.current_score
+                balls_remaining = (20 - state.over) * 6 - state.ball
+                wickets_remaining = 10 - state.wickets_lost
                 
                 # Match already won
                 if runs_needed <= 0:
                     prob = 1.0
-                # Near-certain win (resource > 97%) - ensure model doesn't underestimate
+                
+                # --- ENDGAME GUARDRAILS ---
+                # 1. "Victory Lap" Scenarios: Explicitly handle obvious wins
+                # The model can be conservative (e.g. 92%) due to calibration bins, but
+                # humans know these are 99%+ situations.
+                elif runs_needed <= 6 and wickets_remaining >= 3:
+                    # One hit away with wickets in hand -> 99%
+                    prob = max(model_prob, 0.99)
+                    
+                elif runs_needed <= 12 and runs_needed < balls_remaining and wickets_remaining >= 4:
+                    # Two hits away, run-a-ball, plenty of wickets -> 98%
+                    prob = max(model_prob, 0.98)
+
+                # 2. Resource-based Guardrails (for other high-prob situations)
                 elif resource_prob > 0.97:
-                    prob = max(model_prob, 0.92)
-                # Near-certain loss (resource < 3%) - ensure model doesn't overestimate
+                    # If resource says we are winning (>97%), ensure we are at least 95% confident
+                    # If resource is extremely high (>99%), go higher
+                    floor = 0.95
+                    if resource_prob > 0.99: floor = 0.98
+                    
+                    prob = max(model_prob, floor)
+
+                # 3. Loss Guardrails
                 elif resource_prob < 0.03:
-                    prob = min(model_prob, 0.08)
+                    # Tier 1: Virtually Impossible to Win (<0.5% resource prob)
+                    # e.g. Need 30 runs off 2 balls
+                    if resource_prob < 0.005:
+                        prob = min(model_prob, 0.01)
+                        
+                    # Tier 2: Extremely Difficult (<1% resource prob)
+                    elif resource_prob < 0.01:
+                        prob = min(model_prob, 0.02)
+                        
+                    # Tier 3: Very Difficult (<3% resource prob)
+                    else:
+                        prob = min(model_prob, 0.05)
                 else:
                     prob = model_prob
             else:

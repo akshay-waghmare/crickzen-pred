@@ -52,7 +52,7 @@ if resource_probs is None:
     resource_probs = np.array(resource_probs)
 
 # Calculate guardrail-blended predictions
-def apply_guardrail(model_prob, resource_prob, over, innings, runs_required=None):
+def apply_guardrail(model_prob, resource_prob, over, ball, innings, runs_required=None, wickets_lost=0):
     """Apply the same guardrail logic as in predictor.py"""
     if innings != 2:
         return model_prob
@@ -61,29 +61,59 @@ def apply_guardrail(model_prob, resource_prob, over, innings, runs_required=None
     if runs_required is not None and runs_required <= 0:
         return 1.0
     
-    # Death overs (over >= 16)
-    if over >= 16:
-        overs_into_death = over - 16
-        resource_weight = min(0.90, 0.70 + (overs_into_death * 0.067))
-        if resource_prob > 0.90 or resource_prob < 0.15:
-            return resource_weight * resource_prob + (1 - resource_weight) * model_prob
-    
-    # Very easy/hard chase
-    if resource_prob > 0.95 and model_prob < resource_prob:
-        return 0.80 * resource_prob + 0.20 * model_prob
-    elif resource_prob < 0.10 and model_prob > resource_prob:
-        return 0.80 * resource_prob + 0.20 * model_prob
+    if runs_required is not None:
+        balls_remaining = (20 - over) * 6 - ball
+        wickets_remaining = 10 - wickets_lost
+        
+        # --- ENDGAME GUARDRAILS ---
+        # 1. "Victory Lap" Scenarios: Explicitly handle obvious wins
+        if runs_required <= 6 and wickets_remaining >= 3:
+            return max(model_prob, 0.99)
+            
+        if runs_required <= 12 and runs_required < balls_remaining and wickets_remaining >= 4:
+            return max(model_prob, 0.98)
+
+        # 2. Resource-based Guardrails (for other high-prob situations)
+        if resource_prob > 0.97:
+            floor = 0.95
+            if resource_prob > 0.99: floor = 0.98
+            return max(model_prob, floor)
+
+        # 3. Loss Guardrails
+        if resource_prob < 0.03:
+            if resource_prob < 0.005:
+                return min(model_prob, 0.01)
+            elif resource_prob < 0.01:
+                return min(model_prob, 0.02)
+            else:
+                return min(model_prob, 0.05)
     
     return model_prob
 
 # Apply guardrail
 guardrail_probs = []
 for i in range(len(df)):
-    over = df.iloc[i].get('over', 0)
-    innings = df.iloc[i].get('innings', 1)
-    runs_req = df.iloc[i].get('runs_required', None)
+    row = df.iloc[i]
     
-    gp = apply_guardrail(model_probs[i], resource_probs[i], over, innings, runs_req)
+    # Infer state from features
+    overs_rem = row.get('overs_remaining', 0)
+    rrr = row.get('required_run_rate', 0)
+    
+    # Infer innings
+    innings = 2 if rrr > 0 else 1
+    
+    # Infer over/ball
+    balls_rem = round(overs_rem * 6)
+    balls_bowled = 120 - balls_rem
+    over = int(balls_bowled // 6)
+    ball = int(balls_bowled % 6)
+    
+    # Infer runs required
+    runs_req = rrr * overs_rem if innings == 2 else None
+    
+    wickets = row.get('wickets_lost', 0)
+    
+    gp = apply_guardrail(model_probs[i], resource_probs[i], over, ball, innings, runs_req, wickets)
     guardrail_probs.append(gp)
 guardrail_probs = np.array(guardrail_probs)
 
@@ -92,61 +122,41 @@ print("\n" + "="*80)
 print("BRIER SCORE COMPARISON")
 print("="*80)
 
+# Re-create masks based on inferred data
+inferred_innings = np.where(df['required_run_rate'] > 0, 2, 1)
+inferred_over = (120 - np.round(df['overs_remaining'] * 6)) // 6
+
 def calc_brier(mask, name):
     if mask.sum() == 0:
+        print(f"{name:<30} | No samples")
         return None
     y_sub = y[mask]
     model_brier = brier_score_loss(y_sub, model_probs[mask])
     resource_brier = brier_score_loss(y_sub, resource_probs[mask])
     guardrail_brier = brier_score_loss(y_sub, guardrail_probs[mask])
     
-    print(f"\n{name} (n={mask.sum()}):")
-    print(f"  Model only:     {model_brier:.4f}")
-    print(f"  Resource only:  {resource_brier:.4f}")
-    print(f"  Guardrail:      {guardrail_brier:.4f}")
-    
-    best = min(model_brier, resource_brier, guardrail_brier)
-    if guardrail_brier == best:
-        print(f"  → Best: Guardrail ✓")
-    elif model_brier == best:
-        print(f"  → Best: Model")
-    else:
-        print(f"  → Best: Resource")
-    
-    return model_brier, resource_brier, guardrail_brier
+    print(f"{name:<30} | Model: {model_brier:.4f} | Resource: {resource_brier:.4f} | Guardrail: {guardrail_brier:.4f}")
+    return guardrail_brier
 
-# Overall
-calc_brier(np.ones(len(df), dtype=bool), "ALL DATA")
+# 1. Overall
+calc_brier(np.ones(len(df), dtype=bool), "Overall")
 
-# 2nd innings only
-innings_2 = df['innings'] == 2
-calc_brier(innings_2, "2ND INNINGS ONLY")
+# 2. 2nd Innings
+mask_inn2 = inferred_innings == 2
+calc_brier(mask_inn2, "2nd Innings")
 
-# Death overs (over >= 16)
-death_overs = (df['over'] >= 16) & (df['innings'] == 2)
-calc_brier(death_overs, "DEATH OVERS (16-20, 2nd innings)")
+# 3. Death Overs (16-20)
+mask_death = inferred_over >= 16
+calc_brier(mask_death, "Death Overs (16-20)")
 
-# Over 18-19 (last 2 overs)
-last_2_overs = (df['over'] >= 18) & (df['innings'] == 2)
-calc_brier(last_2_overs, "LAST 2 OVERS (18-19, 2nd innings)")
+# 4. 2nd Innings Death Overs
+mask_inn2_death = (inferred_innings == 2) & (inferred_over >= 16)
+calc_brier(mask_inn2_death, "2nd Innings Death Overs")
 
-# Easy chases (resource > 90%)
-easy_chase = (resource_probs > 0.90) & (df['innings'] == 2)
-calc_brier(easy_chase, "EASY CHASES (resource > 90%)")
+# 5. Close Games (Resource Prob between 0.2 and 0.8)
+mask_close = (resource_probs > 0.2) & (resource_probs < 0.8)
+calc_brier(mask_close, "Close Games (20-80%)")
 
-# Hard chases (resource < 20%)
-hard_chase = (resource_probs < 0.20) & (df['innings'] == 2)
-calc_brier(hard_chase, "HARD CHASES (resource < 20%)")
-
-# Powerplay (over < 6)
-powerplay = (df['over'] < 6) & (df['innings'] == 2)
-calc_brier(powerplay, "POWERPLAY (2nd innings)")
-
-# Middle overs
-middle = (df['over'] >= 6) & (df['over'] < 16) & (df['innings'] == 2)
-calc_brier(middle, "MIDDLE OVERS (6-15, 2nd innings)")
-
-print("\n" + "="*80)
-print("CONCLUSION:")
-print("Lower Brier score = better calibration")
-print("="*80)
+# 6. Extreme Games (Resource Prob > 0.95 or < 0.05)
+mask_extreme = (resource_probs > 0.95) | (resource_probs < 0.05)
+calc_brier(mask_extreme, "Extreme Games (>95% or <5%)")
