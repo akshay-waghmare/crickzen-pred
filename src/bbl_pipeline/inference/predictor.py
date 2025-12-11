@@ -187,7 +187,7 @@ class Predictor:
         
         return pd.DataFrame([features])
 
-    def predict(self, state: MatchState, debug: bool = False) -> float:
+    def predict(self, state: MatchState, debug: bool = False, ball_history: list = None) -> float:
         """
         Returns the win probability for the batting team.
         Uses RealTimeFeatureMapper to generate all required features.
@@ -195,7 +195,12 @@ class Predictor:
         Args:
             state: Current match state
             debug: If True, print all features being fed to the model
+            ball_history: Optional list of ball data dicts for rolling stats
         """
+        # Feed ball history to mapper if provided
+        if ball_history:
+            self.feature_mapper.ball_history = ball_history
+        
         # Convert MatchState to scraped_data format for the mapper
         scraped_data = {
             'innings_num': state.innings,
@@ -218,14 +223,35 @@ class Predictor:
             # Use RealTimeFeatureMapper to generate all features
             X = self.feature_mapper.create_feature_dataframe(scraped_data)
             
-            # Filter features if model has selected_features_ attribute
-            if hasattr(self.model, 'selected_features_'):
-                # Ensure all required features exist (fill missing with 0)
-                for feat in self.model.selected_features_:
+            # Get expected features from model
+            expected_features = None
+            if hasattr(self.model, 'feature_names_in_'):
+                expected_features = list(self.model.feature_names_in_)
+            elif hasattr(self.model, 'selected_features_'):
+                expected_features = self.model.selected_features_
+            elif hasattr(self.model, 'get_booster'):
+                # XGBoost: get feature names from booster
+                try:
+                    expected_features = self.model.get_booster().feature_names
+                except:
+                    pass
+            
+            # Filter to expected features if we know them
+            if expected_features:
+                # Ensure all required features exist (fill missing with appropriate defaults)
+                for feat in expected_features:
                     if feat not in X.columns:
-                        X[feat] = 0.0
+                        # Use appropriate default based on feature name
+                        if 'rate' in feat.lower() or 'avg' in feat.lower():
+                            X[feat] = 0.0
+                        elif 'is_' in feat:
+                            X[feat] = 0
+                        elif 'pct' in feat or 'prob' in feat:
+                            X[feat] = 0.5
+                        else:
+                            X[feat] = 0.0
                 # Select only the required features in the correct order
-                X = X[self.model.selected_features_]
+                X = X[expected_features]
             
             if debug:
                 print("\n" + "="*70)
@@ -265,6 +291,25 @@ class Predictor:
                 if runs_needed <= 0:
                     prob = 1.0
                 
+                # Match already lost (no balls remaining)
+                elif balls_remaining <= 0:
+                    prob = 0.0
+                
+                # Mathematically impossible: Need more runs than max possible
+                # Max possible = 6 runs per ball (all sixes, no wides/noballs considered)
+                elif runs_needed > balls_remaining * 6:
+                    prob = 0.0
+                
+                # Near-impossible: Need >5 runs per ball on average
+                elif runs_needed > balls_remaining * 5:
+                    # e.g. 22 off 4 balls = 5.5 per ball, very unlikely
+                    prob = min(model_prob, 0.02)
+                
+                # Very difficult: Need >4 runs per ball on average  
+                elif runs_needed > balls_remaining * 4:
+                    # e.g. 20 off 4 balls = 5 per ball
+                    prob = min(model_prob, 0.05)
+                
                 # --- ENDGAME GUARDRAILS ---
                 # 1. "Victory Lap" Scenarios: Explicitly handle obvious wins
                 # The model can be conservative (e.g. 92%) due to calibration bins, but
@@ -279,27 +324,31 @@ class Predictor:
 
                 # 2. Resource-based Guardrails (for other high-prob situations)
                 elif resource_prob > 0.97:
+                    # Game Won: resource_prob = 1.0 means target already achieved
+                    if resource_prob == 1.0:
+                        prob = 1.0
                     # If resource says we are winning (>97%), ensure we are at least 95% confident
                     # If resource is extremely high (>99%), go higher
-                    floor = 0.95
-                    if resource_prob > 0.99: floor = 0.98
-                    
-                    prob = max(model_prob, floor)
-
-                # 3. Loss Guardrails
-                elif resource_prob < 0.03:
-                    # Tier 1: Virtually Impossible to Win (<0.5% resource prob)
-                    # e.g. Need 30 runs off 2 balls
-                    if resource_prob < 0.005:
-                        prob = min(model_prob, 0.01)
-                        
-                    # Tier 2: Extremely Difficult (<1% resource prob)
-                    elif resource_prob < 0.01:
-                        prob = min(model_prob, 0.02)
-                        
-                    # Tier 3: Very Difficult (<3% resource prob)
                     else:
-                        prob = min(model_prob, 0.05)
+                        floor = 0.95
+                        if resource_prob > 0.99: floor = 0.98
+                        
+                        prob = max(model_prob, floor)
+
+                # 3. Loss Guardrails - Smooth continuous capping
+                # If resource_prob is low, the model shouldn't be too optimistic
+                elif resource_prob < 0.20:
+                    # Game Over: No resources left = 0% win probability
+                    if resource_prob == 0.0:
+                        prob = 0.0
+                    else:
+                        # Smooth cap: Allow model to be slightly higher than resource_prob, but not much
+                        # e.g. res=0.01 -> cap=0.025
+                        #      res=0.05 -> cap=0.085
+                        #      res=0.10 -> cap=0.16
+                        #      res=0.15 -> cap=0.235
+                        max_allowed = (resource_prob * 1.5) + 0.01
+                        prob = min(model_prob, max_allowed)
                 else:
                     prob = model_prob
             else:

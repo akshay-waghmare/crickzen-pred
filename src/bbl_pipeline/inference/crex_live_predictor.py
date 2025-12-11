@@ -2,14 +2,16 @@
 Crex Live Match Predictor
 
 Uses the existing Crex scraper to get live match data and runs predictions.
+Optionally outputs state to a JSON file for Streamlit integration.
 """
 
 import asyncio
 import sys
 import os
 import re
+import json
 from pathlib import Path
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
@@ -70,19 +72,23 @@ class MatchState:
 class CrexLivePredictor:
     """
     Live match predictor using Crex scraper data.
+    Optionally writes state to JSON for Streamlit integration.
     """
     
-    def __init__(self, match_url: str, model_dir: str, headless: bool = True, feature_store_dir: str = None):
+    def __init__(self, match_url: str, model_dir: str, headless: bool = True, 
+                 feature_store_dir: str = None, output_json: str = None):
         self.match_url = match_url
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
+        self.output_json = output_json  # Path for JSON output (for Streamlit)
         self.browser = None
         self.page = None
         self.match_state = MatchState()
         self.last_ball_number = ""
         self._running = False
         self._first_prediction = True  # Debug flag for first prediction
+        self._prediction_history = []  # Track predictions over time
         
         # Try to load the prediction model
         self.model = None
@@ -119,38 +125,52 @@ class CrexLivePredictor:
             # Extract toss info - look for "opt to Bat" or "opt to Bowl"
             page_text = await self.page.inner_text("body")
             
-            # Parse toss decision
+            # Parse toss decision - match team abbreviations like PRS-W, SYS-W
             import re
-            toss_match = re.search(r'(\w+)\s+opt\s+to\s+(Bat|Bowl)', page_text, re.IGNORECASE)
+            toss_match = re.search(r'([A-Z0-9\-]+)\s+opt\s+to\s+(Bat|Bowl)', page_text, re.IGNORECASE)
             if toss_match:
                 self.match_state.toss_winner = toss_match.group(1)
                 self.match_state.toss_decision = toss_match.group(2).lower()
                 print(f"🪙 Toss: {self.match_state.toss_winner} won, elected to {self.match_state.toss_decision}")
             
-            # Extract venue - look for specific cricket ground names
+            # Extract venue - look for known cricket venue patterns
+            # Be specific to avoid capturing random text
             venue_patterns = [
-                r'(Tribhuvan University International Cricket Ground[,\s]*\w*)',
-                r'([\w\s]+ Cricket Ground[,\s]*[\w]*)',
-                r'([\w\s]+ Stadium[,\s]*[\w]*)',
-                r'([\w\s]+ Oval[,\s]*[\w]*)',
+                r'Venue\s*[:\-]?\s*([\w\s]+(?:Stadium|Oval|Ground|Arena))',  # "Venue: North Sydney Oval"
+                r'(North Sydney Oval)',
+                r'(Sydney Showground Stadium)',
+                r'(Adelaide Oval)',
+                r'(The Gabba|Brisbane Cricket Ground)',
+                r'(MCG|Melbourne Cricket Ground)',
+                r'(SCG|Sydney Cricket Ground)',
+                r'(WACA|Perth Stadium|Optus Stadium)',
+                r'(Bellerive Oval|Blundstone Arena)',
+                r'(Manuka Oval)',
+                r'(Junction Oval)',
+                r'(Kardinia Park)',
+                r'([\w\s]+Cricket Ground)',
+                r'([\w\s]+Stadium)',
+                r'([\w\s]+Oval)',
             ]
             for pattern in venue_patterns:
-                venue_match = re.search(pattern, page_text)
+                venue_match = re.search(pattern, page_text, re.IGNORECASE)
                 if venue_match:
-                    self.match_state.venue = venue_match.group(1).strip()
-                    print(f"🏟️ Venue: {self.match_state.venue}")
-                    break
+                    venue = venue_match.group(1).strip()
+                    # Clean up venue - remove any newlines or extra whitespace
+                    venue = ' '.join(venue.split())
+                    if len(venue) > 5 and len(venue) < 60:  # Reasonable venue name length
+                        self.match_state.venue = venue
+                        print(f"🏟️ Venue: {self.match_state.venue}")
+                        break
             
-            # Extract team form (last 5 matches)
-            # Look for patterns like "WWWWL" after team names
-            form_matches = re.findall(r'([WL]{5})', page_text)
-            if len(form_matches) >= 2:
-                print(f"📊 Team Form - Team1: {form_matches[0]}, Team2: {form_matches[1]}")
-            
-            # Extract head to head (format: "KMG 2 - 2 LBL")
-            h2h_match = re.search(r'(\w+)\s+(\d+)\s*-\s*(\d+)\s+(\w+)', page_text)
-            if h2h_match and int(h2h_match.group(2)) <= 10 and int(h2h_match.group(3)) <= 10:
-                print(f"📊 Head to Head: {h2h_match.group(1)} {h2h_match.group(2)} - {h2h_match.group(3)} {h2h_match.group(4)}")
+            # Extract teams from info page - store both teams, we'll figure out batting/bowling from title
+            vs_match = re.search(r'([A-Z0-9\-]+)\s+vs\s+([A-Z0-9\-]+)', page_text)
+            if vs_match:
+                team1, team2 = vs_match.group(1), vs_match.group(2)
+                # Store as team1 and team2 initially - batting will be set from title later
+                self._team1 = team1
+                self._team2 = team2
+                print(f"📍 Teams: {team1} vs {team2}")
             
             # Navigate back to live page
             await self.page.goto(self.match_url, timeout=30000)
@@ -274,69 +294,77 @@ class CrexLivePredictor:
     async def _extract_match_info(self):
         """Extract match information from DOM using Crex selectors."""
         try:
-            # Extract from page title as fallback (most reliable)
+            # PRIMARY: Extract from page title (most reliable - Crex always updates title)
             title = await self.page.title()
-            # Title format: "LBL 16-0 (1.4)" or "LBL 16/0 (1.4)" - handle both hyphen and slash
-            title_match = re.match(r'^(\w+)\s+(\d+)[-/](\d+)\s+\((\d+\.?\d*)\)', title)
+            # Title format: "PRS-W 66-1 (7.2) (Sophie Devine 0(0), Beth Mooney 22(14)) vs Sydney..."
+            # Extract score first
+            title_match = re.match(r'^([A-Z0-9\-]+)\s+(\d+)[-/](\d+)\s+\((\d+\.?\d*)\)', title)
             if title_match:
-                self.match_state.batting_team = title_match.group(1)
+                current_batting_team = title_match.group(1)
                 self.match_state.total_runs = int(title_match.group(2))
                 self.match_state.wickets = int(title_match.group(3))
                 self.match_state.overs = float(title_match.group(4))
-                print(f"📊 From title: {self.match_state.batting_team} {self.match_state.total_runs}/{self.match_state.wickets} ({self.match_state.overs} ov)")
+                
+                # If batting team changed, update bowling team accordingly
+                if self.match_state.batting_team and self.match_state.batting_team != current_batting_team:
+                    # The current batting was the previous bowling
+                    self.match_state.bowling_team = self.match_state.batting_team
+                
+                self.match_state.batting_team = current_batting_team
             
-            # Get page text to detect second innings
+            # Extract batsmen names from title: "(Sophie Devine 0(0), Beth Mooney 22(14))"
+            # Pattern: Name Runs(Balls), Name Runs(Balls)
+            batsmen_match = re.search(r'\)\s*\(([A-Za-z\s]+)\s+(\d+)\((\d+)\),\s*([A-Za-z\s]+)\s+(\d+)\((\d+)\)\)', title)
+            if batsmen_match:
+                self.match_state.batsman1_name = batsmen_match.group(1).strip()
+                self.match_state.batsman1_runs = int(batsmen_match.group(2))
+                self.match_state.batsman1_balls = int(batsmen_match.group(3))
+                self.match_state.batsman2_name = batsmen_match.group(4).strip()
+                self.match_state.batsman2_runs = int(batsmen_match.group(5))
+                self.match_state.batsman2_balls = int(batsmen_match.group(6))
+            
+            # Get page text to detect second innings and extract data
             page_text = await self.page.inner_text("body")
             
             # Detect second innings by looking for "need X runs" or "RRR"
-            needs_runs_match = re.search(r'need\s+(\d+)\s+runs\s+in\s+(\d+)\s+balls', page_text, re.IGNORECASE)
+            needs_runs_match = re.search(r'need\s+(\d+)\s+runs?\s+(?:in|from)\s+(\d+)\s+balls?', page_text, re.IGNORECASE)
             rrr_match = re.search(r'RRR\s*:\s*([\d.]+)', page_text)
             
             if needs_runs_match or rrr_match:
                 self.match_state.is_second_innings = True
                 if needs_runs_match:
                     runs_needed = int(needs_runs_match.group(1))
-                    # Target = current_score + runs_needed (need to win, so +1 implicitly)
+                    # Target = current_score + runs_needed
                     self.match_state.target = self.match_state.total_runs + runs_needed
-                    print(f"🎯 2nd Innings: Target = {self.match_state.target}, Need {runs_needed} more runs")
                 if rrr_match:
                     self.match_state.required_run_rate = float(rrr_match.group(1))
-                    print(f"📈 RRR: {self.match_state.required_run_rate}")
             
-            # Extract team names from DOM
-            team_els = await self.page.query_selector_all(".team-content .team-name")
-            teams = []
-            for el in team_els[:2]:
-                name = await el.inner_text()
-                teams.append(name.strip())
-            
-            if len(teams) >= 2:
-                if not self.match_state.batting_team:
-                    self.match_state.batting_team = teams[0]
-                self.match_state.bowling_team = teams[1] if teams[0] == self.match_state.batting_team else teams[0]
-                print(f"📍 Teams: {self.match_state.batting_team} vs {self.match_state.bowling_team}")
-            
-            # Extract score from .team-content .runs
-            team_content = await self.page.query_selector(".team-content")
-            if team_content:
-                runs_span = await team_content.query_selector(".runs span:first-child")
-                if runs_span:
-                    runs_text = await runs_span.inner_text()
-                    # Parse "63/7" format
-                    match = re.match(r'(\d+)/(\d+)', runs_text)
-                    if match:
-                        self.match_state.total_runs = int(match.group(1))
-                        self.match_state.wickets = int(match.group(2))
-                        print(f"📊 Score: {self.match_state.total_runs}/{self.match_state.wickets}")
+            # Extract bowling team from page text if not already set
+            if not self.match_state.bowling_team or self.match_state.bowling_team == self.match_state.batting_team:
+                # First try using stored teams from info page
+                if hasattr(self, '_team1') and hasattr(self, '_team2'):
+                    if self.match_state.batting_team == self._team1:
+                        self.match_state.bowling_team = self._team2
+                    elif self.match_state.batting_team == self._team2:
+                        self.match_state.bowling_team = self._team1
                 
-                overs_span = await team_content.query_selector(".runs span:nth-child(2)")
-                if overs_span:
-                    overs_text = await overs_span.inner_text()
-                    # Parse "(12.3)" format
-                    match = re.search(r'(\d+\.?\d*)', overs_text)
-                    if match:
-                        self.match_state.overs = float(match.group(1))
-                        print(f"⏱️ Overs: {self.match_state.overs}")
+                # If still not set, look for "vs TEAM" pattern - "PRS-W vs SYS-W"
+                if not self.match_state.bowling_team or self.match_state.bowling_team == self.match_state.batting_team:
+                    vs_match = re.search(r'([A-Z0-9\-]+)\s+vs\s+([A-Z0-9\-]+)', page_text)
+                    if vs_match:
+                        team1 = vs_match.group(1)
+                        team2 = vs_match.group(2)
+                        # The batting team is from title, bowling is the other
+                        if self.match_state.batting_team == team1:
+                            self.match_state.bowling_team = team2
+                        elif self.match_state.batting_team == team2:
+                            self.match_state.bowling_team = team1
+                        else:
+                            # Fuzzy match - batting team might be abbreviated differently
+                            if team1.startswith(self.match_state.batting_team[:3]):
+                                self.match_state.bowling_team = team2
+                            else:
+                                self.match_state.bowling_team = team1
             
             # Calculate run rate
             if self.match_state.overs > 0:
@@ -344,28 +372,29 @@ class CrexLivePredictor:
                     self.match_state.total_runs / self.match_state.overs, 2
                 )
             
-            # Extract batsman data
-            batsman_rows = await self.page.query_selector_all(".batsman-row, .bat-bowl-row")
-            for i, row in enumerate(batsman_rows[:2]):
-                name_el = await row.query_selector(".player-name, .name")
-                runs_el = await row.query_selector(".runs, .score")
-                balls_el = await row.query_selector(".balls, .ball")
-                
-                if name_el and runs_el:
-                    name = await name_el.inner_text()
-                    runs = await runs_el.inner_text()
-                    balls = await balls_el.inner_text() if balls_el else "0"
+            # Extract batsman data from DOM (fallback if title parsing didn't work)
+            if not self.match_state.batsman1_name or self.match_state.batsman1_name == "Unknown":
+                batsman_rows = await self.page.query_selector_all(".batsman-row, .bat-bowl-row")
+                for i, row in enumerate(batsman_rows[:2]):
+                    name_el = await row.query_selector(".player-name, .name")
+                    runs_el = await row.query_selector(".runs, .score")
+                    balls_el = await row.query_selector(".balls, .ball")
                     
-                    if i == 0:
-                        self.match_state.batsman1_name = name.strip()
-                        self.match_state.batsman1_runs = int(runs) if runs.isdigit() else 0
-                        self.match_state.batsman1_balls = int(balls) if balls.isdigit() else 0
-                    else:
-                        self.match_state.batsman2_name = name.strip()
-                        self.match_state.batsman2_runs = int(runs) if runs.isdigit() else 0
-                        self.match_state.batsman2_balls = int(balls) if balls.isdigit() else 0
+                    if name_el and runs_el:
+                        name = await name_el.inner_text()
+                        runs = await runs_el.inner_text()
+                        balls = await balls_el.inner_text() if balls_el else "0"
+                        
+                        if i == 0:
+                            self.match_state.batsman1_name = name.strip()
+                            self.match_state.batsman1_runs = int(runs) if runs.isdigit() else 0
+                            self.match_state.batsman1_balls = int(balls) if balls.isdigit() else 0
+                        else:
+                            self.match_state.batsman2_name = name.strip()
+                            self.match_state.batsman2_runs = int(runs) if runs.isdigit() else 0
+                            self.match_state.batsman2_balls = int(balls) if balls.isdigit() else 0
             
-            # Extract bowler data
+            # Extract bowler data from DOM
             bowler_row = await self.page.query_selector(".bowler-row, .bowl-row")
             if bowler_row:
                 name_el = await bowler_row.query_selector(".player-name, .name")
@@ -393,6 +422,13 @@ class CrexLivePredictor:
                         self.match_state.bowler1_wickets = int(wickets_text)
                     except:
                         pass
+            
+            # Fallback: Try to extract bowler from page text patterns
+            if not self.match_state.bowler1_name or self.match_state.bowler1_name == "Unknown":
+                # Look for bowling figure pattern: "Player Name 1-0-8-0" (overs-maidens-runs-wickets)
+                bowler_match = re.search(r'([A-Za-z\s]+)\s+(\d+)-(\d+)-(\d+)-(\d+)', page_text)
+                if bowler_match:
+                    self.match_state.bowler1_name = bowler_match.group(1).strip()
                         
         except Exception as e:
             print(f"⚠️ Error extracting match info: {e}")
@@ -417,9 +453,45 @@ class CrexLivePredictor:
             print(f"⚠️ Error in poll_and_predict: {e}")
             return None
     
+    def _check_match_result(self) -> Optional[float]:
+        """
+        Check if match is definitively over and return final probability.
+        Returns:
+            1.0 if batting team won
+            0.0 if bowling team won
+            None if match still in progress
+        """
+        state = self.match_state
+        
+        # Second innings scenarios
+        if state.is_second_innings and state.target:
+            # Batting team won - scored enough runs
+            if state.total_runs >= state.target:
+                return 1.0
+            
+            # Bowling team won - innings complete and target not reached
+            # All out (10 wickets) or all overs bowled (20 overs)
+            if state.wickets >= 10:
+                return 0.0
+            if state.overs >= 20.0:
+                return 0.0
+            
+            # Match tied - score equals target-1 at end of innings
+            # (This is rare but handle it)
+            
+        # First innings - can't determine winner yet
+        # (unless all out or 20 overs, but that just ends the innings)
+        
+        return None  # Match still in progress
+    
     def _run_prediction(self) -> Optional[float]:
         """Run the prediction model on current match state."""
         try:
+            # First check if match has a definitive result
+            final_result = self._check_match_result()
+            if final_result is not None:
+                return final_result
+            
             from bbl_pipeline.inference.schema import MatchState as PredictorMatchState
             
             # Parse overs into over and ball
@@ -446,8 +518,15 @@ class CrexLivePredictor:
                 target_runs=self.match_state.target,
             )
             
+            # Convert ball history to mapper format for rolling stats
+            ball_history = self._build_ball_history_for_mapper()
+            
             # Get prediction using predictor (debug=True to see features)
-            win_prob = self.predictor.predict(pred_state, debug=self._first_prediction)
+            win_prob = self.predictor.predict(
+                pred_state, 
+                debug=self._first_prediction,
+                ball_history=ball_history
+            )
             self._first_prediction = False
             
             return float(win_prob)
@@ -457,6 +536,39 @@ class CrexLivePredictor:
             import traceback
             traceback.print_exc()
             return None
+    
+    def _build_ball_history_for_mapper(self) -> list:
+        """
+        Convert scraped ball data to the format expected by RealTimeFeatureMapper.
+        The mapper expects dicts with: runs_scored, is_wicket, is_boundary, total_score, total_wickets
+        """
+        history = []
+        running_score = 0
+        running_wickets = 0
+        
+        # Sort balls by over and ball number
+        sorted_balls = sorted(
+            self.match_state.balls_data,
+            key=lambda b: (b.over_number, b.ball_in_over)
+        )
+        
+        for ball in sorted_balls:
+            running_score += ball.runs
+            if ball.is_wicket:
+                running_wickets += 1
+            
+            history.append({
+                'innings_num': 2 if self.match_state.is_second_innings else 1,
+                'over_number': ball.over_number,
+                'ball_number': ball.ball_in_over,
+                'runs_scored': ball.runs,
+                'is_wicket': 1 if ball.is_wicket else 0,
+                'is_boundary': 1 if ball.is_boundary or ball.is_six else 0,
+                'total_score': running_score,
+                'total_wickets': running_wickets,
+            })
+        
+        return history
     
     def _build_features(self) -> Optional[Dict[str, Any]]:
         """Build feature dictionary from match state for model input."""
@@ -519,6 +631,8 @@ class CrexLivePredictor:
         print("🏏 LIVE MATCH PREDICTION")
         print("="*60)
         print(f"   {self.match_state.batting_team} vs {self.match_state.bowling_team}")
+        if self.match_state.venue:
+            print(f"   📍 {self.match_state.venue}")
         print("="*60)
         print("\n⏳ Monitoring match... Press Ctrl+C to stop\n")
         
@@ -543,16 +657,124 @@ class CrexLivePredictor:
         """Display current match state and prediction."""
         state = self.match_state
         
-        # Clear line and print update
-        print(f"\r📊 {state.batting_team}: {state.total_runs}/{state.wickets} ({state.overs} ov) | CRR: {state.current_run_rate}", end="")
+        # Build display line
+        display = f"\r📊 {state.batting_team}: {state.total_runs}/{state.wickets} ({state.overs} ov)"
+        
+        if state.is_second_innings and state.target:
+            runs_needed = state.target - state.total_runs
+            display += f" | Need: {runs_needed}"
+        else:
+            display += f" | CRR: {state.current_run_rate}"
         
         if win_prob is not None:
             bar_len = 20
             filled = int(win_prob * bar_len)
             bar = "█" * filled + "░" * (bar_len - filled)
-            print(f" | Win Prob: [{bar}] {win_prob*100:.1f}%", end="")
+            # Show both teams' probabilities
+            bowling_prob = 1 - win_prob
+            display += f" | {state.batting_team}: {win_prob*100:.1f}% [{bar}] {state.bowling_team}: {bowling_prob*100:.1f}%"
+            
+            # Track prediction history
+            self._prediction_history.append({
+                "overs": state.overs,
+                "bat_prob": win_prob,
+                "bowl_prob": bowling_prob,
+                "score": state.total_runs,
+                "wickets": state.wickets,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+            # Write to JSON if output file specified
+            if self.output_json:
+                self._write_json_state(win_prob)
         
-        print("   ", end="", flush=True)
+        # Pad and print
+        print(display.ljust(120), end="", flush=True)
+    
+    def _write_json_state(self, win_prob: float):
+        """Write current state to JSON file for Streamlit."""
+        try:
+            state = self.match_state
+            
+            # Get features if predictor is available
+            features = {}
+            if self.predictor:
+                try:
+                    from bbl_pipeline.inference.schema import MatchState as PredictorMatchState
+                    over = int(state.overs)
+                    ball = int(round((state.overs - over) * 10))
+                    if ball >= 6:
+                        ball = 0
+                    
+                    pred_state = PredictorMatchState(
+                        match_id="live_match",
+                        venue=state.venue or "Unknown",
+                        batting_team=state.batting_team,
+                        bowling_team=state.bowling_team,
+                        innings=2 if state.is_second_innings else 1,
+                        over=over,
+                        ball=ball,
+                        current_score=state.total_runs,
+                        wickets_lost=state.wickets,
+                        batsman_1=state.batsman1_name or "Unknown",
+                        batsman_2=state.batsman2_name or "Unknown",
+                        bowler=state.bowler1_name or "Unknown",
+                        target_runs=state.target,
+                    )
+                    
+                    scraped_data = {
+                        'innings_num': pred_state.innings,
+                        'over_number': over,
+                        'ball_number': ball,
+                        'total_score': state.total_runs,
+                        'total_wickets': state.wickets,
+                        'current_batsman': state.batsman1_name,
+                        'non_striker': state.batsman2_name,
+                        'batting_team': state.batting_team,
+                        'bowling_team': state.bowling_team,
+                        'venue': state.venue,
+                        'target_score': state.target,
+                        'runs_needed': (state.target - state.total_runs) if state.target else 0
+                    }
+                    feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
+                    features = {k: (float(v) if isinstance(v, (int, float)) else str(v)) 
+                               for k, v in feat_df.iloc[0].to_dict().items()}
+                except Exception as e:
+                    pass
+            
+            output = {
+                "timestamp": datetime.now().isoformat(),
+                "batting_team": state.batting_team,
+                "bowling_team": state.bowling_team,
+                "score": state.total_runs,
+                "wickets": state.wickets,
+                "overs": state.overs,
+                "target": state.target,
+                "is_second_innings": state.is_second_innings,
+                "venue": state.venue,
+                "batsman1_name": state.batsman1_name,
+                "batsman1_runs": state.batsman1_runs,
+                "batsman1_balls": state.batsman1_balls,
+                "batsman2_name": state.batsman2_name,
+                "batsman2_runs": state.batsman2_runs,
+                "batsman2_balls": state.batsman2_balls,
+                "current_run_rate": state.current_run_rate,
+                "required_run_rate": state.required_run_rate,
+                "bat_win_prob": win_prob,
+                "bowl_win_prob": 1 - win_prob,
+                "features": features,
+                "history": self._prediction_history[-50:]  # Last 50 data points
+            }
+            
+            # Write atomically
+            json_path = Path(self.output_json)
+            tmp_path = json_path.with_suffix('.tmp')
+            with open(tmp_path, 'w') as f:
+                json.dump(output, f, indent=2)
+            tmp_path.replace(json_path)
+            
+        except Exception as e:
+            pass  # Don't interrupt the main flow
     
     async def stop(self):
         """Stop the predictor."""
@@ -572,6 +794,7 @@ async def main():
     parser.add_argument("--feature-store-dir", default=None, help="Feature store directory (for league-specific models)")
     parser.add_argument("--headless", action="store_true", default=True, help="Run headless")
     parser.add_argument("--poll-interval", type=float, default=2.0, help="Poll interval in seconds")
+    parser.add_argument("--output-json", default=None, help="Output JSON file for Streamlit integration")
     
     args = parser.parse_args()
     
@@ -579,7 +802,8 @@ async def main():
         match_url=args.match_url,
         model_dir=args.model_dir,
         headless=args.headless,
-        feature_store_dir=args.feature_store_dir
+        feature_store_dir=args.feature_store_dir,
+        output_json=args.output_json
     )
     
     await predictor.run(poll_interval=args.poll_interval)

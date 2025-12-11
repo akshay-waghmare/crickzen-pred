@@ -25,6 +25,18 @@ class InMemoryFeatureStore:
         self._player_names_lower: Dict[str, str] = {}
         self._venue_names_lower: Dict[str, str] = {}
         self._team_names_lower: Dict[str, str] = {}
+        
+        # Player-venue and player-vs-team lookup tables
+        self._player_venue_batting: Dict[tuple, Dict[str, Any]] = {}
+        self._player_vs_team_batting: Dict[tuple, Dict[str, Any]] = {}
+        self._player_venue_bowling: Dict[tuple, Dict[str, Any]] = {}
+        self._player_vs_team_bowling: Dict[tuple, Dict[str, Any]] = {}
+        
+        # Cache for fuzzy-matched names
+        self._player_name_cache: Dict[str, str] = {}
+        self._venue_name_cache: Dict[str, str] = {}
+        self._team_name_cache: Dict[str, str] = {}
+        
         self._loaded = False
 
     def load(self):
@@ -67,7 +79,60 @@ class InMemoryFeatureStore:
             except Exception as e:
                 logger.error(f"Error loading team stats: {e}")
         
+        # Load player-venue and player-vs-team lookup tables
+        self._load_player_venue_tables()
+        
         self._loaded = True
+    
+    def _load_player_venue_tables(self):
+        """Load player-venue and player-vs-team lookup tables."""
+        store_dir = self.player_stats_path.parent
+        
+        # Player-venue batting stats
+        pv_batting_path = store_dir / "player_venue_batting.parquet"
+        if pv_batting_path.exists():
+            df = pd.read_parquet(pv_batting_path)
+            for _, row in df.iterrows():
+                key = (row['player'], row['venue'])
+                self._player_venue_batting[key] = {
+                    'batsman_venue_avg': row['batsman_venue_avg'],
+                    'batsman_venue_sr': row['batsman_venue_sr']
+                }
+            logger.info(f"Loaded {len(self._player_venue_batting)} player-venue batting entries")
+        
+        # Player-vs-team batting stats
+        pvt_batting_path = store_dir / "player_vs_team_batting.parquet"
+        if pvt_batting_path.exists():
+            df = pd.read_parquet(pvt_batting_path)
+            for _, row in df.iterrows():
+                key = (row['player'], row['opponent'])
+                self._player_vs_team_batting[key] = {
+                    'batsman_vs_team_avg': row['batsman_vs_team_avg']
+                }
+            logger.info(f"Loaded {len(self._player_vs_team_batting)} player-vs-team batting entries")
+        
+        # Player-venue bowling stats
+        pv_bowling_path = store_dir / "player_venue_bowling.parquet"
+        if pv_bowling_path.exists():
+            df = pd.read_parquet(pv_bowling_path)
+            for _, row in df.iterrows():
+                key = (row['player'], row['venue'])
+                self._player_venue_bowling[key] = {
+                    'bowler_venue_econ': row['bowler_venue_econ'],
+                    'bowler_venue_sr': row['bowler_venue_sr']
+                }
+            logger.info(f"Loaded {len(self._player_venue_bowling)} player-venue bowling entries")
+        
+        # Player-vs-team bowling stats
+        pvt_bowling_path = store_dir / "player_vs_team_bowling.parquet"
+        if pvt_bowling_path.exists():
+            df = pd.read_parquet(pvt_bowling_path)
+            for _, row in df.iterrows():
+                key = (row['player'], row['opponent'])
+                self._player_vs_team_bowling[key] = {
+                    'bowler_vs_team_econ': row['bowler_vs_team_econ']
+                }
+            logger.info(f"Loaded {len(self._player_vs_team_bowling)} player-vs-team bowling entries")
 
     def get_team_stats(self, team_name: str) -> Optional[Dict[str, Any]]:
         if not self._loaded:
@@ -142,4 +207,212 @@ class InMemoryFeatureStore:
             logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
             return self._venue_stats[match]
             
+        return None
+
+    def _fuzzy_match_player(self, player_name: str) -> Optional[str]:
+        """Fuzzy match a player name to a known player in the store."""
+        if not player_name:
+            return None
+            
+        # Check cache first
+        if player_name in self._player_name_cache:
+            return self._player_name_cache[player_name]
+        
+        # Get all known player names from the lookup tables
+        all_players = set(k[0] for k in self._player_venue_batting.keys())
+        all_players.update(k[0] for k in self._player_vs_team_batting.keys())
+        all_players.update(k[0] for k in self._player_venue_bowling.keys())
+        all_players.update(k[0] for k in self._player_vs_team_bowling.keys())
+        all_players.update(self._player_stats.keys())
+        
+        # 1. Exact match
+        if player_name in all_players:
+            self._player_name_cache[player_name] = player_name
+            return player_name
+        
+        # 2. Case-insensitive match
+        lower_map = {p.lower(): p for p in all_players}
+        if player_name.lower() in lower_map:
+            match = lower_map[player_name.lower()]
+            self._player_name_cache[player_name] = match
+            return match
+        
+        # 3. Fuzzy match
+        matches = difflib.get_close_matches(player_name, list(all_players), n=1, cutoff=0.6)
+        if matches:
+            match = matches[0]
+            logger.info(f"Fuzzy matched player '{player_name}' to '{match}'")
+            self._player_name_cache[player_name] = match
+            return match
+        
+        return None
+
+    def _fuzzy_match_venue(self, venue_name: str) -> Optional[str]:
+        """Fuzzy match a venue name to a known venue in the store."""
+        if not venue_name:
+            return None
+            
+        # Check cache first
+        if venue_name in self._venue_name_cache:
+            return self._venue_name_cache[venue_name]
+        
+        # Get all known venue names
+        all_venues = set(k[1] for k in self._player_venue_batting.keys())
+        all_venues.update(k[1] for k in self._player_venue_bowling.keys())
+        all_venues.update(self._venue_stats.keys())
+        
+        # 1. Exact match
+        if venue_name in all_venues:
+            self._venue_name_cache[venue_name] = venue_name
+            return venue_name
+        
+        # 2. Case-insensitive match
+        lower_map = {v.lower(): v for v in all_venues}
+        if venue_name.lower() in lower_map:
+            match = lower_map[venue_name.lower()]
+            self._venue_name_cache[venue_name] = match
+            return match
+        
+        # 3. Fuzzy match
+        matches = difflib.get_close_matches(venue_name, list(all_venues), n=1, cutoff=0.6)
+        if matches:
+            match = matches[0]
+            logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
+            self._venue_name_cache[venue_name] = match
+            return match
+        
+        return None
+
+    def _fuzzy_match_team(self, team_name: str) -> Optional[str]:
+        """Fuzzy match a team name to a known team in the store."""
+        if not team_name:
+            return None
+        
+        # Team abbreviation mapping for WBBL/BBL
+        TEAM_ABBREV_MAP = {
+            # WBBL abbreviations
+            'SYS-W': 'Sydney Sixers',
+            'STW': 'Sydney Thunder',
+            'STH-W': 'Sydney Thunder',
+            'PRS-W': 'Perth Scorchers',
+            'HBH-W': 'Hobart Hurricanes',
+            'BRH-W': 'Brisbane Heat',
+            'MLR-W': 'Melbourne Renegades',
+            'MLS-W': 'Melbourne Stars',
+            'ADS-W': 'Adelaide Strikers',
+            # BBL abbreviations
+            'SYS': 'Sydney Sixers',
+            'STH': 'Sydney Thunder',
+            'PRS': 'Perth Scorchers',
+            'HBH': 'Hobart Hurricanes',
+            'BRH': 'Brisbane Heat',
+            'MLR': 'Melbourne Renegades',
+            'MLS': 'Melbourne Stars',
+            'ADS': 'Adelaide Strikers',
+            # Full names with Women suffix
+            'Sydney Sixers Women': 'Sydney Sixers',
+            'Sydney Thunder Women': 'Sydney Thunder',
+            'Perth Scorchers Women': 'Perth Scorchers',
+            'Hobart Hurricanes Women': 'Hobart Hurricanes',
+            'Brisbane Heat Women': 'Brisbane Heat',
+            'Melbourne Renegades Women': 'Melbourne Renegades',
+            'Melbourne Stars Women': 'Melbourne Stars',
+            'Adelaide Strikers Women': 'Adelaide Strikers',
+        }
+        
+        # Check abbreviation map first
+        if team_name in TEAM_ABBREV_MAP:
+            full_name = TEAM_ABBREV_MAP[team_name]
+            self._team_name_cache[team_name] = full_name
+            return full_name
+            
+        # Check cache
+        if team_name in self._team_name_cache:
+            return self._team_name_cache[team_name]
+        
+        # Get all known team names
+        all_teams = set(k[1] for k in self._player_vs_team_batting.keys())
+        all_teams.update(k[1] for k in self._player_vs_team_bowling.keys())
+        all_teams.update(self._team_stats.keys())
+        
+        # 1. Exact match
+        if team_name in all_teams:
+            self._team_name_cache[team_name] = team_name
+            return team_name
+        
+        # 2. Case-insensitive match
+        lower_map = {t.lower(): t for t in all_teams}
+        if team_name.lower() in lower_map:
+            match = lower_map[team_name.lower()]
+            self._team_name_cache[team_name] = match
+            return match
+        
+        # 3. Fuzzy match
+        matches = difflib.get_close_matches(team_name, list(all_teams), n=1, cutoff=0.6)
+        if matches:
+            match = matches[0]
+            logger.info(f"Fuzzy matched team '{team_name}' to '{match}'")
+            self._team_name_cache[team_name] = match
+            return match
+        
+        return None
+
+    def get_player_venue_batting_stats(self, player_name: str, venue_name: str) -> Optional[Dict[str, Any]]:
+        """Get batsman stats at a specific venue with fuzzy matching."""
+        if not self._loaded:
+            self.load()
+        
+        matched_player = self._fuzzy_match_player(player_name)
+        matched_venue = self._fuzzy_match_venue(venue_name)
+        
+        if matched_player and matched_venue:
+            key = (matched_player, matched_venue)
+            if key in self._player_venue_batting:
+                return self._player_venue_batting[key]
+        
+        return None
+
+    def get_player_vs_team_batting_stats(self, player_name: str, opponent_team: str) -> Optional[Dict[str, Any]]:
+        """Get batsman stats against a specific team with fuzzy matching."""
+        if not self._loaded:
+            self.load()
+        
+        matched_player = self._fuzzy_match_player(player_name)
+        matched_team = self._fuzzy_match_team(opponent_team)
+        
+        if matched_player and matched_team:
+            key = (matched_player, matched_team)
+            if key in self._player_vs_team_batting:
+                return self._player_vs_team_batting[key]
+        
+        return None
+
+    def get_player_venue_bowling_stats(self, player_name: str, venue_name: str) -> Optional[Dict[str, Any]]:
+        """Get bowler stats at a specific venue with fuzzy matching."""
+        if not self._loaded:
+            self.load()
+        
+        matched_player = self._fuzzy_match_player(player_name)
+        matched_venue = self._fuzzy_match_venue(venue_name)
+        
+        if matched_player and matched_venue:
+            key = (matched_player, matched_venue)
+            if key in self._player_venue_bowling:
+                return self._player_venue_bowling[key]
+        
+        return None
+
+    def get_player_vs_team_bowling_stats(self, player_name: str, batting_team: str) -> Optional[Dict[str, Any]]:
+        """Get bowler stats against a specific team with fuzzy matching."""
+        if not self._loaded:
+            self.load()
+        
+        matched_player = self._fuzzy_match_player(player_name)
+        matched_team = self._fuzzy_match_team(batting_team)
+        
+        if matched_player and matched_team:
+            key = (matched_player, matched_team)
+            if key in self._player_vs_team_bowling:
+                return self._player_vs_team_bowling[key]
+        
         return None

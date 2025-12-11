@@ -250,8 +250,16 @@ class RealTimeFeatureMapper:
         is_middle_overs = int(scraped_data.get('middle_overs', (over >= 6 and over < 16)))
         is_death_overs = int(scraped_data.get('death_overs', over >= 16))
         
-        # --- Pressure & Win Probability ---
-        pressure_index = scraped_data.get('pressure_index', resource_features['pressure_index'])
+        # --- Pressure Index ---
+        # Match training calculation: RRR * (1 + wickets_lost * 0.15) for innings 2
+        # wickets_lost * 0.5 for innings 1
+        if innings == 2:
+            pressure_index = required_run_rate * (1 + wickets_lost * 0.15)
+        else:
+            pressure_index = wickets_lost * 0.5
+        
+        # DLS pressure index from resource calculator (different calculation)
+        dls_pressure_index = resource_features['pressure_index']
         resource_win_prob = resource_features['resource_win_prob']
         
         # --- Derived Features for Model ---
@@ -274,10 +282,55 @@ class RealTimeFeatureMapper:
         rrr_times_wickets = required_run_rate * wickets_lost
         chase_difficulty = required_run_rate / (current_run_rate + 0.1) if innings == 2 else 0
         
-        # Heuristics
-        situation_advantage = (resource_win_prob - 0.5) * 2
-        batting_team_situation_wr = resource_win_prob
-        bowling_team_situation_wr = 1 - resource_win_prob
+        # Team situation win rates - these should be team's historical win rates for batting/bowling first
+        # In training: batting_team_situation_wr = bat_first_wr (innings 1) or bowl_first_wr (innings 2)
+        # At inference without team stats, use 0.5 (neutral)
+        # TODO: Add team historical bat_first/bowl_first win rates to feature store
+        batting_team_situation_wr = batting_team_win_rate  # Use team's overall win rate as proxy
+        bowling_team_situation_wr = bowling_team_win_rate
+        situation_advantage = batting_team_situation_wr - bowling_team_situation_wr
+        
+        # --- Venue-specific and vs-team stats (using feature store with fuzzy matching) ---
+        # Look up player-venue batting stats
+        batsman_venue_stats = self.feature_store.get_player_venue_batting_stats(batsman_1_name, venue) if hasattr(self.feature_store, 'get_player_venue_batting_stats') else None
+        batsman_venue_avg = batsman_venue_stats.get('batsman_venue_avg', 38.0) if batsman_venue_stats else 38.0
+        batsman_venue_sr = batsman_venue_stats.get('batsman_venue_sr', 61.0) if batsman_venue_stats else 61.0
+        
+        # Look up player-vs-team batting stats
+        batsman_vs_team_stats = self.feature_store.get_player_vs_team_batting_stats(batsman_1_name, bowling_team) if hasattr(self.feature_store, 'get_player_vs_team_batting_stats') else None
+        batsman_vs_team_avg = batsman_vs_team_stats.get('batsman_vs_team_avg', 31.5) if batsman_vs_team_stats else 31.5
+        
+        # Look up player-venue bowling stats
+        bowler_venue_stats = self.feature_store.get_player_venue_bowling_stats(bowler_name, venue) if hasattr(self.feature_store, 'get_player_venue_bowling_stats') else None
+        bowler_venue_econ = bowler_venue_stats.get('bowler_venue_econ', 4.2) if bowler_venue_stats else 4.2
+        bowler_venue_sr = bowler_venue_stats.get('bowler_venue_sr', 516.0) if bowler_venue_stats else 516.0
+        
+        # Look up player-vs-team bowling stats
+        bowler_vs_team_stats = self.feature_store.get_player_vs_team_bowling_stats(bowler_name, batting_team) if hasattr(self.feature_store, 'get_player_vs_team_bowling_stats') else None
+        bowler_vs_team_econ = bowler_vs_team_stats.get('bowler_vs_team_econ', 5.7) if bowler_vs_team_stats else 5.7
+        
+        # Batting pair strength = sum of both batsmen's rolling averages
+        b1_avg = batsman_1_stats.get('batsman_rolling_avg', 25.0)
+        b2_avg = batsman_2_stats.get('batsman_rolling_avg', 25.0) if batsman_2_stats else 25.0
+        batting_pair_strength = b1_avg + b2_avg  # ~50 for two average batters
+        
+        # Acceleration potential (how much faster can they score)
+        # Typically SR - CRR, capped at reasonable value
+        acceleration_potential = max(0, batsman_rolling_sr - current_run_rate * 16.67) if current_run_rate > 0 else 0
+        
+        # wickets_last_30: wickets in last 30 balls (5 overs)
+        wickets_last_30 = 0.0
+        if len(self.ball_history) >= 6:
+            df_hist = pd.DataFrame(self.ball_history)
+            if 'is_wicket' in df_hist.columns:
+                last_30 = df_hist.tail(30)
+                wickets_last_30 = last_30['is_wicket'].sum()
+        
+        # CRR times resources remaining
+        crr_times_res = current_run_rate * resource_features.get('resource_pct', 100) / 100
+        
+        # Resources remaining (for 2nd innings chase)
+        resources_remaining = resource_features.get('resource_pct', 100) / 100 if innings == 2 else 0
         
         # --- Construct Feature DataFrame ---
         features = {
@@ -285,7 +338,7 @@ class RealTimeFeatureMapper:
             'expected_final_score': expected_final_score,
             'resource_win_prob': resource_win_prob,
             'score_vs_par': score_vs_par,
-            'dls_pressure_index': pressure_index,
+            'dls_pressure_index': dls_pressure_index,  # DLS-based pressure
             'projected_vs_venue_avg': projected_vs_venue_avg,
             'projected_score': projected_score,
             'is_powerplay': is_powerplay,
@@ -294,7 +347,7 @@ class RealTimeFeatureMapper:
             'required_run_rate': required_run_rate,
             'chase_difficulty': chase_difficulty,
             'wickets_times_balls': wickets_times_balls,
-            'pressure_index': pressure_index,
+            'pressure_index': pressure_index,  # RRR-based pressure (matches training)
             'team_strength_diff': team_strength_diff,
             'rrr_times_wickets': rrr_times_wickets,
             'overs_remaining': overs_remaining,
@@ -307,6 +360,21 @@ class RealTimeFeatureMapper:
             'runs_last_12': rolling_stats['runs_last_12'],
             'runs_last_18': rolling_stats['runs_last_18'],
             'wickets_last_12': rolling_stats['wickets_last_12'],
+            
+            # Player-venue and player-vs-team stats
+            'batsman_venue_avg': batsman_venue_avg,
+            'batsman_venue_sr': batsman_venue_sr,
+            'batsman_vs_team_avg': batsman_vs_team_avg,
+            'bowler_venue_econ': bowler_venue_econ,
+            'bowler_venue_sr': bowler_venue_sr,
+            'bowler_vs_team_econ': bowler_vs_team_econ,
+            'batting_pair_strength': batting_pair_strength,
+            
+            # Additional derived features
+            'acceleration_potential': acceleration_potential,
+            'wickets_last_30': wickets_last_30,
+            'crr_times_res': crr_times_res,
+            'resources_remaining': resources_remaining,
             
             # Extra features (kept for completeness)
             'innings': innings,

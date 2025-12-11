@@ -23,16 +23,16 @@ class ResourceFeatureCalculator:
     # Format: wickets_lost -> {overs_remaining: resource_percentage}
     # Based on standard T20 resource percentages
     DLS_RESOURCE_TABLE = {
-        0: {20: 100.0, 15: 84.4, 10: 63.4, 5: 35.4, 1: 8.2},
-        1: {20: 95.3, 15: 81.5, 10: 61.6, 5: 34.5, 1: 8.0},
-        2: {20: 88.9, 15: 77.4, 10: 59.0, 5: 33.2, 1: 7.7},
-        3: {20: 80.6, 15: 71.8, 10: 55.5, 5: 31.4, 1: 7.3},
-        4: {20: 70.6, 15: 64.5, 10: 50.8, 5: 28.8, 1: 6.7},
-        5: {20: 59.1, 15: 55.5, 10: 44.7, 5: 25.5, 1: 5.9},
-        6: {20: 46.1, 15: 44.5, 10: 37.0, 5: 21.3, 1: 4.9},
-        7: {20: 32.4, 15: 32.0, 10: 27.5, 5: 16.1, 1: 3.7},
-        8: {20: 18.4, 15: 18.4, 10: 16.6, 5: 10.0, 1: 2.3},
-        9: {20: 5.5, 15: 5.5, 10: 5.5, 5: 4.1, 1: 0.9},
+        0: {20: 100.0, 15: 84.4, 10: 63.4, 5: 35.4, 1: 8.2, 0: 0.0},
+        1: {20: 95.3, 15: 81.5, 10: 61.6, 5: 34.5, 1: 8.0, 0: 0.0},
+        2: {20: 88.9, 15: 77.4, 10: 59.0, 5: 33.2, 1: 7.7, 0: 0.0},
+        3: {20: 80.6, 15: 71.8, 10: 55.5, 5: 31.4, 1: 7.3, 0: 0.0},
+        4: {20: 70.6, 15: 64.5, 10: 50.8, 5: 28.8, 1: 6.7, 0: 0.0},
+        5: {20: 59.1, 15: 55.5, 10: 44.7, 5: 25.5, 1: 5.9, 0: 0.0},
+        6: {20: 46.1, 15: 44.5, 10: 37.0, 5: 21.3, 1: 4.9, 0: 0.0},
+        7: {20: 32.4, 15: 32.0, 10: 27.5, 5: 16.1, 1: 3.7, 0: 0.0},
+        8: {20: 18.4, 15: 18.4, 10: 16.6, 5: 10.0, 1: 2.3, 0: 0.0},
+        9: {20: 5.5, 15: 5.5, 10: 5.5, 5: 4.1, 1: 0.9, 0: 0.0},
     }
     
     # Average T20 par score for resource calculation
@@ -279,9 +279,18 @@ class ResourceFeatureCalculator:
         # Resources * par score * 1.3 factor for T20 explosiveness
         max_gettable = (resource_pct / 100.0) * self.PAR_SCORE_T20 * 1.3
 
+        # CRITICAL: If resources are essentially zero (game over), return definitive result
+        if resource_pct <= 0.1:  # Less than 0.1% resources = game is over
+            if runs_required <= 0:
+                return 1.0  # Already won
+            else:
+                return 0.0  # Definitely lost - no resources left to score
+
         # If target is beyond reach given resources, give minimum but non-zero win probability
         if runs_required > max_gettable:
-            return 0.05
+            # Decay probability based on how far beyond reach it is
+            ratio = runs_required / max_gettable
+            return 0.05 / (ratio * ratio)  # Quadratic decay
 
         # -------------------------------------
         # Difficulty Ratio
@@ -313,8 +322,8 @@ class ResourceFeatureCalculator:
         # Combine with run-rate factor
         win_prob = base_prob * rate_factor
 
-        # Final clamp for sanity
-        return float(max(0.05, min(0.98, win_prob)))
+        # Final clamp for sanity - allow lower probabilities for hopeless chases
+        return float(max(0.001, min(0.999, win_prob)))
     
     def calculate_all_features(self, innings: int, over: int, ball: int,
                                 current_score: int, wickets_lost: int,
