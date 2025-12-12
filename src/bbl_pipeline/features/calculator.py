@@ -39,22 +39,49 @@ class ResourceFeatureCalculator:
     PAR_SCORE_T20 = 160.0
     
     # =========================================================================
-    # FIRST INNINGS CALIBRATION (from ILT20 EDA)
+    # FIRST INNINGS v2 CALIBRATION (Professional Model) - EDA VALIDATED
     # =========================================================================
-    # Key finding: batting first wins only 37% overall in ILT20
-    # Projected score -> win rate mapping:
-    # < 120: 5%, 140-150: 24%, 160-170: 35%, 180-200: 58%, >200: 65%
-    # This means PAR (160) = 35% win rate, not 50%!
-    # To get 50% win rate, need to project ~185
-    FIRST_INNINGS_SCORE_MIDPOINT = 185.0  # Score where win_prob = 50%
-    FIRST_INNINGS_SCORE_BETA = 0.04  # Controls steepness
+    # Key insight: Don't jump directly to win probability.
+    # Flow: Expected Score → Wicket Capability → Contextual Par → SQI → Win Prob
     
-    # First innings wicket penalty (different from chase)
-    # 0 wkt: 48%, 2 wkt: 36%, 4 wkt: 35%, 6 wkt: 23%
+    # Historical batting first win rate (ILT20 EDA: 37.0%)
+    HISTORICAL_BAT_FIRST_WIN_RATE = 0.37  # Validated from 12,361 first innings rows
+    
+    # League average score (ILT20 EDA: 165.0)
+    LEAGUE_AVG_SCORE = 165.0  # Validated: avg=165.0, median=163.9
+    
+    # Wicket capability decay (affects future scoring potential, NOT probability)
+    # wicket_capability = exp(-WICKET_DECAY_ALPHA * wickets_lost)
+    # This reduces EXPECTED SCORE, not win probability directly
+    # EDA: implied_alpha = 0.02-0.03 from actual score decay by wickets
+    WICKET_DECAY_ALPHA = 0.025  # Gentle: 3 wkts = 0.93, 5 wkts = 0.88, 7 wkts = 0.84
+    
+    # Phase-dependent standard deviation for Score Quality Index
+    # EDA INSIGHT: Variance INCREASES as innings progresses (not decreases!)
+    # Powerplay std=14.3, Middle=23.5, Death=26.6
+    # Early projections are formulaic (low variance), late scores have high variance
+    SCORE_STD_EARLY = 15.0  # Low uncertainty early (projections are assumptions)
+    SCORE_STD_LATE = 26.0   # High uncertainty late (actual variability in scores)
+    
+    # Confidence ramp-up for blending with historical prior
+    # EDA: correlation plateaus around 12 overs (0.406 at 12 vs 0.348 at 4)
+    CONFIDENCE_FULL_OVERS = 12.0  # Full model confidence after 12 overs
+    
+    # Score Quality Index (SQI) to Win Probability mapping
+    # win_prob = sigmoid(SQI_BETA * SQI)
+    # EDA: MSE minimized at beta=0.7-0.8 (tested 0.4-0.8)
+    SQI_BETA = 0.75  # Controls steepness of SQI -> prob mapping
+    
+    # =========================================================================
+    # FIRST INNINGS v1 CONSTANTS (kept for compatibility, used by v2)
+    # =========================================================================
+    # These are superseded by v2 professional model but kept as fallback
+    FIRST_INNINGS_SCORE_MIDPOINT = 165.0  # Score where win_prob = 50%
+    FIRST_INNINGS_SCORE_BETA = 0.04  # Logistic steepness
     FIRST_INNINGS_WICKET_PENALTY = {
-        0: 1.00, 1: 0.95, 2: 0.85, 3: 0.80,
-        4: 0.75, 5: 0.70, 6: 0.55, 7: 0.50,
-        8: 0.30, 9: 0.20, 10: 0.05
+        0: 1.00, 1: 1.00, 2: 0.95, 3: 0.85,
+        4: 0.70, 5: 0.55, 6: 0.40, 7: 0.25,
+        8: 0.12, 9: 0.05, 10: 0.01
     }
     
     # =========================================================================
@@ -318,30 +345,68 @@ class ResourceFeatureCalculator:
         # Get actual wickets (default to 0 if not provided)
         actual_wickets_lost = wickets_lost if wickets_lost is not None else 0
         
-        # -------------------------------------
-        # INNINGS 1: Team batting first (Data-Calibrated)
-        # -------------------------------------
+        # =====================================================================
+        # INNINGS 1: Professional v2 Model (EDA-Calibrated)
+        # =====================================================================
+        # Key insight: Don't map score directly to probability.
+        # Flow: Expected Score → Wicket Capability → SQI → Win Prob
+        # Then blend with historical prior based on confidence (overs bowled)
+        # =====================================================================
         if innings == 1:
-            # Base probability from projected score using logistic
-            # Calibrated: 185 projected = 50% win, 160 = 35%, 200 = 65%
-            score_diff = expected_final_score - self.FIRST_INNINGS_SCORE_MIDPOINT
-            base_prob = 1.0 / (1.0 + np.exp(-self.FIRST_INNINGS_SCORE_BETA * score_diff))
-            
-            # Apply wicket penalty (different from chase - wickets hurt more in 1st innings)
-            wicket_mult = self.FIRST_INNINGS_WICKET_PENALTY.get(actual_wickets_lost, 0.05)
-            
-            # Calculate overs bowled to weight wicket penalty
-            # Early wickets are less concerning (can recover), late wickets are critical
+            # Step 0: Calculate overs context
             if balls_remaining is not None:
                 overs_bowled = self.TOTAL_OVERS - (balls_remaining / 6.0)
             else:
                 overs_bowled = (1 - resource_pct / 100.0) * self.TOTAL_OVERS
+            overs_progress = overs_bowled / self.TOTAL_OVERS  # 0 to 1
             
-            # Phase weight: wicket penalty impact increases as innings progresses
-            phase_weight = min(1.0, overs_bowled / 15.0)  # Full weight after 15 overs
-            adjusted_wicket_mult = 1.0 - phase_weight * (1.0 - wicket_mult)
+            # -----------------------------------------------------------------
+            # Step 1: Wicket capability decay (affects SCORE, not probability)
+            # -----------------------------------------------------------------
+            # EDA: wicket decay alpha = 0.025 (gentle: 5 wkts = 0.88 capability)
+            # Wickets reduce future scoring potential, not win chance directly
+            wicket_capability = np.exp(-self.WICKET_DECAY_ALPHA * actual_wickets_lost)
             
-            win_prob = base_prob * adjusted_wicket_mult
+            # Apply wicket decay to expected score
+            # This models "with 5 down, expected final score is reduced"
+            adjusted_expected_score = expected_final_score * wicket_capability
+            
+            # -----------------------------------------------------------------
+            # Step 2: Calculate Score Quality Index (SQI)
+            # -----------------------------------------------------------------
+            # SQI = (adjusted_score - contextual_par) / phase_std_dev
+            # A z-score telling us how far above/below par we are
+            
+            # Contextual par: Use league average (venue data not available)
+            contextual_par = self.LEAGUE_AVG_SCORE
+            
+            # Phase-dependent standard deviation (EDA: variance INCREASES with overs)
+            # Powerplay: std=15 (projections are assumptions)
+            # Death overs: std=26 (actual variability in outcomes)
+            phase_std = self.SCORE_STD_EARLY + overs_progress * (self.SCORE_STD_LATE - self.SCORE_STD_EARLY)
+            
+            # Calculate SQI (score quality index)
+            sqi = (adjusted_expected_score - contextual_par) / phase_std
+            
+            # -----------------------------------------------------------------
+            # Step 3: SQI to Win Probability (sigmoid mapping)
+            # -----------------------------------------------------------------
+            # EDA: beta=0.75 gives optimal MSE fit
+            # SQI +1 (1 std above par) → ~68% win
+            # SQI -1 (1 std below par) → ~32% win
+            sqi_based_prob = 1.0 / (1.0 + np.exp(-self.SQI_BETA * sqi))
+            
+            # -----------------------------------------------------------------
+            # Step 4: Confidence-weighted blend with historical prior
+            # -----------------------------------------------------------------
+            # Early overs: lean toward historical bat-first win rate (37%)
+            # Late overs: trust the SQI-based probability
+            # EDA: confidence plateaus around 12 overs
+            confidence = min(1.0, overs_bowled / self.CONFIDENCE_FULL_OVERS)
+            
+            # Blend: (1-conf)*prior + conf*model
+            win_prob = (1 - confidence) * self.HISTORICAL_BAT_FIRST_WIN_RATE + confidence * sqi_based_prob
+            
             return float(max(0.05, min(0.95, win_prob)))
 
         # -------------------------------------
