@@ -38,13 +38,35 @@ class ResourceFeatureCalculator:
     # Average T20 par score for resource calculation
     PAR_SCORE_T20 = 160.0
     
-    # RRR-based logistic parameters (calibrated from ILT20 EDA)
+    # =========================================================================
+    # FIRST INNINGS CALIBRATION (from ILT20 EDA)
+    # =========================================================================
+    # Key finding: batting first wins only 37% overall in ILT20
+    # Projected score -> win rate mapping:
+    # < 120: 5%, 140-150: 24%, 160-170: 35%, 180-200: 58%, >200: 65%
+    # This means PAR (160) = 35% win rate, not 50%!
+    # To get 50% win rate, need to project ~185
+    FIRST_INNINGS_SCORE_MIDPOINT = 185.0  # Score where win_prob = 50%
+    FIRST_INNINGS_SCORE_BETA = 0.04  # Controls steepness
+    
+    # First innings wicket penalty (different from chase)
+    # 0 wkt: 48%, 2 wkt: 36%, 4 wkt: 35%, 6 wkt: 23%
+    FIRST_INNINGS_WICKET_PENALTY = {
+        0: 1.00, 1: 0.95, 2: 0.85, 3: 0.80,
+        4: 0.75, 5: 0.70, 6: 0.55, 7: 0.50,
+        8: 0.30, 9: 0.20, 10: 0.05
+    }
+    
+    # =========================================================================
+    # SECOND INNINGS (CHASE) CALIBRATION (from ILT20 EDA)
+    # =========================================================================
+    # RRR-based logistic parameters
     # win_prob = 1 / (1 + exp(RRR_BETA * (RRR - RRR_MIDPOINT)))
     # At RRR=9.5, win_prob = 50%
     RRR_BETA = 0.7  # Controls steepness of transition
     RRR_MIDPOINT = 9.5  # RRR where win_prob = 50%
     
-    # Wicket penalty factors (calibrated from ILT20 EDA)
+    # Wicket penalty factors for chase (calibrated from ILT20 EDA)
     # Based on actual win rates by wickets lost:
     # 0-3 wkts: 70-76% win rate (no penalty)
     # 4 wkts: 52% (25% penalty)
@@ -293,15 +315,33 @@ class ResourceFeatureCalculator:
         Returns:
             Win probability estimate (0.001 to 0.999)
         """
+        # Get actual wickets (default to 0 if not provided)
+        actual_wickets_lost = wickets_lost if wickets_lost is not None else 0
+        
         # -------------------------------------
-        # INNINGS 1: Team batting first
+        # INNINGS 1: Team batting first (Data-Calibrated)
         # -------------------------------------
         if innings == 1:
-            # Score advantage relative to par score
-            score_advantage = (expected_final_score - self.PAR_SCORE_T20) / 50.0
+            # Base probability from projected score using logistic
+            # Calibrated: 185 projected = 50% win, 160 = 35%, 200 = 65%
+            score_diff = expected_final_score - self.FIRST_INNINGS_SCORE_MIDPOINT
+            base_prob = 1.0 / (1.0 + np.exp(-self.FIRST_INNINGS_SCORE_BETA * score_diff))
             
-            # Use sigmoid for wider probability range (0.05-0.95)
-            win_prob = 1.0 / (1.0 + np.exp(-score_advantage * 1.5))
+            # Apply wicket penalty (different from chase - wickets hurt more in 1st innings)
+            wicket_mult = self.FIRST_INNINGS_WICKET_PENALTY.get(actual_wickets_lost, 0.05)
+            
+            # Calculate overs bowled to weight wicket penalty
+            # Early wickets are less concerning (can recover), late wickets are critical
+            if balls_remaining is not None:
+                overs_bowled = self.TOTAL_OVERS - (balls_remaining / 6.0)
+            else:
+                overs_bowled = (1 - resource_pct / 100.0) * self.TOTAL_OVERS
+            
+            # Phase weight: wicket penalty impact increases as innings progresses
+            phase_weight = min(1.0, overs_bowled / 15.0)  # Full weight after 15 overs
+            adjusted_wicket_mult = 1.0 - phase_weight * (1.0 - wicket_mult)
+            
+            win_prob = base_prob * adjusted_wicket_mult
             return float(max(0.05, min(0.95, win_prob)))
 
         # -------------------------------------
@@ -320,9 +360,6 @@ class ResourceFeatureCalculator:
         if balls_remaining is None:
             overs_remaining = (resource_pct / 100.0) * self.TOTAL_OVERS
             balls_remaining = int(overs_remaining * 6)
-        
-        # Get actual wickets (default to 0 if not provided)
-        actual_wickets_lost = wickets_lost if wickets_lost is not None else 0
 
         # -------------------------------------
         # END-GAME SPECIAL CASE: Last 2 overs
