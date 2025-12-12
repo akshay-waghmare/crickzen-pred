@@ -75,13 +75,21 @@ class CrexLivePredictor:
     Optionally writes state to JSON for Streamlit integration.
     """
     
-    def __init__(self, match_url: str, model_dir: str, headless: bool = True, 
-                 feature_store_dir: str = None, output_json: str = None):
+    def __init__(self, match_url: str, model_dir: str, headless: bool = True,
+                 feature_store_dir: str = None, output_json: str = None,
+                 live_match_json: str = None):
         self.match_url = match_url
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
         self.output_json = output_json  # Path for JSON output (for Streamlit)
+        # Optional richer debug output (defaults to sibling livematch.json if output_json is set)
+        if live_match_json is None and output_json:
+            try:
+                live_match_json = str(Path(output_json).with_name("livematch.json"))
+            except Exception:
+                live_match_json = None
+        self.live_match_json = live_match_json
         self.browser = None
         self.page = None
         self.match_state = MatchState()
@@ -695,17 +703,21 @@ class CrexLivePredictor:
         """Write current state to JSON file for Streamlit."""
         try:
             state = self.match_state
-            
+
+            over = int(state.overs)
+            ball = int(round((state.overs - over) * 10))
+            if ball >= 6:
+                ball = 0
+
             # Get features if predictor is available
+            pred_state = None
+            scraped_data = None
+            ball_history = None
             features = {}
             if self.predictor:
                 try:
                     from bbl_pipeline.inference.schema import MatchState as PredictorMatchState
-                    over = int(state.overs)
-                    ball = int(round((state.overs - over) * 10))
-                    if ball >= 6:
-                        ball = 0
-                    
+
                     pred_state = PredictorMatchState(
                         match_id="live_match",
                         venue=state.venue or "Unknown",
@@ -721,7 +733,7 @@ class CrexLivePredictor:
                         bowler=state.bowler1_name or "Unknown",
                         target_runs=state.target,
                     )
-                    
+
                     scraped_data = {
                         'innings_num': pred_state.innings,
                         'over_number': over,
@@ -736,19 +748,28 @@ class CrexLivePredictor:
                         'target_score': state.target,
                         'runs_needed': (state.target - state.total_runs) if state.target else 0
                     }
+                    ball_history = self._build_ball_history_for_mapper()
+
                     feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
-                    features = {k: (float(v) if isinstance(v, (int, float)) else str(v)) 
-                               for k, v in feat_df.iloc[0].to_dict().items()}
-                except Exception as e:
+                    features = {
+                        k: (float(v) if isinstance(v, (int, float)) else str(v))
+                        for k, v in feat_df.iloc[0].to_dict().items()
+                    }
+                except Exception:
                     pass
             
             output = {
                 "timestamp": datetime.now().isoformat(),
+                "match_url": self.match_url,
+                "model_dir": self.model_dir,
+                "feature_store_dir": self.feature_store_dir,
                 "batting_team": state.batting_team,
                 "bowling_team": state.bowling_team,
                 "score": state.total_runs,
                 "wickets": state.wickets,
                 "overs": state.overs,
+                "over": over,
+                "ball": ball,
                 "target": state.target,
                 "is_second_innings": state.is_second_innings,
                 "venue": state.venue,
@@ -772,6 +793,60 @@ class CrexLivePredictor:
             with open(tmp_path, 'w') as f:
                 json.dump(output, f, indent=2)
             tmp_path.replace(json_path)
+
+            if self.live_match_json:
+                try:
+                    from dataclasses import asdict
+
+                    debug_payload = {
+                        "timestamp": output["timestamp"],
+                        "match_url": self.match_url,
+                        "model_dir": self.model_dir,
+                        "feature_store_dir": self.feature_store_dir,
+                        "state": {
+                            "batting_team": state.batting_team,
+                            "bowling_team": state.bowling_team,
+                            "score": state.total_runs,
+                            "wickets": state.wickets,
+                            "overs": state.overs,
+                            "over": over,
+                            "ball": ball,
+                            "target": state.target,
+                            "is_second_innings": state.is_second_innings,
+                            "venue": state.venue,
+                            "toss_winner": state.toss_winner,
+                            "toss_decision": state.toss_decision,
+                            "batsman1_name": state.batsman1_name,
+                            "batsman1_runs": state.batsman1_runs,
+                            "batsman1_balls": state.batsman1_balls,
+                            "batsman2_name": state.batsman2_name,
+                            "batsman2_runs": state.batsman2_runs,
+                            "batsman2_balls": state.batsman2_balls,
+                            "bowler1_name": state.bowler1_name,
+                            "bowler1_overs": state.bowler1_overs,
+                            "bowler1_runs": state.bowler1_runs,
+                            "bowler1_wickets": state.bowler1_wickets,
+                            "current_run_rate": state.current_run_rate,
+                            "required_run_rate": state.required_run_rate,
+                            "last_ball_number": self.last_ball_number,
+                        },
+                        "pred_state": asdict(pred_state) if pred_state else None,
+                        "scraped_data": scraped_data,
+                        "ball_history": ball_history,
+                        "features": features,
+                        "bat_win_prob": win_prob,
+                        "bowl_win_prob": 1 - win_prob,
+                        "history": self._prediction_history[-200:],
+                        "balls_data": [asdict(b) for b in (state.balls_data or [])],
+                    }
+
+                    debug_path = Path(self.live_match_json)
+                    debug_tmp = debug_path.with_suffix('.tmp')
+                    with open(debug_tmp, 'w') as f:
+                        json.dump(debug_payload, f, indent=2)
+                    debug_tmp.replace(debug_path)
+                except Exception:
+                    pass
             
         except Exception as e:
             pass  # Don't interrupt the main flow
@@ -780,8 +855,13 @@ class CrexLivePredictor:
         """Stop the predictor."""
         self._running = False
         if self.browser:
-            await self.browser.close()
-            print("\n🛑 Browser closed")
+            try:
+                await self.browser.close()
+                print("\n🛑 Browser closed")
+            except Exception as e:
+                print(f"\n⚠️ Browser close failed (ignored): {e}")
+            finally:
+                self.browser = None
 
 
 async def main():
@@ -795,6 +875,11 @@ async def main():
     parser.add_argument("--headless", action="store_true", default=True, help="Run headless")
     parser.add_argument("--poll-interval", type=float, default=2.0, help="Poll interval in seconds")
     parser.add_argument("--output-json", default=None, help="Output JSON file for Streamlit integration")
+    parser.add_argument(
+        "--live-match-json",
+        default=None,
+        help="Optional richer per-match debug JSON (defaults to sibling livematch.json when --output-json is set)",
+    )
     
     args = parser.parse_args()
     
@@ -803,7 +888,8 @@ async def main():
         model_dir=args.model_dir,
         headless=args.headless,
         feature_store_dir=args.feature_store_dir,
-        output_json=args.output_json
+        output_json=args.output_json,
+        live_match_json=args.live_match_json,
     )
     
     await predictor.run(poll_interval=args.poll_interval)

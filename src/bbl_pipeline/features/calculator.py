@@ -241,7 +241,8 @@ class ResourceFeatureCalculator:
         resource_pct: float,
         current_run_rate: float,
         required_run_rate: float,
-        current_score: float = 0
+        current_score: float = 0,
+        balls_remaining: int = None
     ) -> float:
         """
         Returns a smooth, stable baseline win probability estimate.
@@ -254,6 +255,7 @@ class ResourceFeatureCalculator:
             current_run_rate: Current run rate
             required_run_rate: Required run rate to win (2nd innings only)
             current_score: Current score
+            balls_remaining: Actual balls remaining in innings (for endgame logic)
             
         Returns:
             Win probability estimate (0.05 to 0.98)
@@ -263,16 +265,11 @@ class ResourceFeatureCalculator:
         # -------------------------------------
         if innings == 1:
             # Score advantage relative to par score
-            # Normalize by 50 runs (typical spread of T20 scores)
             score_advantage = (expected_final_score - self.PAR_SCORE_T20) / 50.0
             
-            # Use sigmoid for smooth probability mapping with full range
-            # This gives:
-            #   - expected=110 (50 below par) → ~18% win prob
-            #   - expected=135 (25 below par) → ~32% win prob  
-            #   - expected=160 (par) → 50% win prob
-            #   - expected=185 (25 above par) → ~68% win prob
-            #   - expected=210 (50 above par) → ~82% win prob
+            # Use sigmoid for wider probability range (0.05-0.95)
+            # Allows extreme scores like 180/2 to show ~79% win prob
+            # vs tanh which capped at 0.3-0.7 range
             win_prob = 1.0 / (1.0 + np.exp(-score_advantage * 1.5))
 
             return float(max(0.05, min(0.95, win_prob)))
@@ -288,10 +285,28 @@ class ResourceFeatureCalculator:
         # If the chase is already over
         if runs_required <= 0:
             return 1.0
+        
+        # Use actual balls remaining if provided, otherwise estimate from resource_pct
+        if balls_remaining is None:
+            overs_remaining = (resource_pct / 100.0) * self.TOTAL_OVERS
+            balls_remaining = int(overs_remaining * 6)
+        
+        # END-GAME SPECIAL CASE: When runs needed is achievable within balls remaining
+        # The DLS resource model breaks down for "4 needed off 3 balls" type situations
+        # Use a simple ball-by-ball probability model instead
+        if balls_remaining > 0 and balls_remaining <= 12 and runs_required <= balls_remaining * 2:
+            # Average runs per ball in T20 death overs is ~1.5
+            # Probability based on runs_per_ball needed vs achievable rate
+            runs_per_ball_needed = runs_required / balls_remaining
+            # At 1.0 rpb needed: ~80% win prob
+            # At 1.5 rpb needed: ~50% win prob  
+            # At 2.0 rpb needed: ~25% win prob
+            # At 2.5 rpb needed: ~10% win prob
+            endgame_prob = 1.0 / (1.0 + np.exp(4 * (runs_per_ball_needed - 1.5)))
+            return float(max(0.05, min(0.95, endgame_prob)))
 
         # Estimate the "maximum realistically gettable" runs
-        # Modern T20 death overs scoring is aggressive (12-15 RPO common)
-        # Resources * par score * 1.5 factor for T20 explosiveness
+        # Resources * par score * 1.5 factor for modern T20 death overs scoring
         max_gettable = (resource_pct / 100.0) * self.PAR_SCORE_T20 * 1.5
 
         # CRITICAL: If resources are essentially zero (game over), return definitive result
@@ -316,26 +331,32 @@ class ResourceFeatureCalculator:
         # -------------------------------------
         # Run Rate Factor (CRR / RRR)
         # -------------------------------------
+        # Early in the innings, CRR is volatile and shouldn't heavily influence probability.
+        # Scale the rate_factor impact by overs bowled (0-20).
+        overs_bowled = self.TOTAL_OVERS - (resource_pct / 100.0 * self.TOTAL_OVERS)
+        overs_weight = min(1.0, overs_bowled / 10.0)  # Full weight after 10 overs
+        
         if required_run_rate > 0 and current_run_rate > 0:
             rate_ratio = current_run_rate / required_run_rate
-            # Bound the impact: between 0.7 and 1.3 multiplier
-            rate_factor = min(1.3, max(0.7, rate_ratio))
+            # Bound the impact: between 0.8 and 1.2 multiplier (reduced from 0.7-1.3)
+            raw_rate_factor = min(1.2, max(0.8, rate_ratio))
+            # Scale toward 1.0 in early overs
+            rate_factor = 1.0 + (raw_rate_factor - 1.0) * overs_weight
         else:
             rate_factor = 1.0
 
         # -------------------------------------
         # Base probability using sigmoid transformation
         # -------------------------------------
-        # Calibrated to match actual T20 chase success rates:
-        # difficulty_ratio 0.3 → ~99%
-        # difficulty_ratio 0.5 → ~94%
-        # difficulty_ratio 0.65 → ~80%
-        # difficulty_ratio 0.78 → ~50%
-        # difficulty_ratio 0.90 → ~20%
-        # Shifted center from 0.85 to 0.78, steepness from 12 to 11
-        base_prob = 1.0 / (1.0 + np.exp(11 * (difficulty_ratio - 0.78)))
+        # Calibrated for realistic 2nd innings probabilities:
+        # difficulty_ratio 0.3 → ~95%
+        # difficulty_ratio 0.5 → ~73%
+        # difficulty_ratio 0.65 → ~50%
+        # difficulty_ratio 0.8 → ~25%
+        # difficulty_ratio 0.95 → ~5%
+        base_prob = 1.0 / (1.0 + np.exp(8 * (difficulty_ratio - 0.65)))
 
-        # Combine with run-rate factor
+        # Combine with run-rate factor (effect is muted early in innings)
         win_prob = base_prob * rate_factor
 
         # Final clamp for sanity - allow lower probabilities for hopeless chases
@@ -401,7 +422,8 @@ class ResourceFeatureCalculator:
             resource_pct=resource_pct,
             current_run_rate=current_run_rate,
             required_run_rate=required_run_rate,
-            current_score=current_score
+            current_score=current_score,
+            balls_remaining=balls_remaining
         )
         
         return {

@@ -154,9 +154,12 @@ class InMemoryFeatureStore:
         'SIX': 'Sydney Sixers', 'SCO': 'Perth Scorchers', 'STK': 'Adelaide Strikers',
         'HEA': 'Brisbane Heat', 'REN': 'Melbourne Renegades', 'STA': 'Melbourne Stars',
         'HUR': 'Hobart Hurricanes', 'THU': 'Sydney Thunder',
-        # ILT20
+        # ILT20 (International League T20)
         'DUB': 'Dubai Capitals', 'ABD': 'Abu Dhabi Knight Riders', 'SHA': 'Sharjah Warriors',
         'DSG': 'Desert Vipers', 'GUL': 'Gulf Giants', 'MIC': 'MI Emirates',
+        # ILT20 alternate abbreviations (from CREX scraper)
+        'DV': 'Desert Vipers', 'GG': 'Gulf Giants', 'MIE': 'MI Emirates',
+        'DC': 'Dubai Capitals', 'ADKR': 'Abu Dhabi Knight Riders', 'SW': 'Sharjah Warriors',
     }
 
     def get_team_stats(self, team_name: str) -> Optional[Dict[str, Any]]:
