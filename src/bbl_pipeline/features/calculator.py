@@ -361,14 +361,16 @@ class ResourceFeatureCalculator:
             overs_progress = overs_bowled / self.TOTAL_OVERS  # 0 to 1
             
             # -----------------------------------------------------------------
-            # Step 1: Wicket capability decay (affects SCORE, not probability)
+            # Step 1: Wicket capability decay (PHASE-AWARE)
             # -----------------------------------------------------------------
-            # EDA: wicket decay alpha = 0.025 (gentle: 5 wkts = 0.88 capability)
-            # Wickets reduce future scoring potential, not win chance directly
-            wicket_capability = np.exp(-self.WICKET_DECAY_ALPHA * actual_wickets_lost)
+            # Improvement: Early wickets are recoverable; late wickets are not
+            # phase_multiplier: 0.8 early → 1.4 late
+            # This makes late wickets hurt ~1.75x more than early wickets
+            phase_multiplier = 0.8 + 0.6 * overs_progress
+            wicket_capability = np.exp(-self.WICKET_DECAY_ALPHA * phase_multiplier * actual_wickets_lost)
             
             # Apply wicket decay to expected score
-            # This models "with 5 down, expected final score is reduced"
+            # This models "with 5 down in death overs, expected final score is severely reduced"
             adjusted_expected_score = expected_final_score * wicket_capability
             
             # -----------------------------------------------------------------
@@ -377,7 +379,11 @@ class ResourceFeatureCalculator:
             # SQI = (adjusted_score - contextual_par) / phase_std_dev
             # A z-score telling us how far above/below par we are
             
-            # Contextual par: Use league average (venue data not available)
+            # Improvement: Contextual par blends venue avg with league avg
+            # If venue_avg_score is available (passed via expected_final_score context),
+            # use 60% venue + 40% league. Otherwise, fallback to league avg.
+            # For now, we use league avg as venue data isn't passed to this method
+            # TODO: Pass venue_avg_score when available for cross-venue calibration
             contextual_par = self.LEAGUE_AVG_SCORE
             
             # Phase-dependent standard deviation (EDA: variance INCREASES with overs)
@@ -391,10 +397,11 @@ class ResourceFeatureCalculator:
             # -----------------------------------------------------------------
             # Step 3: SQI to Win Probability (sigmoid mapping)
             # -----------------------------------------------------------------
-            # EDA: beta=0.75 gives optimal MSE fit
-            # SQI +1 (1 std above par) → ~68% win
-            # SQI -1 (1 std below par) → ~32% win
-            sqi_based_prob = 1.0 / (1.0 + np.exp(-self.SQI_BETA * sqi))
+            # Improvement: Shift sigmoid center to encode bat-first disadvantage
+            # Instead of SQI=0 → 50%, we shift left by 0.35 to reflect 37% baseline
+            # This means SQI=0.35 → 50%, SQI=0 → ~43%
+            sqi_shifted = sqi - 0.35
+            sqi_based_prob = 1.0 / (1.0 + np.exp(-self.SQI_BETA * sqi_shifted))
             
             # -----------------------------------------------------------------
             # Step 4: Confidence-weighted blend with historical prior
@@ -407,7 +414,14 @@ class ResourceFeatureCalculator:
             # Blend: (1-conf)*prior + conf*model
             win_prob = (1 - confidence) * self.HISTORICAL_BAT_FIRST_WIN_RATE + confidence * sqi_based_prob
             
-            return float(max(0.05, min(0.95, win_prob)))
+            # -----------------------------------------------------------------
+            # Step 5: Dynamic clamp range (more expressive late)
+            # -----------------------------------------------------------------
+            # Late innings with dominant position (215 on board) should reach 97-98%
+            lower_clamp = 0.05
+            upper_clamp = 0.95 + 0.03 * confidence  # 0.95 early → 0.98 at full confidence
+            
+            return float(max(lower_clamp, min(upper_clamp, win_prob)))
 
         # -------------------------------------
         # INNINGS 2: Team chasing a target
