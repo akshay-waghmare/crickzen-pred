@@ -263,13 +263,19 @@ class ResourceFeatureCalculator:
         # -------------------------------------
         if innings == 1:
             # Score advantage relative to par score
+            # Normalize by 50 runs (typical spread of T20 scores)
             score_advantage = (expected_final_score - self.PAR_SCORE_T20) / 50.0
             
-            # Smooth bounded output using tanh
-            # ~50% at par score, gently rising/falling with advantage
-            win_prob = 0.5 + 0.2 * np.tanh(score_advantage)
+            # Use sigmoid for smooth probability mapping with full range
+            # This gives:
+            #   - expected=110 (50 below par) → ~18% win prob
+            #   - expected=135 (25 below par) → ~32% win prob  
+            #   - expected=160 (par) → 50% win prob
+            #   - expected=185 (25 above par) → ~68% win prob
+            #   - expected=210 (50 above par) → ~82% win prob
+            win_prob = 1.0 / (1.0 + np.exp(-score_advantage * 1.5))
 
-            return float(max(0.05, min(0.98, win_prob)))
+            return float(max(0.05, min(0.95, win_prob)))
 
         # -------------------------------------
         # INNINGS 2: Team chasing a target
@@ -284,8 +290,9 @@ class ResourceFeatureCalculator:
             return 1.0
 
         # Estimate the "maximum realistically gettable" runs
-        # Resources * par score * 1.3 factor for T20 explosiveness
-        max_gettable = (resource_pct / 100.0) * self.PAR_SCORE_T20 * 1.3
+        # Modern T20 death overs scoring is aggressive (12-15 RPO common)
+        # Resources * par score * 1.5 factor for T20 explosiveness
+        max_gettable = (resource_pct / 100.0) * self.PAR_SCORE_T20 * 1.5
 
         # CRITICAL: If resources are essentially zero (game over), return definitive result
         if resource_pct <= 0.1:  # Less than 0.1% resources = game is over
@@ -319,13 +326,14 @@ class ResourceFeatureCalculator:
         # -------------------------------------
         # Base probability using sigmoid transformation
         # -------------------------------------
-        # More generous for easy chases:
+        # Calibrated to match actual T20 chase success rates:
         # difficulty_ratio 0.3 → ~99%
-        # difficulty_ratio 0.5 → ~95%
-        # difficulty_ratio 0.7 → ~82%
-        # difficulty_ratio 0.85 → ~50%
-        # difficulty_ratio 0.95 → ~20%
-        base_prob = 1.0 / (1.0 + np.exp(12 * (difficulty_ratio - 0.85)))
+        # difficulty_ratio 0.5 → ~94%
+        # difficulty_ratio 0.65 → ~80%
+        # difficulty_ratio 0.78 → ~50%
+        # difficulty_ratio 0.90 → ~20%
+        # Shifted center from 0.85 to 0.78, steepness from 12 to 11
+        base_prob = 1.0 / (1.0 + np.exp(11 * (difficulty_ratio - 0.78)))
 
         # Combine with run-rate factor
         win_prob = base_prob * rate_factor
