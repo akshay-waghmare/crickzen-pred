@@ -62,6 +62,11 @@ DEFAULT_JSON = "data/live_state.json"
 
 def get_color(team): return TEAM_COLORS.get(team, "#607d8b")
 def get_name(team): return TEAM_NAMES.get(team, team)
+def prob_to_odds(prob): 
+    """Convert probability to decimal odds."""
+    if prob <= 0: return 999.99
+    if prob >= 1: return 1.00
+    return round(1 / prob, 2)
 
 
 def check_match_result(state: dict) -> tuple:
@@ -106,10 +111,14 @@ def load_state(json_path: str) -> dict:
 
 
 def create_gauges(bat_team, bowl_team, bat_prob, bowl_prob):
-    """Create win probability gauge chart."""
+    """Create win probability gauge chart with decimal odds."""
+    bat_odds = prob_to_odds(bat_prob)
+    bowl_odds = prob_to_odds(bowl_prob)
+    
     fig = make_subplots(rows=1, cols=2, specs=[[{"type": "indicator"}, {"type": "indicator"}]],
-                        subplot_titles=[get_name(bat_team), get_name(bowl_team)])
-    for i, (t, p) in enumerate([(bat_team, bat_prob), (bowl_team, bowl_prob)], 1):
+                        subplot_titles=[f"{get_name(bat_team)} (Odds: {bat_odds})", 
+                                       f"{get_name(bowl_team)} (Odds: {bowl_odds})"])
+    for i, (t, p, odds) in enumerate([(bat_team, bat_prob, bat_odds), (bowl_team, bowl_prob, bowl_odds)], 1):
         fig.add_trace(go.Indicator(
             mode="gauge+number", value=p*100,
             number={"suffix": "%", "font": {"size": 40, "color": get_color(t)}},
@@ -148,7 +157,7 @@ def create_rr_chart(crr, rrr):
 
 
 def create_probability_timeline(history):
-    """Create probability over time chart."""
+    """Create probability over time chart showing full 20 overs."""
     if not history or len(history) < 2:
         return None
     
@@ -159,26 +168,38 @@ def create_probability_timeline(history):
     bat_team = df.get("batting_team", pd.Series(["Team A"])).iloc[0] if "batting_team" in df else "Batting"
     bowl_team = df.get("bowling_team", pd.Series(["Team B"])).iloc[0] if "bowling_team" in df else "Bowling"
     
+    # Get team colors
+    bat_color = get_color(bat_team) if bat_team else "#e91e63"
+    bowl_color = get_color(bowl_team) if bowl_team else "#2196f3"
+    
     fig.add_trace(go.Scatter(
         x=df["overs"], y=df["bat_prob"].apply(lambda x: x * 100),
-        name="Batting Team", mode="lines+markers",
-        line=dict(color="#e91e63", width=3),
-        marker=dict(size=8)
+        name=get_name(bat_team), mode="lines+markers",
+        line=dict(color=bat_color, width=3),
+        marker=dict(size=6),
+        fill='tozeroy', fillcolor=f'rgba{tuple(list(int(bat_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.1])}' if bat_color.startswith('#') else None
     ))
     fig.add_trace(go.Scatter(
         x=df["overs"], y=df["bowl_prob"].apply(lambda x: x * 100),
-        name="Bowling Team", mode="lines+markers",
-        line=dict(color="#2196f3", width=3),
-        marker=dict(size=8)
+        name=get_name(bowl_team), mode="lines+markers",
+        line=dict(color=bowl_color, width=3),
+        marker=dict(size=6)
     ))
     
-    fig.add_hline(y=50, line_dash="dash", line_color="gray")
+    fig.add_hline(y=50, line_dash="dash", line_color="gray", annotation_text="50%")
+    
+    # Determine max overs for x-axis (at least current over + buffer, max 20)
+    max_over = max(df["overs"].max(), 1)
+    x_max = min(20, max(max_over + 2, 6))  # Show at least 6 overs or current + 2
+    
     fig.update_layout(
         title="Win Probability Over Time",
         xaxis_title="Overs", yaxis_title="Win Probability (%)",
-        yaxis=dict(range=[0, 100]),
-        height=300, margin=dict(l=20, r=20, t=50, b=20),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02)
+        xaxis=dict(range=[0, x_max], dtick=2, tickmode='linear'),
+        yaxis=dict(range=[0, 100], dtick=10),
+        height=350, margin=dict(l=20, r=20, t=50, b=20),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+        hovermode='x unified'
     )
     return fig
 
@@ -289,9 +310,35 @@ def main():
             </div>
             ''', unsafe_allow_html=True)
     
-    # Win probability gauges
+    # Win probability gauges with odds
     st.markdown("---")
-    st.subheader("🎯 Win Probability")
+    
+    # Calculate odds
+    bat_odds = prob_to_odds(d["bat_win_prob"])
+    bowl_odds = prob_to_odds(d["bowl_win_prob"])
+    
+    # Header with odds summary
+    st.subheader("🎯 Win Probability & Odds")
+    odds_col1, odds_col2 = st.columns(2)
+    with odds_col1:
+        st.markdown(f'''
+        <div style="text-align: center; padding: 10px; background: linear-gradient(135deg, {get_color(d["batting_team"])}, #333); 
+             border-radius: 10px; color: white;">
+            <b>{get_name(d["batting_team"])}</b><br>
+            <span style="font-size: 1.8em;">{d["bat_win_prob"]*100:.1f}%</span><br>
+            <span style="font-size: 1.2em;">Odds: <b>{bat_odds}</b></span>
+        </div>
+        ''', unsafe_allow_html=True)
+    with odds_col2:
+        st.markdown(f'''
+        <div style="text-align: center; padding: 10px; background: linear-gradient(135deg, {get_color(d["bowling_team"])}, #333); 
+             border-radius: 10px; color: white;">
+            <b>{get_name(d["bowling_team"])}</b><br>
+            <span style="font-size: 1.8em;">{d["bowl_win_prob"]*100:.1f}%</span><br>
+            <span style="font-size: 1.2em;">Odds: <b>{bowl_odds}</b></span>
+        </div>
+        ''', unsafe_allow_html=True)
+    
     st.plotly_chart(
         create_gauges(d["batting_team"], d["bowling_team"], d["bat_win_prob"], d["bowl_win_prob"]), 
         use_container_width=True

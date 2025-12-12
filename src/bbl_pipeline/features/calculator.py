@@ -88,8 +88,16 @@ class ResourceFeatureCalculator:
         The regression factor increases as more overs are bowled (more data = more trust
         in the current run rate).
         """
+        # If all out (10 wickets), the innings is over - return actual score
+        if wickets_lost >= 10:
+            return float(current_score)
+        
         if overs_bowled <= 0:
             return self.PAR_SCORE_T20
+        
+        # If innings is complete (20 overs), return actual score
+        if overs_bowled >= self.TOTAL_OVERS:
+            return float(current_score)
             
         overs_remaining = self.TOTAL_OVERS - overs_bowled
         

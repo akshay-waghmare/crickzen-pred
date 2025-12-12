@@ -134,12 +134,44 @@ class InMemoryFeatureStore:
                 }
             logger.info(f"Loaded {len(self._player_vs_team_bowling)} player-vs-team bowling entries")
 
+    # Team abbreviation mappings for various tournaments
+    TEAM_ABBREVIATIONS = {
+        # SMA (Syed Mushtaq Ali Trophy) - Indian domestic T20
+        'MUM': 'Mumbai', 'HYD': 'Hyderabad (India)', 'KAR': 'Karnataka', 'DEL': 'Delhi',
+        'GUJ': 'Gujarat', 'RAJ': 'Rajasthan', 'TN': 'Tamil Nadu', 'KER': 'Kerala',
+        'MP': 'Madhya Pradesh', 'MAH': 'Maharashtra', 'PUN': 'Punjab', 'HAR': 'Haryana',
+        'UP': 'Uttar Pradesh', 'BEN': 'Bengal', 'VID': 'Vidarbha', 'SAU': 'Saurashtra',
+        'BAR': 'Baroda', 'GOA': 'Goa', 'JHA': 'Jharkhand', 'ODI': 'Odisha',
+        'ASM': 'Assam', 'TRI': 'Tripura', 'SER': 'Services', 'HP': 'Himachal Pradesh',
+        'HIM': 'Himachal', 'CHG': 'Chhattisgarh', 'JK': 'Jammu & Kashmir', 'AND': 'Andhra',
+        'RLY': 'Railways', 'MEG': 'Meghalaya', 'NAG': 'Nagaland', 'MIZ': 'Mizoram',
+        'SKM': 'Sikkim', 'MNP': 'Manipur', 'ARN': 'Arunachal Pradesh', 'BIH': 'Bihar',
+        'CHD': 'Chandigarh', 'PON': 'Puducherry', 'UTT': 'Uttarakhand',
+        # BBL (Big Bash League)
+        'SYS-W': 'Sydney Sixers', 'PRS-W': 'Perth Scorchers', 'ADL-W': 'Adelaide Strikers',
+        'BRH-W': 'Brisbane Heat', 'MLR-W': 'Melbourne Renegades', 'MLS-W': 'Melbourne Stars',
+        'HBH-W': 'Hobart Hurricanes', 'STR-W': 'Sydney Thunder',
+        'SIX': 'Sydney Sixers', 'SCO': 'Perth Scorchers', 'STK': 'Adelaide Strikers',
+        'HEA': 'Brisbane Heat', 'REN': 'Melbourne Renegades', 'STA': 'Melbourne Stars',
+        'HUR': 'Hobart Hurricanes', 'THU': 'Sydney Thunder',
+        # ILT20
+        'DUB': 'Dubai Capitals', 'ABD': 'Abu Dhabi Knight Riders', 'SHA': 'Sharjah Warriors',
+        'DSG': 'Desert Vipers', 'GUL': 'Gulf Giants', 'MIC': 'MI Emirates',
+    }
+
     def get_team_stats(self, team_name: str) -> Optional[Dict[str, Any]]:
         if not self._loaded:
             self.load()
             
         if not team_name:
             return None
+        
+        # 0. Check abbreviation map first
+        if team_name.upper() in self.TEAM_ABBREVIATIONS:
+            full_name = self.TEAM_ABBREVIATIONS[team_name.upper()]
+            if full_name in self._team_stats:
+                logger.info(f"Mapped team abbreviation '{team_name}' to '{full_name}'")
+                return self._team_stats[full_name]
             
         # 1. Exact match
         if team_name in self._team_stats:
