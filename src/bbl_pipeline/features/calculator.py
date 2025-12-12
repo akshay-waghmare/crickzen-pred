@@ -38,6 +38,27 @@ class ResourceFeatureCalculator:
     # Average T20 par score for resource calculation
     PAR_SCORE_T20 = 160.0
     
+    # RRR-based logistic parameters (calibrated from ILT20 EDA)
+    # win_prob = 1 / (1 + exp(RRR_BETA * (RRR - RRR_MIDPOINT)))
+    # At RRR=9.5, win_prob = 50%
+    RRR_BETA = 0.7  # Controls steepness of transition
+    RRR_MIDPOINT = 9.5  # RRR where win_prob = 50%
+    
+    # Wicket penalty factors (calibrated from ILT20 EDA)
+    # Based on actual win rates by wickets lost:
+    # 0-3 wkts: 70-76% win rate (no penalty)
+    # 4 wkts: 52% (25% penalty)
+    # 5 wkts: 31% (50% penalty)
+    # 6 wkts: 21% (65% penalty)
+    # 7 wkts: 16% (75% penalty)
+    # 8 wkts: 7% (88% penalty)
+    # 9 wkts: 0% (95% penalty)
+    WICKET_PENALTY = {
+        0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00,
+        4: 0.75, 5: 0.50, 6: 0.35, 7: 0.25,
+        8: 0.12, 9: 0.05, 10: 0.01
+    }
+    
     def calculate_resource_percentage(self, overs_remaining: float, wickets_lost: int) -> float:
         """
         Calculate the resource percentage remaining using interpolated DLS values.
@@ -242,10 +263,21 @@ class ResourceFeatureCalculator:
         current_run_rate: float,
         required_run_rate: float,
         current_score: float = 0,
-        balls_remaining: int = None
+        balls_remaining: int = None,
+        wickets_lost: int = None
     ) -> float:
         """
-        Returns a smooth, stable baseline win probability estimate.
+        Returns a data-calibrated win probability estimate.
+        
+        For 2nd innings, uses Required Run Rate as the primary difficulty metric,
+        with wicket penalty applied as a multiplier. Parameters calibrated from
+        ILT20 historical data (EDA).
+        
+        Key findings from EDA:
+        - RRR 7-8: 80% win rate
+        - RRR 9-10: 44% win rate  
+        - RRR 10-12: 37% win rate
+        - Wicket penalty kicks in hard after 4 wickets
         
         Args:
             innings: Current innings (1 or 2)
@@ -256,9 +288,10 @@ class ResourceFeatureCalculator:
             required_run_rate: Required run rate to win (2nd innings only)
             current_score: Current score
             balls_remaining: Actual balls remaining in innings (for endgame logic)
+            wickets_lost: Number of wickets fallen (0-9)
             
         Returns:
-            Win probability estimate (0.05 to 0.98)
+            Win probability estimate (0.001 to 0.999)
         """
         # -------------------------------------
         # INNINGS 1: Team batting first
@@ -268,10 +301,7 @@ class ResourceFeatureCalculator:
             score_advantage = (expected_final_score - self.PAR_SCORE_T20) / 50.0
             
             # Use sigmoid for wider probability range (0.05-0.95)
-            # Allows extreme scores like 180/2 to show ~79% win prob
-            # vs tanh which capped at 0.3-0.7 range
             win_prob = 1.0 / (1.0 + np.exp(-score_advantage * 1.5))
-
             return float(max(0.05, min(0.95, win_prob)))
 
         # -------------------------------------
@@ -291,75 +321,81 @@ class ResourceFeatureCalculator:
             overs_remaining = (resource_pct / 100.0) * self.TOTAL_OVERS
             balls_remaining = int(overs_remaining * 6)
         
-        # END-GAME SPECIAL CASE: When runs needed is achievable within balls remaining
-        # The DLS resource model breaks down for "4 needed off 3 balls" type situations
-        # Use a simple ball-by-ball probability model instead
+        # Get actual wickets (default to 0 if not provided)
+        actual_wickets_lost = wickets_lost if wickets_lost is not None else 0
+
+        # -------------------------------------
+        # END-GAME SPECIAL CASE: Last 2 overs
+        # -------------------------------------
         if balls_remaining > 0 and balls_remaining <= 12 and runs_required <= balls_remaining * 2:
-            # Average runs per ball in T20 death overs is ~1.5
-            # Probability based on runs_per_ball needed vs achievable rate
+            # Use runs per ball needed vs typical death over scoring (~1.5 rpb)
             runs_per_ball_needed = runs_required / balls_remaining
-            # At 1.0 rpb needed: ~80% win prob
-            # At 1.5 rpb needed: ~50% win prob  
-            # At 2.0 rpb needed: ~25% win prob
-            # At 2.5 rpb needed: ~10% win prob
+            # Logistic centered at 1.5 rpb
             endgame_prob = 1.0 / (1.0 + np.exp(4 * (runs_per_ball_needed - 1.5)))
-            return float(max(0.05, min(0.95, endgame_prob)))
-
-        # Estimate the "maximum realistically gettable" runs
-        # Resources * par score * 1.5 factor for modern T20 death overs scoring
-        max_gettable = (resource_pct / 100.0) * self.PAR_SCORE_T20 * 1.5
-
-        # CRITICAL: If resources are essentially zero (game over), return definitive result
-        if resource_pct <= 0.1:  # Less than 0.1% resources = game is over
-            if runs_required <= 0:
-                return 1.0  # Already won
-            else:
-                return 0.0  # Definitely lost - no resources left to score
-
-        # If target is beyond reach given resources, give minimum but non-zero win probability
-        if runs_required > max_gettable:
-            # Decay probability based on how far beyond reach it is
-            ratio = runs_required / max_gettable
-            return 0.05 / (ratio * ratio)  # Quadratic decay
+            
+            # Reduce wicket penalty impact in easy endgame situations
+            # At 0.5 rpb (3 off 6), even 5 down should be ~90%+
+            # Scale penalty by difficulty: low rpb = reduced penalty
+            wicket_mult = self.WICKET_PENALTY.get(actual_wickets_lost, 0.01)
+            # Blend toward 1.0 as runs_per_ball_needed decreases
+            # At rpb=0.5, penalty_weight=0.25; at rpb=1.5, penalty_weight=1.0
+            penalty_weight = min(1.0, runs_per_ball_needed / 1.5)
+            adjusted_wicket_mult = 1.0 - penalty_weight * (1.0 - wicket_mult)
+            
+            return float(max(0.05, min(0.95, endgame_prob * adjusted_wicket_mult)))
 
         # -------------------------------------
-        # Difficulty Ratio
+        # CRITICAL: Handle edge cases
         # -------------------------------------
-        difficulty_ratio = runs_required / max_gettable
-        # Lower ratio = easier chase, higher = tougher
+        if resource_pct <= 0.1:
+            return 1.0 if runs_required <= 0 else 0.001
+
+        # If no balls remaining, match is effectively over
+        if balls_remaining <= 0:
+            return 1.0 if runs_required <= 0 else 0.001
 
         # -------------------------------------
-        # Run Rate Factor (CRR / RRR)
+        # RRR-BASED WIN PROBABILITY (Data-Calibrated)
         # -------------------------------------
-        # Early in the innings, CRR is volatile and shouldn't heavily influence probability.
-        # Scale the rate_factor impact by overs bowled (0-20).
-        overs_bowled = self.TOTAL_OVERS - (resource_pct / 100.0 * self.TOTAL_OVERS)
+        # Calculate effective RRR
+        overs_remaining = balls_remaining / 6.0
+        if overs_remaining > 0:
+            effective_rrr = runs_required / overs_remaining
+        else:
+            effective_rrr = 50.0  # Effectively impossible
+        
+        # Base probability from RRR using logistic function
+        # Calibrated from ILT20 EDA: beta=0.7, mu=9.5
+        # At RRR=7: ~80%, RRR=9.5: ~50%, RRR=12: ~20%
+        base_prob = 1.0 / (1.0 + np.exp(self.RRR_BETA * (effective_rrr - self.RRR_MIDPOINT)))
+        
+        # -------------------------------------
+        # WICKET PENALTY (Data-Calibrated)
+        # -------------------------------------
+        # Based on ILT20 EDA: significant drop in win rate after 4 wickets
+        wicket_mult = self.WICKET_PENALTY.get(actual_wickets_lost, 0.01)
+        
+        # -------------------------------------
+        # CURRENT RUN RATE ADJUSTMENT
+        # -------------------------------------
+        # If batting above required rate, slight boost; below, slight penalty
+        # Effect is muted early in innings (CRR volatile)
+        overs_bowled = self.TOTAL_OVERS - overs_remaining
         overs_weight = min(1.0, overs_bowled / 10.0)  # Full weight after 10 overs
         
+        rate_factor = 1.0
         if required_run_rate > 0 and current_run_rate > 0:
             rate_ratio = current_run_rate / required_run_rate
-            # Bound the impact: between 0.8 and 1.2 multiplier (reduced from 0.7-1.3)
-            raw_rate_factor = min(1.2, max(0.8, rate_ratio))
-            # Scale toward 1.0 in early overs
+            # Bound the impact: between 0.90 and 1.10 multiplier
+            raw_rate_factor = min(1.10, max(0.90, rate_ratio))
             rate_factor = 1.0 + (raw_rate_factor - 1.0) * overs_weight
-        else:
-            rate_factor = 1.0
-
+        
         # -------------------------------------
-        # Base probability using sigmoid transformation
+        # COMBINE ALL FACTORS
         # -------------------------------------
-        # Calibrated for realistic 2nd innings probabilities:
-        # difficulty_ratio 0.3 → ~95%
-        # difficulty_ratio 0.5 → ~73%
-        # difficulty_ratio 0.65 → ~50%
-        # difficulty_ratio 0.8 → ~25%
-        # difficulty_ratio 0.95 → ~5%
-        base_prob = 1.0 / (1.0 + np.exp(8 * (difficulty_ratio - 0.65)))
+        win_prob = base_prob * wicket_mult * rate_factor
 
-        # Combine with run-rate factor (effect is muted early in innings)
-        win_prob = base_prob * rate_factor
-
-        # Final clamp for sanity - allow lower probabilities for hopeless chases
+        # Final clamp
         return float(max(0.001, min(0.999, win_prob)))
     
     def calculate_all_features(self, innings: int, over: int, ball: int,
@@ -423,7 +459,8 @@ class ResourceFeatureCalculator:
             current_run_rate=current_run_rate,
             required_run_rate=required_run_rate,
             current_score=current_score,
-            balls_remaining=balls_remaining
+            balls_remaining=balls_remaining,
+            wickets_lost=wickets_lost
         )
         
         return {
