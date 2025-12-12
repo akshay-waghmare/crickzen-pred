@@ -132,6 +132,42 @@ def flatten_delivery(
     }
     return row
 
+def should_skip_match(match_data: Dict[str, Any], match_id: str) -> Tuple[bool, str]:
+    """
+    Check if a match should be skipped for training purposes.
+    
+    Skip matches where:
+    - No clear winner (tie decided by super over, no result, abandoned, etc.)
+    - The outcome is determined by something other than normal play
+    
+    Returns:
+        Tuple of (should_skip, reason)
+    """
+    info = match_data.get('info', {})
+    outcome = info.get('outcome', {})
+    
+    # Skip if no outcome at all
+    if not outcome:
+        return True, "no_outcome"
+    
+    # Skip 'no result' matches (rain, abandoned, etc.)
+    if outcome.get('result') == 'no result':
+        return True, "no_result"
+    
+    # Skip tie matches (decided by super over or eliminator)
+    # These have outcome.result='tie' with an 'eliminator' key
+    if outcome.get('result') == 'tie':
+        return True, "tie_super_over"
+    
+    # Skip if no winner specified (shouldn't happen for normal completed matches)
+    if not outcome.get('winner') and outcome.get('result') not in ['runs', 'wickets']:
+        # Some matches have 'by' key without 'winner' for DLS etc.
+        if 'by' not in outcome:
+            return True, "no_winner"
+    
+    return False, ""
+
+
 def process_match(
     match_data: Dict[str, Any], 
     match_id: str,
@@ -142,7 +178,14 @@ def process_match(
     
     Returns:
         Tuple of (main_records, super_over_records)
+        Returns empty lists if match should be skipped (tie/no result/etc.)
     """
+    # Check if match should be skipped
+    skip, reason = should_skip_match(match_data, match_id)
+    if skip:
+        logger.info("Skipping match", match_id=match_id, reason=reason)
+        return [], []
+    
     meta = extract_match_metadata(match_data, match_id)
     
     main_records = []
