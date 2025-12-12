@@ -49,7 +49,13 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         'runs_last_12', 'runs_last_18', 'wickets_last_12'
     ]
     
-    def __init__(self, xgb_weight: float = 0.5, n_features: int = 25):
+    def __init__(
+        self,
+        xgb_weight: float = 0.5,
+        n_features: int = 25,
+        xgb_params: Optional[Dict[str, Any]] = None,
+        logreg_c: float = 0.01,
+    ):
         """
         Args:
             xgb_weight: Weight for XGBoost predictions (1 - xgb_weight for LogReg)
@@ -57,6 +63,8 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         """
         self.xgb_weight = xgb_weight
         self.n_features = min(n_features, len(self.TOP_FEATURES))
+        self.xgb_params = xgb_params
+        self.logreg_c = logreg_c
         self.selected_features_ = None
         self.xgb_model_ = None
         self.logreg_model_ = None
@@ -76,29 +84,32 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
             
         X_selected = X[self.selected_features_]
         
-        # XGBoost model
-        self.xgb_model_ = XGBClassifier(
-            objective='binary:logistic', 
-            eval_metric='logloss', 
-            n_estimators=650,
-            max_depth=2,
-            learning_rate=0.011,
-            subsample=0.5,
-            colsample_bytree=0.5,
-            min_child_weight=28,
-            reg_alpha=2.8,
-            reg_lambda=3.8,
-            tree_method='hist',
-            n_jobs=-1,
-            verbosity=0,
-            random_state=42
-        )
+        default_xgb_params = {
+            'objective': 'binary:logistic',
+            'eval_metric': 'logloss',
+            'n_estimators': 650,
+            'max_depth': 2,
+            'learning_rate': 0.011,
+            'subsample': 0.5,
+            'colsample_bytree': 0.5,
+            'min_child_weight': 28,
+            'reg_alpha': 2.8,
+            'reg_lambda': 3.8,
+            'tree_method': 'hist',
+            'n_jobs': -1,
+            'verbosity': 0,
+            'random_state': 42,
+        }
+        if self.xgb_params:
+            default_xgb_params.update(self.xgb_params)
+
+        self.xgb_model_ = XGBClassifier(**default_xgb_params)
         
         # LogisticRegression model with scaling
         self.logreg_model_ = Pipeline([
             ('imputer', SimpleImputer(strategy='mean')),
             ('scaler', StandardScaler()),
-            ('clf', LogisticRegression(C=0.01, max_iter=1000, random_state=42))
+            ('clf', LogisticRegression(C=self.logreg_c, max_iter=1000, random_state=42))
         ])
         
         # Fit both models
@@ -131,6 +142,9 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         return {
             'xgb_weight': self.xgb_weight,
             'n_features': self.n_features
+            ,
+            'xgb_params': self.xgb_params,
+            'logreg_c': self.logreg_c,
         }
     
     def set_params(self, **params):
@@ -158,12 +172,11 @@ class Trainer:
     ==================================================
     - XGBoost (50%) + LogisticRegression (50%) blend
     - Uses top 25 features by importance
-    - No calibration needed (hurts performance)
+    - No post-hoc calibration by default (hurts performance)
     
     OPTIMIZATION FINDINGS (December 2025):
     =====================================
-    1. CALIBRATION: Isotonic calibration HURTS performance.
-       - With calibration: 0.1854 | Without: 0.1795 | With ensemble: 0.1777
+    1. CALIBRATION: Post-hoc calibration did not improve Brier in experiments.
        
     2. ENSEMBLE: XGB + LogReg blend outperforms single models
        - XGBoost alone: 0.1795
@@ -178,13 +191,13 @@ class Trainer:
     def __init__(self, use_calibration: bool = False, calibration_method: str = 'isotonic'):
         """
         Args:
-            use_calibration: Whether to apply post-hoc calibration. 
+            use_calibration: Whether to apply post-hoc calibration.
                              Default False (best Brier score).
             calibration_method: 'isotonic' or 'sigmoid' (Platt scaling)
         """
         self.use_calibration = use_calibration
         self.calibration_method = calibration_method
-        
+
         # Primary model: XGBLogRegEnsemble (Brier 0.1777)
         self.models = {
             'ensemble': XGBLogRegEnsemble(xgb_weight=0.5, n_features=25),
@@ -207,23 +220,23 @@ class Trainer:
                 
                 # Clone to ensure fresh start
                 base_model = clone(model)
-                
+
                 if self.use_calibration:
                     # Split into train/calib
                     X_train, y_train = X.iloc[train_idx], y.iloc[train_idx]
                     X_calib, y_calib = X.iloc[calib_idx], y.iloc[calib_idx]
-                    
+
                     base_model.fit(X_train, y_train)
-                    
+
                     calibrated = CalibratedModel(base_model, method=self.calibration_method)
                     calibrated.fit(X_calib, y_calib)
-                    
+
                     probs = calibrated.predict_proba(X_test)[:, 1]
                 else:
                     # No calibration - use all training data
                     all_train_idx = np.concatenate([train_idx, calib_idx])
                     X_train, y_train = X.iloc[all_train_idx], y.iloc[all_train_idx]
-                    
+
                     base_model.fit(X_train, y_train)
                     probs = base_model.predict_proba(X_test)[:, 1]
                 
@@ -257,19 +270,19 @@ class Trainer:
             # Split into Train/Calibration
             n_samples = len(X)
             n_calib = int(n_samples * calibration_size)
-            
+
             X_train = X.iloc[:-n_calib]
             y_train = y.iloc[:-n_calib]
             X_calib = X.iloc[-n_calib:]
             y_calib = y.iloc[-n_calib:]
-            
+
             logger.info(f"Training final {model_name} model. Train size: {len(X_train)}, Calib size: {len(X_calib)}")
-            
+
             base_model.fit(X_train, y_train)
-            
+
             calibrated = CalibratedModel(base_model, method=self.calibration_method)
             calibrated.fit(X_calib, y_calib)
-            
+
             return calibrated
         else:
             # No calibration - train on full data

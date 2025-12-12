@@ -25,7 +25,7 @@ After extensive experimentation (December 2025), the following optimizations wer
 2. Can overfit to the calibration set (especially isotonic)
 3. Adds unnecessary complexity
 
-**Action:** Default training now uses `--no-calibration`. Use `--calibration` flag only if you have a specific reason.
+**Action:** Default training is uncalibrated (post-hoc calibration did not improve Brier in our experiments).
 
 ### 2. Optimal Hyperparameters
 
@@ -115,12 +115,12 @@ python -m bbl_pipeline.cli train \
     --output-dir models/champion
 ```
 
-### Training with Calibration (if needed)
+### Training with Calibration (optional)
 ```bash
 python -m bbl_pipeline.cli train \
-    --input-file data/training_sampled.parquet \
-    --output-dir models/champion \
-    --calibration
+   --input-file data/training_sampled.parquet \
+   --output-dir models/champion \
+   --calibration
 ```
 
 ## Model Location

@@ -316,9 +316,6 @@ def process(input_dir, output_dir, feature_store_dir):
 def train(ctx, input_file, output_dir, calibration):
     """
     Train, evaluate, and select the champion model.
-    
-    By default, trains WITHOUT post-hoc calibration as this produces the best
-    Brier score (0.1795 vs 0.1854 with isotonic calibration).
     """
     from bbl_pipeline.training.trainer import Trainer
     from bbl_pipeline.training.selection import select_champion
@@ -340,10 +337,9 @@ def train(ctx, input_file, output_dir, calibration):
     y = df[target_col]
     X = df.drop(columns=[target_col])
     
-    # Initialize trainer with calibration setting
     # Default: no calibration (best Brier score)
     trainer = Trainer(use_calibration=calibration)
-    
+
     if not calibration:
         logger.info("Training without post-hoc calibration (best Brier score)")
     else:
