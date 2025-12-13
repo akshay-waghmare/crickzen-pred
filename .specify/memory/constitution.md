@@ -1,10 +1,8 @@
 <!--
 SYNC IMPACT REPORT
-Version: 1.2.0 -> 1.3.0
+Version: 1.3.0 -> 1.4.0
 Modified Principles:
-- Refined PRINCIPLE_1 to explicitly mention robust handling of edge cases (rain, DLS, etc.).
-- Refined PRINCIPLE_2 to include drift-based retraining triggers.
-- Refined PRINCIPLE_5 to mandate separate calibration sets, uncertainty quantification, and live monitoring.
+- Refined PRINCIPLE_5 (Model Calibration & Observability) to enforce a strict Expected Calibration Error (ECE) threshold of < 0.0021 for betting-grade production readiness.
 Added Sections: None
 Removed Sections: None
 Templates requiring updates: None
@@ -28,7 +26,8 @@ All experiments, data versions, and model artifacts MUST be versioned. Training 
 Data quality is paramount. Input data MUST be validated against strict schemas before entering the pipeline. **Crucially, all categorical entity identifiers (including but not limited to player names, team names, and venue names) MUST be normalized to a canonical format using a shared mapping layer. This ensures consistency between historical training data (e.g., Cricsheet) and live inference data (e.g., scraped feeds).** Feature engineering steps MUST include checks for outliers, missing values, and data drift. "Garbage in, garbage out" is a critical risk that must be mitigated through automated validation gates.
 
 ### V. Model Calibration & Observability
-The system MUST provide comprehensive observability into model performance. **The supreme metric for model quality is PROBABILISTIC CALIBRATION. If the model predicts an event with 70% probability, it MUST occur approximately 70% of the time (e.g., 69-71%).**
+The system MUST provide comprehensive observability into model performance. **The supreme metric for model quality is PROBABILISTIC CALIBRATION.**
+*   **Strict ECE Threshold**: For production deployment in betting scenarios, models **MUST** achieve an Expected Calibration Error (ECE) of **< 0.0021**. This ensures that predicted probabilities are highly reliable and actionable.
 *   **Strict Separation**: Calibration metrics MUST be calculated on a held-out evaluation set distinct from the set used to train or calibrate the model.
 *   **Uncertainty Quantification**: The system SHOULD support uncertainty-aware models (e.g., ensembles, Bayesian methods) to provide robust probability distributions.
 *   **Live Monitoring**: In production, all predictions MUST be logged against actual outcomes to track calibration drift and "model health" in real-time.
@@ -71,4 +70,4 @@ This constitution is the supreme law of the project. Amendments require a Pull R
 ### Compliance
 All Pull Requests MUST be checked against these principles. Non-compliant code (e.g., hardcoded tournament logic, monolithic scripts) MUST be rejected.
 
-**Version**: 1.3.0 | **Ratified**: 2025-12-09 | **Last Amended**: 2025-12-09
+**Version**: 1.4.0 | **Ratified**: 2025-12-09 | **Last Amended**: 2025-12-14
