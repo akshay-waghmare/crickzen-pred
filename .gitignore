@@ -32,10 +32,14 @@ ENV/
 # Project Data
 big_bash_model/bbl_male_dataset/
 big_bash_model/bbl_male_json_dataset/
-data/
+data/*
 !data/raw_json/
+!data/bbl_feature_store_v2/
+!data/ilt_feature_store_v3/
 output/
 *.parquet
+!data/bbl_feature_store_v2/*.parquet
+!data/ilt_feature_store_v3/*.parquet
 *.json
 !config/*.json
 !src/**/*.json
