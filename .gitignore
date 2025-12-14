@@ -33,12 +33,14 @@ ENV/
 big_bash_model/bbl_male_dataset/
 big_bash_model/bbl_male_json_dataset/
 data/
+!data/raw_json/
 output/
 *.parquet
 *.json
 !config/*.json
 !src/**/*.json
 !tests/**/*.json
+!data/raw_json/**/*.json
 
 # Logs
 *.log
