@@ -8,7 +8,7 @@ Our latest champion model achieves state-of-the-art calibration:
 - **Brier Score:** 0.1514
 - **ECE (Calibration Error):** 0.0087
 - **Method:** XGBoost (WBBL Tuned) + Isotonic Calibration
-- [Read the full documentation](docs/BBL_MODEL_V3.md)
+- [Read the full documentation](docs/BBL_MODEL_V3.md) - Includes detailed phase-wise, over-wise, and probability zone analysis.
 
 ## Features
 

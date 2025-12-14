@@ -75,5 +75,40 @@ calibrated = CalibratedClassifierCV(base_model, method='isotonic', cv='prefit')
 calibrated.fit(X_calib, y_calib)
 ```
 
+## Detailed Performance Analysis
+
+### 1. Probability Zone Calibration
+The model shows exceptional calibration across high-density probability zones.
+
+| Range | Count | Mean Pred | Actual Win Rate | Diff (Error) | Brier Score | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **0.0 - 0.1** | 3,406 | 3.20% | 3.20% | **0.00%** | 0.0301 | ✅ Perfect |
+| **0.1 - 0.2** | 1,660 | 14.11% | 11.51% | 2.61% | 0.1019 | Slight Overconfidence |
+| **0.2 - 0.3** | 3,024 | 25.02% | 25.43% | **0.41%** | 0.1890 | ✅ Excellent |
+| **0.3 - 0.4** | 322 | 35.44% | 31.37% | 4.07% | 0.2170 | Overconfidence (Low Sample) |
+| **0.4 - 0.5** | 3,194 | 41.88% | 41.70% | **0.17%** | 0.2426 | ✅ Perfect |
+| **0.5 - 0.6** | 2,035 | 55.60% | 54.64% | 0.95% | 0.2477 | ✅ Excellent |
+| **0.6 - 0.7** | 1,391 | 67.92% | 64.34% | 3.58% | 0.2307 | Slight Overconfidence |
+| **0.7 - 0.8** | 4,175 | 74.18% | 75.50% | 1.32% | 0.1835 | ✅ Very Good |
+| **0.8 - 0.9** | 36 | 85.97% | 91.67% | 5.69% | 0.0793 | Underconfidence (Very Low Sample) |
+| **0.9 - 1.0** | 3,951 | 94.97% | 94.99% | **0.02%** | 0.0459 | ✅ Perfect |
+
+### 2. Over-wise Performance
+The model's reliability varies by match stage, with the **2nd Inning Middle Overs** being the most reliable.
+
+#### Inning 1
+| Over | ECE | Brier | Notes |
+| :--- | :--- | :--- | :--- |
+| **2-6 (PP)** | ~0.046 | ~0.205 | High uncertainty, slightly higher calibration error. |
+| **7-15** | ~0.040 | ~0.185 | Calibration improves as the inning stabilizes. |
+| **16-20** | ~0.032 | ~0.172 | **Best Calibration** for Inning 1. The model reads the death overs well. |
+
+#### Inning 2
+| Over | ECE | Brier | Notes |
+| :--- | :--- | :--- | :--- |
+| **2-6 (PP)** | ~0.042 | ~0.160 | Better accuracy than Inn 1 PP, but similar calibration error. |
+| **7-15** | **~0.029** | **~0.109** | **Sweet Spot**. Over 11 has an incredible ECE of **0.0148**. |
+| **16-20** | ~0.040 | **~0.059** | **Highest Accuracy**. Brier drops massively as the result becomes clear. |
+
 ## Conclusion
 The combination of **domain-specific hyperparameter tuning** (transfer learning from WBBL) and **post-hoc isotonic calibration** yields the most robust probability estimates for the Big Bash League.
