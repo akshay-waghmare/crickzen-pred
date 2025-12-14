@@ -1,0 +1,15 @@
+{
+  "last_updated": "2025-12-14",
+  "active_models": {
+    "BBL": {
+      "path": "models/bbl_v8",
+      "version": "v8",
+      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.1809, ECE: 0.0000)"
+    },
+    "ILT20": {
+      "path": "models/ilt20_v4",
+      "version": "v4",
+      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.0714, ECE: 0.0000)"
+    }
+  }
+}
