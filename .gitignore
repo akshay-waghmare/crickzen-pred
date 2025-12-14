@@ -30,8 +30,7 @@ ENV/
 .idea/
 
 # Project Data
-big_bash_model/bbl_male_dataset/
-big_bash_model/bbl_male_json_dataset/
+archived_data/
 data/*
 !data/raw_json/
 !data/bbl_feature_store_v2/
