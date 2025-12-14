@@ -87,14 +87,14 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         default_xgb_params = {
             'objective': 'binary:logistic',
             'eval_metric': 'logloss',
-            'n_estimators': 650,
-            'max_depth': 2,
-            'learning_rate': 0.011,
-            'subsample': 0.5,
-            'colsample_bytree': 0.5,
-            'min_child_weight': 28,
-            'reg_alpha': 2.8,
-            'reg_lambda': 3.8,
+            'n_estimators': 400,
+            'max_depth': 5,  # Deeper trees for more feature interactions
+            'learning_rate': 0.02,
+            'subsample': 0.8,
+            'colsample_bytree': 0.9,  # Use most features per tree
+            'min_child_weight': 10,  # Allow more splits
+            'reg_alpha': 0.5,  # Less regularization = more feature usage
+            'reg_lambda': 1.5,
             'tree_method': 'hist',
             'n_jobs': -1,
             'verbosity': 0,
@@ -203,7 +203,7 @@ class Trainer:
             'ensemble': XGBLogRegEnsemble(xgb_weight=0.5, n_features=25),
         }
         
-        self.splitter = TimeSeriesCalibrationSplit(n_splits=5, calibration_size=0.15)
+        self.splitter = TimeSeriesCalibrationSplit(n_splits=5, calibration_size=0.30)
 
     def evaluate_models(self, X: pd.DataFrame, y: pd.Series) -> List[Dict[str, Any]]:
         """
@@ -256,7 +256,7 @@ class Trainer:
             
         return results
 
-    def train_final_model(self, model_name: str, X: pd.DataFrame, y: pd.Series, calibration_size: float = 0.15):
+    def train_final_model(self, model_name: str, X: pd.DataFrame, y: pd.Series, calibration_size: float = 0.30):
         """
         Trains the final model. If use_calibration=False, trains on full data.
         Returns either a CalibratedModel or the base model.

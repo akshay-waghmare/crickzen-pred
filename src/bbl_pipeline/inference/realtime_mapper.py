@@ -56,11 +56,15 @@ class RealTimeFeatureMapper:
         if len(self.ball_history) > 30:
             self.ball_history.pop(0)
 
-    def _calculate_rolling_stats(self) -> Dict[str, float]:
-        """Calculate rolling stats from history."""
-        # If we don't have enough history for meaningful rolling stats,
-        # return sensible defaults based on average T20 scoring
-        if len(self.ball_history) < 6:  # Need at least an over of history
+    def _calculate_rolling_stats(self, current_innings: int = None) -> Dict[str, float]:
+        """Calculate rolling stats from history.
+        
+        Args:
+            current_innings: The current innings number (1 or 2). If provided,
+                           only balls from this innings are used.
+        """
+        # If we don't have any history, return sensible defaults
+        if len(self.ball_history) == 0:
             return {
                 'runs_last_12': 12.0,  # ~6 runs per over (2 overs) is typical
                 'runs_last_18': 18.0,  # ~6 runs per over (3 overs)
@@ -68,8 +72,21 @@ class RealTimeFeatureMapper:
                 'boundary_pct_last_18': 0.15  # ~15% boundary rate typical
             }
             
-        # Convert to DF for easier calc
+        # Convert to DF for easier calc (use whatever history we have)
         df = pd.DataFrame(self.ball_history)
+        
+        # CRITICAL: Filter to current innings only to avoid cross-innings contamination
+        if current_innings is not None and 'innings_num' in df.columns:
+            df = df[df['innings_num'] == current_innings]
+            
+        # If no balls in current innings, return defaults
+        if len(df) == 0:
+            return {
+                'runs_last_12': 0.0,  # No history in this innings yet
+                'runs_last_18': 0.0,
+                'wickets_last_12': 0.0,
+                'boundary_pct_last_18': 0.0
+            }
         
         # Ensure columns exist
         if 'runs_scored' not in df.columns:
@@ -228,7 +245,8 @@ class RealTimeFeatureMapper:
         )
         
         # --- Rolling Stats ---
-        rolling_stats = self._calculate_rolling_stats()
+        # Pass current innings to avoid cross-innings contamination
+        rolling_stats = self._calculate_rolling_stats(current_innings=innings)
         
         # --- Rate Features ---
         # Use scraped values if available, otherwise use calculated
@@ -329,8 +347,8 @@ class RealTimeFeatureMapper:
         # CRR times resources remaining
         crr_times_res = current_run_rate * resource_features.get('resource_pct', 100) / 100
         
-        # Resources remaining (for 2nd innings chase)
-        resources_remaining = resource_features.get('resource_pct', 100) / 100 if innings == 2 else 0
+        # Resources remaining (for both innings)
+        resources_remaining = resource_features.get('resource_pct', 100) / 100
         
         # --- Construct Feature DataFrame ---
         features = {

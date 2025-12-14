@@ -1,5 +1,6 @@
 import joblib
 import json
+import pickle
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -32,10 +33,11 @@ class Predictor:
     Inference engine for BBL win probability.
     Enhanced with resource-based features for improved calibration.
     """
-    def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float]):
+    def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], calibrator=None):
         self.model = model
         self.feature_store = feature_store
         self.global_stats = global_stats
+        self.calibrator = calibrator  # Isotonic calibrator for probability calibration
         self.resource_calculator = ResourceFeatureCalculator()
         # Use RealTimeFeatureMapper for proper feature generation
         self.feature_mapper = RealTimeFeatureMapper(feature_store, global_stats)
@@ -114,7 +116,18 @@ class Predictor:
                 'global_bowling_sr': 18.0,
             }
         
-        return cls(model, feature_store, global_stats)
+        # Load isotonic calibrator if available
+        calibrator = None
+        calibrator_path = path / "isotonic_calibrator.pkl"
+        if calibrator_path.exists():
+            try:
+                with open(calibrator_path, 'rb') as f:
+                    calibrator = pickle.load(f)
+                logger.info("Loaded isotonic calibrator for probability calibration")
+            except Exception as e:
+                logger.warning(f"Failed to load calibrator: {e}")
+        
+        return cls(model, feature_store, global_stats, calibrator)
 
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
@@ -274,7 +287,15 @@ class Predictor:
                         print(f"  {col}: {val}")
                 print("="*70 + "\n")
             
-            model_prob = self.model.predict_proba(X)[0, 1]  # Probability of class 1 (Win)
+            raw_prob = self.model.predict_proba(X)[0, 1]  # Probability of class 1 (Win)
+            
+            # Apply isotonic calibration if available
+            if self.calibrator is not None:
+                model_prob = float(self.calibrator.predict([raw_prob])[0])
+                if debug:
+                    print(f"📊 Calibration: raw={raw_prob:.4f} → calibrated={model_prob:.4f}")
+            else:
+                model_prob = raw_prob
             
             # Get resource-based probability for extreme edge case guardrail
             resource_prob = X['resource_win_prob'].iloc[0] if 'resource_win_prob' in X.columns else 0.5
@@ -311,6 +332,9 @@ class Predictor:
                     prob = min(model_prob, 0.05)
                 
                 # --- ENDGAME GUARDRAILS ---
+                # Only apply these in late-game situations (after 10 overs)
+                # Early innings have too much variance to apply resource-based floors
+                
                 # 1. "Victory Lap" Scenarios: Explicitly handle obvious wins
                 # The model can be conservative (e.g. 92%) due to calibration bins, but
                 # humans know these are 99%+ situations.
@@ -322,18 +346,15 @@ class Predictor:
                     # Two hits away, run-a-ball, plenty of wickets -> 98%
                     prob = max(model_prob, 0.98)
 
-                # 2. Resource-based Guardrails (for other high-prob situations)
-                elif resource_prob > 0.97:
-                    # Game Won: resource_prob = 1.0 means target already achieved
-                    if resource_prob == 1.0:
-                        prob = 1.0
-                    # If resource says we are winning (>97%), ensure we are at least 95% confident
-                    # If resource is extremely high (>99%), go higher
-                    else:
-                        floor = 0.95
-                        if resource_prob > 0.99: floor = 0.98
-                        
-                        prob = max(model_prob, floor)
+                # 2. Resource-based Guardrails (ONLY in late game - after 10 overs)
+                # Early innings have too much variance - trust the model
+                elif state.over >= 10 and resource_prob > 0.99:
+                    # Very late game with near-certain DLS position
+                    prob = max(model_prob, 0.95)
+                    
+                elif state.over >= 15 and resource_prob > 0.97:
+                    # Death overs with strong DLS position  
+                    prob = max(model_prob, 0.90)
 
                 # 3. Loss Guardrails - Smooth continuous capping
                 # If resource_prob is low, the model shouldn't be too optimistic

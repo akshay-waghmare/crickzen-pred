@@ -10,10 +10,13 @@ import sys
 import os
 import re
 import json
+import structlog
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+
+logger = structlog.get_logger()
 
 # Add scraper to path
 SCRAPER_PATH = Path(__file__).parent.parent.parent.parent.parent / "scraper" / "crex_scraper_python"
@@ -263,12 +266,19 @@ class CrexLivePredictor:
                         
                         if isinstance(b_obj, dict):
                             u_val = str(b_obj.get("u", "0"))
+                            # Also check for explicit wicket field
+                            has_wicket_field = b_obj.get("w") == 1 or b_obj.get("wicket") == 1
                         else:
                             u_val = str(b_obj)
+                            has_wicket_field = False
                         
                         # Parse runs
                         runs = 0
-                        is_wicket = u_val.upper() == "W"
+                        # Detect wicket from multiple formats: W, w, OUT, or explicit wicket field
+                        # Be careful NOT to match "WD" (wide) or "1W" (runs + wide) as wickets
+                        u_upper = u_val.upper()
+                        is_wide = "WD" in u_upper or u_upper.endswith("W") and u_upper != "W"  # e.g. "1W" = 1 wide
+                        is_wicket = (u_upper in ("W", "OUT") or has_wicket_field) and not is_wide
                         is_dot = u_val == "0"
                         is_boundary = u_val == "4"
                         is_six = u_val == "6"
@@ -338,12 +348,29 @@ class CrexLivePredictor:
             needs_runs_match = re.search(r'need\s+(\d+)\s+runs?\s+(?:in|from)\s+(\d+)\s+balls?', page_text, re.IGNORECASE)
             rrr_match = re.search(r'RRR\s*:\s*([\d.]+)', page_text)
             
-            if needs_runs_match or rrr_match:
+            # Also try to extract the first innings total from "vs Team XXX-Y" or "((overs))" pattern
+            # Pattern: "vs Sydney Sixers 113-5 ((11.0))" -> target = 114
+            first_innings_match = re.search(r'vs\s+[A-Za-z\s]+\s+(\d+)-\d+\s+\(\(', page_text)
+            
+            if needs_runs_match or rrr_match or first_innings_match:
+                # Note: We do NOT clear balls_data here anymore!
+                # The _build_ball_history_for_mapper function handles innings filtering
+                # by detecting the innings boundary (over number reset)
+                if not self.match_state.is_second_innings:
+                    logger.info("Innings change detected - will filter ball history in _build_ball_history_for_mapper")
                 self.match_state.is_second_innings = True
+                
+                # Set target from "need X runs" if available
                 if needs_runs_match:
                     runs_needed = int(needs_runs_match.group(1))
                     # Target = current_score + runs_needed
                     self.match_state.target = self.match_state.total_runs + runs_needed
+                # Otherwise, set target from first innings score (if not already set)
+                elif first_innings_match and self.match_state.target is None:
+                    first_innings_score = int(first_innings_match.group(1))
+                    self.match_state.target = first_innings_score + 1  # Target = first innings + 1
+                    logger.info(f"Set target from first innings score: {first_innings_score} + 1 = {self.match_state.target}")
+                    
                 if rrr_match:
                     self.match_state.required_run_rate = float(rrr_match.group(1))
             
@@ -528,6 +555,14 @@ class CrexLivePredictor:
             
             # Convert ball history to mapper format for rolling stats
             ball_history = self._build_ball_history_for_mapper()
+            logger.info(f"Ball history has {len(ball_history)} balls, current state: {self.match_state.total_runs}/{self.match_state.wickets}")
+            
+            # Log ball history details for debugging
+            if ball_history:
+                logger.info(f"Ball history details: {ball_history[-3:]}")  # Last 3 balls
+                # Show all wicket balls
+                wicket_balls = [b for b in ball_history if b.get('is_wicket', 0) == 1]
+                logger.info(f"Wicket balls in history ({len(wicket_balls)}): {wicket_balls}")
             
             # Get prediction using predictor (debug=True to see features)
             win_prob = self.predictor.predict(
@@ -554,11 +589,38 @@ class CrexLivePredictor:
         running_score = 0
         running_wickets = 0
         
-        # Sort balls by over and ball number
-        sorted_balls = sorted(
-            self.match_state.balls_data,
-            key=lambda b: (b.over_number, b.ball_in_over)
-        )
+        # Get balls - use original order first to detect innings boundary
+        balls = list(self.match_state.balls_data)
+        
+        # For 2nd innings: filter to only include balls from current innings
+        # Detection: Find where overs reset (e.g., 11.4 -> 0.1), indicating innings change
+        if self.match_state.is_second_innings and balls:
+            current_overs = self.match_state.overs
+            innings_start_idx = 0
+            
+            # Look for the point where overs reset to a low value
+            # In 2nd innings, current overs will be <= 20, while 1st innings had overs up to 20
+            for i, ball in enumerate(balls):
+                # If this ball's over is small (early in 2nd innings) and we're in 2nd innings
+                if ball.over_number <= current_overs + 1:
+                    # Check if this could be the start of 2nd innings
+                    # The key indicator: preceding balls have higher over numbers
+                    if i > 0:
+                        # Look at a few preceding balls
+                        preceding_overs = [b.over_number for b in balls[max(0, i-3):i]]
+                        if preceding_overs and max(preceding_overs) > current_overs + 5:
+                            # Big jump backwards = innings boundary
+                            innings_start_idx = i
+                            logger.info(f"Detected innings boundary at index {i}: overs {preceding_overs} -> {ball.over_number}")
+                            break
+            
+            # Only keep balls from current innings
+            if innings_start_idx > 0:
+                balls = balls[innings_start_idx:]
+                logger.info(f"Filtered ball history: keeping {len(balls)} balls from 2nd innings")
+        
+        # Now sort the filtered balls by over/ball
+        sorted_balls = sorted(balls, key=lambda b: (b.over_number, b.ball_in_over))
         
         for ball in sorted_balls:
             running_score += ball.runs
@@ -575,6 +637,20 @@ class CrexLivePredictor:
                 'total_score': running_score,
                 'total_wickets': running_wickets,
             })
+        
+        # CRITICAL: Sync with actual match state if there's a mismatch
+        # The scraped ball-by-ball data may miss some events
+        actual_wickets = self.match_state.wickets
+        actual_score = self.match_state.total_runs
+        
+        if history and (running_wickets != actual_wickets or running_score != actual_score):
+            # Correct the last ball's totals to match reality
+            history[-1]['total_score'] = actual_score
+            history[-1]['total_wickets'] = actual_wickets
+            # If wickets are behind, mark the last ball as a wicket if it wasn't
+            if running_wickets < actual_wickets and history[-1]['is_wicket'] == 0:
+                history[-1]['is_wicket'] = 1
+                logger.info(f"Corrected ball history: adjusted wickets from {running_wickets} to {actual_wickets}")
         
         return history
     
