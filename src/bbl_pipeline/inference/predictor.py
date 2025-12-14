@@ -28,13 +28,49 @@ class DummyFeatureStore:
         pass
 
 
+class EnsembleModelWrapper:
+    """Wrapper to make ensemble model dict behave like a sklearn model."""
+    
+    def __init__(self, model_dict):
+        self.model_dict = model_dict
+        self.xgb_model = model_dict['xgb_model']
+        self.lr_model = model_dict['lr_model']
+        self.scaler = model_dict['scaler']
+        self.features = model_dict.get('features', [])
+        weights = model_dict.get('ensemble_weights', [0.5, 0.5])
+        self.xgb_weight = weights[0]
+        self.lr_weight = weights[1]
+    
+    def predict_proba(self, X):
+        """Return ensemble probability predictions."""
+        # Scale for LogReg
+        X_scaled = self.scaler.transform(X)
+        
+        # Get probabilities from both models
+        xgb_probs = self.xgb_model.predict_proba(X)
+        lr_probs = self.lr_model.predict_proba(X_scaled)
+        
+        # Weighted average
+        ensemble_probs = self.xgb_weight * xgb_probs + self.lr_weight * lr_probs
+        return ensemble_probs
+    
+    @property
+    def feature_names_in_(self):
+        """Return feature names for compatibility."""
+        return self.features if self.features else None
+
+
 class Predictor:
     """
     Inference engine for BBL win probability.
     Enhanced with resource-based features for improved calibration.
     """
     def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], calibrator=None):
-        self.model = model
+        # Wrap ensemble model dict if needed
+        if isinstance(model, dict) and 'xgb_model' in model:
+            self.model = EnsembleModelWrapper(model)
+        else:
+            self.model = model
         self.feature_store = feature_store
         self.global_stats = global_stats
         self.calibrator = calibrator  # Isotonic calibrator for probability calibration
@@ -121,8 +157,12 @@ class Predictor:
         calibrator_path = path / "isotonic_calibrator.pkl"
         if calibrator_path.exists():
             try:
-                with open(calibrator_path, 'rb') as f:
-                    calibrator = pickle.load(f)
+                # Try joblib first (newer models), then pickle (older models)
+                try:
+                    calibrator = joblib.load(calibrator_path)
+                except Exception:
+                    with open(calibrator_path, 'rb') as f:
+                        calibrator = pickle.load(f)
                 logger.info("Loaded isotonic calibrator for probability calibration")
             except Exception as e:
                 logger.warning(f"Failed to load calibrator: {e}")
@@ -289,13 +329,23 @@ class Predictor:
             
             raw_prob = self.model.predict_proba(X)[0, 1]  # Probability of class 1 (Win)
             
-            # Apply isotonic calibration if available
+            # Apply isotonic calibration if available with smoothing to prevent cliff effects
+            # Use raw model probability but show all three for comparison
+            model_prob = raw_prob
+            
             if self.calibrator is not None:
-                model_prob = float(self.calibrator.predict([raw_prob])[0])
+                calibrated_prob = float(self.calibrator.predict([raw_prob])[0])
+                # Calculate smoothed (what we would use if blending)
+                CALIBRATOR_WEIGHT = 0.3
+                MAX_CALIBRATION_SHIFT = 0.05
+                smoothed_prob = CALIBRATOR_WEIGHT * calibrated_prob + (1 - CALIBRATOR_WEIGHT) * raw_prob
+                if abs(smoothed_prob - raw_prob) > MAX_CALIBRATION_SHIFT:
+                    smoothed_prob = raw_prob + (MAX_CALIBRATION_SHIFT if smoothed_prob > raw_prob else -MAX_CALIBRATION_SHIFT)
                 if debug:
-                    print(f"📊 Calibration: raw={raw_prob:.4f} → calibrated={model_prob:.4f}")
+                    print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Calibrated: {calibrated_prob:.1%}")
             else:
-                model_prob = raw_prob
+                if debug:
+                    print(f"📊 Model probability: {model_prob:.1%}")
             
             # Get resource-based probability for extreme edge case guardrail
             resource_prob = X['resource_win_prob'].iloc[0] if 'resource_win_prob' in X.columns else 0.5

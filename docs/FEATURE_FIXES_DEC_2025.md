@@ -217,3 +217,27 @@ python -m bbl_pipeline.inference.crex_live_predictor \
 2. **Feature Interpretation** - Check that features make intuitive sense for edge cases (easy chase, big target, etc.)
 3. **Default Values Matter** - When data is missing, defaults can significantly skew predictions
 4. **Test with Real Scenarios** - Live match testing revealed issues that unit tests missed
+
+## Updates - December 14, 2025
+
+### 1. Robust 2nd Innings Detection
+**Location:** \src/bbl_pipeline/inference/crex_live_predictor.py\
+
+**Issue:**
+The predictor sometimes failed to correctly identify the start of the 2nd innings or retained ball history from the 1st innings, leading to incorrect state calculations.
+
+**Fix:**
+- Added explicit check for 0 overs/0 runs to return empty history.
+- Improved 'innings boundary' detection by looking for significant backward jumps in over numbers (e.g., 19.4 -> 0.1).
+- Added safety guardrails to clear history if early 2nd innings state conflicts with late 1st innings ball history.
+
+### 2. Ensemble Model Support & Calibration Smoothing
+**Location:** \src/bbl_pipeline/inference/predictor.py\
+
+**Changes:**
+- **Ensemble Wrapper:** Added \EnsembleModelWrapper\ to support models combining XGBoost and Logistic Regression.
+- **Smoothed Calibration:** Implemented a blending strategy for probability calibration:
+  - Blends 30% calibrated probability with 70% raw probability.
+  - Caps maximum shift from raw probability to 5% to prevent 'cliff effects' where calibration causes sudden large jumps.
+  - Updated debug logging to show Raw, Smoothed, and Calibrated probabilities.
+

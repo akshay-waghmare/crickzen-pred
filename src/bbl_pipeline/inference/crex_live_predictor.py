@@ -564,13 +564,12 @@ class CrexLivePredictor:
                 wicket_balls = [b for b in ball_history if b.get('is_wicket', 0) == 1]
                 logger.info(f"Wicket balls in history ({len(wicket_balls)}): {wicket_balls}")
             
-            # Get prediction using predictor (debug=True to see features)
+            # Get prediction using predictor (always show debug for visibility)
             win_prob = self.predictor.predict(
                 pred_state, 
-                debug=self._first_prediction,
+                debug=True,  # Always show debug output
                 ball_history=ball_history
             )
-            self._first_prediction = False
             
             return float(win_prob)
             
@@ -593,31 +592,40 @@ class CrexLivePredictor:
         balls = list(self.match_state.balls_data)
         
         # For 2nd innings: filter to only include balls from current innings
-        # Detection: Find where overs reset (e.g., 11.4 -> 0.1), indicating innings change
         if self.match_state.is_second_innings and balls:
             current_overs = self.match_state.overs
+            
+            # SPECIAL CASE: 2nd innings just started (0/0 at 0.0 overs)
+            # No balls have been bowled yet - return empty history
+            if current_overs == 0 and self.match_state.total_runs == 0:
+                logger.info("2nd innings just started - returning empty ball history")
+                return []
+            
             innings_start_idx = 0
             
-            # Look for the point where overs reset to a low value
-            # In 2nd innings, current overs will be <= 20, while 1st innings had overs up to 20
+            # Detection: Find where overs reset (e.g., 19.4 -> 0.1), indicating innings change
+            # Look for the point where overs jump backwards significantly
             for i, ball in enumerate(balls):
-                # If this ball's over is small (early in 2nd innings) and we're in 2nd innings
-                if ball.over_number <= current_overs + 1:
-                    # Check if this could be the start of 2nd innings
-                    # The key indicator: preceding balls have higher over numbers
-                    if i > 0:
-                        # Look at a few preceding balls
-                        preceding_overs = [b.over_number for b in balls[max(0, i-3):i]]
-                        if preceding_overs and max(preceding_overs) > current_overs + 5:
-                            # Big jump backwards = innings boundary
-                            innings_start_idx = i
-                            logger.info(f"Detected innings boundary at index {i}: overs {preceding_overs} -> {ball.over_number}")
-                            break
+                if i > 0:
+                    prev_ball = balls[i - 1]
+                    # If previous ball was in high overs (late 1st innings) and this ball is in low overs
+                    if prev_ball.over_number >= 15 and ball.over_number <= 5:
+                        innings_start_idx = i
+                        logger.info(f"Detected innings boundary at index {i}: over {prev_ball.over_number} -> {ball.over_number}")
+                        break
             
             # Only keep balls from current innings
             if innings_start_idx > 0:
                 balls = balls[innings_start_idx:]
                 logger.info(f"Filtered ball history: keeping {len(balls)} balls from 2nd innings")
+            else:
+                # No innings boundary found - check if all balls are from 1st innings
+                # If all balls have high over numbers and we're early in 2nd innings, clear history
+                if balls and current_overs <= 2:
+                    max_over_in_history = max(b.over_number for b in balls)
+                    if max_over_in_history >= 15:
+                        logger.info(f"2nd innings early but ball history shows 1st innings (max over {max_over_in_history}) - clearing")
+                        balls = []
         
         # Now sort the filtered balls by over/ball
         sorted_balls = sorted(balls, key=lambda b: (b.over_number, b.ball_in_over))
