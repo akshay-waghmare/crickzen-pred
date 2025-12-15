@@ -299,11 +299,13 @@ class InMemoryFeatureStore:
 
         # 1. Exact match
         if venue_name in self._venue_stats:
+            logger.info(f"Using venue stats for '{venue_name}'")
             return self._venue_stats[venue_name]
             
         # 2. Case-insensitive match
         if venue_name.lower() in self._venue_names_lower:
             real_name = self._venue_names_lower[venue_name.lower()]
+            logger.info(f"Using venue stats for '{real_name}' (case-insensitive match)")
             return self._venue_stats[real_name]
             
         # 3. Fuzzy match (increased cutoff to 0.8 for stricter matching)
@@ -312,7 +314,8 @@ class InMemoryFeatureStore:
             match = matches[0]
             logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
             return self._venue_stats[match]
-            
+        
+        logger.warning(f"No venue stats found for '{venue_name}'")
         return None
 
     def _fuzzy_match_player(self, player_name: str) -> Optional[str]:

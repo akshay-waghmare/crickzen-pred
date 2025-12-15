@@ -148,6 +148,9 @@ class CrexLivePredictor:
             # Be specific to avoid capturing random text
             venue_patterns = [
                 r'Venue\s*[:\-]?\s*([\w\s]+(?:Stadium|Oval|Ground|Arena))',  # "Venue: North Sydney Oval"
+                r'(Simonds Stadium)',  # Specific pattern for Simonds Stadium
+                r'(Kardinia Park)',
+                r'(GMHBA Stadium)',
                 r'(North Sydney Oval)',
                 r'(Sydney Showground Stadium)',
                 r'(Adelaide Oval)',
@@ -158,7 +161,6 @@ class CrexLivePredictor:
                 r'(Bellerive Oval|Blundstone Arena)',
                 r'(Manuka Oval)',
                 r'(Junction Oval)',
-                r'(Kardinia Park)',
                 r'([\w\s]+Cricket Ground)',
                 r'([\w\s]+Stadium)',
                 r'([\w\s]+Oval)',
@@ -169,8 +171,11 @@ class CrexLivePredictor:
                     venue = venue_match.group(1).strip()
                     # Clean up venue - remove any newlines or extra whitespace
                     venue = ' '.join(venue.split())
+                    # Remove time prefixes like "45 PM" or date info
+                    venue = re.sub(r'^\d+\s*(?:AM|PM)\s+', '', venue, flags=re.IGNORECASE)
                     if len(venue) > 5 and len(venue) < 60:  # Reasonable venue name length
                         self.match_state.venue = venue
+                        logger.info(f"Extracted venue from page: '{venue}'")
                         print(f"🏟️ Venue: {self.match_state.venue}")
                         break
             
