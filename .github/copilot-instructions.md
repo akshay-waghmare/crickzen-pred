@@ -70,7 +70,20 @@ Both champion models share the same architecture:
 ### Feature Stores
 Each model relies on a specific feature store for inference (player stats, venue stats):
 - **BBL v8:** `data/bbl_feature_store_v2`
+  - 8 teams, 508 players, 31 venues
+  - Columns: team, win_rate, matches, bat_first_wr, bowl_first_wr
+  - Generated: 2025-12-15
 - **ILT20 v4:** `data/ilt_feature_store_v3`
+  - 6 teams, 320 players, 3 venues
+  - Columns: team, win_rate, matches, bat_first_wr, bowl_first_wr
+  - Generated: 2025-12-14
+
+**Feature Store Components:**
+1. **team_ratings.parquet**: Team stats (overall + situation-specific win rates)
+2. **player_stats.parquet**: Player rolling averages and strike rates
+3. **venue_stats.parquet**: Venue-specific performance metrics
+
+See `docs/FEATURE_STORE.md` for detailed schema documentation.
 
 ## 🛠️ Common Tasks
 
@@ -90,7 +103,15 @@ Each model relies on a specific feature store for inference (player stats, venue
 ## ⚠️ Important Notes for Copilot
 
 1.  **Active Models Only:** Only use `models/bbl_v8` and `models/ilt20_v4`. Ignore everything in `models/archive/`.
-2.  **Model Registry:** Keep `models/model_registry.json` updated with the latest active models and their versions.
+2.  **Model Registry:** Keep `models/model_registry.json` updated whenever:
+     - Regenerating feature stores (`bbl-pipeline process`)
+     - Retraining models (`bbl-pipeline train`)
+     - Adding/modifying feature store columns
+     - See `docs/MODEL_REGISTRY_GUIDE.md` for detailed procedures
 3.  **Prefer CLI:** Use `bbl-pipeline` for standard tasks.
-3.  **Calibration:** Ensure Isotonic Calibration is applied after raw prediction.
-4.  **Imports:** Use absolute imports from `bbl_pipeline`.
+4.  **Calibration:** Ensure Isotonic Calibration is applied after raw prediction.
+5.  **Imports:** Use absolute imports from `bbl_pipeline`.
+6.  **Feature Store Maintenance:** 
+     - Always update model registry when feature stores are regenerated
+     - Document changes: what changed, why, and impact on predictions
+     - Include training data match counts and statistics in registry

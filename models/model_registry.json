@@ -1,15 +1,53 @@
 {
-  "last_updated": "2025-12-14",
+  "last_updated": "2025-12-15",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v8",
       "version": "v8",
-      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.1809, ECE: 0.0000)"
+      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.1809, ECE: 0.0000)",
+      "feature_store": {
+        "path": "data/bbl_feature_store_v2",
+        "version": "v2",
+        "generated_date": "2025-12-15",
+        "training_data_matches": 600,
+        "statistics": {
+          "teams": 8,
+          "players": 508,
+          "venues": 31,
+          "team_columns": ["team", "win_rate", "matches", "bat_first_wr", "bowl_first_wr"],
+          "player_columns": ["batsman_rolling_avg", "batsman_rolling_sr", "bowler_rolling_econ", "bowler_rolling_sr"],
+          "venue_columns": ["venue_avg_score", "venue_avg_wickets", "venue_bat_first_win_rate"]
+        },
+        "recent_changes": {
+          "date": "2025-12-15",
+          "description": "Added bat_first_wr and bowl_first_wr for situation-specific predictions",
+          "impact": "Improves situation_advantage feature accuracy in innings 1 vs innings 2"
+        }
+      }
     },
     "ILT20": {
       "path": "models/ilt20_v4",
       "version": "v4",
-      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.0714, ECE: 0.0000)"
+      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.0714, ECE: 0.0000)",
+      "feature_store": {
+        "path": "data/ilt_feature_store_v3",
+        "version": "v3",
+        "generated_date": "2025-12-14",
+        "training_data_matches": 180,
+        "statistics": {
+          "teams": 6,
+          "players": 320,
+          "venues": 3,
+          "team_columns": ["team", "win_rate", "matches", "bat_first_wr", "bowl_first_wr"],
+          "player_columns": ["batsman_rolling_avg", "batsman_rolling_sr", "bowler_rolling_econ", "bowler_rolling_sr"],
+          "venue_columns": ["venue_avg_score", "venue_avg_wickets", "venue_bat_first_win_rate"]
+        },
+        "recent_changes": {
+          "date": "2025-12-14",
+          "description": "Initial v3 with full player coverage",
+          "impact": "Improved player lookup success rate"
+        }
+      }
     }
   }
 }
