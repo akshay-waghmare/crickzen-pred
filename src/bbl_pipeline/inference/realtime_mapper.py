@@ -219,10 +219,13 @@ class RealTimeFeatureMapper:
         venue_avg_wickets = venue_stats.get('venue_avg_wickets', 6.0)
         venue_bat_first_win_rate = venue_stats.get('venue_bat_first_win_rate', 0.5)
         
-        # Team Stats (Placeholder - need to implement get_team_stats in FeatureStore)
-        # For now, use defaults or try to get from feature store if available
+        # Team Stats - Overall and Situation-Specific Win Rates
         batting_team_win_rate = 0.5
         bowling_team_win_rate = 0.5
+        batting_team_bat_first_wr = 0.5
+        batting_team_bowl_first_wr = 0.5
+        bowling_team_bat_first_wr = 0.5
+        bowling_team_bowl_first_wr = 0.5
         team_strength_diff = 0.0
         
         if hasattr(self.feature_store, 'get_team_stats'):
@@ -230,6 +233,10 @@ class RealTimeFeatureMapper:
              bowling_stats = self.feature_store.get_team_stats(bowling_team) or {}
              batting_team_win_rate = batting_stats.get('win_rate', 0.5)
              bowling_team_win_rate = bowling_stats.get('win_rate', 0.5)
+             batting_team_bat_first_wr = batting_stats.get('bat_first_wr', 0.5)
+             batting_team_bowl_first_wr = batting_stats.get('bowl_first_wr', 0.5)
+             bowling_team_bat_first_wr = bowling_stats.get('bat_first_wr', 0.5)
+             bowling_team_bowl_first_wr = bowling_stats.get('bowl_first_wr', 0.5)
              team_strength_diff = batting_team_win_rate - bowling_team_win_rate
 
         # --- Resource-based Features (DLS-style) ---
@@ -300,12 +307,16 @@ class RealTimeFeatureMapper:
         rrr_times_wickets = required_run_rate * wickets_lost
         chase_difficulty = required_run_rate / (current_run_rate + 0.1) if innings == 2 else 0
         
-        # Team situation win rates - these should be team's historical win rates for batting/bowling first
-        # In training: batting_team_situation_wr = bat_first_wr (innings 1) or bowl_first_wr (innings 2)
-        # At inference without team stats, use 0.5 (neutral)
-        # TODO: Add team historical bat_first/bowl_first win rates to feature store
-        batting_team_situation_wr = batting_team_win_rate  # Use team's overall win rate as proxy
-        bowling_team_situation_wr = bowling_team_win_rate
+        # Team situation win rates - based on batting/bowling first
+        # Innings 1: batting_team bats first, bowling_team bowls first
+        # Innings 2: batting_team bowls first (chasing), bowling_team bats first (set target)
+        if innings == 1:
+            batting_team_situation_wr = batting_team_bat_first_wr
+            bowling_team_situation_wr = bowling_team_bowl_first_wr
+        else:  # innings == 2
+            batting_team_situation_wr = batting_team_bowl_first_wr
+            bowling_team_situation_wr = bowling_team_bat_first_wr
+        
         situation_advantage = batting_team_situation_wr - bowling_team_situation_wr
         
         # --- Venue-specific and vs-team stats (using feature store with fuzzy matching) ---

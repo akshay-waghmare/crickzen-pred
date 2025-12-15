@@ -1154,7 +1154,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     print("Calculating team stats...")
     # Calculate win rate for each team
     # Get unique matches from the dataframe
-    matches = df[['match_id', 'date', 'batting_team', 'bowling_team', 'winner']].drop_duplicates()
+    matches = df[['match_id', 'date', 'batting_team', 'bowling_team', 'winner', 'innings']].drop_duplicates(subset=['match_id'])
     
     team_stats = []
     all_teams = pd.concat([matches['batting_team'], matches['bowling_team']]).unique()
@@ -1164,7 +1164,26 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
         wins = team_matches[team_matches['winner'] == team].shape[0]
         total = team_matches.shape[0]
         win_rate = wins / total if total > 0 else 0.5
-        team_stats.append({'team': team, 'win_rate': win_rate, 'matches': total})
+        
+        # Calculate bat first win rate (when team is batting_team and innings == 1)
+        bat_first_matches = matches[matches['batting_team'] == team]
+        bat_first_wins = bat_first_matches[bat_first_matches['winner'] == team].shape[0]
+        bat_first_total = bat_first_matches.shape[0]
+        bat_first_wr = bat_first_wins / bat_first_total if bat_first_total > 0 else 0.5
+        
+        # Calculate bowl first win rate (when team is bowling_team and innings == 1)
+        bowl_first_matches = matches[matches['bowling_team'] == team]
+        bowl_first_wins = bowl_first_matches[bowl_first_matches['winner'] == team].shape[0]
+        bowl_first_total = bowl_first_matches.shape[0]
+        bowl_first_wr = bowl_first_wins / bowl_first_total if bowl_first_total > 0 else 0.5
+        
+        team_stats.append({
+            'team': team, 
+            'win_rate': win_rate, 
+            'matches': total,
+            'bat_first_wr': bat_first_wr,
+            'bowl_first_wr': bowl_first_wr
+        })
     
     df_team_stats = pd.DataFrame(team_stats)
     df_team_stats.to_parquet(feature_store_dir / "team_ratings.parquet")

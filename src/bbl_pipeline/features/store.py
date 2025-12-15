@@ -9,9 +9,10 @@ logger = structlog.get_logger()
 # Venue alias mapping for handling different venue names
 VENUE_ALIASES = {
     # Geelong (Simonds Stadium / Kardinia Park / GMHBA Stadium)
-    'Simonds Stadium': 'Kardinia Park',
-    'GMHBA Stadium': 'Kardinia Park',
-    'Kardinia Park': 'Kardinia Park',
+    'Simonds Stadium': 'Simonds Stadium, South Geelong, Victoria',
+    'GMHBA Stadium': 'GMHBA Stadium, South Geelong, Victoria',
+    'Kardinia Park': 'Simonds Stadium, South Geelong, Victoria',
+    'Geelong Cricket Ground': 'Simonds Stadium, South Geelong, Victoria',
     
     # Melbourne Cricket Ground
     'MCG': 'Melbourne Cricket Ground',
