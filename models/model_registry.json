@@ -32,10 +32,10 @@
       "feature_store": {
         "path": "data/ilt_feature_store_v3",
         "version": "v3",
-        "generated_date": "2025-12-14",
-        "training_data_matches": 180,
+        "generated_date": "2025-12-15",
+        "training_data_matches": 100,
         "statistics": {
-          "teams": 6,
+          "teams": 7,
           "players": 320,
           "venues": 3,
           "team_columns": ["team", "win_rate", "matches", "bat_first_wr", "bowl_first_wr"],
@@ -43,9 +43,9 @@
           "venue_columns": ["venue_avg_score", "venue_avg_wickets", "venue_bat_first_win_rate"]
         },
         "recent_changes": {
-          "date": "2025-12-14",
-          "description": "Initial v3 with full player coverage",
-          "impact": "Improved player lookup success rate"
+          "date": "2025-12-15",
+          "description": "Regenerated with latest ILT20 2025-26 data; now includes 100 matches with all 3 venues (Dubai, Sharjah, Abu Dhabi)",
+          "impact": "Fixed situation_advantage calculation; ensures venue stats properly loaded for live predictions"
         }
       }
     }
