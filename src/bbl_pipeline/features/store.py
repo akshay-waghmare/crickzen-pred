@@ -6,6 +6,68 @@ import difflib
 
 logger = structlog.get_logger()
 
+# Venue alias mapping for handling different venue names
+VENUE_ALIASES = {
+    # Geelong (Simonds Stadium / Kardinia Park / GMHBA Stadium)
+    'Simonds Stadium': 'Kardinia Park',
+    'GMHBA Stadium': 'Kardinia Park',
+    'Kardinia Park': 'Kardinia Park',
+    
+    # Melbourne Cricket Ground
+    'MCG': 'Melbourne Cricket Ground',
+    'Melbourne Cricket Ground': 'Melbourne Cricket Ground',
+    
+    # Sydney Cricket Ground
+    'SCG': 'Sydney Cricket Ground',
+    'Sydney Cricket Ground': 'Sydney Cricket Ground',
+    
+    # Perth (WACA / Optus Stadium)
+    'WACA Ground': 'Perth Stadium',
+    'W.A.C.A. Ground': 'Perth Stadium',
+    'Optus Stadium': 'Perth Stadium',
+    'Perth Stadium': 'Perth Stadium',
+    
+    # The Gabba
+    'The Gabba': 'Brisbane Cricket Ground',
+    'Brisbane Cricket Ground': 'Brisbane Cricket Ground',
+    'Gabba': 'Brisbane Cricket Ground',
+    
+    # Adelaide Oval
+    'Adelaide Oval': 'Adelaide Oval',
+    
+    # Docklands/Marvel Stadium
+    'Docklands Stadium': 'Docklands',
+    'Marvel Stadium': 'Docklands',
+    'Colonial Stadium': 'Docklands',
+    'Etihad Stadium': 'Docklands',
+    'Docklands': 'Docklands',
+    
+    # Bellerive Oval
+    'Bellerive Oval': 'Bellerive Oval',
+    'Blundstone Arena': 'Bellerive Oval',
+    
+    # Manuka Oval
+    'Manuka Oval': 'Manuka Oval',
+    
+    # Carrara / Metricon Stadium
+    'Carrara Oval': 'Carrara Oval',
+    'Metricon Stadium': 'Carrara Oval',
+    
+    # North Sydney Oval
+    'North Sydney Oval': 'North Sydney Oval',
+    
+    # Junction Oval
+    'Junction Oval': 'Junction Oval',
+    
+    # Traeger Park
+    'Traeger Park': 'Traeger Park',
+    
+    # ILT20 Venues
+    'Dubai International Cricket Stadium': 'Dubai International Cricket Stadium',
+    'Sheikh Zayed Stadium': 'Sheikh Zayed Stadium',
+    'Sharjah Cricket Stadium': 'Sharjah Cricket Stadium',
+}
+
 class FeatureStore(Protocol):
     def get_player_stats(self, player_name: str) -> Optional[Dict[str, Any]]:
         """Retrieve rolling stats for a player."""
@@ -229,6 +291,12 @@ class InMemoryFeatureStore:
         if not venue_name:
             return None
 
+        # 0. Check venue alias mapping first
+        if venue_name in VENUE_ALIASES:
+            canonical_name = VENUE_ALIASES[venue_name]
+            logger.info(f"Resolved venue alias '{venue_name}' to '{canonical_name}'")
+            venue_name = canonical_name
+
         # 1. Exact match
         if venue_name in self._venue_stats:
             return self._venue_stats[venue_name]
@@ -238,8 +306,8 @@ class InMemoryFeatureStore:
             real_name = self._venue_names_lower[venue_name.lower()]
             return self._venue_stats[real_name]
             
-        # 3. Fuzzy match
-        matches = difflib.get_close_matches(venue_name, self._venue_stats.keys(), n=1, cutoff=0.6)
+        # 3. Fuzzy match (increased cutoff to 0.8 for stricter matching)
+        matches = difflib.get_close_matches(venue_name, self._venue_stats.keys(), n=1, cutoff=0.8)
         if matches:
             match = matches[0]
             logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
@@ -311,8 +379,15 @@ class InMemoryFeatureStore:
             self._venue_name_cache[venue_name] = match
             return match
         
-        # 3. Fuzzy match
-        matches = difflib.get_close_matches(venue_name, list(all_venues), n=1, cutoff=0.6)
+        # 3. Check venue aliases
+        if venue_name in VENUE_ALIASES:
+            canonical = VENUE_ALIASES[venue_name]
+            logger.info(f"Resolved venue alias '{venue_name}' to '{canonical}'")
+            self._venue_name_cache[venue_name] = canonical
+            return canonical
+        
+        # 4. Fuzzy match (increased cutoff to 0.8)
+        matches = difflib.get_close_matches(venue_name, list(all_venues), n=1, cutoff=0.8)
         if matches:
             match = matches[0]
             logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
