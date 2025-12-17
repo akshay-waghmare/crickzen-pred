@@ -523,5 +523,94 @@ def analyze(input_file, model_name):
     except Exception as e:
         raise click.ClickException(str(e))
 
+
+@main.command(name='generate-oof')
+@click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
+@click.option('--model-dir', type=click.Path(exists=True), required=True, help='Model directory containing champion_model.joblib')
+@click.option('--n-splits', type=int, default=5, show_default=True, help='Number of folds for OOF predictions')
+@click.option('--target-col', default='is_winner', show_default=True, help='Target column name')
+def generate_oof(input_file, model_dir, n_splits, target_col):
+    """Generate an OOF isotonic calibrator (models/.../isotonic_calibrator.pkl) for an existing model."""
+    from sklearn.model_selection import KFold
+    from sklearn.isotonic import IsotonicRegression
+    from sklearn.base import clone
+    from sklearn.metrics import brier_score_loss
+    from bbl_pipeline.training.evaluation import expected_calibration_error
+    from bbl_pipeline.training.calibration import CalibratedModel
+    import joblib
+
+    input_path = Path(input_file)
+    model_path = Path(model_dir)
+    champion_path = model_path / 'champion_model.joblib'
+    if not champion_path.exists():
+        raise click.ClickException(f"champion_model.joblib not found at {champion_path}")
+
+    logger.info('Loading training data', path=str(input_path))
+    df = pd.read_parquet(input_path)
+    if target_col not in df.columns:
+        raise click.ClickException(f"Target column '{target_col}' not found in dataset")
+
+    y = df[target_col]
+
+    # Drop obviously-non-feature columns if present
+    X = df.drop(columns=[target_col])
+    for col in list(X.columns):
+        if str(col).startswith('__'):
+            X = X.drop(columns=[col])
+
+    # Keep numeric features only (models expect numeric)
+    X = X.select_dtypes(include=[np.number]).fillna(0)
+
+    logger.info('Loading champion model', path=str(champion_path))
+    champion_model = joblib.load(champion_path)
+
+    # If the saved model is already a calibrated wrapper, use its base estimator for OOF.
+    base_model_template = champion_model
+    if isinstance(champion_model, CalibratedModel) and hasattr(champion_model, 'base_estimator'):
+        base_model_template = champion_model.base_estimator
+        logger.warning('Model appears already calibrated; generating OOF calibrator from base_estimator. For BBL-style inference, champion_model.joblib should be uncalibrated.')
+
+    # If the base model has an explicit feature list, align X to those columns.
+    selected_features = None
+    if hasattr(base_model_template, 'selected_features_') and base_model_template.selected_features_:
+        selected_features = [c for c in base_model_template.selected_features_ if c in X.columns]
+    elif hasattr(base_model_template, 'feature_names_in_') and base_model_template.feature_names_in_ is not None:
+        selected_features = [c for c in list(base_model_template.feature_names_in_) if c in X.columns]
+
+    if selected_features:
+        X = X[selected_features]
+
+    logger.info('Generating out-of-fold predictions', n_splits=n_splits, rows=len(X), features=X.shape[1])
+    kf = KFold(n_splits=n_splits, shuffle=False)
+    oof_probs = np.zeros(len(y), dtype=float)
+
+    for fold_idx, (train_idx, val_idx) in enumerate(kf.split(X), start=1):
+        model = clone(base_model_template)
+        model.fit(X.iloc[train_idx], y.iloc[train_idx])
+        oof_probs[val_idx] = model.predict_proba(X.iloc[val_idx])[:, 1]
+        logger.info('OOF fold complete', fold=fold_idx, train_size=len(train_idx), val_size=len(val_idx))
+
+    iso = IsotonicRegression(out_of_bounds='clip')
+    iso.fit(oof_probs, y)
+
+    # Report OOF calibration metrics (before/after)
+    oof_brier_raw = float(brier_score_loss(y, oof_probs))
+    oof_ece_raw = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs))
+    oof_probs_cal = iso.predict(oof_probs)
+    oof_brier_cal = float(brier_score_loss(y, oof_probs_cal))
+    oof_ece_cal = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs_cal))
+
+    logger.info(
+        'OOF calibration metrics',
+        brier_raw=oof_brier_raw,
+        ece_raw=oof_ece_raw,
+        brier_calibrated=oof_brier_cal,
+        ece_calibrated=oof_ece_cal,
+    )
+
+    calibrator_out = model_path / 'isotonic_calibrator.pkl'
+    joblib.dump(iso, calibrator_out)
+    logger.info('Saved OOF isotonic calibrator', path=str(calibrator_out))
+
 if __name__ == '__main__':
     main()

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-12-15",
+  "last_updated": "2025-12-16",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v8",
@@ -46,6 +46,32 @@
           "date": "2025-12-15",
           "description": "Regenerated with latest ILT20 2025-26 data; now includes 100 matches with all 3 venues (Dubai, Sharjah, Abu Dhabi)",
           "impact": "Fixed situation_advantage calculation; ensures venue stats properly loaded for live predictions"
+        }
+      }
+    }
+  },
+  "archived_models": {
+    "SMA": {
+      "path": "models/archive/sma_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) base model + OOF Isotonic calibrator artifact (Brier: 0.1476; OOF ECE ~0)",
+      "feature_store": {
+        "path": "data/sma_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2025-12-16",
+        "training_data_matches": 686,
+        "statistics": {
+          "teams": 39,
+          "players": 1458,
+          "venues": 61,
+          "team_columns": ["team", "win_rate", "matches", "bat_first_wr", "bowl_first_wr"],
+          "player_columns": ["batsman_rolling_avg", "batsman_rolling_sr", "bowler_rolling_econ", "bowler_rolling_sr"],
+          "venue_columns": ["venue_avg_score", "venue_avg_wickets", "venue_bat_first_win_rate"]
+        },
+        "recent_changes": {
+          "date": "2025-12-16",
+          "description": "Retrained SMA as uncalibrated base model and generated separate OOF isotonic_calibrator.pkl",
+          "impact": "Aligns SMA inference with BBL-style flow (raw model + external OOF calibrator)"
         }
       }
     }

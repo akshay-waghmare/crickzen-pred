@@ -4,12 +4,15 @@ Transforms data from the real-time scraper into BBL model feature format.
 """
 import pandas as pd
 import numpy as np
+import structlog
 from typing import Dict, Any, Optional
 from pathlib import Path
 
 from .schema import MatchState
 from ..features.store import InMemoryFeatureStore
 from ..features.calculator import ResourceFeatureCalculator
+
+logger = structlog.get_logger()
 
 
 class RealTimeFeatureMapper:
@@ -56,12 +59,14 @@ class RealTimeFeatureMapper:
         if len(self.ball_history) > 30:
             self.ball_history.pop(0)
 
-    def _calculate_rolling_stats(self, current_innings: int = None) -> Dict[str, float]:
+    def _calculate_rolling_stats(self, current_innings: int = None, total_balls_in_match: int = None) -> Dict[str, float]:
         """Calculate rolling stats from history.
         
         Args:
             current_innings: The current innings number (1 or 2). If provided,
                            only balls from this innings are used.
+            total_balls_in_match: Total balls bowled in current innings so far.
+                                 Used to detect incomplete ball history.
         """
         # If we don't have any history, return sensible defaults
         if len(self.ball_history) == 0:
@@ -79,13 +84,39 @@ class RealTimeFeatureMapper:
         if current_innings is not None and 'innings_num' in df.columns:
             df = df[df['innings_num'] == current_innings]
             
-        # If no balls in current innings, return defaults
+        # If no balls in current innings, return sensible defaults (not zeros!)
+        # At innings start, we should assume average performance, not worst case
         if len(df) == 0:
             return {
-                'runs_last_12': 0.0,  # No history in this innings yet
-                'runs_last_18': 0.0,
-                'wickets_last_12': 0.0,
-                'boundary_pct_last_18': 0.0
+                'runs_last_12': 12.0,  # ~6 runs per over (2 overs) is typical
+                'runs_last_18': 18.0,  # ~6 runs per over (3 overs)
+                'wickets_last_12': 0.5, # ~1 wicket every 4 overs on average
+                'boundary_pct_last_18': 0.15  # ~15% boundary rate typical
+            }
+        
+        # Check if ball history is incomplete (missing data from scraper)
+        # If we're 50 balls into the match but only have 20 balls of history, data is sparse
+        history_completeness = 1.0  # Default: assume complete
+        if total_balls_in_match is not None and total_balls_in_match > 0:
+            balls_in_history = len(df)
+            if balls_in_history < total_balls_in_match:
+                history_completeness = min(balls_in_history / total_balls_in_match, 1.0)
+                # Log sparse data warning
+                if history_completeness < 0.7:
+                    logger.warning(
+                        f"Sparse ball history detected: {balls_in_history}/{total_balls_in_match} balls "
+                        f"({history_completeness:.1%} complete)"
+                    )
+        
+        # If data is too sparse (< 30% complete), return sensible defaults
+        # Using incomplete rolling stats creates feature mismatch vs training
+        if history_completeness < 0.3:
+            logger.info("Ball history too sparse - using default rolling stats")
+            return {
+                'runs_last_12': 12.0,  # ~6 runs per over (2 overs) is typical
+                'runs_last_18': 18.0,  # ~6 runs per over (3 overs)
+                'wickets_last_12': 0.5, # ~1 wicket every 4 overs on average
+                'boundary_pct_last_18': 0.15  # ~15% boundary rate typical
             }
         
         # Ensure columns exist
@@ -102,7 +133,17 @@ class RealTimeFeatureMapper:
         # Last 12 balls (approx 2 overs)
         last_12 = df.tail(12)
         runs_last_12 = last_12['runs_scored'].sum()
-        wickets_last_12 = last_12['is_wicket'].sum()
+        wickets_last_12_raw = last_12['is_wicket'].sum()
+        
+        # CONSISTENCY WITH TRAINING: During training, wickets_last_12 is an integer count
+        # We should NOT scale it - just use actual count from available data
+        # If data is very sparse (< 30% complete), use defaults instead
+        if history_completeness < 0.3:
+            # Too sparse - use defaults (approx 0.5 wickets per 12 balls)
+            wickets_last_12 = 0.5
+        else:
+            # Use actual count from available ball history (matches training distribution)
+            wickets_last_12 = float(wickets_last_12_raw)
         
         # Last 18 balls (approx 3 overs)
         last_18 = df.tail(18)
@@ -252,8 +293,13 @@ class RealTimeFeatureMapper:
         )
         
         # --- Rolling Stats ---
-        # Pass current innings to avoid cross-innings contamination
-        rolling_stats = self._calculate_rolling_stats(current_innings=innings)
+        # Calculate total balls bowled in current innings
+        total_balls_in_innings = over * 6 + ball
+        # Pass current innings and total balls to detect incomplete ball history
+        rolling_stats = self._calculate_rolling_stats(
+            current_innings=innings,
+            total_balls_in_match=total_balls_in_innings
+        )
         
         # --- Rate Features ---
         # Use scraped values if available, otherwise use calculated
@@ -261,9 +307,15 @@ class RealTimeFeatureMapper:
                                             resource_features['current_run_rate'])
         required_run_rate = scraped_data.get('required_run_rate',
                                              resource_features['required_run_rate'])
-        # Positive = batting team ahead (scoring faster than required)
-        # This ensures scoring runs INCREASES this value
-        run_rate_diff = current_run_rate - required_run_rate
+        
+        # At the very start of an innings (0 balls bowled), use neutral run_rate_diff
+        # to avoid penalizing teams before they've had a chance to bat
+        if total_balls_in_innings == 0:
+            # Assume they'll score at required rate initially
+            run_rate_diff = 0.0
+        else:
+            # Positive = batting team ahead (scoring faster than required)
+            run_rate_diff = current_run_rate - required_run_rate
         
         # --- Projected/Expected Scores ---
         expected_final_score = scraped_data.get('projected_score',

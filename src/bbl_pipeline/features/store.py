@@ -65,8 +65,9 @@ VENUE_ALIASES = {
     
     # ILT20 Venues
     'Dubai International Cricket Stadium': 'Dubai International Cricket Stadium',
-    'Sheikh Zayed Stadium': 'Sheikh Zayed Stadium',
+    'Sheikh Zayed Stadium': 'Zayed Cricket Stadium, Abu Dhabi',
     'Sharjah Cricket Stadium': 'Sharjah Cricket Stadium',
+    'Zayed Cricket Stadium': 'Zayed Cricket Stadium, Abu Dhabi',
 }
 
 class FeatureStore(Protocol):
@@ -216,7 +217,7 @@ class InMemoryFeatureStore:
         'HBH-W': 'Hobart Hurricanes', 'STR-W': 'Sydney Thunder',
         'SYS': 'Sydney Sixers', 'PRS': 'Perth Scorchers', 'ADS': 'Adelaide Strikers',
         'BRH': 'Brisbane Heat', 'MLR': 'Melbourne Renegades', 'MLS': 'Melbourne Stars',
-        'HBH': 'Hobart Hurricanes', 'STH': 'Sydney Thunder',
+        'HBH': 'Hobart Hurricanes', 'STH': 'Sydney Thunder', 'SYT': 'Sydney Thunder',
         'SIX': 'Sydney Sixers', 'SCO': 'Perth Scorchers', 'STK': 'Adelaide Strikers',
         'HEA': 'Brisbane Heat', 'REN': 'Melbourne Renegades', 'STA': 'Melbourne Stars',
         'HUR': 'Hobart Hurricanes', 'THU': 'Sydney Thunder',

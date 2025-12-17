@@ -576,6 +576,11 @@ class CrexLivePredictor:
                 ball_history=ball_history
             )
             
+            # Store the detailed probabilities for JSON output
+            self.last_raw_prob = getattr(self.predictor, 'last_raw_prob', win_prob)
+            self.last_smoothed_prob = getattr(self.predictor, 'last_smoothed_prob', win_prob)
+            self.last_calibrated_prob = getattr(self.predictor, 'last_calibrated_prob', win_prob)
+            
             return float(win_prob)
             
         except Exception as e:
@@ -656,14 +661,20 @@ class CrexLivePredictor:
         actual_wickets = self.match_state.wickets
         actual_score = self.match_state.total_runs
         
-        if history and (running_wickets != actual_wickets or running_score != actual_score):
-            # Correct the last ball's totals to match reality
+        if history:
+            # Always sync the totals to match reality
             history[-1]['total_score'] = actual_score
             history[-1]['total_wickets'] = actual_wickets
-            # If wickets are behind, mark the last ball as a wicket if it wasn't
-            if running_wickets < actual_wickets and history[-1]['is_wicket'] == 0:
-                history[-1]['is_wicket'] = 1
-                logger.info(f"Corrected ball history: adjusted wickets from {running_wickets} to {actual_wickets}")
+            
+            # DON'T retroactively mark balls as wickets - this creates false rolling stats
+            # If ball history is incomplete, accept that and let rolling stats reflect
+            # only the wickets we actually have data for
+            if running_wickets != actual_wickets or running_score != actual_score:
+                logger.warning(
+                    f"Ball history mismatch: running={running_score}/{running_wickets}, "
+                    f"actual={actual_score}/{actual_wickets}. "
+                    f"History has {len(history)} balls (may be incomplete from scraper)"
+                )
         
         return history
     
@@ -872,6 +883,9 @@ class CrexLivePredictor:
                 "required_run_rate": state.required_run_rate,
                 "bat_win_prob": win_prob,
                 "bowl_win_prob": 1 - win_prob,
+                "raw_win_prob": getattr(self, 'last_raw_prob', win_prob),
+                "smoothed_win_prob": getattr(self, 'last_smoothed_prob', win_prob),
+                "calibrated_win_prob": getattr(self, 'last_calibrated_prob', win_prob),
                 "features": features,
                 "history": self._prediction_history[-50:]  # Last 50 data points
             }

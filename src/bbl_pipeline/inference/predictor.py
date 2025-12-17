@@ -333,6 +333,11 @@ class Predictor:
             # Use raw model probability but show all three for comparison
             model_prob = raw_prob
             
+            # Store all probability types for external access
+            self.last_raw_prob = raw_prob
+            self.last_smoothed_prob = raw_prob
+            self.last_calibrated_prob = raw_prob
+            
             if self.calibrator is not None:
                 calibrated_prob = float(self.calibrator.predict([raw_prob])[0])
                 # Calculate smoothed (what we would use if blending)
@@ -341,6 +346,11 @@ class Predictor:
                 smoothed_prob = CALIBRATOR_WEIGHT * calibrated_prob + (1 - CALIBRATOR_WEIGHT) * raw_prob
                 if abs(smoothed_prob - raw_prob) > MAX_CALIBRATION_SHIFT:
                     smoothed_prob = raw_prob + (MAX_CALIBRATION_SHIFT if smoothed_prob > raw_prob else -MAX_CALIBRATION_SHIFT)
+                
+                # Store for external access
+                self.last_smoothed_prob = smoothed_prob
+                self.last_calibrated_prob = calibrated_prob
+                
                 if debug:
                     print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Calibrated: {calibrated_prob:.1%}")
             else:

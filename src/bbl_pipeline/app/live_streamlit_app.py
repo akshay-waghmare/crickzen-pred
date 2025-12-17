@@ -319,6 +319,48 @@ def main():
     
     # Header with odds summary
     st.subheader("🎯 Win Probability & Odds")
+    
+    # Display Raw, Smoothed, and Calibrated probabilities
+    raw_prob = d.get("raw_win_prob", d["bat_win_prob"])
+    smoothed_prob = d.get("smoothed_win_prob", d["bat_win_prob"])
+    calibrated_prob = d.get("calibrated_win_prob", d["bat_win_prob"])
+    
+    # Calculate odds for each
+    raw_odds = prob_to_odds(raw_prob)
+    smoothed_odds = prob_to_odds(smoothed_prob)
+    calibrated_odds = prob_to_odds(calibrated_prob)
+    
+    prob_col1, prob_col2, prob_col3 = st.columns(3)
+    with prob_col1:
+        st.markdown(f'''
+        <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #2196F3;">
+            <b>📊 Raw Model</b><br>
+            <span style="font-size: 1.5em; color: #2196F3;">{raw_prob*100:.1f}%</span><br>
+            <span style="font-size: 1.1em; color: #333;">Odds: <b>{raw_odds}</b></span><br>
+            <span style="font-size: 0.9em; color: #666;">XGB+LogReg Ensemble</span>
+        </div>
+        ''', unsafe_allow_html=True)
+    with prob_col2:
+        st.markdown(f'''
+        <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #FF9800;">
+            <b>🔄 Smoothed</b><br>
+            <span style="font-size: 1.5em; color: #FF9800;">{smoothed_prob*100:.1f}%</span><br>
+            <span style="font-size: 1.1em; color: #333;">Odds: <b>{smoothed_odds}</b></span><br>
+            <span style="font-size: 0.9em; color: #666;">30% Calibrated Blend</span>
+        </div>
+        ''', unsafe_allow_html=True)
+    with prob_col3:
+        st.markdown(f'''
+        <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #4CAF50;">
+            <b>✅ Calibrated</b><br>
+            <span style="font-size: 1.5em; color: #4CAF50;">{calibrated_prob*100:.1f}%</span><br>
+            <span style="font-size: 1.1em; color: #333;">Odds: <b>{calibrated_odds}</b></span><br>
+            <span style="font-size: 0.9em; color: #666;">Isotonic Calibration</span>
+        </div>
+        ''', unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     odds_col1, odds_col2 = st.columns(2)
     with odds_col1:
         st.markdown(f'''
