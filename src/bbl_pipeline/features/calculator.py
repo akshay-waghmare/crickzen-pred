@@ -483,7 +483,10 @@ class ResourceFeatureCalculator:
         # Base probability from RRR using logistic function
         # Calibrated from ILT20 EDA: beta=0.7, mu=9.5
         # At RRR=7: ~80%, RRR=9.5: ~50%, RRR=12: ~20%
-        base_prob = 1.0 / (1.0 + np.exp(self.RRR_BETA * (effective_rrr - self.RRR_MIDPOINT)))
+        # Clip exponent to prevent overflow (exp argument range: -700 to 700)
+        exponent = self.RRR_BETA * (effective_rrr - self.RRR_MIDPOINT)
+        exponent = np.clip(exponent, -700, 700)
+        base_prob = 1.0 / (1.0 + np.exp(exponent))
         
         # -------------------------------------
         # WICKET PENALTY (Data-Calibrated)

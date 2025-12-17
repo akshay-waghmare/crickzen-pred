@@ -104,6 +104,74 @@
           "impact": "Fixed situation_advantage calculation; ensures venue stats properly loaded for live predictions"
         }
       }
+    },
+    "T20I": {
+      "path": "models/t20i_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + Innings-Specific Isotonic Calibration (Brier: 0.1603, ECE: 0.0000)",
+      "calibrator": {
+        "path": "models/t20i_v1/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2025-12-17T13:29:58.045613",
+        "oof_metrics": {
+          "brier_raw": 0.16059962334965408,
+          "brier_calibrated": 0.1602608581095958,
+          "ece_raw": 0.0045456140746591425,
+          "ece_calibrated": 0.0
+        },
+        "innings_specific": {
+          "innings1": {
+            "samples": 358395,
+            "brier_raw": 0.19916284179859248,
+            "brier_calibrated": 0.1988168849808302,
+            "ece_raw": 0.010117858980634815,
+            "ece_calibrated": 7.383442357227207e-18
+          },
+          "innings2": {
+            "samples": 314147,
+            "brier_raw": 0.11660472708768985,
+            "brier_calibrated": 0.11627416636809888,
+            "ece_raw": 0.009863666004120905,
+            "ece_calibrated": 0.0
+          }
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
+      "feature_store": {
+        "path": "data/t20i_feature_store_v3",
+        "version": "v3",
+        "generated_date": "2025-12-17",
+        "training_data_matches": 2940,
+        "statistics": {
+          "teams": 106,
+          "players": "~5000+",
+          "venues": "~200+",
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
+        },
+        "recent_changes": {
+          "date": "2025-12-17",
+          "description": "Initial T20I International model trained on 2,940 matches (2004-2025); includes innings-specific calibrators",
+          "impact": "Covers all T20I matches with 106 international teams; broader coverage than league models"
+        }
+      }
     }
   },
   "archived_models": {
