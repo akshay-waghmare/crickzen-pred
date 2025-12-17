@@ -251,3 +251,21 @@ python src/run_integrated_prediction.py \
 ```
 
 Happy predicting! 🎉
+
+## Running Predictor Locally (Minimal)
+
+This project supports running the live predictor locally for development
+and testing without deploying a full service.
+
+### High-level flow
+1. The CLI (`cli.py`) parses runtime arguments.
+2. A live predictor runner is initialized with match and model configuration.
+3. The predictor loads the trained model, calibrator, and metadata from `model_dir`.
+4. Live match state is fetched from an API or read from JSON.
+5. Features are constructed and passed to the inference pipeline.
+6. Calibrated win probabilities are produced as output.
+
+### Notes
+- The required model artifacts must already exist under `model_dir`.
+- If artifacts are missing or incompatible, defensive checks may log warnings
+  or fall back safely.
