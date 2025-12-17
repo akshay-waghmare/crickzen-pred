@@ -20,6 +20,19 @@ The `models/model_registry.json` file is the single source of truth for all acti
     "path": "models/bbl_v8",
     "version": "v8",
     "description": "Model architecture + calibration + metrics",
+    "calibrator": {
+      "path": "models/bbl_v8/isotonic_calibrator.pkl",
+      "type": "isotonic_regression",
+      "generated_date": "2025-12-15",
+      "oof_metrics": {
+        "brier_raw": 0.1809,
+        "brier_calibrated": 0.1809,
+        "ece_raw": 0.0000,
+        "ece_calibrated": 0.0000
+      },
+      "n_features": 25,
+      "feature_hash": "abc123def456..."
+    },
     "feature_store": {
       "path": "data/bbl_feature_store_v2",
       "version": "v2",
@@ -43,6 +56,23 @@ The `models/model_registry.json` file is the single source of truth for all acti
 }
 ```
 
+### Calibrator Section (NEW)
+
+The `calibrator` section tracks which isotonic calibrator belongs to each model:
+
+- **`path`**: Absolute path to `isotonic_calibrator.pkl` file
+- **`type`**: Calibration method (usually `isotonic_regression`)
+- **`generated_date`**: When calibrator was created
+- **`oof_metrics`**: Out-of-fold performance metrics
+  - `brier_raw`: Brier score before calibration
+  - `brier_calibrated`: Brier score after calibration
+  - `ece_raw`: Expected Calibration Error before calibration
+  - `ece_calibrated`: Expected Calibration Error after calibration
+- **`n_features`**: Number of features the calibrator expects
+- **`feature_hash`**: MD5 hash of sorted feature names (for validation)
+
+**CRITICAL:** The `feature_hash` ensures the calibrator is only used with the exact model it was trained for. Mismatched calibrators will be rejected during inference.
+
 ---
 
 ## When to Update the Registry
@@ -56,6 +86,35 @@ bbl-pipeline process \
   --output-dir data/bbl_features_v2 \
   --feature-store-dir data/bbl_feature_store_v2
 ```
+
+### 2. After Generating/Regenerating Calibrator (AUTOMATIC)
+
+**Trigger**: Running the generate-oof command
+```bash
+bbl-pipeline generate-oof \
+  --input-file data/bbl_features_v2/training.parquet \
+  --model-dir models/bbl_v8 \
+  --n-splits 5
+```
+
+**What Happens Automatically**:
+- Calibrator metadata is saved with `isotonic_calibrator.pkl`
+- Model registry is automatically updated with:
+  - Calibrator path
+  - Feature hash (for compatibility checking)
+  - OOF metrics (Brier, ECE before/after)
+  - Generation date
+- `last_updated` field is set to current date
+
+**No Manual Steps Required!** The CLI handles registry updates automatically.
+
+**When to Regenerate Calibrator**:
+- After retraining model
+- After changing features or preprocessing
+- After updating training data significantly
+- If you see calibrator mismatch warnings during inference
+
+### 3. After Regenerating Feature Store (Manual Updates)
 
 **Update Steps**:
 1. Extract feature store metadata:

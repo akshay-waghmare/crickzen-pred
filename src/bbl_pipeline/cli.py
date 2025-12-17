@@ -608,9 +608,93 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
         ece_calibrated=oof_ece_cal,
     )
 
+    # Store calibrator with metadata for model compatibility checking
+    import hashlib
+    feature_list = list(X.columns) if hasattr(X, 'columns') else []
+    feature_hash = hashlib.md5('_'.join(sorted(feature_list)).encode()).hexdigest()
+    
+    calibrator_metadata = {
+        'calibrator': iso,
+        'model_path': str(champion_path),
+        'features': feature_list,
+        'feature_hash': feature_hash,
+        'n_features': len(feature_list),
+        'created_date': pd.Timestamp.now().isoformat(),
+        'oof_brier_raw': oof_brier_raw,
+        'oof_brier_calibrated': oof_brier_cal,
+        'oof_ece_raw': oof_ece_raw,
+        'oof_ece_calibrated': oof_ece_cal,
+    }
+    
     calibrator_out = model_path / 'isotonic_calibrator.pkl'
-    joblib.dump(iso, calibrator_out)
-    logger.info('Saved OOF isotonic calibrator', path=str(calibrator_out))
+    joblib.dump(calibrator_metadata, calibrator_out)
+    logger.info('Saved OOF isotonic calibrator with metadata', path=str(calibrator_out), feature_hash=feature_hash)
+    
+    # Update model registry with calibrator information
+    try:
+        registry_path = Path(__file__).parent.parent.parent / 'models' / 'model_registry.json'
+        if registry_path.exists():
+            with open(registry_path, 'r') as f:
+                registry = json.load(f)
+            
+            # Find model entry in registry by matching model_dir path
+            model_dir_rel = str(model_path.relative_to(registry_path.parent))
+            updated = False
+            
+            # Check active models
+            for league, model_info in registry.get('active_models', {}).items():
+                if model_info.get('path') == model_dir_rel:
+                    model_info['calibrator'] = {
+                        'path': f"{model_dir_rel}/isotonic_calibrator.pkl",
+                        'type': 'isotonic_regression',
+                        'generated_date': calibrator_metadata['created_date'],
+                        'oof_metrics': {
+                            'brier_raw': calibrator_metadata['oof_brier_raw'],
+                            'brier_calibrated': calibrator_metadata['oof_brier_calibrated'],
+                            'ece_raw': calibrator_metadata['oof_ece_raw'],
+                            'ece_calibrated': calibrator_metadata['oof_ece_calibrated']
+                        },
+                        'n_features': calibrator_metadata['n_features'],
+                        'feature_hash': calibrator_metadata['feature_hash']
+                    }
+                    updated = True
+                    logger.info(f'Updated registry for {league} model', league=league)
+                    break
+            
+            # Check archived models if not found in active
+            if not updated:
+                for league, model_info in registry.get('archived_models', {}).items():
+                    if model_info.get('path') == model_dir_rel:
+                        model_info['calibrator'] = {
+                            'path': f"{model_dir_rel}/isotonic_calibrator.pkl",
+                            'type': 'isotonic_regression',
+                            'generated_date': calibrator_metadata['created_date'],
+                            'oof_metrics': {
+                                'brier_raw': calibrator_metadata['oof_brier_raw'],
+                                'brier_calibrated': calibrator_metadata['oof_brier_calibrated'],
+                                'ece_raw': calibrator_metadata['oof_ece_raw'],
+                                'ece_calibrated': calibrator_metadata['oof_ece_calibrated']
+                            },
+                            'n_features': calibrator_metadata['n_features'],
+                            'feature_hash': calibrator_metadata['feature_hash']
+                        }
+                        updated = True
+                        logger.info(f'Updated registry for archived {league} model', league=league)
+                        break
+            
+            if updated:
+                # Update last_updated date
+                from datetime import datetime
+                registry['last_updated'] = datetime.now().strftime('%Y-%m-%d')
+                
+                # Write back to registry
+                with open(registry_path, 'w') as f:
+                    json.dump(registry, f, indent=2)
+                logger.info('Model registry updated successfully')
+            else:
+                logger.warning(f'Model {model_dir_rel} not found in registry - skipping registry update')
+    except Exception as e:
+        logger.warning(f'Failed to update model registry: {e}')
 
 if __name__ == '__main__':
     main()

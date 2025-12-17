@@ -10,6 +10,39 @@
 | **Model Architecture** | XGBLogRegEnsemble (50% XGBoost + 50% LogisticRegression) |
 | **Calibration Method** | Isotonic Regression on Cross-Validated Out-of-Fold Predictions |
 
+## ⚠️ Calibrator-Model Compatibility
+
+**CRITICAL:** Calibrators are tightly coupled to the specific model and features they were trained with.
+
+### When to Regenerate Calibrator
+
+You **MUST** regenerate the calibrator (`isotonic_calibrator.pkl`) whenever you:
+
+1. **Retrain the model** (even with same architecture/features)
+2. **Change features** (add/remove/rename columns)
+3. **Change feature preprocessing** (scaling, encoding, imputation)
+4. **Change model architecture** (XGBoost → LogReg, ensemble weights, etc.)
+5. **Update training data** significantly (new season, league expansion)
+
+### Automated Safety Checks
+
+The system now includes automatic validation:
+- **Feature hash**: Stored with calibrator, checked on load
+- **Mismatch detection**: Warns and refuses to load incompatible calibrators
+- **Metadata tracking**: Calibrator knows which model/features it was trained for
+
+```bash
+# If you see this warning:
+⚠️  CALIBRATOR-MODEL MISMATCH DETECTED!
+    Calibrator was trained on different features.
+    
+# Fix it by regenerating:
+python -m src.bbl_pipeline.cli generate-oof \
+  --input-file data/bbl_features_v2/training.parquet \
+  --model-dir models/bbl_v8 \
+  --n-splits 5
+```
+
 ---
 
 ## The Problem: Data Leakage in Calibration

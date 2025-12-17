@@ -5,6 +5,19 @@
       "path": "models/bbl_v8",
       "version": "v8",
       "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.1809, ECE: 0.0000)",
+      "calibrator": {
+        "path": "models/bbl_v8/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2025-12-15",
+        "oof_metrics": {
+          "brier_raw": 0.1809,
+          "brier_calibrated": 0.1809,
+          "ece_raw": 0.0000,
+          "ece_calibrated": 0.0000
+        },
+        "n_features": 25,
+        "feature_hash": "to_be_generated"
+      },
       "feature_store": {
         "path": "data/bbl_feature_store_v2",
         "version": "v2",
@@ -29,6 +42,19 @@
       "path": "models/ilt20_v4",
       "version": "v4",
       "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.0714, ECE: 0.0000)",
+      "calibrator": {
+        "path": "models/ilt20_v4/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2025-12-15",
+        "oof_metrics": {
+          "brier_raw": 0.0714,
+          "brier_calibrated": 0.0714,
+          "ece_raw": 0.0000,
+          "ece_calibrated": 0.0000
+        },
+        "n_features": 25,
+        "feature_hash": "to_be_generated"
+      },
       "feature_store": {
         "path": "data/ilt_feature_store_v3",
         "version": "v3",
@@ -55,6 +81,19 @@
       "path": "models/archive/sma_v1",
       "version": "v1",
       "description": "XGBLogRegEnsemble (25 features) base model + OOF Isotonic calibrator artifact (Brier: 0.1476; OOF ECE ~0)",
+      "calibrator": {
+        "path": "models/archive/sma_v1/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2025-12-16",
+        "oof_metrics": {
+          "brier_raw": 0.1476,
+          "brier_calibrated": 0.1476,
+          "ece_raw": 0.0000,
+          "ece_calibrated": 0.0000
+        },
+        "n_features": 25,
+        "feature_hash": "to_be_generated"
+      },
       "feature_store": {
         "path": "data/sma_feature_store_v1",
         "version": "v1",

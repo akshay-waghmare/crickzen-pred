@@ -159,11 +159,66 @@ class Predictor:
             try:
                 # Try joblib first (newer models), then pickle (older models)
                 try:
-                    calibrator = joblib.load(calibrator_path)
+                    calibrator_data = joblib.load(calibrator_path)
                 except Exception:
                     with open(calibrator_path, 'rb') as f:
-                        calibrator = pickle.load(f)
-                logger.info("Loaded isotonic calibrator for probability calibration")
+                        calibrator_data = pickle.load(f)
+                
+                # Check if calibrator has metadata (newer format)
+                if isinstance(calibrator_data, dict) and 'calibrator' in calibrator_data:
+                    # Extract actual calibrator and metadata
+                    calibrator = calibrator_data['calibrator']
+                    cal_features = calibrator_data.get('features', [])
+                    cal_feature_hash = calibrator_data.get('feature_hash', '')
+                    cal_model_path = calibrator_data.get('model_path', '')
+                    
+                    # Validate compatibility with loaded model
+                    import hashlib
+                    
+                    # Get model's feature list
+                    model_features = None
+                    if hasattr(model, 'selected_features_'):
+                        model_features = model.selected_features_
+                    elif hasattr(model, 'feature_names_in_'):
+                        model_features = list(model.feature_names_in_) if model.feature_names_in_ is not None else None
+                    elif isinstance(model, dict) and 'features' in model:
+                        model_features = model['features']
+                    
+                    # Calculate model feature hash
+                    if model_features:
+                        model_feature_hash = hashlib.md5('_'.join(sorted(model_features)).encode()).hexdigest()
+                        
+                        # Warn if feature mismatch
+                        if cal_feature_hash != model_feature_hash:
+                            logger.warning(
+                                "⚠️  CALIBRATOR-MODEL MISMATCH DETECTED!",
+                                calibrator_features=len(cal_features),
+                                model_features=len(model_features),
+                                calibrator_hash=cal_feature_hash,
+                                model_hash=model_feature_hash,
+                                message="Calibrator was trained on different features. Regenerate with: bbl-pipeline generate-oof"
+                            )
+                            # Don't load mismatched calibrator - safer to use uncalibrated model
+                            calibrator = None
+                        else:
+                            logger.info(
+                                "✓ Calibrator validated",
+                                feature_hash=cal_feature_hash,
+                                n_features=len(cal_features),
+                                created=calibrator_data.get('created_date', 'unknown')
+                            )
+                    else:
+                        logger.warning("Could not validate calibrator - model has no feature list")
+                else:
+                    # Old format (just the calibrator object) - load but warn
+                    calibrator = calibrator_data
+                    logger.warning(
+                        "⚠️  Using legacy calibrator format (no metadata).",
+                        message="Cannot validate compatibility. Regenerate with: bbl-pipeline generate-oof"
+                    )
+                
+                if calibrator:
+                    logger.info("Loaded isotonic calibrator for probability calibration")
             except Exception as e:
                 logger.warning(f"Failed to load calibrator: {e}")
         
