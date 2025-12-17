@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-12-16",
+  "last_updated": "2025-12-17",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v8",
@@ -8,15 +8,15 @@
       "calibrator": {
         "path": "models/bbl_v8/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-15",
+        "generated_date": "2025-12-17T13:52:16.679706",
         "oof_metrics": {
-          "brier_raw": 0.1809,
-          "brier_calibrated": 0.1809,
-          "ece_raw": 0.0000,
-          "ece_calibrated": 0.0000
+          "brier_raw": 0.1815751129243961,
+          "brier_calibrated": 0.18090263897353165,
+          "ece_raw": 0.01502756289181674,
+          "ece_calibrated": 3.01758359052853e-17
         },
         "n_features": 25,
-        "feature_hash": "to_be_generated"
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
         "path": "data/bbl_feature_store_v2",
@@ -27,9 +27,24 @@
           "teams": 8,
           "players": 508,
           "venues": 31,
-          "team_columns": ["team", "win_rate", "matches", "bat_first_wr", "bowl_first_wr"],
-          "player_columns": ["batsman_rolling_avg", "batsman_rolling_sr", "bowler_rolling_econ", "bowler_rolling_sr"],
-          "venue_columns": ["venue_avg_score", "venue_avg_wickets", "venue_bat_first_win_rate"]
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
         },
         "recent_changes": {
           "date": "2025-12-15",
@@ -49,8 +64,8 @@
         "oof_metrics": {
           "brier_raw": 0.0714,
           "brier_calibrated": 0.0714,
-          "ece_raw": 0.0000,
-          "ece_calibrated": 0.0000
+          "ece_raw": 0.0,
+          "ece_calibrated": 0.0
         },
         "n_features": 25,
         "feature_hash": "to_be_generated"
@@ -64,9 +79,24 @@
           "teams": 7,
           "players": 320,
           "venues": 3,
-          "team_columns": ["team", "win_rate", "matches", "bat_first_wr", "bowl_first_wr"],
-          "player_columns": ["batsman_rolling_avg", "batsman_rolling_sr", "bowler_rolling_econ", "bowler_rolling_sr"],
-          "venue_columns": ["venue_avg_score", "venue_avg_wickets", "venue_bat_first_win_rate"]
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
         },
         "recent_changes": {
           "date": "2025-12-15",
@@ -88,8 +118,8 @@
         "oof_metrics": {
           "brier_raw": 0.1476,
           "brier_calibrated": 0.1476,
-          "ece_raw": 0.0000,
-          "ece_calibrated": 0.0000
+          "ece_raw": 0.0,
+          "ece_calibrated": 0.0
         },
         "n_features": 25,
         "feature_hash": "to_be_generated"
@@ -103,9 +133,24 @@
           "teams": 39,
           "players": 1458,
           "venues": 61,
-          "team_columns": ["team", "win_rate", "matches", "bat_first_wr", "bowl_first_wr"],
-          "player_columns": ["batsman_rolling_avg", "batsman_rolling_sr", "bowler_rolling_econ", "bowler_rolling_sr"],
-          "venue_columns": ["venue_avg_score", "venue_avg_wickets", "venue_bat_first_win_rate"]
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
         },
         "recent_changes": {
           "date": "2025-12-16",

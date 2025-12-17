@@ -633,12 +633,24 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     # Update model registry with calibrator information
     try:
         registry_path = Path(__file__).parent.parent.parent / 'models' / 'model_registry.json'
+        project_root = registry_path.parent.parent  # Go up from models/model_registry.json to project root
+        
         if registry_path.exists():
             with open(registry_path, 'r') as f:
                 registry = json.load(f)
             
             # Find model entry in registry by matching model_dir path
-            model_dir_rel = str(model_path.relative_to(registry_path.parent))
+            # Normalize paths to use forward slashes for cross-platform compatibility
+            try:
+                model_dir_rel = str(model_path.relative_to(project_root)).replace('\\', '/')
+            except ValueError:
+                # If relative_to fails, try comparing absolute paths
+                model_dir_abs = str(model_path.resolve()).replace('\\', '/')
+                project_root_abs = str(project_root.resolve()).replace('\\', '/')
+                if model_dir_abs.startswith(project_root_abs):
+                    model_dir_rel = model_dir_abs[len(project_root_abs):].lstrip('/')
+                else:
+                    raise
             updated = False
             
             # Check active models
