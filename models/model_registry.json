@@ -8,12 +8,12 @@
       "calibrator": {
         "path": "models/bbl_v8/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-17T13:52:16.679706",
+        "generated_date": "2025-12-17T14:29:33.196140",
         "oof_metrics": {
           "brier_raw": 0.1815751129243961,
-          "brier_calibrated": 0.18090263897353165,
+          "brier_calibrated": 0.17990776055450192,
           "ece_raw": 0.01502756289181674,
-          "ece_calibrated": 3.01758359052853e-17
+          "ece_calibrated": 3.297994676873298e-17
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"

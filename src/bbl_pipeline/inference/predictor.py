@@ -63,9 +63,10 @@ class EnsembleModelWrapper:
 class Predictor:
     """
     Inference engine for BBL win probability.
-    Enhanced with resource-based features for improved calibration.
+    Enhanced with resource-based features and innings-specific calibration.
     """
-    def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], calibrator=None):
+    def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], 
+                 calibrator=None, calibrator_inn1=None, calibrator_inn2=None, calibrator_type='none'):
         # Wrap ensemble model dict if needed
         if isinstance(model, dict) and 'xgb_model' in model:
             self.model = EnsembleModelWrapper(model)
@@ -73,7 +74,10 @@ class Predictor:
             self.model = model
         self.feature_store = feature_store
         self.global_stats = global_stats
-        self.calibrator = calibrator  # Isotonic calibrator for probability calibration
+        self.calibrator = calibrator  # Single calibrator (legacy/backward compatible)
+        self.calibrator_inn1 = calibrator_inn1  # Innings 1 calibrator
+        self.calibrator_inn2 = calibrator_inn2  # Innings 2 calibrator
+        self.calibrator_type = calibrator_type  # 'innings_specific', 'single', 'legacy', or 'none'
         self.resource_calculator = ResourceFeatureCalculator()
         # Use RealTimeFeatureMapper for proper feature generation
         self.feature_mapper = RealTimeFeatureMapper(feature_store, global_stats)
@@ -154,6 +158,9 @@ class Predictor:
         
         # Load isotonic calibrator if available
         calibrator = None
+        calibrator_inn1 = None
+        calibrator_inn2 = None
+        calibrator_type = 'none'
         calibrator_path = path / "isotonic_calibrator.pkl"
         if calibrator_path.exists():
             try:
@@ -164,15 +171,40 @@ class Predictor:
                     with open(calibrator_path, 'rb') as f:
                         calibrator_data = pickle.load(f)
                 
-                # Check if calibrator has metadata (newer format)
-                if isinstance(calibrator_data, dict) and 'calibrator' in calibrator_data:
-                    # Extract actual calibrator and metadata
-                    calibrator = calibrator_data['calibrator']
+                # Check calibrator type
+                cal_type = calibrator_data.get('type', 'unknown') if isinstance(calibrator_data, dict) else 'legacy'
+                
+                if cal_type == 'innings_specific':
+                    # Innings-specific calibrators
+                    calibrator_inn1 = calibrator_data['calibrator_innings1']
+                    calibrator_inn2 = calibrator_data['calibrator_innings2']
+                    calibrator = calibrator_data.get('calibrator_combined', None)  # Optional combined for comparison
+                    calibrator_type = 'innings_specific'
+                    logger.info(
+                        "Loaded innings-specific calibrators",
+                        created=calibrator_data.get('created_date', 'unknown'),
+                        inn1_samples=calibrator_data.get('innings1_metrics', {}).get('samples', 0),
+                        inn2_samples=calibrator_data.get('innings2_metrics', {}).get('samples', 0),
+                        has_combined=calibrator is not None
+                    )
                     cal_features = calibrator_data.get('features', [])
                     cal_feature_hash = calibrator_data.get('feature_hash', '')
-                    cal_model_path = calibrator_data.get('model_path', '')
-                    
-                    # Validate compatibility with loaded model
+                elif isinstance(calibrator_data, dict) and 'calibrator' in calibrator_data:
+                    # Single calibrator with metadata (newer format)
+                    calibrator = calibrator_data['calibrator']
+                    calibrator_type = 'single'
+                    cal_features = calibrator_data.get('features', [])
+                    cal_feature_hash = calibrator_data.get('feature_hash', '')
+                else:
+                    # Legacy format (bare calibrator object)
+                    calibrator = calibrator_data
+                    calibrator_type = 'legacy'
+                    cal_features = []
+                    cal_feature_hash = ''
+                    logger.warning("Loaded legacy calibrator format (no metadata)")
+                
+                # Validate compatibility with loaded model (only if we have metadata)
+                if cal_features and calibrator_type != 'legacy':
                     import hashlib
                     
                     # Get model's feature list
@@ -200,29 +232,34 @@ class Predictor:
                             )
                             # Don't load mismatched calibrator - safer to use uncalibrated model
                             calibrator = None
+                            calibrator_inn1 = None
+                            calibrator_inn2 = None
+                            calibrator_type = 'none'
                         else:
                             logger.info(
                                 "✓ Calibrator validated",
+                                type=calibrator_type,
                                 feature_hash=cal_feature_hash,
                                 n_features=len(cal_features),
                                 created=calibrator_data.get('created_date', 'unknown')
                             )
                     else:
                         logger.warning("Could not validate calibrator - model has no feature list")
-                else:
-                    # Old format (just the calibrator object) - load but warn
-                    calibrator = calibrator_data
-                    logger.warning(
-                        "⚠️  Using legacy calibrator format (no metadata).",
-                        message="Cannot validate compatibility. Regenerate with: bbl-pipeline generate-oof"
-                    )
                 
-                if calibrator:
-                    logger.info("Loaded isotonic calibrator for probability calibration")
+                if calibrator or calibrator_inn1 or calibrator_inn2:
+                    if calibrator_type == 'innings_specific':
+                        logger.info("Loaded innings-specific isotonic calibrators for probability calibration")
+                    elif calibrator_type == 'single':
+                        logger.info("Loaded isotonic calibrator for probability calibration")
+                    elif calibrator_type == 'legacy':
+                        logger.warning(
+                            "⚠️  Using legacy calibrator format (no metadata).",
+                            message="Cannot validate compatibility. Regenerate with: bbl-pipeline generate-oof"
+                        )
             except Exception as e:
                 logger.warning(f"Failed to load calibrator: {e}")
         
-        return cls(model, feature_store, global_stats, calibrator)
+        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, calibrator_type)
 
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
@@ -384,17 +421,33 @@ class Predictor:
             
             raw_prob = self.model.predict_proba(X)[0, 1]  # Probability of class 1 (Win)
             
-            # Apply isotonic calibration if available with smoothing to prevent cliff effects
-            # Use raw model probability but show all three for comparison
+            # Apply innings-specific or single calibration if available
             model_prob = raw_prob
             
             # Store all probability types for external access
             self.last_raw_prob = raw_prob
             self.last_smoothed_prob = raw_prob
             self.last_calibrated_prob = raw_prob
+            self.last_calibrated_combined = raw_prob  # For comparison when using innings-specific
             
-            if self.calibrator is not None:
-                calibrated_prob = float(self.calibrator.predict([raw_prob])[0])
+            # Select appropriate calibrator based on innings
+            active_calibrator = None
+            combined_calibrator = None
+            
+            if self.calibrator_type == 'innings_specific':
+                if state.innings == 1 and self.calibrator_inn1 is not None:
+                    active_calibrator = self.calibrator_inn1
+                elif state.innings == 2 and self.calibrator_inn2 is not None:
+                    active_calibrator = self.calibrator_inn2
+                else:
+                    logger.warning(f"No calibrator for innings {state.innings}, using raw probability")
+                # Also get combined calibrator for comparison
+                combined_calibrator = self.calibrator
+            elif self.calibrator_type in ['single', 'legacy'] and self.calibrator is not None:
+                active_calibrator = self.calibrator
+            
+            if active_calibrator is not None:
+                calibrated_prob = float(active_calibrator.predict([raw_prob])[0])
                 # Calculate smoothed (what we would use if blending)
                 CALIBRATOR_WEIGHT = 0.3
                 MAX_CALIBRATION_SHIFT = 0.05
@@ -406,8 +459,17 @@ class Predictor:
                 self.last_smoothed_prob = smoothed_prob
                 self.last_calibrated_prob = calibrated_prob
                 
+                # Also calculate combined calibrator if available (for comparison)
+                if combined_calibrator is not None:
+                    calibrated_combined = float(combined_calibrator.predict([raw_prob])[0])
+                    self.last_calibrated_combined = calibrated_combined
+                
                 if debug:
-                    print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Calibrated: {calibrated_prob:.1%}")
+                    cal_label = f"Inn{state.innings}" if self.calibrator_type == 'innings_specific' else "Single"
+                    if self.calibrator_type == 'innings_specific' and combined_calibrator is not None:
+                        print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Combined: {calibrated_combined:.1%} | Inn-Specific ({cal_label}): {calibrated_prob:.1%}")
+                    else:
+                        print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Calibrated ({cal_label}): {calibrated_prob:.1%}")
             else:
                 if debug:
                     print(f"📊 Model probability: {model_prob:.1%}")

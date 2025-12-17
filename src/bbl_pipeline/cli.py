@@ -550,6 +550,12 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     if target_col not in df.columns:
         raise click.ClickException(f"Target column '{target_col}' not found in dataset")
 
+    # Check if innings column exists for innings-specific calibration
+    has_innings = 'innings' in df.columns
+    if has_innings:
+        logger.info('Innings column detected - will generate innings-specific calibrators')
+        innings_col = df['innings'].copy()
+    
     y = df[target_col]
 
     # Drop obviously-non-feature columns if present
@@ -590,18 +596,76 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
         oof_probs[val_idx] = model.predict_proba(X.iloc[val_idx])[:, 1]
         logger.info('OOF fold complete', fold=fold_idx, train_size=len(train_idx), val_size=len(val_idx))
 
-    iso = IsotonicRegression(out_of_bounds='clip')
-    iso.fit(oof_probs, y)
-
-    # Report OOF calibration metrics (before/after)
-    oof_brier_raw = float(brier_score_loss(y, oof_probs))
-    oof_ece_raw = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs))
-    oof_probs_cal = iso.predict(oof_probs)
-    oof_brier_cal = float(brier_score_loss(y, oof_probs_cal))
-    oof_ece_cal = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs_cal))
+    # Create innings-specific calibrators if innings column exists
+    if has_innings:
+        # Train separate calibrators for each innings
+        iso_inn1 = IsotonicRegression(out_of_bounds='clip')
+        iso_inn2 = IsotonicRegression(out_of_bounds='clip')
+        # Also train a combined calibrator for comparison
+        iso_combined = IsotonicRegression(out_of_bounds='clip')
+        
+        mask_inn1 = (innings_col == 1).values
+        mask_inn2 = (innings_col == 2).values
+        
+        iso_inn1.fit(oof_probs[mask_inn1], y.values[mask_inn1] if hasattr(y, 'values') else y[mask_inn1])
+        iso_inn2.fit(oof_probs[mask_inn2], y.values[mask_inn2] if hasattr(y, 'values') else y[mask_inn2])
+        iso_combined.fit(oof_probs, y)
+        
+        # Calculate innings-specific metrics
+        oof_probs_cal_inn1 = iso_inn1.predict(oof_probs[mask_inn1])
+        oof_probs_cal_inn2 = iso_inn2.predict(oof_probs[mask_inn2])
+        
+        y_inn1 = y.values[mask_inn1] if hasattr(y, 'values') else y[mask_inn1]
+        y_inn2 = y.values[mask_inn2] if hasattr(y, 'values') else y[mask_inn2]
+        
+        inn1_brier_raw = float(brier_score_loss(y_inn1, oof_probs[mask_inn1]))
+        inn1_ece_raw = float(expected_calibration_error(y_inn1, oof_probs[mask_inn1]))
+        inn1_brier_cal = float(brier_score_loss(y_inn1, oof_probs_cal_inn1))
+        inn1_ece_cal = float(expected_calibration_error(y_inn1, oof_probs_cal_inn1))
+        
+        inn2_brier_raw = float(brier_score_loss(y_inn2, oof_probs[mask_inn2]))
+        inn2_ece_raw = float(expected_calibration_error(y_inn2, oof_probs[mask_inn2]))
+        inn2_brier_cal = float(brier_score_loss(y_inn2, oof_probs_cal_inn2))
+        inn2_ece_cal = float(expected_calibration_error(y_inn2, oof_probs_cal_inn2))
+        
+        logger.info(
+            'Innings 1 calibration metrics',
+            samples=int(mask_inn1.sum()),
+            brier_raw=inn1_brier_raw,
+            ece_raw=inn1_ece_raw,
+            brier_calibrated=inn1_brier_cal,
+            ece_calibrated=inn1_ece_cal,
+        )
+        logger.info(
+            'Innings 2 calibration metrics',
+            samples=int(mask_inn2.sum()),
+            brier_raw=inn2_brier_raw,
+            ece_raw=inn2_ece_raw,
+            brier_calibrated=inn2_brier_cal,
+            ece_calibrated=inn2_ece_cal,
+        )
+        
+        # Store combined metrics for overall reporting
+        oof_brier_raw = float(brier_score_loss(y, oof_probs))
+        oof_ece_raw = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs))
+        oof_probs_cal = oof_probs.copy()
+        oof_probs_cal[mask_inn1] = oof_probs_cal_inn1
+        oof_probs_cal[mask_inn2] = oof_probs_cal_inn2
+        oof_brier_cal = float(brier_score_loss(y, oof_probs_cal))
+        oof_ece_cal = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs_cal))
+    else:
+        # Single calibrator for all data (backward compatible)
+        iso = IsotonicRegression(out_of_bounds='clip')
+        iso.fit(oof_probs, y)
+        
+        oof_brier_raw = float(brier_score_loss(y, oof_probs))
+        oof_ece_raw = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs))
+        oof_probs_cal = iso.predict(oof_probs)
+        oof_brier_cal = float(brier_score_loss(y, oof_probs_cal))
+        oof_ece_cal = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs_cal))
 
     logger.info(
-        'OOF calibration metrics',
+        'Overall OOF calibration metrics',
         brier_raw=oof_brier_raw,
         ece_raw=oof_ece_raw,
         brier_calibrated=oof_brier_cal,
@@ -613,22 +677,69 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     feature_list = list(X.columns) if hasattr(X, 'columns') else []
     feature_hash = hashlib.md5('_'.join(sorted(feature_list)).encode()).hexdigest()
     
-    calibrator_metadata = {
-        'calibrator': iso,
-        'model_path': str(champion_path),
-        'features': feature_list,
-        'feature_hash': feature_hash,
-        'n_features': len(feature_list),
-        'created_date': pd.Timestamp.now().isoformat(),
-        'oof_brier_raw': oof_brier_raw,
-        'oof_brier_calibrated': oof_brier_cal,
-        'oof_ece_raw': oof_ece_raw,
-        'oof_ece_calibrated': oof_ece_cal,
-    }
+    if has_innings:
+        # Innings-specific calibrators
+        calibrator_metadata = {
+            'type': 'innings_specific',
+            'calibrator_innings1': iso_inn1,
+            'calibrator_innings2': iso_inn2,
+            'calibrator_combined': iso_combined,  # For comparison
+            'model_path': str(champion_path),
+            'features': feature_list,
+            'feature_hash': feature_hash,
+            'n_features': len(feature_list),
+            'created_date': pd.Timestamp.now().isoformat(),
+            'oof_brier_raw': oof_brier_raw,
+            'oof_brier_calibrated': oof_brier_cal,
+            'oof_ece_raw': oof_ece_raw,
+            'oof_ece_calibrated': oof_ece_cal,
+            'innings1_metrics': {
+                'samples': int(mask_inn1.sum()),
+                'brier_raw': inn1_brier_raw,
+                'brier_calibrated': inn1_brier_cal,
+                'ece_raw': inn1_ece_raw,
+                'ece_calibrated': inn1_ece_cal,
+            },
+            'innings2_metrics': {
+                'samples': int(mask_inn2.sum()),
+                'brier_raw': inn2_brier_raw,
+                'brier_calibrated': inn2_brier_cal,
+                'ece_raw': inn2_ece_raw,
+                'ece_calibrated': inn2_ece_cal,
+            },
+        }
+    else:
+        # Single calibrator (backward compatible)
+        calibrator_metadata = {
+            'type': 'single',
+            'calibrator': iso,
+            'model_path': str(champion_path),
+            'features': feature_list,
+            'feature_hash': feature_hash,
+            'n_features': len(feature_list),
+            'created_date': pd.Timestamp.now().isoformat(),
+            'oof_brier_raw': oof_brier_raw,
+            'oof_brier_calibrated': oof_brier_cal,
+            'oof_ece_raw': oof_ece_raw,
+            'oof_ece_calibrated': oof_ece_cal,
+        }
     
     calibrator_out = model_path / 'isotonic_calibrator.pkl'
     joblib.dump(calibrator_metadata, calibrator_out)
-    logger.info('Saved OOF isotonic calibrator with metadata', path=str(calibrator_out), feature_hash=feature_hash)
+    if has_innings:
+        logger.info(
+            'Saved innings-specific calibrators with metadata',
+            path=str(calibrator_out),
+            feature_hash=feature_hash,
+            type='innings_specific'
+        )
+    else:
+        logger.info(
+            'Saved OOF isotonic calibrator with metadata',
+            path=str(calibrator_out),
+            feature_hash=feature_hash,
+            type='single'
+        )
     
     # Update model registry with calibrator information
     try:
