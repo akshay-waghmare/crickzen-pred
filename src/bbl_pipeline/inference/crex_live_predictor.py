@@ -352,8 +352,23 @@ class CrexLivePredictor:
                 if self.match_state.batting_team and self.match_state.batting_team != current_batting_team:
                     # The current batting was the previous bowling
                     self.match_state.bowling_team = self.match_state.batting_team
+                elif not self.match_state.bowling_team:
+                    # First time setting teams - use info page teams if available
+                    if hasattr(self, '_team1') and hasattr(self, '_team2'):
+                        self.match_state.bowling_team = self._team2 if current_batting_team == self._team1 else self._team1
                 
                 self.match_state.batting_team = current_batting_team
+            else:
+                # Fallback: If match hasn't started, use teams from info page
+                if hasattr(self, '_team1') and hasattr(self, '_team2'):
+                    self.match_state.batting_team = self._team1
+                    self.match_state.bowling_team = self._team2
+                else:
+                    # Try to extract from title "ADKR vs GG"
+                    vs_match = re.search(r'([A-Z0-9\-]+)\s+vs\s+([A-Z0-9\-]+)', title)
+                    if vs_match:
+                        self.match_state.batting_team = vs_match.group(1)
+                        self.match_state.bowling_team = vs_match.group(2)
             
             # Extract batsmen names from title: "(Sophie Devine 0(0), Beth Mooney 22(14))"
             # Pattern: Name Runs(Balls), Name Runs(Balls)
