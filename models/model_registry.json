@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-12-17",
+  "last_updated": "2025-12-28",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v8",
@@ -8,7 +8,7 @@
       "calibrator": {
         "path": "models/bbl_v8/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-17T14:29:33.196140",
+        "generated_date": "2025-12-28T14:23:09.428796",
         "oof_metrics": {
           "brier_raw": 0.1815751129243961,
           "brier_calibrated": 0.17990776055450192,
@@ -60,15 +60,15 @@
       "calibrator": {
         "path": "models/ilt20_v4/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-15",
+        "generated_date": "2025-12-27T20:02:00.235465",
         "oof_metrics": {
-          "brier_raw": 0.0714,
-          "brier_calibrated": 0.0714,
-          "ece_raw": 0.0,
-          "ece_calibrated": 0.0
+          "brier_raw": 0.20582701765993391,
+          "brier_calibrated": 0.18732205239997266,
+          "ece_raw": 0.08414622778916676,
+          "ece_calibrated": 2.82452954749335e-17
         },
         "n_features": 25,
-        "feature_hash": "to_be_generated"
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
         "path": "data/ilt_feature_store_v3",

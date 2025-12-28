@@ -580,6 +580,7 @@ class CrexLivePredictor:
             self.last_raw_prob = getattr(self.predictor, 'last_raw_prob', win_prob)
             self.last_smoothed_prob = getattr(self.predictor, 'last_smoothed_prob', win_prob)
             self.last_calibrated_prob = getattr(self.predictor, 'last_calibrated_prob', win_prob)
+            self.last_calibrated_combined = getattr(self.predictor, 'last_calibrated_combined', win_prob)
             
             return float(win_prob)
             
@@ -885,6 +886,7 @@ class CrexLivePredictor:
                 "bowl_win_prob": 1 - win_prob,
                 "raw_win_prob": getattr(self, 'last_raw_prob', win_prob),
                 "smoothed_win_prob": getattr(self, 'last_smoothed_prob', win_prob),
+                "calibrated_combined_prob": getattr(self, 'last_calibrated_combined', win_prob),
                 "calibrated_win_prob": getattr(self, 'last_calibrated_prob', win_prob),
                 "features": features,
                 "history": self._prediction_history[-50:]  # Last 50 data points

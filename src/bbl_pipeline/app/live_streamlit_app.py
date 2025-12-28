@@ -320,17 +320,19 @@ def main():
     # Header with odds summary
     st.subheader("🎯 Win Probability & Odds")
     
-    # Display Raw, Smoothed, and Calibrated probabilities
+    # Display Raw, Smoothed, Combined, and Inn-Specific probabilities
     raw_prob = d.get("raw_win_prob", d["bat_win_prob"])
     smoothed_prob = d.get("smoothed_win_prob", d["bat_win_prob"])
-    calibrated_prob = d.get("calibrated_win_prob", d["bat_win_prob"])
+    combined_prob = d.get("calibrated_combined_prob", d["bat_win_prob"])
+    inn_specific_prob = d.get("calibrated_win_prob", d["bat_win_prob"])
     
     # Calculate odds for each
     raw_odds = prob_to_odds(raw_prob)
     smoothed_odds = prob_to_odds(smoothed_prob)
-    calibrated_odds = prob_to_odds(calibrated_prob)
+    combined_odds = prob_to_odds(combined_prob)
+    inn_specific_odds = prob_to_odds(inn_specific_prob)
     
-    prob_col1, prob_col2, prob_col3 = st.columns(3)
+    prob_col1, prob_col2, prob_col3, prob_col4 = st.columns(4)
     with prob_col1:
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #2196F3;">
@@ -351,11 +353,21 @@ def main():
         ''', unsafe_allow_html=True)
     with prob_col3:
         st.markdown(f'''
+        <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #9C27B0;">
+            <b>🎯 Combined</b><br>
+            <span style="font-size: 1.5em; color: #9C27B0;">{combined_prob*100:.1f}%</span><br>
+            <span style="font-size: 1.1em; color: #333;">Odds: <b>{combined_odds}</b></span><br>
+            <span style="font-size: 0.9em; color: #666;">Combined Isotonic</span>
+        </div>
+        ''', unsafe_allow_html=True)
+    with prob_col4:
+        innings_label = "Inn1" if not d.get("is_second_innings") else "Inn2"
+        st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #4CAF50;">
-            <b>✅ Calibrated</b><br>
-            <span style="font-size: 1.5em; color: #4CAF50;">{calibrated_prob*100:.1f}%</span><br>
-            <span style="font-size: 1.1em; color: #333;">Odds: <b>{calibrated_odds}</b></span><br>
-            <span style="font-size: 0.9em; color: #666;">Isotonic Calibration</span>
+            <b>✅ Inn-Specific</b><br>
+            <span style="font-size: 1.5em; color: #4CAF50;">{inn_specific_prob*100:.1f}%</span><br>
+            <span style="font-size: 1.1em; color: #333;">Odds: <b>{inn_specific_odds}</b></span><br>
+            <span style="font-size: 0.9em; color: #666;">{innings_label} Isotonic</span>
         </div>
         ''', unsafe_allow_html=True)
     
