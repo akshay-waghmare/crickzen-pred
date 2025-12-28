@@ -68,6 +68,30 @@ VENUE_ALIASES = {
     'Sheikh Zayed Stadium': 'Zayed Cricket Stadium, Abu Dhabi',
     'Sharjah Cricket Stadium': 'Sharjah Cricket Stadium',
     'Zayed Cricket Stadium': 'Zayed Cricket Stadium, Abu Dhabi',
+
+    # SA20 Venues
+    'Kingsmead': 'Kingsmead, Durban',
+    'Kingsmead, Durban': 'Kingsmead, Durban',
+    'Durban Hollywoodbets Kingsmead Cricket Stadium': 'Kingsmead, Durban',
+    'Hollywoodbets Kingsmead Stadium': 'Kingsmead, Durban',
+    'Hollywoodbets Kingsmead': 'Kingsmead, Durban',
+    'Newlands': 'Newlands, Cape Town',
+    'Newlands, Cape Town': 'Newlands, Cape Town',
+    'Newlands Cricket Ground': 'Newlands, Cape Town',
+    'Boland Park': 'Boland Park, Paarl',
+    'Boland Park, Paarl': 'Boland Park, Paarl',
+    'Boland Park Paarl': 'Boland Park, Paarl',
+    "St George's Park": "St George's Park, Gqeberha",
+    "St George's Park, Gqeberha": "St George's Park, Gqeberha",
+    'St Georges Park': "St George's Park, Gqeberha",
+    'SuperSport Park': 'SuperSport Park, Centurion',
+    'SuperSport Park, Centurion': 'SuperSport Park, Centurion',
+    'SuperSport Park Centurion': 'SuperSport Park, Centurion',
+    'The Wanderers Stadium': 'The Wanderers Stadium, Johannesburg',
+    'The Wanderers Stadium, Johannesburg': 'The Wanderers Stadium, Johannesburg',
+    'Wanderers': 'The Wanderers Stadium, Johannesburg',
+    'Wanderers Stadium': 'The Wanderers Stadium, Johannesburg',
+    'Wanderers, Johannesburg': 'The Wanderers Stadium, Johannesburg',
 }
 
 class FeatureStore(Protocol):
@@ -223,10 +247,19 @@ class InMemoryFeatureStore:
         'HUR': 'Hobart Hurricanes', 'THU': 'Sydney Thunder',
         # ILT20 (International League T20)
         'DUB': 'Dubai Capitals', 'ABD': 'Abu Dhabi Knight Riders', 'SHA': 'Sharjah Warriors',
-        'DSG': 'Desert Vipers', 'GUL': 'Gulf Giants', 'MIC': 'MI Emirates',
+        'DES': 'Desert Vipers', 'GUL': 'Gulf Giants', 'MIC': 'MI Emirates',
         # ILT20 alternate abbreviations (from CREX scraper)
         'DV': 'Desert Vipers', 'GG': 'Gulf Giants', 'MIE': 'MI Emirates',
         'DC': 'Dubai Capitals', 'ADKR': 'Abu Dhabi Knight Riders', 'SW': 'Sharjah Warriors',
+        
+        # SA20 (South Africa T20)
+        'DSG': "Durban's Super Giants",
+        'MICT': 'MI Cape Town',
+        'PR': 'Paarl Royals',
+        'JSK': 'Joburg Super Kings',
+        'PC': 'Pretoria Capitals',
+        'SEC': 'Sunrisers Eastern Cape',
+        'SUNE': 'Sunrisers Eastern Cape',
     }
 
     def get_team_stats(self, team_name: str) -> Optional[Dict[str, Any]]:

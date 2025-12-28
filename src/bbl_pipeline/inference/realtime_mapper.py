@@ -272,6 +272,7 @@ class RealTimeFeatureMapper:
         if hasattr(self.feature_store, 'get_team_stats'):
              batting_stats = self.feature_store.get_team_stats(batting_team) or {}
              bowling_stats = self.feature_store.get_team_stats(bowling_team) or {}
+
              batting_team_win_rate = batting_stats.get('win_rate', 0.5)
              bowling_team_win_rate = bowling_stats.get('win_rate', 0.5)
              batting_team_bat_first_wr = batting_stats.get('bat_first_wr', 0.5)
@@ -279,6 +280,8 @@ class RealTimeFeatureMapper:
              bowling_team_bat_first_wr = bowling_stats.get('bat_first_wr', 0.5)
              bowling_team_bowl_first_wr = bowling_stats.get('bowl_first_wr', 0.5)
              team_strength_diff = batting_team_win_rate - bowling_team_win_rate
+        else:
+             logger.warning("Feature store does not have get_team_stats method")
 
         # --- Resource-based Features (DLS-style) ---
         target_runs = scraped_data.get('target_score') if innings == 2 else None

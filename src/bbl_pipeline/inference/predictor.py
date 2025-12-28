@@ -134,7 +134,8 @@ class Predictor:
             try:
                 feature_store = InMemoryFeatureStore(player_stats_path, venue_stats_path)
                 feature_store.load()
-                logger.info("Feature store loaded successfully")
+                logger.info(f"Feature store loaded successfully. Type: {type(feature_store)}")
+                logger.info(f"Has get_team_stats: {hasattr(feature_store, 'get_team_stats')}")
             except Exception as e:
                 logger.warning(f"Failed to load feature store: {e}")
                 feature_store = None

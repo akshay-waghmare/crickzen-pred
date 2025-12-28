@@ -147,7 +147,17 @@ class CrexLivePredictor:
             # Extract venue - look for known cricket venue patterns
             # Be specific to avoid capturing random text
             venue_patterns = [
-                r'Venue\s*[:\-]?\s*([\w\s]+(?:Stadium|Oval|Ground|Arena))',  # "Venue: North Sydney Oval"
+                r'Venue\s*[:\-]?\s*([\w\s]+(?:Stadium|Oval|Ground|Arena|Park))',  # "Venue: North Sydney Oval"
+                # SA20 venues
+                r'(Kingsmead[\w\s,]*)',  # Durban
+                r'(Newlands[\w\s,]*)',   # Cape Town
+                r'(Boland Park[\w\s,]*)', # Paarl
+                r"(St George's Park[\w\s,]*)",  # Gqeberha
+                r'(SuperSport Park[\w\s,]*)',  # Centurion
+                r'(Wanderers[\w\s,]*)',  # Johannesburg
+                r'(Durban[\w\s]+Stadium)',
+                r'(Hollywoodbets[\w\s]+)',
+                # Australian venues
                 r'(Simonds Stadium)',  # Specific pattern for Simonds Stadium
                 r'(Kardinia Park)',
                 r'(GMHBA Stadium)',
@@ -161,7 +171,13 @@ class CrexLivePredictor:
                 r'(Bellerive Oval|Blundstone Arena)',
                 r'(Manuka Oval)',
                 r'(Junction Oval)',
+                # UAE venues
+                r'(Dubai International Cricket Stadium)',
+                r'(Zayed Cricket Stadium[\w\s,]*)',
+                r'(Sharjah Cricket Stadium)',
+                # Generic patterns (last)
                 r'([\w\s]+Cricket Ground)',
+                r'([\w\s]+Cricket Stadium)',
                 r'([\w\s]+Stadium)',
                 r'([\w\s]+Oval)',
             ]
@@ -173,6 +189,10 @@ class CrexLivePredictor:
                     venue = ' '.join(venue.split())
                     # Remove time prefixes like "45 PM" or date info
                     venue = re.sub(r'^\d+\s*(?:AM|PM)\s+', '', venue, flags=re.IGNORECASE)
+                    # Remove common trailing words that get captured
+                    venue = re.sub(r'\s+(Team Form|Match Info|Live|Scorecard|Commentary).*$', '', venue, flags=re.IGNORECASE)
+                    # Clean trailing commas or spaces
+                    venue = venue.rstrip(', ')
                     if len(venue) > 5 and len(venue) < 60:  # Reasonable venue name length
                         self.match_state.venue = venue
                         logger.info(f"Extracted venue from page: '{venue}'")
