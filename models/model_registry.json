@@ -172,6 +172,74 @@
           "impact": "Covers all T20I matches with 106 international teams; broader coverage than league models"
         }
       }
+    },
+    "SAT": {
+      "path": "models/sat_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + OOF Isotonic Calibration (Brier: 0.1790)",
+      "calibrator": {
+        "path": "models/sat_v1/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2025-12-28T16:15:17.116443",
+        "oof_metrics": {
+          "brier_raw": 0.18954002493153077,
+          "brier_calibrated": 0.1789639900109204,
+          "ece_raw": 0.05664185985468428,
+          "ece_calibrated": 9.065997772784512e-17
+        },
+        "innings_specific": {
+          "innings1": {
+            "samples": 11470,
+            "brier_raw": 0.23202981654402852,
+            "brier_calibrated": 0.21904897662158526,
+            "ece_raw": 0.08270213019853524,
+            "ece_calibrated": 7.083358408201303e-17
+          },
+          "innings2": {
+            "samples": 10323,
+            "brier_raw": 0.14232914536208877,
+            "brier_calibrated": 0.13442511599907053,
+            "ece_raw": 0.05062332989368735,
+            "ece_calibrated": 1.2099204714746694e-17
+          }
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
+      "feature_store": {
+        "path": "data/sat_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2025-12-28",
+        "training_data_matches": 94,
+        "statistics": {
+          "teams": 6,
+          "players": 184,
+          "venues": 6,
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
+        },
+        "recent_changes": {
+          "date": "2025-12-28",
+          "description": "Initial SAT model trained on 94 matches",
+          "impact": "New league support"
+        }
+      }
     }
   },
   "archived_models": {
