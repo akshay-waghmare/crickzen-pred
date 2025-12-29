@@ -92,6 +92,23 @@ VENUE_ALIASES = {
     'Wanderers': 'The Wanderers Stadium, Johannesburg',
     'Wanderers Stadium': 'The Wanderers Stadium, Johannesburg',
     'Wanderers, Johannesburg': 'The Wanderers Stadium, Johannesburg',
+    
+    # BPL Venues (Bangladesh Premier League)
+    'Shere Bangla National Stadium': 'Shere Bangla National Stadium, Mirpur',
+    'Shere Bangla National Stadium, Mirpur': 'Shere Bangla National Stadium, Mirpur',
+    'Mirpur Stadium': 'Shere Bangla National Stadium, Mirpur',
+    'Sylhet International Cricket Stadium': 'Sylhet International Cricket Stadium',
+    'Sylhet Stadium': 'Sylhet International Cricket Stadium',
+    'Zahur Ahmed Chowdhury Stadium': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Zahur Ahmed Chowdhury Stadium, Chattogram': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Zahur Ahmed Chowdhury Stadium, Chittagong': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Chittagong Stadium': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Chattogram Stadium': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Sheikh Abu Naser Stadium': 'Sheikh Abu Naser Stadium, Khulna',
+    'Sheikh Abu Naser Stadium, Khulna': 'Sheikh Abu Naser Stadium, Khulna',
+    'Khulna Stadium': 'Sheikh Abu Naser Stadium, Khulna',
+    'MA Aziz Stadium': 'MA Aziz Stadium, Chittagong',
+    'MA Aziz Stadium, Chittagong': 'MA Aziz Stadium, Chittagong',
 }
 
 class FeatureStore(Protocol):
@@ -260,7 +277,107 @@ class InMemoryFeatureStore:
         'PC': 'Pretoria Capitals',
         'SEC': 'Sunrisers Eastern Cape',
         'SUNE': 'Sunrisers Eastern Cape',
+        
+        # BPL (Bangladesh Premier League)
+        'CV': 'Comilla Victorians',
+        'RR': 'Rangpur Riders',
+        'FB': 'Fortune Barishal',
+        'KT': 'Khulna Tigers',
+        'DD': 'Dhaka Dominators',
+        'DC': 'Dhaka Capitals',  # BPL 2025-26
+        'DuD': 'Durdanto Dhaka',
+        'DurD': 'Durbar Rajshahi',
+        'DurR': 'Duronto Rajshahi',
+        'DR': 'Durbar Rajshahi',  # BPL 2025
+        'SS': 'Sylhet Strikers',
+        'CK': 'Chittagong Kings',
+        'CC': 'Chattogram Challengers',
+        # BPL 2025-26 new teams
+        'NE': 'Noakhali Express',
+        'RW': 'Rajshahi Warriors',
+        'BB': 'Barisal Bulls',
+        'MGD': 'Minister Group Dhaka',
+        'DG': 'Dhaka Gladiators',
+        'SSS': 'Sylhet Super Stars',
+        'SR': 'Sylhet Royals',
+        'SYS': 'Sylhet Sunrisers',
     }
+
+    # Team aliases for mapping new/renamed teams to historical equivalents
+    TEAM_ALIASES = {
+        # Rajshahi lineage: Duronto Rajshahi (2012-13) → Rajshahi Kings (2016-19) → Rajshahi Royals (2019-20) → Durbar Rajshahi (2024) → Rajshahi Warriors (2025)
+        'Rajshahi Warriors': 'Durbar Rajshahi',  # 2025 successor of Durbar Rajshahi
+        'Durbar Rajshahi': 'Rajshahi Royals',  # 2024 successor of Rajshahi Royals
+        'Rajshahi Royals': 'Rajshahi Kings',  # 2019-20 successor of Rajshahi Kings
+        'Rajshahi Kings': 'Duronto Rajshahi',  # 2016 successor of Duronto Rajshahi
+        # Dhaka lineage
+        'Dhaka Capitals': 'Durdanto Dhaka',  # 2025 Dhaka successor
+        # Map new teams to lowest performing historical team
+        'Noakhali Express': 'Durdanto Dhaka',  # New team -> worst performer (8.3% win rate)
+    }
+    
+    # =====================================================================
+    # CONFIGURATION - Toggle between historical data and season overrides
+    # =====================================================================
+    USE_SEASON_OVERRIDES = True  # Set to False to use historical feature store data only
+    
+    # =====================================================================
+    # VENUE SITUATION STATS - Bat/Bowl first win rates from current venue
+    # Auto-populated by crex_live_predictor from match info page
+    # =====================================================================
+    VENUE_SITUATION_STATS = {
+        # Auto-populated: {'bat_first_wr': 0.45, 'bowl_first_wr': 0.53, 'matches': 66}
+    }
+    
+    # =====================================================================
+    # SEASON OVERRIDES - Current season stats (takes precedence over historical)
+    # This is auto-populated by crex_live_predictor from the match info page
+    # Can also be manually updated. Format:
+    # 'Team Name': {'win_rate': X, 'matches': N, 'avg_score': Y, ...}
+    # =====================================================================
+    SEASON_OVERRIDES = {
+        # Auto-populated from CREX match info page during live prediction
+        # Example entry (added automatically):
+        # 'Rajshahi Warriors': {'win_rate': 0.60, 'matches': 10, 'avg_score': 148, ...}
+    }
+    # =====================================================================
+    
+    # Default stats for completely new teams (treat as lower performing)
+    # New teams typically struggle in their first season due to lack of team cohesion,
+    # unfamiliar conditions, and untested squad combinations
+    DEFAULT_TEAM_STATS = {
+        'win_rate': 0.40,  # New teams perform below average historically
+        'matches': 0,
+        'bat_first_wr': 0.40,
+        'bowl_first_wr': 0.40,
+    }
+    
+    # Teams that should use default average stats (none currently - all mapped)
+    NEW_TEAMS = set()
+
+    def _resolve_team_alias(self, team_name: str, max_depth: int = 5) -> Optional[str]:
+        """Follow alias chain to find a team that exists in the feature store."""
+        current = team_name
+        chain = [team_name]
+        
+        for _ in range(max_depth):
+            if current in self._team_stats:
+                if len(chain) > 1:
+                    logger.info(f"Resolved team chain: {' → '.join(chain)}")
+                return current
+            
+            if current in self.TEAM_ALIASES:
+                current = self.TEAM_ALIASES[current]
+                chain.append(current)
+            else:
+                break
+        
+        # Final check
+        if current in self._team_stats:
+            logger.info(f"Resolved team chain: {' → '.join(chain)}")
+            return current
+        
+        return None
 
     def get_team_stats(self, team_name: str) -> Optional[Dict[str, Any]]:
         if not self._loaded:
@@ -269,12 +386,34 @@ class InMemoryFeatureStore:
         if not team_name:
             return None
         
-        # 0. Check abbreviation map first
+        # 0. Check abbreviation map first and resolve full name
+        full_name = team_name
         if team_name.upper() in self.TEAM_ABBREVIATIONS:
             full_name = self.TEAM_ABBREVIATIONS[team_name.upper()]
-            if full_name in self._team_stats:
-                logger.info(f"Mapped team abbreviation '{team_name}' to '{full_name}'")
-                return self._team_stats[full_name]
+        
+        # 0.1 CHECK SEASON OVERRIDES FIRST (if enabled)
+        if self.USE_SEASON_OVERRIDES and full_name in self.SEASON_OVERRIDES:
+            season_stats = self.SEASON_OVERRIDES[full_name].copy()
+            # Log what we're using
+            bat_wr = season_stats.get('bat_first_wr', season_stats['win_rate'])
+            bowl_wr = season_stats.get('bowl_first_wr', season_stats['win_rate'])
+            logger.info(f"📊 Using SEASON stats for '{full_name}': {season_stats['matches']} matches, {season_stats['win_rate']*100:.0f}% win rate (bat_first={bat_wr:.0%}, bowl_first={bowl_wr:.0%})")
+            return season_stats
+        
+        # 0.2 Check if this is a new team that should use default stats
+        if full_name in self.NEW_TEAMS:
+            logger.warning(f"⚠️ Using DEFAULT stats for new team '{full_name}' (no historical data)")
+            return self.DEFAULT_TEAM_STATS.copy()
+            
+        # 0.3 Try to resolve through alias chain
+        resolved = self._resolve_team_alias(full_name)
+        if resolved:
+            # Warn if using a proxy team (not same as original)
+            if resolved != full_name:
+                logger.warning(f"⚠️ Using PROXY stats: '{full_name}' → '{resolved}' (no direct data for this team)")
+            if team_name != full_name:
+                logger.info(f"Mapped team abbreviation '{team_name}' → '{full_name}' → '{resolved}'")
+            return self._team_stats[resolved]
             
         # 1. Exact match
         if team_name in self._team_stats:

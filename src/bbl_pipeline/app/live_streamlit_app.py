@@ -17,6 +17,7 @@ Usage:
 import streamlit as st
 import json
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
@@ -25,7 +26,7 @@ import time
 
 # Page config
 st.set_page_config(
-    page_title="WBBL Live Predictor",
+    page_title="T20 Live Predictor",
     page_icon="🏏",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -47,15 +48,41 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Team colors and names
+# Team colors and names - BBL, WBBL, ILT20, SA20
 TEAM_COLORS = {
+    # WBBL
     "SYS-W": "#e91e63", "PRS-W": "#ff5722", "ADL-W": "#2196f3", "BRH-W": "#00bcd4",
     "MLR-W": "#f44336", "MLS-W": "#4caf50", "HBH-W": "#9c27b0", "STR-W": "#8bc34a",
+    # BBL
+    "SYS": "#e91e63", "PRS": "#ff5722", "ADS": "#2196f3", "BRH": "#00bcd4",
+    "MLR": "#f44336", "MLS": "#4caf50", "HBH": "#9c27b0", "STH": "#8bc34a",
+    "SIX": "#e91e63", "SCO": "#ff5722", "STK": "#2196f3", "HEA": "#00bcd4",
+    "REN": "#f44336", "STA": "#4caf50", "HUR": "#9c27b0", "THU": "#8bc34a",
+    # ILT20
+    "DV": "#6a1b9a", "GG": "#1565c0", "MIE": "#0d47a1", "DC": "#c62828",
+    "ADKR": "#4a148c", "SW": "#e65100", "DES": "#6a1b9a", "GUL": "#1565c0",
+    # SA20
+    "DSG": "#00bcd4", "MICT": "#1565c0", "PR": "#e91e63", "JSK": "#ffc107",
+    "PC": "#4caf50", "SEC": "#ff5722",
 }
 TEAM_NAMES = {
+    # WBBL
     "SYS-W": "Sydney Sixers", "PRS-W": "Perth Scorchers", "ADL-W": "Adelaide Strikers",
     "BRH-W": "Brisbane Heat", "MLR-W": "Melbourne Renegades", "MLS-W": "Melbourne Stars",
     "HBH-W": "Hobart Hurricanes", "STR-W": "Sydney Thunder",
+    # BBL
+    "SYS": "Sydney Sixers", "PRS": "Perth Scorchers", "ADS": "Adelaide Strikers",
+    "BRH": "Brisbane Heat", "MLR": "Melbourne Renegades", "MLS": "Melbourne Stars",
+    "HBH": "Hobart Hurricanes", "STH": "Sydney Thunder",
+    "SIX": "Sydney Sixers", "SCO": "Perth Scorchers", "STK": "Adelaide Strikers",
+    "HEA": "Brisbane Heat", "REN": "Melbourne Renegades", "STA": "Melbourne Stars",
+    "HUR": "Hobart Hurricanes", "THU": "Sydney Thunder",
+    # ILT20
+    "DV": "Desert Vipers", "GG": "Gulf Giants", "MIE": "MI Emirates", "DC": "Dubai Capitals",
+    "ADKR": "Abu Dhabi Knight Riders", "SW": "Sharjah Warriors", "DES": "Desert Vipers", "GUL": "Gulf Giants",
+    # SA20
+    "DSG": "Durban's Super Giants", "MICT": "MI Cape Town", "PR": "Paarl Royals",
+    "JSK": "Joburg Super Kings", "PC": "Pretoria Capitals", "SEC": "Sunrisers Eastern Cape",
 }
 
 DEFAULT_JSON = "data/live_state.json"
@@ -103,7 +130,21 @@ def load_state(json_path: str) -> dict:
     """Load state from JSON file."""
     try:
         with open(json_path, 'r') as f:
-            return json.load(f)
+            state = json.load(f)
+        
+        # Also try to load full history from persistent history file
+        try:
+            history_path = Path(json_path).with_name("prediction_history.json")
+            if history_path.exists():
+                with open(history_path, 'r') as f:
+                    history_data = json.load(f)
+                    full_history = history_data.get("history", [])
+                    if len(full_history) > len(state.get("history", [])):
+                        state["history"] = full_history
+        except Exception:
+            pass  # Use history from main state file
+        
+        return state
     except FileNotFoundError:
         return None
     except json.JSONDecodeError:
@@ -156,57 +197,242 @@ def create_rr_chart(crr, rrr):
     return fig
 
 
-def create_probability_timeline(history):
-    """Create probability over time chart showing full 20 overs."""
-    if not history or len(history) < 2:
+def create_probability_timeline(history, batting_team=None, bowling_team=None):
+    """
+    Create ESPN SmartStats-style win probability chart.
+    Shows full 40 overs (both innings) with filled area above/below 50% line.
+    X-axis: 0-20 for innings 1, 20-40 for innings 2.
+    """
+    if not history or len(history) < 1:
         return None
     
     df = pd.DataFrame(history)
-    fig = go.Figure()
     
-    # Use first entry to get team names
-    bat_team = df.get("batting_team", pd.Series(["Team A"])).iloc[0] if "batting_team" in df else "Batting"
-    bowl_team = df.get("bowling_team", pd.Series(["Team B"])).iloc[0] if "bowling_team" in df else "Bowling"
+    # Deduplicate - keep only unique over values (take last entry for each over+innings combo)
+    if "innings" in df.columns:
+        df["over_key"] = df["innings"].astype(str) + "_" + df["overs"].astype(str)
+    else:
+        df["over_key"] = df["overs"].astype(str)
+    df = df.drop_duplicates(subset=["over_key"], keep="last")
+    
+    # Determine teams - inn1 batting team is the "home" team for the graph
+    # In 2nd innings, probabilities are flipped (inn1 batting team is now bowling)
+    if "innings" in df.columns:
+        inn1_data = df[df["innings"] == 1].copy()
+        inn2_data = df[df["innings"] == 2].copy()
+        
+        # Get inn1 batting team as reference
+        if len(inn1_data) > 0:
+            team1 = inn1_data["batting_team"].iloc[0] if "batting_team" in inn1_data.columns else batting_team
+            team2 = inn1_data["bowling_team"].iloc[0] if "bowling_team" in inn1_data.columns else bowling_team
+        else:
+            # Only inn2 data - current batting team was inn1 bowling team
+            team2 = batting_team  # Current batting = inn1 bowling
+            team1 = bowling_team  # Current bowling = inn1 batting
+    else:
+        # Legacy format without innings info
+        inn1_data = df.copy()
+        inn2_data = pd.DataFrame()
+        team1 = batting_team or "Team A"
+        team2 = bowling_team or "Team B"
     
     # Get team colors
-    bat_color = get_color(bat_team) if bat_team else "#e91e63"
-    bowl_color = get_color(bowl_team) if bowl_team else "#2196f3"
+    team1_color = get_color(team1) if team1 else "#e91e63"
+    team2_color = get_color(team2) if team2 else "#2196f3"
     
+    # Build combined overs and probabilities
+    # For inn1: overs stay as 0-20, probability is batting team's prob
+    # For inn2: overs become 20-40, probability needs to be flipped (inn1 team's perspective)
+    all_overs = []
+    all_probs = []  # Probability for team1 (inn1 batting team)
+    
+    if len(inn1_data) > 0:
+        for _, row in inn1_data.iterrows():
+            all_overs.append(row["overs"])
+            all_probs.append(row["bat_prob"] * 100)  # Inn1 batting team prob
+    
+    if len(inn2_data) > 0:
+        for _, row in inn2_data.iterrows():
+            # In inn2, the inn1 batting team is now bowling
+            # So their win prob is the bowl_prob (or 1 - bat_prob)
+            all_overs.append(20 + row["overs"])  # Shift to 20-40 range
+            all_probs.append(row["bowl_prob"] * 100)  # Inn1 batting team is now bowling
+    
+    if not all_overs:
+        return None
+    
+    overs = np.array(all_overs)
+    team1_probs = np.array(all_probs)
+    
+    # Determine current innings and max overs for x-axis range
+    has_inn2 = len(inn2_data) > 0
+    max_over = 40 if has_inn2 else 20
+    
+    # Create figure
+    fig = go.Figure()
+    
+    # Add filled area ABOVE 50% (team1 advantage) - from 50 to prob when > 50
+    team1_advantage = [max(p, 50) for p in team1_probs]
     fig.add_trace(go.Scatter(
-        x=df["overs"], y=df["bat_prob"].apply(lambda x: x * 100),
-        name=get_name(bat_team), mode="lines+markers",
-        line=dict(color=bat_color, width=3),
-        marker=dict(size=6),
-        fill='tozeroy', fillcolor=f'rgba{tuple(list(int(bat_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.1])}' if bat_color.startswith('#') else None
+        x=overs, y=team1_advantage,
+        mode='lines',
+        line=dict(width=0),
+        showlegend=False,
+        hoverinfo='skip'
     ))
     fig.add_trace(go.Scatter(
-        x=df["overs"], y=df["bowl_prob"].apply(lambda x: x * 100),
-        name=get_name(bowl_team), mode="lines+markers",
-        line=dict(color=bowl_color, width=3),
-        marker=dict(size=6)
+        x=overs, y=[50] * len(overs),
+        mode='lines',
+        line=dict(width=0),
+        fill='tonexty',
+        fillcolor=f'rgba{tuple(list(int(team1_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.4])}' if team1_color.startswith('#') else 'rgba(233, 30, 99, 0.4)',
+        showlegend=False,
+        hoverinfo='skip'
     ))
     
-    fig.add_hline(y=50, line_dash="dash", line_color="gray", annotation_text="50%")
+    # Add filled area BELOW 50% (team2 advantage) - from prob to 50 when < 50
+    team2_advantage = [min(p, 50) for p in team1_probs]
+    fig.add_trace(go.Scatter(
+        x=overs, y=[50] * len(overs),
+        mode='lines',
+        line=dict(width=0),
+        showlegend=False,
+        hoverinfo='skip'
+    ))
+    fig.add_trace(go.Scatter(
+        x=overs, y=team2_advantage,
+        mode='lines',
+        line=dict(width=0),
+        fill='tonexty',
+        fillcolor=f'rgba{tuple(list(int(team2_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.4])}' if team2_color.startswith('#') else 'rgba(33, 150, 243, 0.4)',
+        showlegend=False,
+        hoverinfo='skip'
+    ))
     
-    # Determine max overs for x-axis (at least current over + buffer, max 20)
-    max_over = max(df["overs"].max(), 1)
-    x_max = min(20, max(max_over + 2, 6))  # Show at least 6 overs or current + 2
+    # Add main probability line
+    fig.add_trace(go.Scatter(
+        x=overs, y=team1_probs,
+        name=get_name(team1),
+        mode="lines",
+        line=dict(color='white', width=3),
+        hovertemplate='Over: %{x:.1f}<br>' + get_name(team1) + ' Win: %{y:.1f}%<extra></extra>'
+    ))
     
+    # Add markers at key points (every 4 overs and current)
+    marker_indices = [i for i, o in enumerate(overs) if int(o) % 4 == 0 or i == len(overs) - 1]
+    if marker_indices:
+        fig.add_trace(go.Scatter(
+            x=[overs[i] for i in marker_indices],
+            y=[team1_probs[i] for i in marker_indices],
+            mode='markers',
+            marker=dict(size=8, color='white', line=dict(width=2, color='#333')),
+            showlegend=False,
+            hovertemplate='Over: %{x:.1f}<br>' + get_name(team1) + ' Win: %{y:.1f}%<extra></extra>'
+        ))
+    
+    # Add 50% baseline
+    fig.add_hline(
+        y=50, 
+        line_dash="solid", 
+        line_color="rgba(255,255,255,0.6)", 
+        line_width=2,
+        annotation_text="50%",
+        annotation_position="left",
+        annotation_font_color="white"
+    )
+    
+    # Add innings break marker if we have 2nd innings data
+    if has_inn2:
+        fig.add_vline(
+            x=20,
+            line_dash="dash",
+            line_color="rgba(255,255,255,0.8)",
+            line_width=2,
+            annotation_text="Innings Break",
+            annotation_position="top",
+            annotation_font_color="white"
+        )
+    
+    # Add team labels at edges
+    fig.add_annotation(
+        x=0.02, y=0.95, xref="paper", yref="paper",
+        text=f"<b>{get_name(team1)}</b>",
+        showarrow=False,
+        font=dict(size=14, color=team1_color),
+        bgcolor="rgba(255,255,255,0.8)",
+        borderpad=4
+    )
+    fig.add_annotation(
+        x=0.02, y=0.05, xref="paper", yref="paper",
+        text=f"<b>{get_name(team2)}</b>",
+        showarrow=False,
+        font=dict(size=14, color=team2_color),
+        bgcolor="rgba(255,255,255,0.8)",
+        borderpad=4
+    )
+    
+    # Current probability annotation
+    if len(team1_probs) > 0:
+        current_prob = team1_probs[-1]
+        current_over = overs[-1]
+        leader = get_name(team1) if current_prob > 50 else get_name(team2)
+        leader_prob = current_prob if current_prob > 50 else 100 - current_prob
+        fig.add_annotation(
+            x=current_over, y=current_prob,
+            text=f"<b>{leader_prob:.1f}%</b>",
+            showarrow=True,
+            arrowhead=2,
+            arrowsize=1,
+            arrowwidth=2,
+            arrowcolor="white",
+            font=dict(size=12, color="white"),
+            bgcolor="rgba(0,0,0,0.7)",
+            borderpad=4,
+            ax=30, ay=-30
+        )
+    
+    # Dark gradient background like ESPN
     fig.update_layout(
-        title="Win Probability Over Time",
-        xaxis_title="Overs", yaxis_title="Win Probability (%)",
-        xaxis=dict(range=[0, x_max], dtick=2, tickmode='linear'),
-        yaxis=dict(range=[0, 100], dtick=10),
-        height=350, margin=dict(l=20, r=20, t=50, b=20),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+        title=dict(
+            text="<b>Win Probability</b>",
+            font=dict(size=20, color="white"),
+            x=0.5,
+            xanchor='center'
+        ),
+        xaxis=dict(
+            title=dict(text="Overs", font=dict(color="white")),
+            range=[0, max_over],
+            dtick=4 if has_inn2 else 2,
+            tickmode='linear',
+            tickfont=dict(color="white"),
+            gridcolor='rgba(255,255,255,0.1)',
+            zerolinecolor='rgba(255,255,255,0.2)',
+            showgrid=True
+        ),
+        yaxis=dict(
+            title="",
+            range=[0, 100],
+            dtick=25,
+            ticksuffix="%",
+            tickfont=dict(color="white"),
+            gridcolor='rgba(255,255,255,0.1)',
+            zerolinecolor='rgba(255,255,255,0.2)',
+            showgrid=True
+        ),
+        height=400,
+        margin=dict(l=50, r=50, t=60, b=50),
+        paper_bgcolor='#1a1a2e',
+        plot_bgcolor='#16213e',
+        showlegend=False,
         hovermode='x unified'
     )
+    
     return fig
 
 
 def main():
-    st.markdown('<h1 class="main-header">🏏 WBBL Live Predictor</h1>', unsafe_allow_html=True)
-    st.markdown('<p style="text-align:center;color:#666;">Powered by WBBL Champion Model v3 (Brier: 0.1737)</p>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">🏏 T20 Live Predictor</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align:center;color:#666;">Powered by ML Win Probability Models</p>', unsafe_allow_html=True)
     
     # Controls
     col1, col2, col3 = st.columns([3, 1, 1])
@@ -214,7 +440,7 @@ def main():
         json_path = st.text_input("JSON State File", value=DEFAULT_JSON, 
                                   help="Path to the live state JSON file produced by crex_live_predictor")
     with col2:
-        refresh = st.button("🔄 Refresh", use_container_width=True)
+        refresh = st.button("🔄 Refresh")
     with col3:
         auto = st.checkbox("🔁 Auto (3s)", value=True, help="Auto-refresh every 3 seconds")
     
@@ -394,8 +620,7 @@ def main():
         ''', unsafe_allow_html=True)
     
     st.plotly_chart(
-        create_gauges(d["batting_team"], d["bowling_team"], d["bat_win_prob"], d["bowl_win_prob"]), 
-        use_container_width=True
+        create_gauges(d["batting_team"], d["bowling_team"], d["bat_win_prob"], d["bowl_win_prob"])
     )
     
     # Key metrics
@@ -430,11 +655,11 @@ def main():
     st.markdown("---")
     c1, c2 = st.columns(2)
     with c1:
-        st.plotly_chart(create_resource_gauge(res), use_container_width=True)
+        st.plotly_chart(create_resource_gauge(res))
     with c2:
         if d.get("target"):
             rrr = f.get("required_run_rate", d.get("required_run_rate", 10))
-            st.plotly_chart(create_rr_chart(crr, rrr), use_container_width=True)
+            st.plotly_chart(create_rr_chart(crr, rrr))
         else:
             # Show score vs par
             par = f.get("score_vs_par", 0)
@@ -444,14 +669,15 @@ def main():
                 delta={"reference": 0, "increasing": {"color": "#4CAF50"}, "decreasing": {"color": "#f44336"}}
             ))
             fig.update_layout(height=200, margin=dict(l=20, r=20, t=50, b=20))
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig)
     
-    # Probability timeline
+    # Probability timeline - ESPN SmartStats style
     history = d.get("history", [])
-    timeline = create_probability_timeline(history)
+    timeline = create_probability_timeline(history, d.get("batting_team"), d.get("bowling_team"))
     if timeline:
         st.markdown("---")
-        st.plotly_chart(timeline, use_container_width=True)
+        st.subheader("📈 Win Probability Graph")
+        st.plotly_chart(timeline)
     
     # Feature details
     with st.expander("🔍 All Features (Advanced)"):
@@ -460,7 +686,7 @@ def main():
             for k, v in sorted(f.items()):
                 val_str = f"{v:.4f}" if isinstance(v, float) else str(v)
                 feature_list.append({"Feature": k, "Value": val_str})
-            st.dataframe(pd.DataFrame(feature_list), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(feature_list), hide_index=True)
         else:
             st.info("No features available")
     

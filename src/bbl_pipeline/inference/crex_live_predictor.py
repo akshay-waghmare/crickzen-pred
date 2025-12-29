@@ -101,6 +101,13 @@ class CrexLivePredictor:
         self._first_prediction = True  # Debug flag for first prediction
         self._prediction_history = []  # Track predictions over time
         
+        # Persist history to separate file for Streamlit page refresh resilience
+        if output_json:
+            self._history_file = str(Path(output_json).with_name("prediction_history.json"))
+            self._load_history()  # Load existing history on startup
+        else:
+            self._history_file = None
+        
         # Try to load the prediction model
         self.model = None
         self._load_model()
@@ -119,9 +126,149 @@ class CrexLivePredictor:
             print("   Will run in scraper-only mode (no predictions)")
             self.predictor = None
     
+    def _load_history(self):
+        """Load prediction history from file for persistence across restarts."""
+        if not self._history_file:
+            return
+        try:
+            history_path = Path(self._history_file)
+            if history_path.exists():
+                with open(history_path, 'r') as f:
+                    data = json.load(f)
+                    self._prediction_history = data.get("history", [])
+                    print(f"📈 Loaded {len(self._prediction_history)} history points from {self._history_file}")
+        except Exception as e:
+            logger.warning(f"Could not load history: {e}")
+            self._prediction_history = []
+    
+    def _save_history(self):
+        """Save prediction history to file for persistence."""
+        if not self._history_file:
+            return
+        try:
+            history_path = Path(self._history_file)
+            tmp_path = history_path.with_suffix('.tmp')
+            with open(tmp_path, 'w') as f:
+                json.dump({"history": self._prediction_history}, f)
+            tmp_path.replace(history_path)
+        except Exception as e:
+            logger.warning(f"Could not save history: {e}")
+    
     def _get_info_url(self) -> str:
         """Convert live URL to info URL."""
         return self.match_url.replace("/live", "/info")
+    
+    async def _extract_team_comparison(self, page_text: str, team1: str, team2: str):
+        """
+        Extract team comparison stats from CREX info page and inject into feature store.
+        
+        Example text pattern:
+        Team Comparison (Last 10 matches)
+        RW vs all teams NE vs all teams
+        10 Matches Played 2
+        60% Win 0%
+        148 Avg Score 126
+        """
+        try:
+            import re
+            
+            # Look for team comparison section
+            # Pattern: "X Matches Played Y" where X and Y are numbers
+            matches_pattern = r'(\d+)\s*Matches\s*Played\s*(\d+)'
+            win_pattern = r'(\d+)%\s*Win\s*(\d+)%'
+            avg_score_pattern = r'(\d+)\s*Avg\s*Score\s*(\d+)'
+            
+            matches_match = re.search(matches_pattern, page_text, re.IGNORECASE)
+            win_match = re.search(win_pattern, page_text, re.IGNORECASE)
+            avg_score_match = re.search(avg_score_pattern, page_text, re.IGNORECASE)
+            
+            if matches_match and win_match:
+                team1_matches = int(matches_match.group(1))
+                team2_matches = int(matches_match.group(2))
+                team1_win_pct = int(win_match.group(1)) / 100
+                team2_win_pct = int(win_match.group(2)) / 100
+                team1_avg_score = int(avg_score_match.group(1)) if avg_score_match else 150
+                team2_avg_score = int(avg_score_match.group(2)) if avg_score_match else 150
+                
+                # Only use if at least 2 matches played
+                if team1_matches >= 2:
+                    print(f"📊 Extracted season stats for {team1}: {team1_matches} matches, {team1_win_pct*100:.0f}% win rate")
+                    self._inject_season_stats(team1, team1_matches, team1_win_pct, team1_avg_score)
+                
+                if team2_matches >= 2:
+                    print(f"📊 Extracted season stats for {team2}: {team2_matches} matches, {team2_win_pct*100:.0f}% win rate")
+                    self._inject_season_stats(team2, team2_matches, team2_win_pct, team2_avg_score)
+                    
+        except Exception as e:
+            logger.warning(f"Could not extract team comparison: {e}")
+    
+    def _inject_season_stats(self, team_abbrev: str, matches: int, win_rate: float, avg_score: float):
+        """Inject extracted season stats into the feature store's SEASON_OVERRIDES."""
+        try:
+            from bbl_pipeline.features.store import InMemoryFeatureStore
+            
+            # Resolve full team name from abbreviation
+            full_name = team_abbrev
+            if team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS:
+                full_name = InMemoryFeatureStore.TEAM_ABBREVIATIONS[team_abbrev.upper()]
+            
+            # Get venue-based situation rates if available
+            venue_stats = InMemoryFeatureStore.VENUE_SITUATION_STATS
+            bat_first_wr = venue_stats.get('bat_first_wr', win_rate)
+            bowl_first_wr = venue_stats.get('bowl_first_wr', win_rate)
+            
+            # Update the class-level SEASON_OVERRIDES dictionary
+            InMemoryFeatureStore.SEASON_OVERRIDES[full_name] = {
+                'win_rate': win_rate,
+                'matches': matches,
+                'avg_score': avg_score,
+                'bat_first_wr': bat_first_wr,
+                'bowl_first_wr': bowl_first_wr,
+            }
+            logger.info(f"Injected season stats for '{full_name}': {matches} matches, {win_rate*100:.0f}% WR, bat_first={bat_first_wr:.0%}, bowl_first={bowl_first_wr:.0%}")
+            
+        except Exception as e:
+            logger.warning(f"Could not inject season stats: {e}")
+    
+    async def _extract_venue_stats(self, page_text: str):
+        """
+        Extract venue stats from CREX info page.
+        
+        Example text pattern:
+        Venue Stats
+        66 Matches
+        Win Bat first 45%
+        Win Bowl first 53%
+        """
+        try:
+            import re
+            from bbl_pipeline.features.store import InMemoryFeatureStore
+            
+            # Pattern for venue matches
+            venue_matches_pattern = r'Venue\s*Stats\s*(\d+)\s*Matches'
+            bat_first_pattern = r'Win\s*Bat\s*first\s*(\d+)%'
+            bowl_first_pattern = r'Win\s*Bowl\s*first\s*(\d+)%'
+            
+            venue_matches = re.search(venue_matches_pattern, page_text, re.IGNORECASE)
+            bat_first_match = re.search(bat_first_pattern, page_text, re.IGNORECASE)
+            bowl_first_match = re.search(bowl_first_pattern, page_text, re.IGNORECASE)
+            
+            if bat_first_match and bowl_first_match:
+                bat_first_wr = int(bat_first_match.group(1)) / 100
+                bowl_first_wr = int(bowl_first_match.group(1)) / 100
+                num_matches = int(venue_matches.group(1)) if venue_matches else 0
+                
+                # Store venue situation stats
+                InMemoryFeatureStore.VENUE_SITUATION_STATS = {
+                    'bat_first_wr': bat_first_wr,
+                    'bowl_first_wr': bowl_first_wr,
+                    'matches': num_matches,
+                }
+                print(f"🏟️ Extracted venue stats: {num_matches} matches, {bat_first_wr*100:.0f}% bat first WR, {bowl_first_wr*100:.0f}% bowl first WR")
+                logger.info(f"Injected venue situation stats: bat_first={bat_first_wr:.0%}, bowl_first={bowl_first_wr:.0%}")
+                
+        except Exception as e:
+            logger.warning(f"Could not extract venue stats: {e}")
     
     async def _fetch_match_info_page(self):
         """Fetch additional match info from the info page (toss, venue, etc)."""
@@ -207,6 +354,13 @@ class CrexLivePredictor:
                 self._team1 = team1
                 self._team2 = team2
                 print(f"📍 Teams: {team1} vs {team2}")
+                
+                # Extract venue stats FIRST (bat/bowl first win rates)
+                await self._extract_venue_stats(page_text)
+                
+                # Extract team comparison stats (season form) and inject into feature store
+                # This will use venue stats for situation rates if available
+                await self._extract_team_comparison(page_text, team1, team2)
             
             # Navigate back to live page
             await self.page.goto(self.match_url, timeout=30000)
@@ -825,8 +979,14 @@ class CrexLivePredictor:
                 "bowl_prob": bowling_prob,
                 "score": state.total_runs,
                 "wickets": state.wickets,
+                "innings": 2 if state.is_second_innings else 1,
+                "batting_team": state.batting_team,
+                "bowling_team": state.bowling_team,
                 "timestamp": datetime.now().isoformat()
             })
+            
+            # Persist history to file for page refresh resilience
+            self._save_history()
             
             # Write to JSON if output file specified
             if self.output_json:

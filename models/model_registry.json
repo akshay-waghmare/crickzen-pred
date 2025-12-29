@@ -60,7 +60,7 @@
       "calibrator": {
         "path": "models/ilt20_v4/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-27T20:02:00.235465",
+        "generated_date": "2025-12-28T19:38:53.183209",
         "oof_metrics": {
           "brier_raw": 0.20582701765993391,
           "brier_calibrated": 0.18732205239997266,
