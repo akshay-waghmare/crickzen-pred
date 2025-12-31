@@ -80,12 +80,13 @@ class CrexLivePredictor:
     
     def __init__(self, match_url: str, model_dir: str, headless: bool = True,
                  feature_store_dir: str = None, output_json: str = None,
-                 live_match_json: str = None):
+                 live_match_json: str = None, venue: str = None):
         self.match_url = match_url
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
         self.output_json = output_json  # Path for JSON output (for Streamlit)
+        self.venue_override = venue
         # Optional richer debug output (defaults to sibling livematch.json if output_json is set)
         if live_match_json is None and output_json:
             try:
@@ -135,6 +136,13 @@ class CrexLivePredictor:
             if history_path.exists():
                 with open(history_path, 'r') as f:
                     data = json.load(f)
+                    # Check if history belongs to current match
+                    saved_url = data.get("match_url")
+                    if saved_url and saved_url != self.match_url:
+                        print(f"🔄 New match detected (URL mismatch). Clearing history.")
+                        self._prediction_history = []
+                        return
+                        
                     self._prediction_history = data.get("history", [])
                     print(f"📈 Loaded {len(self._prediction_history)} history points from {self._history_file}")
         except Exception as e:
@@ -149,7 +157,10 @@ class CrexLivePredictor:
             history_path = Path(self._history_file)
             tmp_path = history_path.with_suffix('.tmp')
             with open(tmp_path, 'w') as f:
-                json.dump({"history": self._prediction_history}, f)
+                json.dump({
+                    "match_url": self.match_url,
+                    "history": self._prediction_history
+                }, f)
             tmp_path.replace(history_path)
         except Exception as e:
             logger.warning(f"Could not save history: {e}")
@@ -234,38 +245,57 @@ class CrexLivePredictor:
         """
         Extract venue stats from CREX info page.
         
-        Example text pattern:
+        Example text pattern (multi-line, numbers may be adjacent to labels):
         Venue Stats
-        66 Matches
-        Win Bat first 45%
-        Win Bowl first 53%
+        31
+        Matches
+        Win Bat first
+        55%
+        Win Bowl first
+        45%
+        Avg 1st Inns163
+        Avg 2st Inns147
         """
         try:
             import re
             from bbl_pipeline.features.store import InMemoryFeatureStore
             
-            # Pattern for venue matches
+            # More flexible patterns for multi-line format
+            # Pattern 1: "Venue Stats\n31\nMatches" or "Venue Stats 31 Matches"
             venue_matches_pattern = r'Venue\s*Stats\s*(\d+)\s*Matches'
-            bat_first_pattern = r'Win\s*Bat\s*first\s*(\d+)%'
-            bowl_first_pattern = r'Win\s*Bowl\s*first\s*(\d+)%'
+            
+            # Pattern 2: "Win Bat first\n55%" or "Win Bat first 55%"
+            bat_first_pattern = r'Win\s*Bat\s*first\s*[\n\r\s]*(\d+)\s*%'
+            bowl_first_pattern = r'Win\s*Bowl\s*first\s*[\n\r\s]*(\d+)\s*%'
+            
+            # Pattern for avg innings scores: "Avg 1st Inns163" or "Avg 1st Inns 163"
+            avg_1st_inns_pattern = r'Avg\s*1st\s*Inns\s*[\n\r\s]*(\d+)'
+            avg_2nd_inns_pattern = r'Avg\s*2(?:st|nd)\s*Inns\s*[\n\r\s]*(\d+)'
             
             venue_matches = re.search(venue_matches_pattern, page_text, re.IGNORECASE)
             bat_first_match = re.search(bat_first_pattern, page_text, re.IGNORECASE)
             bowl_first_match = re.search(bowl_first_pattern, page_text, re.IGNORECASE)
+            avg_1st_match = re.search(avg_1st_inns_pattern, page_text, re.IGNORECASE)
+            avg_2nd_match = re.search(avg_2nd_inns_pattern, page_text, re.IGNORECASE)
             
             if bat_first_match and bowl_first_match:
                 bat_first_wr = int(bat_first_match.group(1)) / 100
                 bowl_first_wr = int(bowl_first_match.group(1)) / 100
                 num_matches = int(venue_matches.group(1)) if venue_matches else 0
+                avg_1st_inns = int(avg_1st_match.group(1)) if avg_1st_match else 160
+                avg_2nd_inns = int(avg_2nd_match.group(1)) if avg_2nd_match else 150
                 
                 # Store venue situation stats
                 InMemoryFeatureStore.VENUE_SITUATION_STATS = {
                     'bat_first_wr': bat_first_wr,
                     'bowl_first_wr': bowl_first_wr,
                     'matches': num_matches,
+                    'avg_1st_inns': avg_1st_inns,
+                    'avg_2nd_inns': avg_2nd_inns,
                 }
-                print(f"🏟️ Extracted venue stats: {num_matches} matches, {bat_first_wr*100:.0f}% bat first WR, {bowl_first_wr*100:.0f}% bowl first WR")
-                logger.info(f"Injected venue situation stats: bat_first={bat_first_wr:.0%}, bowl_first={bowl_first_wr:.0%}")
+                print(f"🏟️ Extracted venue stats: {num_matches} matches, bat first WR {bat_first_wr*100:.0f}%, bowl first WR {bowl_first_wr*100:.0f}%")
+                print(f"   Avg 1st innings: {avg_1st_inns}, Avg 2nd innings: {avg_2nd_inns}")
+                logger.info(f"Injected venue situation stats: bat_first={bat_first_wr:.0%}, bowl_first={bowl_first_wr:.0%}, avg_1st={avg_1st_inns}, avg_2nd={avg_2nd_inns}")
                 
         except Exception as e:
             logger.warning(f"Could not extract venue stats: {e}")
@@ -293,58 +323,62 @@ class CrexLivePredictor:
             
             # Extract venue - look for known cricket venue patterns
             # Be specific to avoid capturing random text
-            venue_patterns = [
-                r'Venue\s*[:\-]?\s*([\w\s]+(?:Stadium|Oval|Ground|Arena|Park))',  # "Venue: North Sydney Oval"
-                # SA20 venues
-                r'(Kingsmead[\w\s,]*)',  # Durban
-                r'(Newlands[\w\s,]*)',   # Cape Town
-                r'(Boland Park[\w\s,]*)', # Paarl
-                r"(St George's Park[\w\s,]*)",  # Gqeberha
-                r'(SuperSport Park[\w\s,]*)',  # Centurion
-                r'(Wanderers[\w\s,]*)',  # Johannesburg
-                r'(Durban[\w\s]+Stadium)',
-                r'(Hollywoodbets[\w\s]+)',
-                # Australian venues
-                r'(Simonds Stadium)',  # Specific pattern for Simonds Stadium
-                r'(Kardinia Park)',
-                r'(GMHBA Stadium)',
-                r'(North Sydney Oval)',
-                r'(Sydney Showground Stadium)',
-                r'(Adelaide Oval)',
-                r'(The Gabba|Brisbane Cricket Ground)',
-                r'(MCG|Melbourne Cricket Ground)',
-                r'(SCG|Sydney Cricket Ground)',
-                r'(WACA|Perth Stadium|Optus Stadium)',
-                r'(Bellerive Oval|Blundstone Arena)',
-                r'(Manuka Oval)',
-                r'(Junction Oval)',
-                # UAE venues
-                r'(Dubai International Cricket Stadium)',
-                r'(Zayed Cricket Stadium[\w\s,]*)',
-                r'(Sharjah Cricket Stadium)',
-                # Generic patterns (last)
-                r'([\w\s]+Cricket Ground)',
-                r'([\w\s]+Cricket Stadium)',
-                r'([\w\s]+Stadium)',
-                r'([\w\s]+Oval)',
-            ]
-            for pattern in venue_patterns:
-                venue_match = re.search(pattern, page_text, re.IGNORECASE)
-                if venue_match:
-                    venue = venue_match.group(1).strip()
-                    # Clean up venue - remove any newlines or extra whitespace
-                    venue = ' '.join(venue.split())
-                    # Remove time prefixes like "45 PM" or date info
-                    venue = re.sub(r'^\d+\s*(?:AM|PM)\s+', '', venue, flags=re.IGNORECASE)
-                    # Remove common trailing words that get captured
-                    venue = re.sub(r'\s+(Team Form|Match Info|Live|Scorecard|Commentary).*$', '', venue, flags=re.IGNORECASE)
-                    # Clean trailing commas or spaces
-                    venue = venue.rstrip(', ')
-                    if len(venue) > 5 and len(venue) < 60:  # Reasonable venue name length
-                        self.match_state.venue = venue
-                        logger.info(f"Extracted venue from page: '{venue}'")
-                        print(f"🏟️ Venue: {self.match_state.venue}")
-                        break
+            if self.venue_override:
+                self.match_state.venue = self.venue_override
+                print(f"🏟️ Venue (Override): {self.match_state.venue}")
+            else:
+                venue_patterns = [
+                    r'Venue\s*[:\-]?\s*([\w\s]+(?:Stadium|Oval|Ground|Arena|Park))',  # "Venue: North Sydney Oval"
+                    # SA20 venues
+                    r'(Kingsmead[\w\s,]*)',  # Durban
+                    r'(Newlands[\w\s,]*)',   # Cape Town
+                    r'(Boland Park[\w\s,]*)', # Paarl
+                    r"(St George's Park[\w\s,]*)",  # Gqeberha
+                    r'(SuperSport Park[\w\s,]*)',  # Centurion
+                    r'(Wanderers[\w\s,]*)',  # Johannesburg
+                    r'(Durban[\w\s]+Stadium)',
+                    r'(Hollywoodbets[\w\s]+)',
+                    # Australian venues
+                    r'(Simonds Stadium)',  # Specific pattern for Simonds Stadium
+                    r'(Kardinia Park)',
+                    r'(GMHBA Stadium)',
+                    r'(North Sydney Oval)',
+                    r'(Sydney Showground Stadium)',
+                    r'(Adelaide Oval)',
+                    r'(The Gabba|Brisbane Cricket Ground)',
+                    r'(MCG|Melbourne Cricket Ground)',
+                    r'(SCG|Sydney Cricket Ground)',
+                    r'(WACA|Perth Stadium|Optus Stadium)',
+                    r'(Bellerive Oval|Blundstone Arena)',
+                    r'(Manuka Oval)',
+                    r'(Junction Oval)',
+                    # UAE venues
+                    r'(Dubai International Cricket Stadium)',
+                    r'(Zayed Cricket Stadium[\w\s,]*)',
+                    r'(Sharjah Cricket Stadium)',
+                    # Generic patterns (last)
+                    r'([\w\s]+Cricket Ground)',
+                    r'([\w\s]+Cricket Stadium)',
+                    r'([\w\s]+Stadium)',
+                    r'([\w\s]+Oval)',
+                ]
+                for pattern in venue_patterns:
+                    venue_match = re.search(pattern, page_text, re.IGNORECASE)
+                    if venue_match:
+                        venue = venue_match.group(1).strip()
+                        # Clean up venue - remove any newlines or extra whitespace
+                        venue = ' '.join(venue.split())
+                        # Remove time prefixes like "45 PM" or date info
+                        venue = re.sub(r'^\d+\s*(?:AM|PM)\s+', '', venue, flags=re.IGNORECASE)
+                        # Remove common trailing words that get captured
+                        venue = re.sub(r'\s+(Team Form|Match Info|Live|Scorecard|Commentary).*$', '', venue, flags=re.IGNORECASE)
+                        # Clean trailing commas or spaces
+                        venue = venue.rstrip(', ')
+                        if len(venue) > 5 and len(venue) < 60:  # Reasonable venue name length
+                            self.match_state.venue = venue
+                            logger.info(f"Extracted venue from page: '{venue}'")
+                            print(f"🏟️ Venue: {self.match_state.venue}")
+                            break
             
             # Extract teams from info page - store both teams, we'll figure out batting/bowling from title
             vs_match = re.search(r'([A-Z0-9\-]+)\s+vs\s+([A-Z0-9\-]+)', page_text)
@@ -1175,6 +1209,7 @@ async def main():
     parser.add_argument("--headless", action="store_true", default=True, help="Run headless")
     parser.add_argument("--poll-interval", type=float, default=2.0, help="Poll interval in seconds")
     parser.add_argument("--output-json", default=None, help="Output JSON file for Streamlit integration")
+    parser.add_argument("--venue", default=None, help="Manually specify venue name")
     parser.add_argument(
         "--live-match-json",
         default=None,
@@ -1190,6 +1225,7 @@ async def main():
         feature_store_dir=args.feature_store_dir,
         output_json=args.output_json,
         live_match_json=args.live_match_json,
+        venue=args.venue,
     )
     
     await predictor.run(poll_interval=args.poll_interval)

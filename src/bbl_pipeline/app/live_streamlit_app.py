@@ -623,6 +623,81 @@ def main():
         create_gauges(d["batting_team"], d["bowling_team"], d["bat_win_prob"], d["bowl_win_prob"])
     )
     
+    # BBL Calibration Guidance
+    resource_prob = d.get("features", {}).get("resource_win_prob", 0.5)
+    is_inn2 = d.get("is_second_innings", False)
+    current_over = d.get("overs", 0)
+    
+    # Determine phase
+    if current_over <= 6:
+        phase = "Powerplay"
+    elif current_over <= 15:
+        phase = "Middle"
+    else:
+        phase = "Death"
+    
+    # BBL-specific guidance based on analysis
+    with st.expander("📊 BBL Calibration Guidance - Which Probability to Trust?"):
+        st.markdown("### BBL v10 Model Performance Analysis")
+        st.markdown("""
+        Based on comprehensive Brier Score (accuracy) and ECE (calibration) analysis:
+        
+        | Innings | Phase | Best for Brier | Best for ECE |
+        |---------|-------|----------------|--------------|
+        | **Inn 1** | Powerplay | Raw | Raw |
+        | **Inn 1** | Middle | Raw | Raw |
+        | **Inn 1** | Death | Raw | Raw |
+        | **Inn 2** | Powerplay | Cal (Inn-Specific) | Cal (Inn-Specific) |
+        | **Inn 2** | Middle | Cal (Inn-Specific) | Resource |
+        | **Inn 2** | Death | Raw | Cal (Inn-Specific) |
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 🎯 Current Recommendation")
+        
+        if not is_inn2:
+            st.success(f"""
+            **Innings 1 - {phase} Phase**
+            
+            ✅ **Use: Raw Model Probability ({raw_prob*100:.1f}%)**
+            
+            The raw model is already well-calibrated in innings 1. No calibration needed.
+            """)
+        else:
+            if phase == "Middle":
+                st.info(f"""
+                **Innings 2 - {phase} Phase**
+                
+                📊 **For Best Accuracy (Brier):** Inn-Specific Calibrated ({inn_specific_prob*100:.1f}%)
+                
+                🎯 **For Best Calibration (ECE):** Resource Win Prob ({resource_prob*100:.1f}%)
+                """)
+            elif phase == "Powerplay":
+                st.success(f"""
+                **Innings 2 - {phase} Phase**
+                
+                ✅ **Use: Inn-Specific Calibrated ({inn_specific_prob*100:.1f}%)**
+                
+                Best for both accuracy and calibration in this phase.
+                """)
+            else:  # Death
+                st.info(f"""
+                **Innings 2 - {phase} Phase**
+                
+                📊 **For Best Accuracy (Brier):** Raw Model ({raw_prob*100:.1f}%)
+                
+                🎯 **For Best Calibration (ECE):** Inn-Specific Calibrated ({inn_specific_prob*100:.1f}%)
+                """)
+        
+        st.markdown("---")
+        st.markdown("### 📖 Key Insights")
+        st.markdown("""
+        - **Innings 1:** Raw model dominates - BBL's ensemble is very well-calibrated out of the box
+        - **Innings 2:** Calibrators help, especially Inn-Specific Isotonic
+        - **Resource Win Prob:** Only beats others for ECE in Innings 2 Middle Overs
+        - **Main Odds Display uses:** Inn-Specific Calibrated probability
+        """)
+    
     # Key metrics
     f = d.get("features", {})
     st.markdown("---")

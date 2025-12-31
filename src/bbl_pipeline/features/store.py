@@ -608,6 +608,14 @@ class InMemoryFeatureStore:
             'Melbourne Renegades Women': 'Melbourne Renegades',
             'Melbourne Stars Women': 'Melbourne Stars',
             'Adelaide Strikers Women': 'Adelaide Strikers',
+            
+            # SA20
+            'PC': 'Pretoria Capitals',
+            'SEC': 'Sunrisers Eastern Cape',
+            'DSG': "Durban's Super Giants",
+            'JSK': 'Joburg Super Kings',
+            'MICT': 'MI Cape Town',
+            'PR': 'Paarl Royals',
         }
         
         # Check abbreviation map first

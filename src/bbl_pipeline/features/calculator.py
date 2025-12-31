@@ -363,15 +363,25 @@ class ResourceFeatureCalculator:
             # -----------------------------------------------------------------
             # Step 1: Wicket capability decay (PHASE-AWARE)
             # -----------------------------------------------------------------
-            # Improvement: Early wickets are recoverable; late wickets are not
-            # phase_multiplier: 0.8 early → 1.4 late
-            # This makes late wickets hurt ~1.75x more than early wickets
-            phase_multiplier = 0.8 + 0.6 * overs_progress
-            wicket_capability = np.exp(-self.WICKET_DECAY_ALPHA * phase_multiplier * actual_wickets_lost)
-            
-            # Apply wicket decay to expected score
-            # This models "with 5 down in death overs, expected final score is severely reduced"
-            adjusted_expected_score = expected_final_score * wicket_capability
+            # CRITICAL FIX: At end of innings (overs >= 19.5), wickets don't matter
+            # The score is final - only apply wicket penalty during the innings
+            # when we're projecting future scoring potential
+            if overs_bowled >= 19.5:
+                # Innings complete - use actual score directly, no wicket penalty
+                adjusted_expected_score = expected_final_score
+            else:
+                # Mid-innings: Apply wicket penalty to projected score
+                # Early wickets are recoverable; late wickets are not
+                # phase_multiplier: 0.8 early → 1.4 late
+                phase_multiplier = 0.8 + 0.6 * overs_progress
+                wicket_capability = np.exp(-self.WICKET_DECAY_ALPHA * phase_multiplier * actual_wickets_lost)
+                
+                # Apply penalty ONLY to the remaining potential (future runs)
+                # This ensures we never penalize runs already on the board
+                additional_runs_projected = max(0, expected_final_score - current_score)
+                adjusted_additional_runs = additional_runs_projected * wicket_capability
+                
+                adjusted_expected_score = current_score + adjusted_additional_runs
             
             # -----------------------------------------------------------------
             # Step 2: Calculate Score Quality Index (SQI)

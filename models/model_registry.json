@@ -1,19 +1,35 @@
 {
-  "last_updated": "2025-12-28",
+  "last_updated": "2025-12-31",
   "active_models": {
     "BBL": {
-      "path": "models/bbl_v8",
-      "version": "v8",
-      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.1809, ECE: 0.0000)",
+      "path": "models/bbl_v10",
+      "version": "v10",
+      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Innings-Specific Isotonic Calibration (Brier: 0.1800, ECE: 0.0000)",
       "calibrator": {
-        "path": "models/bbl_v8/isotonic_calibrator.pkl",
+        "path": "models/bbl_v10/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-28T14:23:09.428796",
+        "generated_date": "2025-12-31T08:53:48",
         "oof_metrics": {
-          "brier_raw": 0.1815751129243961,
-          "brier_calibrated": 0.17990776055450192,
-          "ece_raw": 0.01502756289181674,
-          "ece_calibrated": 3.297994676873298e-17
+          "brier_raw": 0.18176028345833248,
+          "brier_calibrated": 0.18000851883037436,
+          "ece_raw": 0.014380847856989556,
+          "ece_calibrated": 1.3503798425911217e-17
+        },
+        "innings_specific": {
+          "innings1": {
+            "samples": 73875,
+            "brier_raw": 0.2202595549354694,
+            "brier_calibrated": 0.2175900466723535,
+            "ece_raw": 0.029600909991345497,
+            "ece_calibrated": 1.465794960498337e-17
+          },
+          "innings2": {
+            "samples": 67560,
+            "brier_raw": 0.1396623900247403,
+            "brier_calibrated": 0.13891415279535055,
+            "ece_raw": 0.014244988173846765,
+            "ece_calibrated": 2.6033382409875263e-17
+          }
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
@@ -21,8 +37,8 @@
       "feature_store": {
         "path": "data/bbl_feature_store_v2",
         "version": "v2",
-        "generated_date": "2025-12-15",
-        "training_data_matches": 600,
+        "generated_date": "2025-12-31",
+        "training_data_matches": 618,
         "statistics": {
           "teams": 8,
           "players": 508,
@@ -54,27 +70,43 @@
       }
     },
     "ILT20": {
-      "path": "models/ilt20_v4",
-      "version": "v4",
-      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Isotonic Calibration (Brier: 0.0714, ECE: 0.0000)",
+      "path": "models/ilt20_v5",
+      "version": "v5",
+      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Innings-Specific Isotonic Calibration (Brier: 0.1886, ECE: 0.0000)",
       "calibrator": {
-        "path": "models/ilt20_v4/isotonic_calibrator.pkl",
+        "path": "models/ilt20_v5/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-28T19:38:53.183209",
+        "generated_date": "2025-12-30T14:19:49",
         "oof_metrics": {
-          "brier_raw": 0.20582701765993391,
-          "brier_calibrated": 0.18732205239997266,
-          "ece_raw": 0.08414622778916676,
-          "ece_calibrated": 2.82452954749335e-17
+          "brier_raw": 0.2084004854350712,
+          "brier_calibrated": 0.18862149515646487,
+          "ece_raw": 0.08789719152730506,
+          "ece_calibrated": 1.54796919629756e-17
+        },
+        "innings_specific": {
+          "innings1": {
+            "samples": 12229,
+            "brier_raw": 0.2596555350043696,
+            "brier_calibrated": 0.22823237933595344,
+            "ece_raw": 0.13780094840725837,
+            "ece_calibrated": 1.9269346387823162e-17
+          },
+          "innings2": {
+            "samples": 10980,
+            "brier_raw": 0.15131505727633252,
+            "brier_calibrated": 0.1445047827128432,
+            "ece_raw": 0.04969032859055428,
+            "ece_calibrated": 0.0
+          }
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
-        "path": "data/ilt_feature_store_v3",
-        "version": "v3",
-        "generated_date": "2025-12-15",
-        "training_data_matches": 100,
+        "path": "data/ilt_feature_store_v4",
+        "version": "v4",
+        "generated_date": "2025-12-30",
+        "training_data_matches": 99,
         "statistics": {
           "teams": 7,
           "players": 320,
@@ -180,7 +212,7 @@
       "calibrator": {
         "path": "models/sat_v1/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-28T19:18:29.128432",
+        "generated_date": "2025-12-29T20:50:52.671726",
         "oof_metrics": {
           "brier_raw": 0.18954002493153077,
           "brier_calibrated": 0.1789639900109204,
@@ -193,8 +225,8 @@
       "feature_store": {
         "path": "data/sat_feature_store_v1",
         "version": "v1",
-        "generated_date": "2025-12-28",
-        "training_data_matches": 94,
+        "generated_date": "2025-12-29",
+        "training_data_matches": 99,
         "statistics": {
           "teams": 6,
           "players": 184,
@@ -219,9 +251,9 @@
           ]
         },
         "recent_changes": {
-          "date": "2025-12-28",
-          "description": "Initial SAT model trained on 94 matches",
-          "impact": "New league support"
+          "date": "2025-12-29",
+          "description": "Regenerated SAT model without calibration on 99 matches",
+          "impact": "Updated model for latest data"
         }
       }
     }
