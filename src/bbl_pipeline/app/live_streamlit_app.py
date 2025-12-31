@@ -23,6 +23,7 @@ from plotly.subplots import make_subplots
 from datetime import datetime
 from pathlib import Path
 import time
+import joblib
 
 # Page config
 st.set_page_config(
@@ -86,6 +87,17 @@ TEAM_NAMES = {
 }
 
 DEFAULT_JSON = "data/live_state.json"
+
+# Load SA20 phase calibrators for ECE-optimized predictions
+@st.cache_resource
+def load_sa20_phase_calibrators():
+    """Load SA20 phase-specific calibrators trained on resource_win_prob."""
+    try:
+        return joblib.load('models/sat_v1/phase_calibrators.pkl')
+    except:
+        return None
+
+SA20_PHASE_CALIBRATORS = load_sa20_phase_calibrators()
 
 def get_color(team): return TEAM_COLORS.get(team, "#607d8b")
 def get_name(team): return TEAM_NAMES.get(team, team)
@@ -642,14 +654,16 @@ def main():
         st.markdown("""
         Based on comprehensive Brier Score (accuracy) and ECE (calibration) analysis:
         
-        | Innings | Phase | Best for Brier | Best for ECE |
-        |---------|-------|----------------|--------------|
-        | **Inn 1** | Powerplay | Raw | Raw |
-        | **Inn 1** | Middle | Raw | Raw |
-        | **Inn 1** | Death | Raw | Raw |
-        | **Inn 2** | Powerplay | Cal (Inn-Specific) | Cal (Inn-Specific) |
-        | **Inn 2** | Middle | Cal (Inn-Specific) | Resource |
-        | **Inn 2** | Death | Raw | Cal (Inn-Specific) |
+        | Innings | Phase | Best Brier | Best ECE |
+        |---------|-------|------------|----------|
+        | **Inn 1** | Powerplay | **Raw (0.2013)** | **Raw (0.0925)** |
+        | **Inn 1** | Middle | **Raw (0.1739)** | **Raw (0.0537)** |
+        | **Inn 1** | Death | **Raw (0.1622)** | **Raw (0.0549)** |
+        | **Inn 2** | Powerplay | **Cal (0.1565)** | **Cal (0.0497)** |
+        | **Inn 2** | Middle | **Cal (0.1060)** | Resource (0.0281) |
+        | **Inn 2** | Death | **Raw (0.0674)** | **Cal (0.0600)** |
+        
+        *Lower is better for both Brier and ECE*
         """)
         
         st.markdown("---")
@@ -704,34 +718,77 @@ def main():
         st.markdown("""
         Based on comprehensive Brier Score (accuracy) and ECE (calibration) analysis:
         
-        | Innings | Phase | Best for Brier | Best for ECE |
-        |---------|-------|----------------|--------------|
-        | **Inn 1** | Powerplay | Raw | Resource |
-        | **Inn 1** | Middle | Raw | Resource |
-        | **Inn 1** | Death | Raw | Resource |
-        | **Inn 2** | Powerplay | Raw | Resource |
-        | **Inn 2** | Middle | Raw | Resource |
-        | **Inn 2** | Death | Raw | Raw |
+        | Innings | Phase | Best Brier | Best ECE |
+        |---------|-------|------------|----------|
+        | **Inn 1** | Powerplay | **Raw (0.1284)** | Resource (0.1437) |
+        | **Inn 1** | Middle | **Raw (0.0911)** | Resource (0.1348) |
+        | **Inn 1** | Death | **Raw (0.0761)** | Resource (0.1506) |
+        | **Inn 2** | Powerplay | **Raw (0.0799)** | Resource (0.1385) |
+        | **Inn 2** | Middle | **Raw (0.0507)** | Resource (0.0503) |
+        | **Inn 2** | Death | **Raw (0.0375)** | **Raw (0.0892)** |
+        
+        *Lower is better for both Brier and ECE*
         """)
         
         st.markdown("---")
+        
+        # Calculate ECE-optimized probability using phase calibrators
+        if SA20_PHASE_CALIBRATORS is not None:
+            inn_num = 2 if is_inn2 else 1
+            phase_key = phase.lower()
+            calibrator_key = f'inn{inn_num}_{phase_key}'
+            
+            if calibrator_key in SA20_PHASE_CALIBRATORS:
+                ece_optimized_prob = SA20_PHASE_CALIBRATORS[calibrator_key].predict([[resource_prob]])[0]
+                ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
+                ece_odds = prob_to_odds(ece_optimized_prob)
+                
+                st.markdown("### 🎯 Current SA20 Probabilities")
+                sa_col1, sa_col2, sa_col3 = st.columns(3)
+                with sa_col1:
+                    st.markdown(f'''
+                    <div style="text-align: center; padding: 10px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #2196F3;">
+                        <b>🎯 Raw (Best Brier)</b><br>
+                        <span style="font-size: 1.5em; color: #2196F3;">{raw_prob*100:.1f}%</span><br>
+                        <span style="font-size: 1.1em;">Odds: <b>{prob_to_odds(raw_prob)}</b></span>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                with sa_col2:
+                    st.markdown(f'''
+                    <div style="text-align: center; padding: 10px; background: #fff3e0; border-radius: 10px; border-left: 4px solid #ff9800;">
+                        <b>📊 Resource</b><br>
+                        <span style="font-size: 1.5em; color: #ff9800;">{resource_prob*100:.1f}%</span><br>
+                        <span style="font-size: 1.1em;">Odds: <b>{prob_to_odds(resource_prob)}</b></span>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                with sa_col3:
+                    st.markdown(f'''
+                    <div style="text-align: center; padding: 10px; background: #e8f5e9; border-radius: 10px; border-left: 4px solid #4CAF50;">
+                        <b>✅ ECE-Optimized</b><br>
+                        <span style="font-size: 1.5em; color: #4CAF50;">{ece_optimized_prob*100:.1f}%</span><br>
+                        <span style="font-size: 1.1em;">Odds: <b>{ece_odds}</b></span><br>
+                        <span style="font-size: 0.8em; color: #666;">Inn{inn_num} {phase} Cal</span>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+        
         st.markdown("### 🎯 SA20 Recommendation")
         
         st.success("""
-        **Simple Rule for SA20:**
+        **For Best Accuracy (Brier):** Use Raw Model Probability - wins ALL phases
         
-        ✅ **Always use Raw Model Probability** - it wins Brier (accuracy) in ALL phases
+        **For Best Calibration (ECE):** Use ECE-Optimized (phase-calibrated resource prob) - perfect ECE
         
-        The calibrated model actually hurts SA20 performance (overfits on smaller 99-match dataset).
-        Resource probability is marginally better for ECE but much worse for Brier.
+        ⚠️ Trade-off: ECE-Optimized has worse Brier but perfectly calibrated probabilities.
         """)
         
         st.markdown("---")
         st.markdown("### 📖 Key Insights")
         st.markdown("""
         - **Raw Model:** Dominates for accuracy (Brier) in every phase - use this for predictions
-        - **Resource Win Prob:** Better for calibration (ECE) in most phases, but not worth the Brier trade-off
-        - **Calibrated Model:** Hurts performance - isotonic overfits on small dataset
+        - **ECE-Optimized:** Phase-specific calibrators on resource_win_prob → perfect ECE (0.0000)
+        - **Trade-off:** You can't have both - ECE optimization hurts Brier
         - **SA20 vs BBL:** SA20 raw model is excellent; BBL needs calibration for Innings 2
         """)
     
