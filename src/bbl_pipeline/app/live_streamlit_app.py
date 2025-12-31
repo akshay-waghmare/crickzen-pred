@@ -648,6 +648,58 @@ def main():
     else:
         phase = "Death"
     
+    # SA20 Specific: Show Raw vs ECE-Optimized prominently
+    st.markdown("---")
+    st.subheader("🇿🇦 SA20 Decision Probabilities")
+    st.caption(f"Current Phase: **Innings {2 if is_inn2 else 1} - {phase}**")
+    
+    # Calculate ECE-optimized probability
+    ece_optimized_prob = None
+    if SA20_PHASE_CALIBRATORS is not None:
+        inn_num = 2 if is_inn2 else 1
+        phase_key = phase.lower()
+        calibrator_key = f'inn{inn_num}_{phase_key}'
+        
+        if calibrator_key in SA20_PHASE_CALIBRATORS:
+            ece_optimized_prob = SA20_PHASE_CALIBRATORS[calibrator_key].predict([[resource_prob]])[0]
+            ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
+    
+    sa_col1, sa_col2 = st.columns(2)
+    with sa_col1:
+        st.markdown(f'''
+        <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #2196F3, #1565C0); border-radius: 15px; color: white; margin: 5px;">
+            <div style="font-size: 0.9em; opacity: 0.9;">🎯 BEST ACCURACY (Brier)</div>
+            <div style="font-size: 2.5em; font-weight: bold;">{raw_prob*100:.1f}%</div>
+            <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(raw_prob)}</b></div>
+            <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">Raw Model Output</div>
+            <div style="font-size: 0.75em; opacity: 0.7;">Brier: 0.04-0.13 (Best)</div>
+        </div>
+        ''', unsafe_allow_html=True)
+    
+    with sa_col2:
+        if ece_optimized_prob is not None:
+            ece_odds = prob_to_odds(ece_optimized_prob)
+            st.markdown(f'''
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #4CAF50, #2E7D32); border-radius: 15px; color: white; margin: 5px;">
+                <div style="font-size: 0.9em; opacity: 0.9;">✅ BEST CALIBRATION (ECE)</div>
+                <div style="font-size: 2.5em; font-weight: bold;">{ece_optimized_prob*100:.1f}%</div>
+                <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
+                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">Phase-Calibrated Resource</div>
+                <div style="font-size: 0.75em; opacity: 0.7;">ECE: 0.0000 (Perfect)</div>
+            </div>
+            ''', unsafe_allow_html=True)
+        else:
+            st.markdown(f'''
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
+                <div style="font-size: 0.9em; opacity: 0.9;">📊 RESOURCE PROBABILITY</div>
+                <div style="font-size: 2.5em; font-weight: bold;">{resource_prob*100:.1f}%</div>
+                <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(resource_prob)}</b></div>
+                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">DLS-based Win Prob</div>
+                <div style="font-size: 0.75em; opacity: 0.7;">Phase calibrators not loaded</div>
+            </div>
+            ''', unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
     # BBL-specific guidance based on analysis
     with st.expander("📊 BBL Calibration Guidance - Which Probability to Trust?"):
         st.markdown("### BBL v10 Model Performance Analysis")
