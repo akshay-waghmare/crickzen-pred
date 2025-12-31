@@ -208,16 +208,32 @@
     "SAT": {
       "path": "models/sat_v1",
       "version": "v1",
-      "description": "XGBLogRegEnsemble (25 features) + OOF Isotonic Calibration (Brier: 0.1790)",
+      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Innings-Specific Isotonic Calibration (Brier: 0.1798, ECE: 0.0000)",
       "calibrator": {
         "path": "models/sat_v1/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-29T20:50:52.671726",
+        "generated_date": "2025-12-31T15:56:17.473343",
         "oof_metrics": {
-          "brier_raw": 0.18954002493153077,
-          "brier_calibrated": 0.1789639900109204,
-          "ece_raw": 0.05664185985468428,
-          "ece_calibrated": 9.065997772784512e-17
+          "brier_raw": 0.19174002716944485,
+          "brier_calibrated": 0.17975095565381222,
+          "ece_raw": 0.06290362025497906,
+          "ece_calibrated": 7.362684469047435e-17
+        },
+        "innings_specific": {
+          "innings1": {
+            "samples": 11470,
+            "brier_raw": 0.23475590836138072,
+            "brier_calibrated": 0.21952151769297049,
+            "ece_raw": 0.0940381151533315,
+            "ece_calibrated": 5.191254526897429e-17
+          },
+          "innings2": {
+            "samples": 10323,
+            "brier_raw": 0.14394460362284942,
+            "brier_calibrated": 0.13556144227696965,
+            "ece_raw": 0.05210787477275786,
+            "ece_calibrated": 2.163875545428475e-17
+          }
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
@@ -225,7 +241,7 @@
       "feature_store": {
         "path": "data/sat_feature_store_v1",
         "version": "v1",
-        "generated_date": "2025-12-29",
+        "generated_date": "2025-12-31",
         "training_data_matches": 99,
         "statistics": {
           "teams": 6,
@@ -251,9 +267,9 @@
           ]
         },
         "recent_changes": {
-          "date": "2025-12-29",
-          "description": "Regenerated SAT model without calibration on 99 matches",
-          "impact": "Updated model for latest data"
+          "date": "2025-12-31",
+          "description": "Cleanly retrained SA20 v1 from scratch with CV-OOF Innings-Specific Isotonic Calibration",
+          "impact": "6.3% Brier improvement with calibration (0.1917 -> 0.1798); calibration helps in BOTH innings unlike BBL"
         }
       }
     }

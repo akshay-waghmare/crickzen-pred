@@ -698,6 +698,43 @@ def main():
         - **Main Odds Display uses:** Inn-Specific Calibrated probability
         """)
     
+    # SA20 Calibration Guidance
+    with st.expander("📊 SA20 Calibration Guidance - Which Probability to Trust?"):
+        st.markdown("### SA20 v1 Model Performance Analysis")
+        st.markdown("""
+        Based on comprehensive Brier Score (accuracy) and ECE (calibration) analysis:
+        
+        | Innings | Phase | Best for Brier | Best for ECE |
+        |---------|-------|----------------|--------------|
+        | **Inn 1** | Powerplay | Raw | Resource |
+        | **Inn 1** | Middle | Raw | Resource |
+        | **Inn 1** | Death | Raw | Resource |
+        | **Inn 2** | Powerplay | Raw | Resource |
+        | **Inn 2** | Middle | Raw | Resource |
+        | **Inn 2** | Death | Raw | Raw |
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 🎯 SA20 Recommendation")
+        
+        st.success("""
+        **Simple Rule for SA20:**
+        
+        ✅ **Always use Raw Model Probability** - it wins Brier (accuracy) in ALL phases
+        
+        The calibrated model actually hurts SA20 performance (overfits on smaller 99-match dataset).
+        Resource probability is marginally better for ECE but much worse for Brier.
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 📖 Key Insights")
+        st.markdown("""
+        - **Raw Model:** Dominates for accuracy (Brier) in every phase - use this for predictions
+        - **Resource Win Prob:** Better for calibration (ECE) in most phases, but not worth the Brier trade-off
+        - **Calibrated Model:** Hurts performance - isotonic overfits on small dataset
+        - **SA20 vs BBL:** SA20 raw model is excellent; BBL needs calibration for Innings 2
+        """)
+    
     # Key metrics
     f = d.get("features", {})
     st.markdown("---")
