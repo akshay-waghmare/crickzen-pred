@@ -95,12 +95,86 @@ SA20's smaller dataset (99 vs 618 matches) means isotonic calibration overfits. 
 - **Venues:** 6
 - **Generated:** 2025-12-31
 
+## ECE-Optimized Phase Calibrators
+
+Since the raw model's ECE is suboptimal but Resource probability shows better ECE, we trained **phase-specific isotonic calibrators on `resource_win_prob`** to achieve perfect ECE.
+
+### Training Script
+
+**Location:** `scripts/train_sa20_phase_calibrators.py`
+
+**What it does:**
+1. Loads SA20 training data
+2. For each innings × phase combination (6 total):
+   - Trains an isotonic calibrator on `resource_win_prob` → `is_winner`
+3. Saves to `models/sat_v1/phase_calibrators.pkl`
+
+**Run:**
+```bash
+python scripts/train_sa20_phase_calibrators.py
+```
+
+### Results: Perfect ECE
+
+| Phase | ECE (Raw) | ECE (Resource) | ECE (Calibrated) |
+|-------|-----------|----------------|------------------|
+| Inn1 Powerplay | 0.2472 | 0.1437 | **0.0000** ✓ |
+| Inn1 Middle | 0.1765 | 0.1348 | **0.0000** ✓ |
+| Inn1 Death | 0.1683 | 0.1506 | **0.0000** ✓ |
+| Inn2 Powerplay | 0.1526 | 0.1385 | **0.0000** ✓ |
+| Inn2 Middle | 0.1172 | 0.0503 | **0.0000** ✓ |
+| Inn2 Death | 0.0892 | 0.1388 | **0.0000** ✓ |
+
+### Trade-off Warning
+
+⚠️ **ECE-optimized probabilities have WORSE Brier scores than raw model.**
+
+| Metric | Best Source | Use Case |
+|--------|-------------|----------|
+| **Brier (Accuracy)** | Raw Model | Betting, Expected Value |
+| **ECE (Calibration)** | Phase Calibrators | Risk assessment, Probability interpretation |
+
+### Inference Code
+
+```python
+import joblib
+import numpy as np
+
+# Load phase calibrators
+calibrators = joblib.load('models/sat_v1/phase_calibrators.pkl')
+# Keys: inn1_powerplay, inn1_middle, inn1_death, inn2_powerplay, inn2_middle, inn2_death
+
+def get_ece_optimized_prob(innings: int, over: int, resource_win_prob: float) -> float:
+    """Get ECE-optimized probability using phase calibrators."""
+    # Determine phase
+    if over <= 6:
+        phase = 'powerplay'
+    elif over <= 15:
+        phase = 'middle'
+    else:
+        phase = 'death'
+    
+    key = f'inn{innings}_{phase}'
+    return calibrators[key].predict([[resource_win_prob]])[0]
+
+# Example usage
+ece_prob = get_ece_optimized_prob(innings=2, over=12, resource_win_prob=0.60)
+print(f"ECE-Optimized: {ece_prob:.2%}")
+```
+
+### Streamlit Integration
+
+The live Streamlit app displays both probabilities side-by-side:
+- **Raw (Blue card)**: Best Brier/Accuracy
+- **ECE-Optimized (Green card)**: Best ECE/Calibration
+
 ## Model Artifacts
 
 ```
 models/sat_v1/
 ├── champion_model.joblib      # XGBLogRegEnsemble
 ├── isotonic_calibrator.pkl    # Innings-specific calibrators (not recommended)
+├── phase_calibrators.pkl      # Phase-specific ECE calibrators (for ECE optimization)
 ├── training_metadata.json     # Training config and metrics
 └── feature_importance.csv     # Top 25 features
 ```
