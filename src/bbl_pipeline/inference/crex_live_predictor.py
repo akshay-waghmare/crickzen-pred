@@ -214,7 +214,12 @@ class CrexLivePredictor:
             logger.warning(f"Could not extract team comparison: {e}")
     
     def _inject_season_stats(self, team_abbrev: str, matches: int, win_rate: float, avg_score: float):
-        """Inject extracted season stats into the feature store's SEASON_OVERRIDES."""
+        """Inject extracted season stats into the feature store's SEASON_OVERRIDES.
+        
+        Note: bat_first_wr and bowl_first_wr are TEAM-specific situation rates, NOT venue rates.
+        We scale the team's historical situation rates by their current season win rate.
+        This preserves team-specific batting/bowling first preferences.
+        """
         try:
             from bbl_pipeline.features.store import InMemoryFeatureStore
             
@@ -223,10 +228,38 @@ class CrexLivePredictor:
             if team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS:
                 full_name = InMemoryFeatureStore.TEAM_ABBREVIATIONS[team_abbrev.upper()]
             
-            # Get venue-based situation rates if available
-            venue_stats = InMemoryFeatureStore.VENUE_SITUATION_STATS
-            bat_first_wr = venue_stats.get('bat_first_wr', win_rate)
-            bowl_first_wr = venue_stats.get('bowl_first_wr', win_rate)
+            # Always use team's historical situation rates scaled by current season win rate
+            # This is different from venue bat_first_wr which is the same for all teams!
+            bat_first_wr = None
+            bowl_first_wr = None
+            
+            # Get feature store from predictor
+            feature_store = getattr(self.predictor, 'feature_store', None) if hasattr(self, 'predictor') else None
+            if feature_store and hasattr(feature_store, '_team_stats'):
+                # Ensure feature store is loaded
+                if not feature_store._loaded:
+                    feature_store.load()
+                # Get historical team stats for situation rates
+                hist_team_stats = feature_store._team_stats.get(full_name)
+                if hist_team_stats:
+                    hist_wr = hist_team_stats.get('win_rate', 0.5)
+                    hist_bat = hist_team_stats.get('bat_first_wr', hist_wr)
+                    hist_bowl = hist_team_stats.get('bowl_first_wr', hist_wr)
+                    
+                    # Scale historical situation rates to current season win rate
+                    # This preserves team's relative strength batting vs bowling first
+                    if hist_wr > 0:
+                        bat_first_ratio = hist_bat / hist_wr
+                        bowl_first_ratio = hist_bowl / hist_wr
+                        bat_first_wr = min(1.0, max(0.0, win_rate * bat_first_ratio))
+                        bowl_first_wr = min(1.0, max(0.0, win_rate * bowl_first_ratio))
+                        logger.info(f"Scaled team situation rates for '{full_name}': bat_first={bat_first_wr:.0%}, bowl_first={bowl_first_wr:.0%} (from historical ratios)")
+            
+            # Final fallback to team's overall win rate
+            if bat_first_wr is None:
+                bat_first_wr = win_rate
+            if bowl_first_wr is None:
+                bowl_first_wr = win_rate
             
             # Update the class-level SEASON_OVERRIDES dictionary
             InMemoryFeatureStore.SEASON_OVERRIDES[full_name] = {

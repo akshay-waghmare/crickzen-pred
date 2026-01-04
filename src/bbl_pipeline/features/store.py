@@ -278,6 +278,14 @@ class InMemoryFeatureStore:
         'SEC': 'Sunrisers Eastern Cape',
         'SUNE': 'Sunrisers Eastern Cape',
         
+        # SSM (Super Smash - New Zealand)
+        'OTG': 'Otago',
+        'NB': 'Northern Districts',
+        'AKL': 'Auckland',
+        'CD': 'Central Districts',
+        'CK': 'Canterbury',
+        'WEL': 'Wellington',
+        
         # BPL (Bangladesh Premier League)
         'CV': 'Comilla Victorians',
         'RR': 'Rangpur Riders',

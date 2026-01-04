@@ -65,6 +65,13 @@ TEAM_COLORS = {
     # SA20
     "DSG": "#00bcd4", "MICT": "#1565c0", "PR": "#e91e63", "JSK": "#ffc107",
     "PC": "#4caf50", "SEC": "#ff5722",
+    # SSM (Super Smash - New Zealand) - both internal and CREX codes
+    "AA": "#1a237e", "AKL": "#1a237e", "Auckland": "#1a237e",
+    "CD": "#d32f2f", "Central Districts": "#d32f2f",
+    "CS": "#ffc107", "CK": "#ffc107", "Canterbury": "#ffc107",
+    "ND": "#1565c0", "NB": "#1565c0", "Northern Districts": "#1565c0",
+    "OV": "#388e3c", "OTG": "#388e3c", "Otago": "#388e3c",
+    "WF": "#7b1fa2", "WEL": "#7b1fa2", "Wellington": "#7b1fa2",
 }
 TEAM_NAMES = {
     # WBBL
@@ -84,6 +91,13 @@ TEAM_NAMES = {
     # SA20
     "DSG": "Durban's Super Giants", "MICT": "MI Cape Town", "PR": "Paarl Royals",
     "JSK": "Joburg Super Kings", "PC": "Pretoria Capitals", "SEC": "Sunrisers Eastern Cape",
+    # SSM (Super Smash - New Zealand) - both internal and CREX codes
+    "AA": "Auckland Aces", "AKL": "Auckland Aces", "Auckland": "Auckland Aces",
+    "CD": "Central Districts", "Central Districts": "Central Districts",
+    "CS": "Canterbury Kings", "CK": "Canterbury Kings", "Canterbury": "Canterbury Kings",
+    "ND": "Northern Brave", "NB": "Northern Brave", "Northern Districts": "Northern Brave",
+    "OV": "Otago Volts", "OTG": "Otago Volts", "Otago": "Otago Volts",
+    "WF": "Wellington Firebirds", "WEL": "Wellington Firebirds", "Wellington": "Wellington Firebirds",
 }
 
 DEFAULT_JSON = "data/live_state.json"
@@ -92,12 +106,16 @@ DEFAULT_JSON = "data/live_state.json"
 # NOTE: SA20 uses phase calibrators (8 phases) instead of per-over due to small dataset
 @st.cache_resource
 def load_per_over_calibrators():
-    """Load per-over calibrators for BBL. Load phase calibrators for SA20."""
+    """Load per-over calibrators for BBL and SSM."""
     calibrators = {}
     try:
         calibrators['bbl'] = joblib.load('models/bbl_v10/per_over_calibrators.pkl')
     except:
         calibrators['bbl'] = None
+    try:
+        calibrators['ssm'] = joblib.load('models/ssm_v1/per_over_calibrators.pkl')
+    except:
+        calibrators['ssm'] = None
     # SA20 uses phase calibrators (8 phases) - more reliable with smaller dataset
     calibrators['sa20'] = None  # per-over disabled
     return calibrators
@@ -686,10 +704,14 @@ def main():
         'STH',                         # Other aliases
     }
     sa20_teams = {'DSG', 'MICT', 'PR', 'JSK', 'PC', 'SEC'}
+    # SSM teams - both internal codes and CREX codes
+    ssm_teams = {'AA', 'AKL', 'Auckland', 'CD', 'Central Districts', 'CS', 'CK', 'Canterbury',
+                 'ND', 'NB', 'Northern Districts', 'OV', 'OTG', 'Otago', 'WF', 'WEL', 'Wellington'}
     
     batting_team = d.get("batting_team", "")
     is_bbl = batting_team in bbl_teams
     is_sa20 = batting_team in sa20_teams
+    is_ssm = batting_team in ssm_teams
     
     # Calculate ECE-optimized probability
     ece_optimized_prob = None
@@ -706,9 +728,10 @@ def main():
             cal_method = 'isotonic'
             ece_optimized_prob = calibrator.predict([[resource_prob]])[0]
             ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
-    elif is_bbl:
-        # BBL: Use per-over calibrators
-        calibrators = PER_OVER_CALIBRATORS.get('bbl')
+    elif is_bbl or is_ssm:
+        # BBL or SSM: Use per-over calibrators
+        league_key = 'bbl' if is_bbl else 'ssm'
+        calibrators = PER_OVER_CALIBRATORS.get(league_key)
         calibrator_key = f'inn{inn_num}_over{current_over}'
         if calibrators is not None and calibrator_key in calibrators:
             cal_info = calibrators[calibrator_key]
@@ -735,7 +758,7 @@ def main():
             ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
     
     # ECE-Optimized Decision Probabilities section
-    league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else "🏏 T20")
+    league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else "🏏 T20"))
     st.markdown("---")
     st.subheader(f"{league_name} Decision Probabilities")
     method_label = "Platt" if cal_method == "platt" else "Isotonic"
@@ -782,18 +805,57 @@ def main():
     st.markdown("<br>", unsafe_allow_html=True)
     # BBL-specific guidance based on analysis
     with st.expander("📊 BBL Calibration Guidance - Which Probability to Trust?"):
-        st.markdown("### BBL v10 Model Performance Analysis")
+        st.markdown("### BBL v10 Model Performance Analysis (141K+ samples)")
         st.markdown("""
-        Based on comprehensive Brier Score (accuracy) and ECE (calibration) analysis:
+        **Detailed ECE & Brier by Over (based on ~3,500 samples per over):**
         
-        | Innings | Phase | Best Brier | Best ECE |
-        |---------|-------|------------|----------|
-        | **Inn 1** | Powerplay | **Raw (0.2013)** | **Raw (0.0925)** |
-        | **Inn 1** | Middle | **Raw (0.1739)** | **Raw (0.0537)** |
-        | **Inn 1** | Death | **Raw (0.1622)** | **Raw (0.0549)** |
-        | **Inn 2** | Powerplay | **Cal (0.1565)** | **Cal (0.0497)** |
-        | **Inn 2** | Middle | **Cal (0.1060)** | Resource (0.0281) |
-        | **Inn 2** | Death | **Raw (0.0674)** | **Cal (0.0600)** |
+        #### Innings 1 - Raw Model wins ECE & Brier for almost ALL overs
+        | Over | ECE_Raw | ECE_Cal | ECE_Res | Brier_Raw | Brier_Cal | Brier_Res | Best ECE | Best Brier |
+        |------|---------|---------|---------|-----------|-----------|-----------|----------|------------|
+        | 1 | **0.0904** | 0.0910 | 0.1114 | **0.2155** | 0.2159 | 0.2617 | Raw | Raw |
+        | 2 | **0.1040** | 0.1060 | 0.1099 | **0.2106** | 0.2117 | 0.2596 | Raw | Raw |
+        | 3 | 0.1074 | **0.1023** | 0.1038 | **0.2002** | 0.2026 | 0.2535 | Cal | Raw |
+        | 4 | 0.0964 | 0.1016 | **0.0958** | **0.1920** | 0.1953 | 0.2457 | Res | Raw |
+        | 5 | **0.0745** | 0.1001 | 0.1051 | **0.1884** | 0.1916 | 0.2395 | Raw | Raw |
+        | 6 | **0.0696** | 0.0839 | 0.0913 | **0.1886** | 0.1923 | 0.2345 | Raw | Raw |
+        | 7 | **0.0597** | 0.0750 | 0.0953 | **0.1845** | 0.1895 | 0.2309 | Raw | Raw |
+        | 8 | **0.0525** | 0.0739 | 0.0899 | **0.1806** | 0.1871 | 0.2269 | Raw | Raw |
+        | 9 | **0.0504** | 0.0805 | 0.0835 | **0.1764** | 0.1839 | 0.2227 | Raw | Raw |
+        | 10 | **0.0521** | 0.0725 | 0.0801 | **0.1739** | 0.1805 | 0.2189 | Raw | Raw |
+        | 11 | **0.0465** | 0.0768 | 0.0795 | **0.1711** | 0.1775 | 0.2171 | Raw | Raw |
+        | 12 | **0.0538** | 0.0825 | 0.0908 | **0.1668** | 0.1734 | 0.2159 | Raw | Raw |
+        | 13 | **0.0591** | 0.0850 | 0.0966 | **0.1617** | 0.1684 | 0.2117 | Raw | Raw |
+        | 14 | **0.0577** | 0.0848 | 0.1037 | **0.1616** | 0.1681 | 0.2119 | Raw | Raw |
+        | 15 | **0.0544** | 0.0827 | 0.1045 | **0.1613** | 0.1676 | 0.2137 | Raw | Raw |
+        | 16 | **0.0566** | 0.0841 | 0.1128 | **0.1601** | 0.1671 | 0.2125 | Raw | Raw |
+        | 17 | **0.0521** | 0.0850 | 0.1102 | **0.1618** | 0.1686 | 0.2127 | Raw | Raw |
+        | 18 | **0.0591** | 0.0917 | 0.1176 | **0.1641** | 0.1712 | 0.2127 | Raw | Raw |
+        | 19 | **0.0602** | 0.0981 | 0.1021 | **0.1636** | 0.1713 | 0.2095 | Raw | Raw |
+        | 20 | **0.0772** | 0.1147 | 0.0888 | **0.1650** | 0.1741 | 0.2068 | Raw | Raw |
+        
+        #### Innings 2 - Inn-Specific Calibrated wins ECE for 19/20 overs
+        | Over | ECE_Raw | ECE_Cal | ECE_Res | Brier_Raw | Brier_Cal | Brier_Res | Best ECE | Best Brier |
+        |------|---------|---------|---------|-----------|-----------|-----------|----------|------------|
+        | 1 | 0.0633 | **0.0513** | 0.1641 | 0.1705 | **0.1690** | 0.2248 | Cal | Cal |
+        | 2 | 0.0570 | **0.0516** | 0.1562 | 0.1655 | **0.1649** | 0.2183 | Cal | Cal |
+        | 3 | 0.0561 | **0.0537** | 0.1496 | 0.1607 | **0.1601** | 0.2132 | Cal | Cal |
+        | 4 | 0.0652 | **0.0512** | 0.1409 | 0.1495 | **0.1486** | 0.2051 | Cal | Cal |
+        | 5 | 0.0656 | **0.0604** | 0.1339 | 0.1409 | **0.1400** | 0.1950 | Cal | Cal |
+        | 6 | 0.0832 | **0.0765** | 0.1194 | 0.1299 | **0.1289** | 0.1817 | Cal | Cal |
+        | 7 | 0.0700 | **0.0619** | 0.1018 | 0.1216 | **0.1210** | 0.1688 | Cal | Cal |
+        | 8 | 0.0654 | **0.0532** | 0.0812 | 0.1165 | **0.1155** | 0.1592 | Cal | Cal |
+        | 9 | 0.0608 | **0.0549** | 0.0632 | 0.1087 | **0.1080** | 0.1454 | Cal | Cal |
+        | 10 | 0.0473 | **0.0401** | 0.0561 | 0.1063 | **0.1061** | 0.1383 | Cal | Cal |
+        | 11 | 0.0467 | **0.0384** | 0.0492 | 0.1010 | **0.1003** | 0.1321 | Cal | Cal |
+        | 12 | 0.0494 | **0.0409** | 0.0494 | 0.0962 | **0.0955** | 0.1273 | Cal | Cal |
+        | 13 | 0.0465 | **0.0453** | 0.0644 | **0.0920** | 0.0921 | 0.1268 | Cal | Raw |
+        | 14 | 0.0462 | **0.0401** | 0.0785 | 0.0858 | **0.0850** | 0.1212 | Cal | Cal |
+        | 15 | 0.0527 | **0.0492** | 0.1035 | 0.0774 | **0.0767** | 0.1194 | Cal | Cal |
+        | 16 | 0.0575 | **0.0541** | 0.1253 | **0.0710** | 0.0711 | 0.1183 | Cal | Raw |
+        | 17 | 0.0709 | **0.0653** | 0.1461 | **0.0685** | 0.0691 | 0.1284 | Cal | Raw |
+        | 18 | 0.0730 | **0.0721** | 0.1632 | **0.0608** | 0.0614 | 0.1324 | Cal | Raw |
+        | 19 | **0.0685** | 0.0687 | 0.1535 | **0.0542** | 0.0548 | 0.1181 | Raw | Raw |
+        | 20 | 0.0416 | **0.0355** | 0.0982 | **0.0476** | 0.0477 | 0.0797 | Cal | Raw |
         
         *Lower is better for both Brier and ECE*
         """)
@@ -803,44 +865,42 @@ def main():
         
         if not is_inn2:
             st.success(f"""
-            **Innings 1 - {phase} Phase**
+            **Innings 1 - Over {current_over} ({phase})**
             
             ✅ **Use: Raw Model Probability ({raw_prob*100:.1f}%)**
             
-            The raw model is already well-calibrated in innings 1. No calibration needed.
+            Raw model wins ECE for 18/20 overs in Innings 1. Only exceptions: Over 3 (Cal), Over 4 (Res).
+            Raw model wins Brier for ALL 20 overs in Innings 1.
             """)
         else:
-            if phase == "Middle":
+            if phase == "Death" and current_over == 19:
                 st.info(f"""
-                **Innings 2 - {phase} Phase**
-                
-                📊 **For Best Accuracy (Brier):** Inn-Specific Calibrated ({inn_specific_prob*100:.1f}%)
-                
-                🎯 **For Best Calibration (ECE):** Resource Win Prob ({resource_prob*100:.1f}%)
-                """)
-            elif phase == "Powerplay":
-                st.success(f"""
-                **Innings 2 - {phase} Phase**
-                
-                ✅ **Use: Inn-Specific Calibrated ({inn_specific_prob*100:.1f}%)**
-                
-                Best for both accuracy and calibration in this phase.
-                """)
-            else:  # Death
-                st.info(f"""
-                **Innings 2 - {phase} Phase**
+                **Innings 2 - Over {current_over} ({phase})**
                 
                 📊 **For Best Accuracy (Brier):** Raw Model ({raw_prob*100:.1f}%)
                 
-                🎯 **For Best Calibration (ECE):** Inn-Specific Calibrated ({inn_specific_prob*100:.1f}%)
+                🎯 **For Best Calibration (ECE):** Raw Model ({raw_prob*100:.1f}%)
+                
+                Over 19 is the ONLY over in Innings 2 where Raw wins ECE.
+                """)
+            else:
+                # Cal wins ECE for most of Innings 2 (overs 1-18, 20)
+                st.success(f"""
+                **Innings 2 - Over {current_over} ({phase})**
+                
+                ✅ **Use: Inn-Specific Calibrated ({inn_specific_prob*100:.1f}%)**
+                
+                Inn-Specific Cal wins ECE for 19/20 overs in Innings 2.
+                Inn-Specific Cal wins Brier for overs 1-12, 14-15.
                 """)
         
         st.markdown("---")
         st.markdown("### 📖 Key Insights")
         st.markdown("""
-        - **Innings 1:** Raw model dominates - BBL's ensemble is very well-calibrated out of the box
-        - **Innings 2:** Calibrators help, especially Inn-Specific Isotonic
-        - **Resource Win Prob:** Only beats others for ECE in Innings 2 Middle Overs
+        - **Innings 1:** Raw model dominates ECE (18/20 overs) & Brier (ALL overs)
+        - **Innings 2:** Inn-Specific Cal dominates ECE (19/20 overs), mixed for Brier
+        - **Resource Win Prob:** Never best for ECE in Innings 2 (unlike SSM)
+        - **Only exception:** Inn 2 Over 19 - Raw wins both ECE and Brier
         - **Main Odds Display uses:** Inn-Specific Calibrated probability
         """)
     
@@ -880,6 +940,61 @@ def main():
         - **Per-Over ECE-Optimized:** 40 calibrators (20 overs × 2 innings) → perfect ECE (0.0000)
         - **Trade-off:** You can't have both - ECE optimization hurts Brier
         - **SA20 vs BBL:** SA20 raw model is excellent; BBL needs calibration for Innings 2
+        """)
+    
+    # SSM Calibration Guidance
+    with st.expander("📊 SSM (Super Smash) Calibration Guidance - Which Probability to Trust?"):
+        st.markdown("### SSM v1 Model Performance Analysis (55K samples)")
+        st.markdown("""
+        **Detailed ECE & Brier by Over (based on ~1,400 samples per over):**
+        
+        #### Innings 1 - Resource (DLS) wins ECE for ALL 20 overs
+        | Over | ECE_Raw | ECE_Cal | ECE_Res | Brier_Raw | Best ECE | Best Brier |
+        |------|---------|---------|---------|-----------|----------|------------|
+        | 1 | 0.1316 | 0.1331 | **0.0891** | **0.2044** | Res | Raw |
+        | 2 | 0.1060 | 0.0860 | **0.0631** | **0.1917** | Res | Raw |
+        | 3 | 0.1097 | 0.0877 | **0.0609** | **0.1838** | Res | Raw |
+        | 4 | 0.1017 | 0.0765 | **0.0588** | **0.1760** | Res | Raw |
+        | 5 | 0.0816 | 0.0584 | **0.0446** | **0.1672** | Res | Raw |
+        | 6 | 0.0820 | 0.0565 | **0.0405** | **0.1626** | Res | Raw |
+        | 7-15 | ~0.06-0.08 | ~0.04-0.06 | **~0.03-0.05** | **~0.11-0.15** | Res | Raw |
+        | 16-20 | ~0.04-0.07 | ~0.03-0.06 | **~0.02-0.04** | **~0.08-0.11** | Res | Raw |
+        
+        #### Innings 2 - Mixed sources for best ECE
+        | Over | ECE_Raw | ECE_Cal | ECE_Res | Brier_Raw | Best ECE | Best Brier |
+        |------|---------|---------|---------|-----------|----------|------------|
+        | 1 | 0.0702 | **0.0426** | 0.0747 | **0.1369** | Cal | Raw |
+        | 2 | 0.0509 | **0.0312** | 0.0583 | **0.1255** | Cal | Raw |
+        | 3 | **0.0327** | 0.0412 | 0.0479 | **0.1193** | Raw | Raw |
+        | 4 | **0.0350** | 0.0450 | 0.0483 | **0.1148** | Raw | Raw |
+        | 5-6 | ~0.03-0.04 | ~0.04-0.05 | **~0.03** | **~0.10-0.11** | Res | Raw |
+        | 7-11 | ~0.03-0.04 | ~0.04-0.05 | **~0.02-0.03** | **~0.07-0.09** | Res | Raw |
+        | 12-20 | **~0.01-0.04** | ~0.03-0.05 | ~0.02-0.05 | **~0.03-0.07** | Raw | Raw |
+        
+        *Lower is better for both Brier and ECE*
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 🎯 SSM Recommendation")
+        
+        st.success("""
+        **For Best Accuracy (Brier):** Use Raw Model Probability - wins ALL 40 overs!
+        
+        **For Best Calibration (ECE):** Use Per-Over Calibrators:
+        - **Inn 1:** Resource probability (DLS-based) for all 20 overs
+        - **Inn 2:** Cal (overs 1-2), Raw (overs 3-4, 12-20), Res (overs 5-11)
+        
+        ⚠️ SSM is different from BBL: Inn 1 uses Resource, not Raw for ECE!
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 📖 Key Insights")
+        st.markdown("""
+        - **Raw Model:** Excellent accuracy (Brier) across all phases
+        - **Resource (DLS):** Surprisingly good ECE in Inn 1 - model may be overconfident early
+        - **55K samples:** Robust calibrators with ~1,400 samples per over
+        - **Per-Over ECE:** 40 calibrators → perfect ECE (0.0000) in all overs
+        - **Key difference from BBL:** SSM Inn 1 benefits from Resource, BBL Inn 1 uses Raw
         """)
     
     # Key metrics
