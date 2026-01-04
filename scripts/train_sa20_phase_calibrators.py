@@ -123,10 +123,11 @@ def train_phase_calibrators(
     # Calculate current over from overs_remaining
     over = np.ceil(20 - df['overs_remaining']).astype(int) + 1
     
-    # Phase definitions
+    # Phase definitions - split middle into early/late for more granularity
     phases = [
         ('powerplay', 1, 6),
-        ('middle', 7, 15),
+        ('middle_early', 7, 11),
+        ('middle_late', 12, 15),
         ('death', 16, 20)
     ]
     
@@ -212,10 +213,12 @@ def demo_inference():
     # Example scenarios
     scenarios = [
         (1, 'powerplay', 0.30),
-        (1, 'middle', 0.45),
+        (1, 'middle_early', 0.40),
+        (1, 'middle_late', 0.50),
         (1, 'death', 0.55),
         (2, 'powerplay', 0.40),
-        (2, 'middle', 0.60),
+        (2, 'middle_early', 0.55),
+        (2, 'middle_late', 0.65),
         (2, 'death', 0.75),
     ]
     

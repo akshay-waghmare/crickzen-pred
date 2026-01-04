@@ -88,16 +88,30 @@ TEAM_NAMES = {
 
 DEFAULT_JSON = "data/live_state.json"
 
-# Load SA20 phase calibrators for ECE-optimized predictions
+# Load per-over calibrators for ECE-optimized predictions (smoother than phase calibrators)
+# NOTE: SA20 uses phase calibrators (8 phases) instead of per-over due to small dataset
 @st.cache_resource
-def load_sa20_phase_calibrators():
-    """Load SA20 phase-specific calibrators trained on resource_win_prob."""
+def load_per_over_calibrators():
+    """Load per-over calibrators for BBL. Load phase calibrators for SA20."""
+    calibrators = {}
+    try:
+        calibrators['bbl'] = joblib.load('models/bbl_v10/per_over_calibrators.pkl')
+    except:
+        calibrators['bbl'] = None
+    # SA20 uses phase calibrators (8 phases) - more reliable with smaller dataset
+    calibrators['sa20'] = None  # per-over disabled
+    return calibrators
+
+@st.cache_resource
+def load_phase_calibrators():
+    """Load phase calibrators for SA20 (8 phases: powerplay, middle_early, middle_late, death)."""
     try:
         return joblib.load('models/sat_v1/phase_calibrators.pkl')
     except:
         return None
 
-SA20_PHASE_CALIBRATORS = load_sa20_phase_calibrators()
+PER_OVER_CALIBRATORS = load_per_over_calibrators()
+SA20_PHASE_CALIBRATORS = load_phase_calibrators()
 
 def get_color(team): return TEAM_COLORS.get(team, "#607d8b")
 def get_name(team): return TEAM_NAMES.get(team, team)
@@ -638,31 +652,94 @@ def main():
     # BBL Calibration Guidance
     resource_prob = d.get("features", {}).get("resource_win_prob", 0.5)
     is_inn2 = d.get("is_second_innings", False)
-    current_over = d.get("overs", 0)
+    # overs field is like 0.4, 6.2, 1.0 etc - need to get current over number (1-20)
+    # 0.4 -> over 1, 1.0 -> over 1 (just completed), 1.2 -> over 2
+    import math
+    overs_float = d.get("overs", 0.0)
+    current_over = max(1, min(20, math.ceil(overs_float) if overs_float > 0 else 1))
+    inn_num = 2 if is_inn2 else 1
     
-    # Determine phase
+    # Determine phase for display (using 4-phase system for SA20)
     if current_over <= 6:
         phase = "Powerplay"
+        phase_key = "powerplay"
+    elif current_over <= 11:
+        phase = "Middle (Early)"
+        phase_key = "middle_early"
     elif current_over <= 15:
-        phase = "Middle"
+        phase = "Middle (Late)"
+        phase_key = "middle_late"
     else:
         phase = "Death"
+        phase_key = "death"
     
-    # SA20 Specific: Show Raw vs ECE-Optimized prominently
-    st.markdown("---")
-    st.subheader("🇿🇦 SA20 Decision Probabilities")
-    st.caption(f"Current Phase: **Innings {2 if is_inn2 else 1} - {phase}**")
+    # Detect league from team names
+    # BBL team codes: various abbreviations used by different sources
+    bbl_teams = {
+        'SYS', 'SYT', 'SIX', 'THU',  # Sydney Sixers, Sydney Thunder
+        'PRS', 'SCO', 'PS',           # Perth Scorchers
+        'ADS', 'STR', 'AS',           # Adelaide Strikers
+        'BRH', 'HEA', 'BH',           # Brisbane Heat
+        'MLR', 'REN', 'MR',           # Melbourne Renegades
+        'MLS', 'STA', 'MS',           # Melbourne Stars
+        'HBH', 'HUR', 'HH',           # Hobart Hurricanes
+        'STH',                         # Other aliases
+    }
+    sa20_teams = {'DSG', 'MICT', 'PR', 'JSK', 'PC', 'SEC'}
+    
+    batting_team = d.get("batting_team", "")
+    is_bbl = batting_team in bbl_teams
+    is_sa20 = batting_team in sa20_teams
     
     # Calculate ECE-optimized probability
     ece_optimized_prob = None
-    if SA20_PHASE_CALIBRATORS is not None:
-        inn_num = 2 if is_inn2 else 1
-        phase_key = phase.lower()
+    cal_source = None
+    cal_method = None
+    calibrator_key = None
+    
+    if is_sa20 and SA20_PHASE_CALIBRATORS is not None:
+        # SA20: Use phase calibrators (8 phases)
         calibrator_key = f'inn{inn_num}_{phase_key}'
-        
         if calibrator_key in SA20_PHASE_CALIBRATORS:
-            ece_optimized_prob = SA20_PHASE_CALIBRATORS[calibrator_key].predict([[resource_prob]])[0]
+            calibrator = SA20_PHASE_CALIBRATORS[calibrator_key]
+            cal_source = 'res'  # SA20 phase calibrators use resource_win_prob
+            cal_method = 'isotonic'
+            ece_optimized_prob = calibrator.predict([[resource_prob]])[0]
             ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
+    elif is_bbl:
+        # BBL: Use per-over calibrators
+        calibrators = PER_OVER_CALIBRATORS.get('bbl')
+        calibrator_key = f'inn{inn_num}_over{current_over}'
+        if calibrators is not None and calibrator_key in calibrators:
+            cal_info = calibrators[calibrator_key]
+            cal_source = cal_info['source']
+            cal_method = cal_info.get('method', 'isotonic')
+            
+            # Get the correct input based on source
+            if cal_source == 'raw':
+                input_prob = raw_prob
+            elif cal_source == 'cal':
+                input_prob = inn_specific_prob  # Already calibrated
+            else:  # 'res'
+                input_prob = resource_prob
+            
+            # Apply calibrator based on method
+            if cal_method == 'platt':
+                # Platt scaling expects logits
+                input_clipped = np.clip(input_prob, 0.001, 0.999)
+                logit = np.log(input_clipped / (1 - input_clipped))
+                ece_optimized_prob = cal_info['calibrator'].predict_proba([[logit]])[0, 1]
+            else:
+                # Isotonic expects probabilities directly
+                ece_optimized_prob = cal_info['calibrator'].predict([[input_prob]])[0]
+            ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
+    
+    # ECE-Optimized Decision Probabilities section
+    league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else "🏏 T20")
+    st.markdown("---")
+    st.subheader(f"{league_name} Decision Probabilities")
+    method_label = "Platt" if cal_method == "platt" else "Isotonic"
+    st.caption(f"**Innings {inn_num} - Over {current_over} ({phase})** | Calibrator: {calibrator_key} | Source: {cal_source or 'N/A'} | Method: {method_label}")
     
     sa_col1, sa_col2 = st.columns(2)
     with sa_col1:
@@ -672,20 +749,23 @@ def main():
             <div style="font-size: 2.5em; font-weight: bold;">{raw_prob*100:.1f}%</div>
             <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(raw_prob)}</b></div>
             <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">Raw Model Output</div>
-            <div style="font-size: 0.75em; opacity: 0.7;">Brier: 0.04-0.13 (Best)</div>
+            <div style="font-size: 0.75em; opacity: 0.7;">Use for Expected Value</div>
         </div>
         ''', unsafe_allow_html=True)
     
     with sa_col2:
         if ece_optimized_prob is not None:
             ece_odds = prob_to_odds(ece_optimized_prob)
+            # Calculate the adjustment for display
+            adjustment = ece_optimized_prob - raw_prob
+            adj_text = f"+{adjustment*100:.0f}%" if adjustment > 0 else f"{adjustment*100:.0f}%"
             st.markdown(f'''
-            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #4CAF50, #2E7D32); border-radius: 15px; color: white; margin: 5px;">
-                <div style="font-size: 0.9em; opacity: 0.9;">✅ BEST CALIBRATION (ECE)</div>
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
+                <div style="font-size: 0.9em; opacity: 0.9;">📊 ECE-CALIBRATED (Historical)</div>
                 <div style="font-size: 2.5em; font-weight: bold;">{ece_optimized_prob*100:.1f}%</div>
                 <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
-                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">Phase-Calibrated Resource</div>
-                <div style="font-size: 0.75em; opacity: 0.7;">ECE: 0.0000 (Perfect)</div>
+                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">Historical Win Rate ({adj_text})</div>
+                <div style="font-size: 0.75em; opacity: 0.7;">Model was under-confident in similar situations</div>
             </div>
             ''', unsafe_allow_html=True)
         else:
@@ -695,7 +775,7 @@ def main():
                 <div style="font-size: 2.5em; font-weight: bold;">{resource_prob*100:.1f}%</div>
                 <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(resource_prob)}</b></div>
                 <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">DLS-based Win Prob</div>
-                <div style="font-size: 0.75em; opacity: 0.7;">Phase calibrators not loaded</div>
+                <div style="font-size: 0.75em; opacity: 0.7;">Per-over calibrators not loaded</div>
             </div>
             ''', unsafe_allow_html=True)
     
@@ -783,54 +863,12 @@ def main():
         """)
         
         st.markdown("---")
-        
-        # Calculate ECE-optimized probability using phase calibrators
-        if SA20_PHASE_CALIBRATORS is not None:
-            inn_num = 2 if is_inn2 else 1
-            phase_key = phase.lower()
-            calibrator_key = f'inn{inn_num}_{phase_key}'
-            
-            if calibrator_key in SA20_PHASE_CALIBRATORS:
-                ece_optimized_prob = SA20_PHASE_CALIBRATORS[calibrator_key].predict([[resource_prob]])[0]
-                ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
-                ece_odds = prob_to_odds(ece_optimized_prob)
-                
-                st.markdown("### 🎯 Current SA20 Probabilities")
-                sa_col1, sa_col2, sa_col3 = st.columns(3)
-                with sa_col1:
-                    st.markdown(f'''
-                    <div style="text-align: center; padding: 10px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #2196F3;">
-                        <b>🎯 Raw (Best Brier)</b><br>
-                        <span style="font-size: 1.5em; color: #2196F3;">{raw_prob*100:.1f}%</span><br>
-                        <span style="font-size: 1.1em;">Odds: <b>{prob_to_odds(raw_prob)}</b></span>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                with sa_col2:
-                    st.markdown(f'''
-                    <div style="text-align: center; padding: 10px; background: #fff3e0; border-radius: 10px; border-left: 4px solid #ff9800;">
-                        <b>📊 Resource</b><br>
-                        <span style="font-size: 1.5em; color: #ff9800;">{resource_prob*100:.1f}%</span><br>
-                        <span style="font-size: 1.1em;">Odds: <b>{prob_to_odds(resource_prob)}</b></span>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                with sa_col3:
-                    st.markdown(f'''
-                    <div style="text-align: center; padding: 10px; background: #e8f5e9; border-radius: 10px; border-left: 4px solid #4CAF50;">
-                        <b>✅ ECE-Optimized</b><br>
-                        <span style="font-size: 1.5em; color: #4CAF50;">{ece_optimized_prob*100:.1f}%</span><br>
-                        <span style="font-size: 1.1em;">Odds: <b>{ece_odds}</b></span><br>
-                        <span style="font-size: 0.8em; color: #666;">Inn{inn_num} {phase} Cal</span>
-                    </div>
-                    ''', unsafe_allow_html=True)
-                
-                st.markdown("<br>", unsafe_allow_html=True)
-        
         st.markdown("### 🎯 SA20 Recommendation")
         
         st.success("""
         **For Best Accuracy (Brier):** Use Raw Model Probability - wins ALL phases
         
-        **For Best Calibration (ECE):** Use ECE-Optimized (phase-calibrated resource prob) - perfect ECE
+        **For Best Calibration (ECE):** Use Per-Over Calibrators (shown above) - perfect ECE (0.0000)
         
         ⚠️ Trade-off: ECE-Optimized has worse Brier but perfectly calibrated probabilities.
         """)
@@ -839,7 +877,7 @@ def main():
         st.markdown("### 📖 Key Insights")
         st.markdown("""
         - **Raw Model:** Dominates for accuracy (Brier) in every phase - use this for predictions
-        - **ECE-Optimized:** Phase-specific calibrators on resource_win_prob → perfect ECE (0.0000)
+        - **Per-Over ECE-Optimized:** 40 calibrators (20 overs × 2 innings) → perfect ECE (0.0000)
         - **Trade-off:** You can't have both - ECE optimization hurts Brier
         - **SA20 vs BBL:** SA20 raw model is excellent; BBL needs calibration for Innings 2
         """)

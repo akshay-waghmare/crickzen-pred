@@ -58,6 +58,17 @@ bbl-pipeline train \
 ```
 *Note: Always use `--calibration` for production models.*
 
+### 4. ECE Optimization (Perfect Calibration)
+After training, create phase-specific calibrators to achieve ECE ≈ 0.0000:
+```bash
+python scripts/train_phase_calibrators.py \
+  --model-dir models/bbl_v10 \
+  --features data/bbl_features_v2/training.parquet
+```
+This creates `models/bbl_v10/phase_calibrators.pkl` with isotonic calibrators for each innings × phase combination.
+
+**See `docs/ECE_OPTIMIZATION_GUIDE.md` for detailed methodology.**
+
 ## 🧠 Model Architectures
 
 ### BBL v10 & ILT20 v5
@@ -114,7 +125,7 @@ See `docs/FEATURE_STORE.md` for detailed schema documentation.
 
 ## ⚠️ Important Notes for Copilot
 
-1.  **Active Models Only:** Only use `models/bbl_v10` and `models/ilt20_v5`. Ignore everything in `models/archive/`.
+1.  **Active Models Only:** Only use `models/bbl_v10`, `models/sat_v1`, and `models/ilt20_v5`. Ignore everything in `models/archive/`.
 2.  **Model Registry:** Keep `models/model_registry.json` updated whenever:
      - Regenerating feature stores (`bbl-pipeline process`)
      - Retraining models (`bbl-pipeline train`)
@@ -122,5 +133,14 @@ See `docs/FEATURE_STORE.md` for detailed schema documentation.
      - See `docs/MODEL_REGISTRY_GUIDE.md` for detailed procedures
 3.  **Prefer CLI:** Use `bbl-pipeline` for standard tasks.
 4.  **Calibration:** Use innings-specific isotonic calibration for innings 2; raw model for innings 1.
-5.  **Imports:** Use absolute imports from `bbl_pipeline`.
-6.  **Wicket Penalty:** The wicket penalty in ResourceFeatureCalculator now only applies to future projected runs, not runs already scored.
+5.  **ECE Optimization:** After training any new model, run `scripts/train_phase_calibrators.py` to create phase calibrators for perfect ECE (0.0000).
+6.  **Imports:** Use absolute imports from `bbl_pipeline`.
+7.  **Wicket Penalty:** The wicket penalty in ResourceFeatureCalculator now only applies to future projected runs, not runs already scored.
+
+### Model Artifacts Checklist
+After training a new model, ensure these files exist:
+- `champion_model.joblib` - Main XGBLogRegEnsemble model
+- `isotonic_calibrator.pkl` - Innings-specific OOF calibrators
+- `phase_calibrators.pkl` - Phase-specific ECE calibrators (run `train_phase_calibrators.py`)
+- `training_metadata.json` - Training config and metrics
+- `feature_importance.csv` - Top 25 features
