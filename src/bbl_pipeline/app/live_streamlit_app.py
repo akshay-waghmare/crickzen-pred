@@ -139,13 +139,17 @@ def load_phase_calibrators():
 
 @st.cache_resource
 def load_brier_calibrators():
-    """Load Brier-optimized calibrators for SSM.
+    """Load Brier-optimized calibrators for SSM and BBL.
     These select best source per over for accuracy (Brier score)."""
     calibrators = {}
     try:
         calibrators['ssm'] = joblib.load('models/ssm_v1/brier_calibrators.pkl')
     except:
         calibrators['ssm'] = None
+    try:
+        calibrators['bbl'] = joblib.load('models/bbl_v10/per_over_calibrators_brier.pkl')
+    except:
+        calibrators['bbl'] = None
     return calibrators
 
 PER_OVER_CALIBRATORS = load_per_over_calibrators()
@@ -750,6 +754,10 @@ def main():
     ssm_brier_prob = None
     ssm_brier_source = None
     
+    # BBL Brier-optimized calibrator variables
+    bbl_brier_prob = None
+    bbl_brier_source = None
+    
     if is_sa20:
         # SA20: Per-over calibrators for BRIER (0.0399), Phase calibrators for ECE (0.0047)
         
@@ -852,6 +860,27 @@ def main():
                     # Apply Brier calibrator (always isotonic)
                     ssm_brier_prob = brier_cal_info['calibrator'].predict([[brier_input]])[0]
                     ssm_brier_prob = np.clip(ssm_brier_prob, 0.01, 0.99)
+        
+        # BBL: Apply Brier-optimized calibrators (separate from ECE calibrators)
+        if is_bbl:
+            brier_cals = BRIER_CALIBRATORS.get('bbl')
+            if brier_cals is not None:
+                brier_cal_key = calibrator_key  # e.g., inn1_over14
+                if brier_cal_key in brier_cals:
+                    brier_cal_info = brier_cals[brier_cal_key]
+                    bbl_brier_source = brier_cal_info['source']
+                    
+                    # Get input based on Brier-optimal source
+                    if bbl_brier_source == 'raw':
+                        brier_input = raw_prob
+                    elif bbl_brier_source == 'cal':
+                        brier_input = inn_specific_prob if inn_specific_prob is not None else raw_prob
+                    else:  # 'res'
+                        brier_input = resource_prob
+                    
+                    # Apply Brier calibrator (always isotonic)
+                    bbl_brier_prob = brier_cal_info['calibrator'].predict([[brier_input]])[0]
+                    bbl_brier_prob = np.clip(bbl_brier_prob, 0.01, 0.99)
     
     # ECE-Optimized Decision Probabilities section
     league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else "🏏 T20"))
@@ -869,7 +898,7 @@ def main():
     with sa_col1:
         # SA20: Use raw model output for display (calibrators output 1.0 at high probs)
         # SSM: Use Brier-optimized calibrator (best accuracy)
-        # BBL: Use raw model
+        # BBL: Use Brier-optimized per-over calibrated (wins 39/40 overs for Brier & LL)
         if is_sa20:
             brier_prob = raw_prob
             brier_label = "Raw Model Output"
@@ -878,6 +907,17 @@ def main():
             brier_prob = ssm_brier_prob
             brier_label = f"Brier-Optimized ({ssm_brier_source})"
             brier_desc = "Brier=0.0867, ECE=0.000"
+        elif is_bbl and bbl_brier_prob is not None:
+            # BBL: Brier-optimized per-over calibrated wins Brier & Log Loss for 39/40 overs
+            # Exception: Over 4 Inn 1 (use raw instead)
+            if inn_num == 1 and current_over == 4:
+                brier_prob = raw_prob
+                brier_label = "Raw Model Output"
+                brier_desc = "Over 4 exception (cal issue)"
+            else:
+                brier_prob = bbl_brier_prob
+                brier_label = f"Brier-Optimized (Per-Over)"
+                brier_desc = f"Wins 39/40 overs for Brier & LL"
         else:
             brier_prob = raw_prob
             brier_label = "Raw Model Output"
@@ -948,100 +988,98 @@ def main():
     with st.expander("📊 BBL Calibration Guidance - Which Probability to Trust?"):
         st.markdown("### BBL v10 Model Performance Analysis (141K+ samples)")
         st.markdown("""
-        **Detailed ECE & Brier by Over (based on ~3,500 samples per over):**
+        **Detailed Brier, ECE & Log Loss by Over (based on ~3,500 samples per over):**
         
-        #### Innings 1 - Raw Model wins ECE & Brier for almost ALL overs
-        | Over | ECE_Raw | ECE_Cal | ECE_Res | Brier_Raw | Brier_Cal | Brier_Res | Best ECE | Best Brier |
-        |------|---------|---------|---------|-----------|-----------|-----------|----------|------------|
-        | 1 | **0.0904** | 0.0910 | 0.1114 | **0.2155** | 0.2159 | 0.2617 | Raw | Raw |
-        | 2 | **0.1040** | 0.1060 | 0.1099 | **0.2106** | 0.2117 | 0.2596 | Raw | Raw |
-        | 3 | 0.1074 | **0.1023** | 0.1038 | **0.2002** | 0.2026 | 0.2535 | Cal | Raw |
-        | 4 | 0.0964 | 0.1016 | **0.0958** | **0.1920** | 0.1953 | 0.2457 | Res | Raw |
-        | 5 | **0.0745** | 0.1001 | 0.1051 | **0.1884** | 0.1916 | 0.2395 | Raw | Raw |
-        | 6 | **0.0696** | 0.0839 | 0.0913 | **0.1886** | 0.1923 | 0.2345 | Raw | Raw |
-        | 7 | **0.0597** | 0.0750 | 0.0953 | **0.1845** | 0.1895 | 0.2309 | Raw | Raw |
-        | 8 | **0.0525** | 0.0739 | 0.0899 | **0.1806** | 0.1871 | 0.2269 | Raw | Raw |
-        | 9 | **0.0504** | 0.0805 | 0.0835 | **0.1764** | 0.1839 | 0.2227 | Raw | Raw |
-        | 10 | **0.0521** | 0.0725 | 0.0801 | **0.1739** | 0.1805 | 0.2189 | Raw | Raw |
-        | 11 | **0.0465** | 0.0768 | 0.0795 | **0.1711** | 0.1775 | 0.2171 | Raw | Raw |
-        | 12 | **0.0538** | 0.0825 | 0.0908 | **0.1668** | 0.1734 | 0.2159 | Raw | Raw |
-        | 13 | **0.0591** | 0.0850 | 0.0966 | **0.1617** | 0.1684 | 0.2117 | Raw | Raw |
-        | 14 | **0.0577** | 0.0848 | 0.1037 | **0.1616** | 0.1681 | 0.2119 | Raw | Raw |
-        | 15 | **0.0544** | 0.0827 | 0.1045 | **0.1613** | 0.1676 | 0.2137 | Raw | Raw |
-        | 16 | **0.0566** | 0.0841 | 0.1128 | **0.1601** | 0.1671 | 0.2125 | Raw | Raw |
-        | 17 | **0.0521** | 0.0850 | 0.1102 | **0.1618** | 0.1686 | 0.2127 | Raw | Raw |
-        | 18 | **0.0591** | 0.0917 | 0.1176 | **0.1641** | 0.1712 | 0.2127 | Raw | Raw |
-        | 19 | **0.0602** | 0.0981 | 0.1021 | **0.1636** | 0.1713 | 0.2095 | Raw | Raw |
-        | 20 | **0.0772** | 0.1147 | 0.0888 | **0.1650** | 0.1741 | 0.2068 | Raw | Raw |
+        #### Innings 1 - Brier-Optimized (Per-Over Cal) wins Log Loss for 19/20 overs
+        | Over | Brier_Raw | Brier_ECE | Brier_Opt | LL_Raw | LL_ECE | LL_Brier | Best Brier | Best LL |
+        |------|-----------|-----------|-----------|--------|--------|----------|------------|---------|
+        | 1 | 0.2115 | 0.2124 | **0.1990** | 0.6127 | 0.6155 | **0.5867** | Brier-Opt | Brier-Opt |
+        | 2 | 0.2019 | 0.2040 | **0.1884** | 0.5916 | 0.5972 | **0.5589** | Brier-Opt | Brier-Opt |
+        | 3 | 0.1928 | 0.1961 | **0.1827** | 0.5711 | 0.5800 | **0.5439** | Brier-Opt | Brier-Opt |
+        | 4 | **0.1889** | 0.1920 | 0.2320 | **0.5617** | 0.5705 | 0.8722 | Raw | Raw |
+        | 5 | 0.1886 | 0.1924 | **0.1836** | 0.5593 | 0.5699 | **0.5437** | Brier-Opt | Brier-Opt |
+        | 6 | 0.1853 | 0.1900 | **0.1804** | 0.5508 | 0.5642 | **0.5334** | Brier-Opt | Brier-Opt |
+        | 7 | 0.1814 | 0.1876 | **0.1749** | 0.5409 | 0.5586 | **0.5142** | Brier-Opt | Brier-Opt |
+        | 8 | 0.1768 | 0.1844 | **0.1710** | 0.5292 | 0.5507 | **0.5048** | Brier-Opt | Brier-Opt |
+        | 9 | 0.1745 | 0.1811 | **0.1706** | 0.5228 | 0.5421 | **0.5022** | Brier-Opt | Brier-Opt |
+        | 10 | 0.1714 | 0.1779 | **0.1691** | 0.5157 | 0.5344 | **0.5058** | Brier-Opt | Brier-Opt |
+        | 11 | 0.1678 | 0.1743 | **0.1637** | 0.5065 | 0.5257 | **0.4866** | Brier-Opt | Brier-Opt |
+        | 12 | 0.1623 | 0.1690 | **0.1563** | 0.4932 | 0.5129 | **0.4668** | Brier-Opt | Brier-Opt |
+        | 13 | 0.1614 | 0.1680 | **0.1554** | 0.4896 | 0.5099 | **0.4613** | Brier-Opt | Brier-Opt |
+        | 14 | 0.1613 | 0.1677 | **0.1568** | 0.4901 | 0.5092 | **0.4705** | Brier-Opt | Brier-Opt |
+        | 15 | 0.1605 | 0.1673 | **0.1569** | 0.4882 | 0.5087 | **0.4715** | Brier-Opt | Brier-Opt |
+        | 16 | 0.1612 | 0.1681 | **0.1580** | 0.4897 | 0.5108 | **0.4712** | Brier-Opt | Brier-Opt |
+        | 17 | 0.1635 | 0.1704 | **0.1584** | 0.4960 | 0.5167 | **0.4755** | Brier-Opt | Brier-Opt |
+        | 18 | 0.1642 | 0.1718 | **0.1585** | 0.4980 | 0.5207 | **0.4735** | Brier-Opt | Brier-Opt |
+        | 19 | 0.1648 | 0.1734 | **0.1568** | 0.5006 | 0.5258 | **0.4726** | Brier-Opt | Brier-Opt |
+        | 20 | 0.1648 | 0.1755 | **0.1523** | 0.5011 | 0.5313 | **0.4613** | Brier-Opt | Brier-Opt |
         
-        #### Innings 2 - Inn-Specific Calibrated wins ECE for 19/20 overs
-        | Over | ECE_Raw | ECE_Cal | ECE_Res | Brier_Raw | Brier_Cal | Brier_Res | Best ECE | Best Brier |
-        |------|---------|---------|---------|-----------|-----------|-----------|----------|------------|
-        | 1 | 0.0633 | **0.0513** | 0.1641 | 0.1705 | **0.1690** | 0.2248 | Cal | Cal |
-        | 2 | 0.0570 | **0.0516** | 0.1562 | 0.1655 | **0.1649** | 0.2183 | Cal | Cal |
-        | 3 | 0.0561 | **0.0537** | 0.1496 | 0.1607 | **0.1601** | 0.2132 | Cal | Cal |
-        | 4 | 0.0652 | **0.0512** | 0.1409 | 0.1495 | **0.1486** | 0.2051 | Cal | Cal |
-        | 5 | 0.0656 | **0.0604** | 0.1339 | 0.1409 | **0.1400** | 0.1950 | Cal | Cal |
-        | 6 | 0.0832 | **0.0765** | 0.1194 | 0.1299 | **0.1289** | 0.1817 | Cal | Cal |
-        | 7 | 0.0700 | **0.0619** | 0.1018 | 0.1216 | **0.1210** | 0.1688 | Cal | Cal |
-        | 8 | 0.0654 | **0.0532** | 0.0812 | 0.1165 | **0.1155** | 0.1592 | Cal | Cal |
-        | 9 | 0.0608 | **0.0549** | 0.0632 | 0.1087 | **0.1080** | 0.1454 | Cal | Cal |
-        | 10 | 0.0473 | **0.0401** | 0.0561 | 0.1063 | **0.1061** | 0.1383 | Cal | Cal |
-        | 11 | 0.0467 | **0.0384** | 0.0492 | 0.1010 | **0.1003** | 0.1321 | Cal | Cal |
-        | 12 | 0.0494 | **0.0409** | 0.0494 | 0.0962 | **0.0955** | 0.1273 | Cal | Cal |
-        | 13 | 0.0465 | **0.0453** | 0.0644 | **0.0920** | 0.0921 | 0.1268 | Cal | Raw |
-        | 14 | 0.0462 | **0.0401** | 0.0785 | 0.0858 | **0.0850** | 0.1212 | Cal | Cal |
-        | 15 | 0.0527 | **0.0492** | 0.1035 | 0.0774 | **0.0767** | 0.1194 | Cal | Cal |
-        | 16 | 0.0575 | **0.0541** | 0.1253 | **0.0710** | 0.0711 | 0.1183 | Cal | Raw |
-        | 17 | 0.0709 | **0.0653** | 0.1461 | **0.0685** | 0.0691 | 0.1284 | Cal | Raw |
-        | 18 | 0.0730 | **0.0721** | 0.1632 | **0.0608** | 0.0614 | 0.1324 | Cal | Raw |
-        | 19 | **0.0685** | 0.0687 | 0.1535 | **0.0542** | 0.0548 | 0.1181 | Raw | Raw |
-        | 20 | 0.0416 | **0.0355** | 0.0982 | **0.0476** | 0.0477 | 0.0797 | Cal | Raw |
+        #### Innings 2 - Brier-Optimized wins Log Loss for ALL 20 overs
+        | Over | Brier_Raw | Brier_ECE | Brier_Opt | LL_Raw | LL_ECE | LL_Brier | Best Brier | Best LL |
+        |------|-----------|-----------|-----------|--------|--------|----------|------------|---------|
+        | 1 | 0.1663 | 0.1654 | **0.1631** | 0.5016 | 0.4992 | **0.4861** | Brier-Opt | Brier-Opt |
+        | 2 | 0.1615 | 0.1611 | **0.1590** | 0.4888 | 0.4882 | **0.4745** | Brier-Opt | Brier-Opt |
+        | 3 | 0.1514 | 0.1504 | **0.1492** | 0.4639 | 0.4622 | **0.4530** | Brier-Opt | Brier-Opt |
+        | 4 | 0.1425 | 0.1417 | **0.1396** | 0.4420 | 0.4405 | **0.4303** | Brier-Opt | Brier-Opt |
+        | 5 | 0.1317 | 0.1307 | **0.1256** | 0.4137 | 0.4110 | **0.3891** | Brier-Opt | Brier-Opt |
+        | 6 | 0.1226 | 0.1220 | **0.1165** | 0.3881 | 0.3869 | **0.3582** | Brier-Opt | Brier-Opt |
+        | 7 | 0.1173 | 0.1164 | **0.1132** | 0.3729 | 0.3703 | **0.3533** | Brier-Opt | Brier-Opt |
+        | 8 | 0.1097 | 0.1090 | **0.1060** | 0.3532 | 0.3506 | **0.3382** | Brier-Opt | Brier-Opt |
+        | 9 | 0.1068 | 0.1065 | **0.1045** | 0.3435 | 0.3421 | **0.3298** | Brier-Opt | Brier-Opt |
+        | 10 | 0.1017 | 0.1010 | **0.0998** | 0.3279 | 0.3253 | **0.3134** | Brier-Opt | Brier-Opt |
+        | 11 | 0.0967 | 0.0959 | **0.0944** | 0.3139 | 0.3110 | **0.3028** | Brier-Opt | Brier-Opt |
+        | 12 | 0.0930 | 0.0931 | **0.0925** | 0.3023 | 0.3016 | **0.2904** | Brier-Opt | Brier-Opt |
+        | 13 | 0.0869 | 0.0861 | **0.0852** | 0.2860 | 0.2834 | **0.2722** | Brier-Opt | Brier-Opt |
+        | 14 | 0.0789 | 0.0783 | **0.0754** | 0.2617 | 0.2602 | **0.2405** | Brier-Opt | Brier-Opt |
+        | 15 | 0.0715 | 0.0714 | **0.0677** | 0.2410 | 0.2410 | **0.2204** | Brier-Opt | Brier-Opt |
+        | 16 | 0.0688 | 0.0694 | **0.0617** | 0.2306 | 0.2318 | **0.2039** | Brier-Opt | Brier-Opt |
+        | 17 | 0.0625 | 0.0631 | **0.0531** | 0.2128 | 0.2144 | **0.1765** | Brier-Opt | Brier-Opt |
+        | 18 | 0.0556 | 0.0562 | **0.0467** | 0.1912 | 0.1925 | **0.1551** | Brier-Opt | Brier-Opt |
+        | 19 | 0.0463 | 0.0467 | **0.0385** | 0.1564 | 0.1580 | **0.1241** | Brier-Opt | Brier-Opt |
+        | 20 | 0.0589 | **0.0577** | 0.0594 | 0.2571 | 0.2554 | **0.2482** | ECE-Opt | Brier-Opt |
         
-        *Lower is better for both Brier and ECE*
+        *Lower is better for Brier & Log Loss. Brier-Opt = Per-Over Calibrated, ECE-Opt = Inn-Specific Calibrated*
         """)
         
         st.markdown("---")
         st.markdown("### 🎯 Current Recommendation")
         
         if not is_inn2:
-            st.success(f"""
-            **Innings 1 - Over {current_over} ({phase})**
-            
-            ✅ **Use: Raw Model Probability ({raw_prob*100:.1f}%)**
-            
-            Raw model wins ECE for 18/20 overs in Innings 1. Only exceptions: Over 3 (Cal), Over 4 (Res).
-            Raw model wins Brier for ALL 20 overs in Innings 1.
-            """)
-        else:
-            if phase == "Death" and current_over == 19:
-                st.info(f"""
-                **Innings 2 - Over {current_over} ({phase})**
+            if current_over == 4:
+                st.warning(f"""
+                **Innings 1 - Over {current_over} ({phase})**
                 
-                📊 **For Best Accuracy (Brier):** Raw Model ({raw_prob*100:.1f}%)
+                ⚠️ **Use: Raw Model Probability ({raw_prob*100:.1f}%)**
                 
-                🎯 **For Best Calibration (ECE):** Raw Model ({raw_prob*100:.1f}%)
-                
-                Over 19 is the ONLY over in Innings 2 where Raw wins ECE.
+                Over 4 is the ONLY over in Innings 1 where Raw beats Brier-Opt.
+                Brier-Opt has calibration issues for this specific over.
                 """)
             else:
-                # Cal wins ECE for most of Innings 2 (overs 1-18, 20)
                 st.success(f"""
-                **Innings 2 - Over {current_over} ({phase})**
+                **Innings 1 - Over {current_over} ({phase})**
                 
-                ✅ **Use: Inn-Specific Calibrated ({inn_specific_prob*100:.1f}%)**
+                ✅ **For Best Accuracy (Brier & Log Loss):** Brier-Optimized (Per-Over Cal)
                 
-                Inn-Specific Cal wins ECE for 19/20 overs in Innings 2.
-                Inn-Specific Cal wins Brier for overs 1-12, 14-15.
+                Brier-Opt wins BOTH Brier and Log Loss for 19/20 overs in Innings 1.
+                Only exception: Over 4 (Raw wins due to calibration issue).
                 """)
+        else:
+            st.success(f"""
+            **Innings 2 - Over {current_over} ({phase})**
+            
+            ✅ **For Best Accuracy (Brier & Log Loss):** Brier-Optimized (Per-Over Cal)
+            
+            Brier-Opt wins Log Loss for ALL 20 overs in Innings 2.
+            Brier-Opt wins Brier for 19/20 overs (ECE-Opt wins only Over 20).
+            """)
         
         st.markdown("---")
         st.markdown("### 📖 Key Insights")
         st.markdown("""
-        - **Innings 1:** Raw model dominates ECE (18/20 overs) & Brier (ALL overs)
-        - **Innings 2:** Inn-Specific Cal dominates ECE (19/20 overs), mixed for Brier
-        - **Resource Win Prob:** Never best for ECE in Innings 2 (unlike SSM)
-        - **Only exception:** Inn 2 Over 19 - Raw wins both ECE and Brier
+        - **Brier-Optimized (Per-Over Cal):** Wins Log Loss for 39/40 overs overall!
+        - **Innings 1:** Brier-Opt wins 19/20 overs (except Over 4 - calibration issue)
+        - **Innings 2:** Brier-Opt wins ALL 20 overs for Log Loss
+        - **ECE-Optimized:** Good for calibration, but worse for accuracy
         - **Main Odds Display uses:** Inn-Specific Calibrated probability
         """)
     
