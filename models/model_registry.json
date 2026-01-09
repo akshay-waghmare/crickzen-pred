@@ -272,6 +272,77 @@
           "impact": "6.3% Brier improvement with calibration (0.1917 -> 0.1798); calibration helps in BOTH innings unlike BBL"
         }
       }
+    },
+    "SSM": {
+      "path": "models/ssm_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Isotonic Calibration (Brier: 0.1062, ECE: 0.0343)",
+      "calibrator": {
+        "path": "models/ssm_v1/per_over_calibrators.pkl",
+        "type": "per_over_isotonic",
+        "generated_date": "2026-01-04T09:48:58",
+        "oof_metrics": {
+          "brier_raw": 0.1088,
+          "brier_per_over_cal": 0.1062,
+          "ece_raw": 0.1050,
+          "ece_per_over_cal": 0.0343,
+          "logloss_raw": 0.3558,
+          "logloss_per_over_cal": 0.3378
+        },
+        "innings_specific": {
+          "innings1": {
+            "samples": 28916,
+            "brier_raw": 0.1363,
+            "brier_per_over_cal": 0.1385,
+            "ece_raw": 0.1384,
+            "ece_per_over_cal": 0.0499
+          },
+          "innings2": {
+            "samples": 26554,
+            "brier_raw": 0.0789,
+            "brier_per_over_cal": 0.0710,
+            "ece_raw": 0.0686,
+            "ece_per_over_cal": 0.0237
+          }
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8",
+        "notes": "Per-Over calibration is superior to Inn-Specific for SSM. Inn-Cal HURTS performance (Brier 0.1257 > 0.1088)"
+      },
+      "feature_store": {
+        "path": "data/ssm_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-01-04",
+        "training_data_matches": 263,
+        "statistics": {
+          "teams": 6,
+          "players": 350,
+          "venues": 10,
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
+        },
+        "recent_changes": {
+          "date": "2026-01-09",
+          "description": "SSM v1 trained on 263 Super Smash matches with Per-Over calibration",
+          "impact": "Per-Over Cal reduces ECE from 0.1050 to 0.0343 (67% improvement); Inn-Cal should NOT be used"
+        }
+      }
     }
   },
   "archived_models": {

@@ -116,20 +116,41 @@ def load_per_over_calibrators():
         calibrators['ssm'] = joblib.load('models/ssm_v1/per_over_calibrators.pkl')
     except:
         calibrators['ssm'] = None
-    # SA20 uses phase calibrators (8 phases) - more reliable with smaller dataset
-    calibrators['sa20'] = None  # per-over disabled
+    # SA20: per-over calibrators give best Brier (0.0399), phase calibrators give best ECE (0.0047)
+    try:
+        calibrators['sa20'] = joblib.load('models/sat_v1/per_over_calibrators.pkl')
+    except:
+        calibrators['sa20'] = None
     return calibrators
 
 @st.cache_resource
 def load_phase_calibrators():
-    """Load phase calibrators for SA20 (8 phases: powerplay, middle_early, middle_late, death)."""
+    """Load Platt phase calibrators for SA20 (8 phases: powerplay, middle_early, middle_late, death).
+    Platt scaling gives smooth probabilities instead of isotonic step functions."""
     try:
-        return joblib.load('models/sat_v1/phase_calibrators.pkl')
+        # Prefer Platt scaling phase calibrators for smooth output
+        return joblib.load('models/sat_v1/phase_calibrators_platt.pkl')
     except:
-        return None
+        try:
+            # Fallback to isotonic if Platt not available
+            return joblib.load('models/sat_v1/phase_calibrators.pkl')
+        except:
+            return None
+
+@st.cache_resource
+def load_brier_calibrators():
+    """Load Brier-optimized calibrators for SSM.
+    These select best source per over for accuracy (Brier score)."""
+    calibrators = {}
+    try:
+        calibrators['ssm'] = joblib.load('models/ssm_v1/brier_calibrators.pkl')
+    except:
+        calibrators['ssm'] = None
+    return calibrators
 
 PER_OVER_CALIBRATORS = load_per_over_calibrators()
 SA20_PHASE_CALIBRATORS = load_phase_calibrators()
+BRIER_CALIBRATORS = load_brier_calibrators()
 
 def get_color(team): return TEAM_COLORS.get(team, "#607d8b")
 def get_name(team): return TEAM_NAMES.get(team, team)
@@ -713,23 +734,71 @@ def main():
     is_sa20 = batting_team in sa20_teams
     is_ssm = batting_team in ssm_teams
     
-    # Calculate ECE-optimized probability
+    # Calculate ECE-optimized probability (for calibration display)
     ece_optimized_prob = None
     cal_source = None
     cal_method = None
     calibrator_key = None
     
-    if is_sa20 and SA20_PHASE_CALIBRATORS is not None:
-        # SA20: Use phase calibrators (8 phases)
-        calibrator_key = f'inn{inn_num}_{phase_key}'
-        if calibrator_key in SA20_PHASE_CALIBRATORS:
-            calibrator = SA20_PHASE_CALIBRATORS[calibrator_key]
-            cal_source = 'res'  # SA20 phase calibrators use resource_win_prob
-            cal_method = 'isotonic'
-            ece_optimized_prob = calibrator.predict([[resource_prob]])[0]
-            ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
+    # Also calculate Brier-optimized probability for SA20 (per-over calibrators)
+    brier_optimized_prob = None
+    brier_cal_source = None
+    brier_calibrator_key = None
+    brier_cal_method = None
+    
+    # SSM Brier-optimized calibrator variables (initialized here for scope)
+    ssm_brier_prob = None
+    ssm_brier_source = None
+    
+    if is_sa20:
+        # SA20: Per-over calibrators for BRIER (0.0399), Phase calibrators for ECE (0.0047)
+        
+        # 1. Per-over calibrators for best Brier
+        sa20_per_over_cals = PER_OVER_CALIBRATORS.get('sa20')
+        brier_calibrator_key = f'inn{inn_num}_over{current_over}'
+        if sa20_per_over_cals is not None and brier_calibrator_key in sa20_per_over_cals:
+            cal_info = sa20_per_over_cals[brier_calibrator_key]
+            brier_cal_source = cal_info.get('source', 'raw')
+            brier_cal_method = cal_info.get('method', 'isotonic')
+            if brier_cal_source == 'raw':
+                input_prob = raw_prob
+            elif brier_cal_source == 'cal':
+                input_prob = inn_specific_prob
+            else:
+                input_prob = resource_prob
+            
+            # Apply calibrator based on method
+            if brier_cal_method == 'platt':
+                # Platt scaling expects logits
+                input_clipped = np.clip(input_prob, 0.001, 0.999)
+                logit = np.log(input_clipped / (1 - input_clipped))
+                brier_optimized_prob = cal_info['calibrator'].predict_proba([[logit]])[0, 1]
+            else:
+                # Isotonic expects probabilities directly
+                brier_optimized_prob = cal_info['calibrator'].predict([[input_prob]])[0]
+            brier_optimized_prob = np.clip(brier_optimized_prob, 0.01, 0.99)
+        
+        # 2. Phase calibrators for best ECE (Platt scaling for smooth output)
+        if SA20_PHASE_CALIBRATORS is not None:
+            calibrator_key = f'inn{inn_num}_{phase_key}'
+            if calibrator_key in SA20_PHASE_CALIBRATORS:
+                phase_cal_info = SA20_PHASE_CALIBRATORS[calibrator_key]
+                cal_source = 'raw'  # SA20 phase calibrators use raw_win_prob
+                
+                # Check if it's Platt (dict with calibrator) or isotonic (direct calibrator)
+                if isinstance(phase_cal_info, dict) and 'calibrator' in phase_cal_info:
+                    # Platt scaling
+                    cal_method = 'platt'
+                    input_clipped = np.clip(raw_prob, 0.001, 0.999)
+                    logit = np.log(input_clipped / (1 - input_clipped))
+                    ece_optimized_prob = phase_cal_info['calibrator'].predict_proba([[logit]])[0, 1]
+                else:
+                    # Isotonic (legacy)
+                    cal_method = 'isotonic'
+                    ece_optimized_prob = phase_cal_info.predict([[raw_prob]])[0]
+                ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
     elif is_bbl or is_ssm:
-        # BBL or SSM: Use per-over calibrators
+        # BBL or SSM: Use per-over calibrators for ECE
         league_key = 'bbl' if is_bbl else 'ssm'
         calibrators = PER_OVER_CALIBRATORS.get(league_key)
         calibrator_key = f'inn{inn_num}_over{current_over}'
@@ -756,39 +825,111 @@ def main():
                 # Isotonic expects probabilities directly
                 ece_optimized_prob = cal_info['calibrator'].predict([[input_prob]])[0]
             ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
+        
+        # SSM: Also apply Brier-optimized calibrators
+        if is_ssm:
+            brier_cals = BRIER_CALIBRATORS.get('ssm')
+            if brier_cals is not None:
+                # Build the key - calibrators start at over 2, so fallback to over 2 for early overs
+                brier_cal_key = calibrator_key  # e.g., inn2_over1
+                if brier_cal_key not in brier_cals:
+                    # Fallback to over 2 for overs 0 or 1
+                    brier_cal_key = f'inn{inn_num}_over2'
+                
+                if brier_cal_key in brier_cals:
+                    brier_cal_info = brier_cals[brier_cal_key]
+                    ssm_brier_source = brier_cal_info['source']
+                    
+                    # Get input based on Brier-optimal source
+                    if ssm_brier_source == 'raw':
+                        brier_input = raw_prob
+                    elif ssm_brier_source == 'per':
+                        # Use the ECE-optimized prob as input
+                        brier_input = ece_optimized_prob if ece_optimized_prob is not None else raw_prob
+                    else:
+                        brier_input = resource_prob
+                    
+                    # Apply Brier calibrator (always isotonic)
+                    ssm_brier_prob = brier_cal_info['calibrator'].predict([[brier_input]])[0]
+                    ssm_brier_prob = np.clip(ssm_brier_prob, 0.01, 0.99)
     
     # ECE-Optimized Decision Probabilities section
     league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else "🏏 T20"))
     st.markdown("---")
     st.subheader(f"{league_name} Decision Probabilities")
     method_label = "Platt" if cal_method == "platt" else "Isotonic"
-    st.caption(f"**Innings {inn_num} - Over {current_over} ({phase})** | Calibrator: {calibrator_key} | Source: {cal_source or 'N/A'} | Method: {method_label}")
+    
+    # For SA20, show per-over calibrator info for Brier column
+    if is_sa20 and brier_optimized_prob is not None:
+        st.caption(f"**Innings {inn_num} - Over {current_over} ({phase})** | Brier Cal: {brier_calibrator_key} | ECE Cal: {calibrator_key}")
+    else:
+        st.caption(f"**Innings {inn_num} - Over {current_over} ({phase})** | Calibrator: {calibrator_key} | Source: {cal_source or 'N/A'} | Method: {method_label}")
     
     sa_col1, sa_col2 = st.columns(2)
     with sa_col1:
+        # SA20: Use raw model output for display (calibrators output 1.0 at high probs)
+        # SSM: Use Brier-optimized calibrator (best accuracy)
+        # BBL: Use raw model
+        if is_sa20:
+            brier_prob = raw_prob
+            brier_label = "Raw Model Output"
+            brier_desc = "Brier=0.0773 (Well-calibrated)"
+        elif is_ssm and ssm_brier_prob is not None:
+            brier_prob = ssm_brier_prob
+            brier_label = f"Brier-Optimized ({ssm_brier_source})"
+            brier_desc = "Brier=0.0867, ECE=0.000"
+        else:
+            brier_prob = raw_prob
+            brier_label = "Raw Model Output"
+            brier_desc = "Use for Expected Value"
+        
         st.markdown(f'''
         <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #2196F3, #1565C0); border-radius: 15px; color: white; margin: 5px;">
             <div style="font-size: 0.9em; opacity: 0.9;">🎯 BEST ACCURACY (Brier)</div>
-            <div style="font-size: 2.5em; font-weight: bold;">{raw_prob*100:.1f}%</div>
-            <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(raw_prob)}</b></div>
-            <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">Raw Model Output</div>
-            <div style="font-size: 0.75em; opacity: 0.7;">Use for Expected Value</div>
+            <div style="font-size: 2.5em; font-weight: bold;">{brier_prob*100:.1f}%</div>
+            <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(brier_prob)}</b></div>
+            <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{brier_label}</div>
+            <div style="font-size: 0.75em; opacity: 0.7;">{brier_desc}</div>
         </div>
         ''', unsafe_allow_html=True)
     
     with sa_col2:
-        if ece_optimized_prob is not None:
+        # For SA20: Show Platt phase calibrated prob (smooth output)
+        # For others: Show per-over ECE calibrated
+        if is_sa20:
+            # Use Platt phase calibration for SA20 (smooth output, not step function)
+            if ece_optimized_prob is not None:
+                ece_prob = ece_optimized_prob
+                ece_label = f"Phase Platt ({calibrator_key})"
+                ece_desc = "Smooth calibration by phase"
+            else:
+                ece_prob = inn_specific_prob if inn_specific_prob is not None else raw_prob
+                ece_label = "Inn-Specific Calibrated"
+                ece_desc = "Fallback: innings context"
+            ece_odds = prob_to_odds(ece_prob)
+            st.markdown(f'''
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
+                <div style="font-size: 0.9em; opacity: 0.9;">📊 PHASE CALIBRATED (Platt)</div>
+                <div style="font-size: 2.5em; font-weight: bold;">{ece_prob*100:.1f}%</div>
+                <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
+                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
+                <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
+            </div>
+            ''', unsafe_allow_html=True)
+        elif ece_optimized_prob is not None:
             ece_odds = prob_to_odds(ece_optimized_prob)
             # Calculate the adjustment for display
             adjustment = ece_optimized_prob - raw_prob
             adj_text = f"+{adjustment*100:.0f}%" if adjustment > 0 else f"{adjustment*100:.0f}%"
+            ece_label = f"Historical Win Rate ({adj_text})"
+            ece_desc = "Model was under-confident in similar situations"
             st.markdown(f'''
             <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
-                <div style="font-size: 0.9em; opacity: 0.9;">📊 ECE-CALIBRATED (Historical)</div>
+                <div style="font-size: 0.9em; opacity: 0.9;">📊 BEST CALIBRATION (ECE)</div>
                 <div style="font-size: 2.5em; font-weight: bold;">{ece_optimized_prob*100:.1f}%</div>
                 <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
-                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">Historical Win Rate ({adj_text})</div>
-                <div style="font-size: 0.75em; opacity: 0.7;">Model was under-confident in similar situations</div>
+                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
+                <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
             </div>
             ''', unsafe_allow_html=True)
         else:
@@ -906,95 +1047,148 @@ def main():
     
     # SA20 Calibration Guidance
     with st.expander("📊 SA20 Calibration Guidance - Which Probability to Trust?"):
-        st.markdown("### SA20 v1 Model Performance Analysis")
+        st.markdown("### SA20 v1 Model Performance by Innings & Phase (21.8K samples)")
         st.markdown("""
-        Based on comprehensive Brier Score (accuracy) and ECE (calibration) analysis:
+        **Detailed Brier & ECE Analysis - Raw vs Calibrated vs Resource:**
         
-        | Innings | Phase | Best Brier | Best ECE |
-        |---------|-------|------------|----------|
-        | **Inn 1** | Powerplay | **Raw (0.1284)** | Resource (0.1437) |
-        | **Inn 1** | Middle | **Raw (0.0911)** | Resource (0.1348) |
-        | **Inn 1** | Death | **Raw (0.0761)** | Resource (0.1506) |
-        | **Inn 2** | Powerplay | **Raw (0.0799)** | Resource (0.1385) |
-        | **Inn 2** | Middle | **Raw (0.0507)** | Resource (0.0503) |
-        | **Inn 2** | Death | **Raw (0.0375)** | **Raw (0.0892)** |
+        #### Innings 1 - Raw wins Brier, Resource wins ECE (all phases)
+        | Phase | N | B_Raw | B_Cal | B_Res | E_Raw | E_Cal | E_Res | Best Brier | Best ECE |
+        |-------|---|-------|-------|-------|-------|-------|-------|------------|----------|
+        | Powerplay | 3963 | **0.1208** | 0.1726 | 0.2531 | 0.2313 | 0.2992 | **0.1408** | 🏆 Raw | 🏆 Res |
+        | Middle Early | 2877 | **0.0930** | 0.1379 | 0.2218 | 0.1781 | 0.2671 | **0.1497** | 🏆 Raw | 🏆 Res |
+        | Middle Late | 2283 | **0.0772** | 0.1251 | 0.2033 | 0.1648 | 0.2436 | **0.1465** | 🏆 Raw | 🏆 Res |
+        | Death | 2347 | **0.0806** | 0.1250 | 0.1987 | 0.1580 | 0.2435 | **0.1402** | 🏆 Raw | 🏆 Res |
+        
+        #### Innings 2 - Raw wins Brier (all), Mixed ECE winners
+        | Phase | N | B_Raw | B_Cal | B_Res | E_Raw | E_Cal | E_Res | Best Brier | Best ECE |
+        |-------|---|-------|-------|-------|-------|-------|-------|------------|----------|
+        | Powerplay | 3978 | **0.0737** | 0.0933 | 0.1726 | 0.1524 | 0.1362 | **0.1312** | 🏆 Raw | 🏆 Res |
+        | Middle Early | 2810 | **0.0504** | 0.0674 | 0.1157 | 0.1197 | 0.1080 | **0.0553** | 🏆 Raw | 🏆 Res |
+        | Middle Late | 2032 | **0.0459** | 0.0599 | 0.1178 | **0.0867** | 0.1036 | 0.0993 | 🏆 Raw | 🏆 Raw |
+        | Death | 1503 | **0.0300** | 0.0421 | 0.1019 | **0.0799** | 0.0940 | 0.1287 | 🏆 Raw | 🏆 Raw |
         
         *Lower is better for both Brier and ECE*
         """)
         
         st.markdown("---")
-        st.markdown("### 🎯 SA20 Recommendation")
+        st.markdown("### 🎯 SA20 Recommendation by Situation")
         
         st.success("""
-        **For Best Accuracy (Brier):** Use Raw Model Probability - wins ALL phases
+        **For Best Accuracy (Brier):** 🏆 **Raw Model wins ALL 8 phases!**
+        - Inn 1 Death: 0.0806 (Raw) vs 0.1250 (Cal) vs 0.1987 (Res)
+        - Inn 2 Death: 0.0300 (Raw) vs 0.0421 (Cal) vs 0.1019 (Res)
         
-        **For Best Calibration (ECE):** Use Per-Over Calibrators (shown above) - perfect ECE (0.0000)
+        **For Best Calibration (ECE):**
+        - **Inn 1 (all phases):** Resource Probability 🏆
+        - **Inn 2 Powerplay/Middle Early:** Resource Probability 🏆
+        - **Inn 2 Middle Late/Death:** Raw Model 🏆
         
-        ⚠️ Trade-off: ECE-Optimized has worse Brier but perfectly calibrated probabilities.
+        ✅ **Current Display:** Raw Model for Brier, Context-aware for ECE
         """)
         
         st.markdown("---")
         st.markdown("### 📖 Key Insights")
         st.markdown("""
-        - **Raw Model:** Dominates for accuracy (Brier) in every phase - use this for predictions
-        - **Per-Over ECE-Optimized:** 40 calibrators (20 overs × 2 innings) → perfect ECE (0.0000)
-        - **Trade-off:** You can't have both - ECE optimization hurts Brier
-        - **SA20 vs BBL:** SA20 raw model is excellent; BBL needs calibration for Innings 2
+        - **🏆 Raw Model is DOMINANT for Accuracy:** Wins Brier in ALL 8 innings×phase combinations!
+        - **Resource wins ECE in 6/8 situations:** All of Inn 1 + Inn 2 early phases
+        - **Raw wins ECE late in Inn 2:** Model shines when chase is clearer (overs 12-20)
+        - **Calibration hurts more than helps:** Inn-specific calibrators have WORSE Brier than Raw!
+        - **Why?** SA20 raw model (0.49±0.32) is already well-differentiated
+        - **Sample sizes:** 1,503-3,978 per phase - statistically robust
         """)
     
     # SSM Calibration Guidance
     with st.expander("📊 SSM (Super Smash) Calibration Guidance - Which Probability to Trust?"):
         st.markdown("### SSM v1 Model Performance Analysis (55K samples)")
         st.markdown("""
-        **Detailed ECE & Brier by Over (based on ~1,400 samples per over):**
+        **Overall Model Performance Summary:**
         
-        #### Innings 1 - Resource (DLS) wins ECE for ALL 20 overs
-        | Over | ECE_Raw | ECE_Cal | ECE_Res | Brier_Raw | Best ECE | Best Brier |
-        |------|---------|---------|---------|-----------|----------|------------|
-        | 1 | 0.1316 | 0.1331 | **0.0891** | **0.2044** | Res | Raw |
-        | 2 | 0.1060 | 0.0860 | **0.0631** | **0.1917** | Res | Raw |
-        | 3 | 0.1097 | 0.0877 | **0.0609** | **0.1838** | Res | Raw |
-        | 4 | 0.1017 | 0.0765 | **0.0588** | **0.1760** | Res | Raw |
-        | 5 | 0.0816 | 0.0584 | **0.0446** | **0.1672** | Res | Raw |
-        | 6 | 0.0820 | 0.0565 | **0.0405** | **0.1626** | Res | Raw |
-        | 7-15 | ~0.06-0.08 | ~0.04-0.06 | **~0.03-0.05** | **~0.11-0.15** | Res | Raw |
-        | 16-20 | ~0.04-0.07 | ~0.03-0.06 | **~0.02-0.04** | **~0.08-0.11** | Res | Raw |
+        | Metric | Raw Model | ECE-Optimized | Brier-Optimized | Winner |
+        |--------|-----------|---------------|-----------------|--------|
+        | **Brier Score** | 0.1088 | 0.1067 | **0.0867** | 🏆 Brier-Opt |
+        | **ECE** | 0.1050 | 0.0439 | **0.0000** | 🏆 Brier-Opt |
+        | **Log Loss** | 0.3558 | 0.6037 | **0.2709** | 🏆 Brier-Opt |
         
-        #### Innings 2 - Mixed sources for best ECE
-        | Over | ECE_Raw | ECE_Cal | ECE_Res | Brier_Raw | Best ECE | Best Brier |
-        |------|---------|---------|---------|-----------|----------|------------|
-        | 1 | 0.0702 | **0.0426** | 0.0747 | **0.1369** | Cal | Raw |
-        | 2 | 0.0509 | **0.0312** | 0.0583 | **0.1255** | Cal | Raw |
-        | 3 | **0.0327** | 0.0412 | 0.0479 | **0.1193** | Raw | Raw |
-        | 4 | **0.0350** | 0.0450 | 0.0483 | **0.1148** | Raw | Raw |
-        | 5-6 | ~0.03-0.04 | ~0.04-0.05 | **~0.03** | **~0.10-0.11** | Res | Raw |
-        | 7-11 | ~0.03-0.04 | ~0.04-0.05 | **~0.02-0.03** | **~0.07-0.09** | Res | Raw |
-        | 12-20 | **~0.01-0.04** | ~0.03-0.05 | ~0.02-0.05 | **~0.03-0.07** | Raw | Raw |
+        **⚠️ Key Insight: ECE-Optimized HURTS Log Loss!** (0.6037 vs 0.3558 Raw)
         
-        *Lower is better for both Brier and ECE*
+        **Winner Summary (38 overs analyzed):**
+        - **Brier Score:** Brier-Opt wins ALL 38 overs!
+        - **ECE:** Both Brier-Opt and ECE-Opt achieve ~0.00 (perfect after isotonic)
+        - **Log Loss:** Brier-Opt wins ALL 38 overs!
         """)
         
         st.markdown("---")
-        st.markdown("### 🎯 SSM Recommendation")
+        st.markdown("#### Per-Over Comparison: Raw vs ECE-Opt vs Brier-Opt")
+        st.markdown("""
+        | Inn | Over | N | B_Raw | B_ECE | B_Brier | L_Raw | L_ECE | L_Brier | Best |
+        |-----|------|---|-------|-------|---------|-------|-------|---------|------|
+        | 1 | 2 | 1410 | 0.185 | 0.272 | **0.123** | 0.558 | 7.781 | **0.372** | 🏆 Brier |
+        | 1 | 5 | 1475 | 0.157 | 0.129 | **0.118** | 0.493 | 0.996 | **0.367** | 🏆 Brier |
+        | 1 | 10 | 1431 | 0.138 | 0.146 | **0.112** | 0.441 | 0.456 | **0.337** | 🏆 Brier |
+        | 1 | 15 | 1447 | 0.119 | 0.121 | **0.094** | 0.391 | 0.491 | **0.288** | 🏆 Brier |
+        | 1 | 20 | 2838 | 0.117 | 0.115 | **0.089** | 0.385 | 0.478 | **0.287** | 🏆 Brier |
+        | 2 | 2 | 1410 | 0.129 | 0.127 | **0.118** | 0.406 | 0.541 | **0.365** | 🏆 Brier |
+        | 2 | 5 | 1462 | 0.091 | 0.086 | **0.077** | 0.306 | 0.278 | **0.250** | 🏆 Brier |
+        | 2 | 10 | 1426 | 0.077 | 0.075 | **0.065** | 0.263 | 0.266 | **0.218** | 🏆 Brier |
+        | 2 | 15 | 1354 | 0.074 | 0.071 | **0.065** | 0.248 | 0.262 | **0.198** | 🏆 Brier |
+        | 2 | 20 | 1539 | 0.044 | 0.026 | **0.025** | 0.165 | 0.189 | **0.094** | 🏆 Brier |
+        
+        *Lower is better. Brier-Optimized wins ALL overs for both Brier and Log Loss!*
+        *Note: ECE-Opt causes Log Loss explosions (e.g., Over 2 Inn1: 7.78 vs 0.37)*
+        """)
+        
+        st.markdown("---")
+        st.markdown("#### By Innings Summary")
+        st.markdown("""
+        | Innings | Method | Brier | ECE | Log Loss | Notes |
+        |---------|--------|-------|-----|----------|-------|
+        | **1** | Raw | 0.1363 | 0.1384 | 0.4368 | Baseline |
+        | **1** | ECE-Opt | 0.1387 | 0.0690 | 0.8925 | ⚠️ Hurts Log Loss! |
+        | **1** | **Brier-Opt** | **0.1063** | **0.0000** | **0.3277** | 🏆 Best all metrics |
+        | **2** | Raw | 0.0789 | 0.0686 | 0.2677 | Baseline |
+        | **2** | ECE-Opt | 0.0718 | 0.0190 | 0.2892 | Slight LL increase |
+        | **2** | **Brier-Opt** | **0.0654** | **0.0000** | **0.2091** | 🏆 Best all metrics |
+        """)
+        
+        st.markdown("---")
+        st.markdown("#### By Phase Summary")
+        st.markdown("""
+        | Inn | Phase | N | B_Raw | B_ECE | B_Brier | L_Raw | L_ECE | L_Brier |
+        |-----|-------|---|-------|-------|---------|-------|-------|---------|
+        | 1 | Powerplay | 7316 | 0.167 | 0.172 | **0.119** | 0.515 | 2.037 | **0.365** |
+        | 1 | Middle | 13027 | 0.134 | 0.137 | **0.109** | 0.431 | 0.559 | **0.334** |
+        | 1 | Death | 8573 | 0.114 | 0.112 | **0.092** | 0.379 | 0.422 | **0.287** |
+        | 2 | Powerplay | 7296 | 0.102 | 0.095 | **0.089** | 0.337 | 0.404 | **0.279** |
+        | 2 | Middle | 12723 | 0.077 | 0.073 | **0.064** | 0.263 | 0.264 | **0.205** |
+        | 2 | Death | 6535 | 0.056 | 0.044 | **0.042** | 0.200 | 0.211 | **0.139** |
+        
+        *Brier-Optimized wins ALL 6 phases for both Brier Score and Log Loss!*
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 🎯 SSM Decision Guide")
         
         st.success("""
-        **For Best Accuracy (Brier):** Use Raw Model Probability - wins ALL 40 overs!
+        **🏆 BRIER-OPTIMIZED CALIBRATOR IS THE CLEAR WINNER FOR SSM!**
         
-        **For Best Calibration (ECE):** Use Per-Over Calibrators:
-        - **Inn 1:** Resource probability (DLS-based) for all 20 overs
-        - **Inn 2:** Cal (overs 1-2), Raw (overs 3-4, 12-20), Res (overs 5-11)
+        | Metric | Improvement over Raw | Improvement over ECE-Opt |
+        |--------|---------------------|-------------------------|
+        | **Brier** | -20% (0.0867 vs 0.1088) | -19% (0.0867 vs 0.1067) |
+        | **ECE** | Perfect 0.000 | Perfect 0.000 |
+        | **Log Loss** | -24% (0.2709 vs 0.3558) | -55% (0.2709 vs 0.6037) |
         
-        ⚠️ SSM is different from BBL: Inn 1 uses Resource, not Raw for ECE!
+        ✅ **Use Brier-Optimized for ALL SSM predictions!**
+        ⚠️ **Never use ECE-Optimized for SSM** - it causes Log Loss explosions
         """)
         
         st.markdown("---")
         st.markdown("### 📖 Key Insights")
         st.markdown("""
-        - **Raw Model:** Excellent accuracy (Brier) across all phases
-        - **Resource (DLS):** Surprisingly good ECE in Inn 1 - model may be overconfident early
-        - **55K samples:** Robust calibrators with ~1,400 samples per over
-        - **Per-Over ECE:** 40 calibrators → perfect ECE (0.0000) in all overs
-        - **Key difference from BBL:** SSM Inn 1 benefits from Resource, BBL Inn 1 uses Raw
+        - **Brier-Opt dominates:** Wins ALL 38 overs for Brier AND Log Loss
+        - **ECE-Opt is harmful:** Causes massive Log Loss increases (overconfident predictions)
+        - **Perfect calibration:** Brier-Opt achieves ECE 0.0000 (same as ECE-Opt)
+        - **Best of both worlds:** Brier-Opt gives accuracy + calibration + low log loss
+        - **55K samples:** Robust analysis with ~1,400 samples per over
         """)
     
     # Key metrics

@@ -360,58 +360,89 @@ class CrexLivePredictor:
                 self.match_state.venue = self.venue_override
                 print(f"🏟️ Venue (Override): {self.match_state.venue}")
             else:
-                venue_patterns = [
-                    r'Venue\s*[:\-]?\s*([\w\s]+(?:Stadium|Oval|Ground|Arena|Park))',  # "Venue: North Sydney Oval"
-                    # SA20 venues
-                    r'(Kingsmead[\w\s,]*)',  # Durban
-                    r'(Newlands[\w\s,]*)',   # Cape Town
-                    r'(Boland Park[\w\s,]*)', # Paarl
-                    r"(St George's Park[\w\s,]*)",  # Gqeberha
-                    r'(SuperSport Park[\w\s,]*)',  # Centurion
-                    r'(Wanderers[\w\s,]*)',  # Johannesburg
-                    r'(Durban[\w\s]+Stadium)',
-                    r'(Hollywoodbets[\w\s]+)',
-                    # Australian venues
-                    r'(Simonds Stadium)',  # Specific pattern for Simonds Stadium
-                    r'(Kardinia Park)',
-                    r'(GMHBA Stadium)',
-                    r'(North Sydney Oval)',
-                    r'(Sydney Showground Stadium)',
-                    r'(Adelaide Oval)',
-                    r'(The Gabba|Brisbane Cricket Ground)',
-                    r'(MCG|Melbourne Cricket Ground)',
-                    r'(SCG|Sydney Cricket Ground)',
-                    r'(WACA|Perth Stadium|Optus Stadium)',
-                    r'(Bellerive Oval|Blundstone Arena)',
-                    r'(Manuka Oval)',
-                    r'(Junction Oval)',
-                    # UAE venues
-                    r'(Dubai International Cricket Stadium)',
-                    r'(Zayed Cricket Stadium[\w\s,]*)',
-                    r'(Sharjah Cricket Stadium)',
-                    # Generic patterns (last)
-                    r'([\w\s]+Cricket Ground)',
-                    r'([\w\s]+Cricket Stadium)',
-                    r'([\w\s]+Stadium)',
-                    r'([\w\s]+Oval)',
-                ]
-                for pattern in venue_patterns:
-                    venue_match = re.search(pattern, page_text, re.IGNORECASE)
-                    if venue_match:
-                        venue = venue_match.group(1).strip()
-                        # Clean up venue - remove any newlines or extra whitespace
-                        venue = ' '.join(venue.split())
-                        # Remove time prefixes like "45 PM" or date info
-                        venue = re.sub(r'^\d+\s*(?:AM|PM)\s+', '', venue, flags=re.IGNORECASE)
-                        # Remove common trailing words that get captured
-                        venue = re.sub(r'\s+(Team Form|Match Info|Live|Scorecard|Commentary).*$', '', venue, flags=re.IGNORECASE)
-                        # Clean trailing commas or spaces
-                        venue = venue.rstrip(', ')
-                        if len(venue) > 5 and len(venue) < 60:  # Reasonable venue name length
-                            self.match_state.venue = venue
-                            logger.info(f"Extracted venue from page: '{venue}'")
-                            print(f"🏟️ Venue: {self.match_state.venue}")
-                            break
+                # First, try to extract venue from the weather section (appears at top of info page)
+                # Pattern: "International Sports Stadium, Coffs Harbour weather International Sports Stadium"
+                # or "Adelaide Oval weather Adelaide Oval 25°C"
+                weather_venue_match = re.search(r'([\w\s]+(?:Stadium|Oval|Ground|Arena|Park))(?:,\s*[\w\s]+)?\s+weather\s+\1', page_text, re.IGNORECASE)
+                if weather_venue_match:
+                    venue = weather_venue_match.group(1).strip()
+                    venue = ' '.join(venue.split())
+                    if len(venue) > 5 and len(venue) < 60:
+                        self.match_state.venue = venue
+                        logger.info(f"Extracted venue from weather section: '{venue}'")
+                        print(f"🏟️ Venue: {self.match_state.venue}")
+                
+                # If weather pattern didn't work, try specific venue patterns
+                if not self.match_state.venue:
+                    venue_patterns = [
+                        r'Venue\s*[:\-]?\s*([\w\s]+(?:Stadium|Oval|Ground|Arena|Park))',  # "Venue: North Sydney Oval"
+                        # BBL regional/special venues (prioritize specific names)
+                        r'(International Sports Stadium[\w\s,]*)',  # Coffs Harbour
+                        r'(C\.?ex Coffs International Stadium)',  # Alternative name
+                        r'(Lavington Sports Ground)',  # Albury
+                        r'(Traeger Park[\w\s,]*)',  # Alice Springs
+                        # SA20 venues
+                        r'(Kingsmead[\w\s,]*)',  # Durban
+                        r'(Newlands[\w\s,]*)',   # Cape Town
+                        r'(Boland Park[\w\s,]*)', # Paarl
+                        r"(St George's Park[\w\s,]*)",  # Gqeberha
+                        r'(SuperSport Park[\w\s,]*)',  # Centurion
+                        r'(Wanderers[\w\s,]*)',  # Johannesburg
+                        r'(Durban[\w\s]+Stadium)',
+                        r'(Hollywoodbets[\w\s]+)',
+                        # New Zealand venues (Super Smash)
+                        r'(Basin Reserve[\w\s,]*)',
+                        r'(Eden Park[\w\s,]*)',
+                        r'(Hagley Oval[\w\s,]*)',
+                        r'(Seddon Park[\w\s,]*)',
+                        r'(Bay Oval[\w\s,]*)',
+                        r'(McLean Park[\w\s,]*)',
+                        r'(University Oval[\w\s,]*)',
+                        r'(Saxton Oval[\w\s,]*)',
+                        r'(Pukekura Park[\w\s,]*)',
+                        r'(Molyneux Park[\w\s,]*)',
+                        r'(John Davies Oval[\w\s,]*)',
+                        r'(Fitzherbert Park[\w\s,]*)',
+                        r'(Cobham Oval[\w\s,]*)',
+                        # Australian venues
+                        r'(Simonds Stadium)',  # Specific pattern for Simonds Stadium
+                        r'(Kardinia Park)',
+                        r'(GMHBA Stadium)',
+                        r'(North Sydney Oval)',
+                        r'(Sydney Showground Stadium)',
+                        r'(Adelaide Oval)',
+                        r'(The Gabba|Brisbane Cricket Ground)',
+                        r'(MCG|Melbourne Cricket Ground)',
+                        r'(SCG|Sydney Cricket Ground)',
+                        r'(WACA|Perth Stadium|Optus Stadium)',
+                        r'(Bellerive Oval|Blundstone Arena)',
+                        r'(Manuka Oval)',
+                        r'(Junction Oval)',
+                        # UAE venues
+                        r'(Dubai International Cricket Stadium)',
+                        r'(Zayed Cricket Stadium[\w\s,]*)',
+                        r'(Sharjah Cricket Stadium)',
+                        # Generic patterns (last)
+                        r'([\w\s]+Cricket Ground)',
+                        r'([\w\s]+Cricket Stadium)',
+                    ]
+                    for pattern in venue_patterns:
+                        venue_match = re.search(pattern, page_text, re.IGNORECASE)
+                        if venue_match:
+                            venue = venue_match.group(1).strip()
+                            # Clean up venue - remove any newlines or extra whitespace
+                            venue = ' '.join(venue.split())
+                            # Remove time prefixes like "45 PM" or date info
+                            venue = re.sub(r'^\d+\s*(?:AM|PM)\s+', '', venue, flags=re.IGNORECASE)
+                            # Remove common trailing words that get captured
+                            venue = re.sub(r'\s+(Team Form|Match Info|Live|Scorecard|Commentary).*$', '', venue, flags=re.IGNORECASE)
+                            # Clean trailing commas or spaces
+                            venue = venue.rstrip(', ')
+                            if len(venue) > 5 and len(venue) < 60:  # Reasonable venue name length
+                                self.match_state.venue = venue
+                                logger.info(f"Extracted venue from page: '{venue}'")
+                                print(f"🏟️ Venue: {self.match_state.venue}")
+                                break
             
             # Extract teams from info page - store both teams, we'll figure out batting/bowling from title
             vs_match = re.search(r'([A-Z0-9\-]+)\s+vs\s+([A-Z0-9\-]+)', page_text)

@@ -63,6 +63,12 @@ VENUE_ALIASES = {
     # Traeger Park
     'Traeger Park': 'Traeger Park',
     
+    # International Sports Stadium, Coffs Harbour (BBL regional venue)
+    'International Sports Stadium': 'International Sports Stadium, Coffs Harbour',
+    'International Sports Stadium, Coffs Harbour': 'International Sports Stadium, Coffs Harbour',
+    'C.ex Coffs International Stadium': 'International Sports Stadium, Coffs Harbour',
+    'Coffs Harbour Stadium': 'International Sports Stadium, Coffs Harbour',
+    
     # ILT20 Venues
     'Dubai International Cricket Stadium': 'Dubai International Cricket Stadium',
     'Sheikh Zayed Stadium': 'Zayed Cricket Stadium, Abu Dhabi',
@@ -109,6 +115,36 @@ VENUE_ALIASES = {
     'Khulna Stadium': 'Sheikh Abu Naser Stadium, Khulna',
     'MA Aziz Stadium': 'MA Aziz Stadium, Chittagong',
     'MA Aziz Stadium, Chittagong': 'MA Aziz Stadium, Chittagong',
+    
+    # New Zealand Venues (Super Smash)
+    'Basin Reserve': 'Basin Reserve, Wellington',
+    'Basin Reserve, Wellington': 'Basin Reserve, Wellington',
+    'Eden Park': 'Eden Park, Auckland',
+    'Eden Park, Auckland': 'Eden Park, Auckland',
+    'Eden Park Outer Oval': 'Eden Park Outer Oval, Auckland',
+    'Eden Park Outer Oval, Auckland': 'Eden Park Outer Oval, Auckland',
+    'Hagley Oval': 'Hagley Oval, Christchurch',
+    'Hagley Oval, Christchurch': 'Hagley Oval, Christchurch',
+    'Seddon Park': 'Seddon Park, Hamilton',
+    'Seddon Park, Hamilton': 'Seddon Park, Hamilton',
+    'Bay Oval': 'Bay Oval, Mount Maunganui',
+    'Bay Oval, Mount Maunganui': 'Bay Oval, Mount Maunganui',
+    'McLean Park': 'McLean Park, Napier',
+    'McLean Park, Napier': 'McLean Park, Napier',
+    'University Oval': 'University Oval, Dunedin',
+    'University Oval, Dunedin': 'University Oval, Dunedin',
+    'Saxton Oval': 'Saxton Oval, Nelson',
+    'Saxton Oval, Nelson': 'Saxton Oval, Nelson',
+    'Pukekura Park': 'Pukekura Park, New Plymouth',
+    'Pukekura Park, New Plymouth': 'Pukekura Park, New Plymouth',
+    'Molyneux Park': 'Molyneux Park, Alexandra',
+    'Molyneux Park, Alexandra': 'Molyneux Park, Alexandra',
+    'John Davies Oval': 'John Davies Oval, Queenstown',
+    'John Davies Oval, Queenstown': 'John Davies Oval, Queenstown',
+    'Fitzherbert Park': 'Fitzherbert Park, Palmerston North',
+    'Fitzherbert Park, Palmerston North': 'Fitzherbert Park, Palmerston North',
+    'Cobham Oval': 'Cobham Oval (New), Whangarei',
+    'Cobham Oval (New), Whangarei': 'Cobham Oval (New), Whangarei',
 }
 
 class FeatureStore(Protocol):
@@ -285,6 +321,17 @@ class InMemoryFeatureStore:
         'CD': 'Central Districts',
         'CK': 'Canterbury',
         'WEL': 'Wellington',
+        'ND': 'Northern Districts',
+        
+        # Women's Super Smash (New Zealand - CREX codes)
+        'AHW': 'Auckland',  # Auckland Hearts Women
+        'OSW': 'Otago',      # Otago Sparks Women
+        'WBW': 'Wellington', # Wellington Blaze Women
+        'CMW': 'Canterbury', # Canterbury Magicians Women
+        'CSW': 'Central Districts',  # Central Hinds Women (alt code)
+        'CHW': 'Central Districts',  # Central Hinds Women
+        'NDW': 'Northern Districts', # Northern Brave Women
+        'NBW': 'Northern Districts', # Northern Brave Women (alt code)
         
         # BPL (Bangladesh Premier League)
         'CV': 'Comilla Victorians',
@@ -292,13 +339,13 @@ class InMemoryFeatureStore:
         'FB': 'Fortune Barishal',
         'KT': 'Khulna Tigers',
         'DD': 'Dhaka Dominators',
-        'DC': 'Dhaka Capitals',  # BPL 2025-26
+        'DCa': 'Dhaka Capitals',  # BPL 2025-26 (was DC - conflicts with Dubai Capitals)
         'DuD': 'Durdanto Dhaka',
         'DurD': 'Durbar Rajshahi',
         'DurR': 'Duronto Rajshahi',
         'DR': 'Durbar Rajshahi',  # BPL 2025
         'SS': 'Sylhet Strikers',
-        'CK': 'Chittagong Kings',
+        'CKi': 'Chittagong Kings',  # was CK - conflicts with Canterbury
         'CC': 'Chattogram Challengers',
         # BPL 2025-26 new teams
         'NE': 'Noakhali Express',
@@ -308,7 +355,7 @@ class InMemoryFeatureStore:
         'DG': 'Dhaka Gladiators',
         'SSS': 'Sylhet Super Stars',
         'SR': 'Sylhet Royals',
-        'SYS': 'Sylhet Sunrisers',
+        'SyS': 'Sylhet Sunrisers',  # was SYS - conflicts with Sydney Sixers
     }
 
     # Team aliases for mapping new/renamed teams to historical equivalents
@@ -479,26 +526,49 @@ class InMemoryFeatureStore:
             logger.info(f"Resolved venue alias '{venue_name}' to '{canonical_name}'")
             venue_name = canonical_name
 
+        # Start with base stats (either from historical data or defaults)
+        base_stats = None
+        
         # 1. Exact match
         if venue_name in self._venue_stats:
             logger.info(f"Using venue stats for '{venue_name}'")
-            return self._venue_stats[venue_name]
+            base_stats = self._venue_stats[venue_name].copy()
             
         # 2. Case-insensitive match
-        if venue_name.lower() in self._venue_names_lower:
+        elif venue_name.lower() in self._venue_names_lower:
             real_name = self._venue_names_lower[venue_name.lower()]
             logger.info(f"Using venue stats for '{real_name}' (case-insensitive match)")
-            return self._venue_stats[real_name]
+            base_stats = self._venue_stats[real_name].copy()
             
         # 3. Fuzzy match (increased cutoff to 0.8 for stricter matching)
-        matches = difflib.get_close_matches(venue_name, self._venue_stats.keys(), n=1, cutoff=0.8)
-        if matches:
-            match = matches[0]
-            logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
-            return self._venue_stats[match]
+        else:
+            matches = difflib.get_close_matches(venue_name, self._venue_stats.keys(), n=1, cutoff=0.8)
+            if matches:
+                match = matches[0]
+                logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
+                base_stats = self._venue_stats[match].copy()
         
-        logger.warning(f"No venue stats found for '{venue_name}'")
-        return None
+        # 4. If no historical data found, create default stats
+        if base_stats is None:
+            logger.warning(f"No venue stats found for '{venue_name}', using defaults")
+            base_stats = {
+                'venue_avg_score': 160.0,
+                'venue_avg_wickets': 6.0,
+                'venue_bat_first_win_rate': 0.5,
+            }
+        
+        # 5. Override with live VENUE_SITUATION_STATS from CREX if available
+        # This ensures we use the actual venue avg from the current match info page
+        # for consistency with what's displayed on CREX
+        if self.VENUE_SITUATION_STATS:
+            if 'avg_1st_inns' in self.VENUE_SITUATION_STATS:
+                # Use avg_1st_inns as venue_avg_score (consistent with training which uses first innings avg)
+                base_stats['venue_avg_score'] = float(self.VENUE_SITUATION_STATS['avg_1st_inns'])
+                logger.info(f"Overrode venue_avg_score with CREX avg_1st_inns: {base_stats['venue_avg_score']}")
+            if 'bat_first_wr' in self.VENUE_SITUATION_STATS:
+                base_stats['venue_bat_first_win_rate'] = float(self.VENUE_SITUATION_STATS['bat_first_wr'])
+        
+        return base_stats
 
     def _fuzzy_match_player(self, player_name: str) -> Optional[str]:
         """Fuzzy match a player name to a known player in the store."""
