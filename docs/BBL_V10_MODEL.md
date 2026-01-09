@@ -119,12 +119,35 @@ BBL's raw model is much better calibrated than ILT20's raw model, especially in 
 - Date: 2025-12-31
 - Source: 618 BBL matches from Cricsheet
 
+## Per-Over Calibrators
+
+BBL v10 has two separate per-over calibrator files, optimized for different metrics:
+
+### Calibrator Files
+| File | Optimized For | Use Case |
+|------|---------------|----------|
+| `per_over_calibrators.pkl` | ECE (Expected Calibration Error) | Best calibration/reliability |
+| `per_over_calibrators_brier.pkl` | Brier Score (Log Loss) | Best accuracy |
+
+### Key Findings
+- **Innings 1:** Both ECE and Brier optimizers select `source: raw` - they produce **identical outputs**
+- **Innings 2:** ECE uses `source: cal`, Brier uses `source: raw` - produces **4-5% difference**
+- **Log Loss Analysis:** Brier-optimized calibrator wins 39/40 overs for Log Loss metric
+
+### Streamlit App Usage
+- **Blue Box (Best Accuracy):** Uses `per_over_calibrators_brier.pkl`
+- **Orange Box (Best ECE):** Uses `per_over_calibrators.pkl`
+
+For innings 1, both boxes will show the same probability. The difference appears in innings 2.
+
 ## Files
 
 | File | Description |
 |------|-------------|
 | `models/bbl_v10/champion_model.joblib` | Trained XGBLogRegEnsemble |
 | `models/bbl_v10/isotonic_calibrator.pkl` | Innings-specific isotonic calibrators |
+| `models/bbl_v10/per_over_calibrators.pkl` | ECE-optimized per-over calibrators |
+| `models/bbl_v10/per_over_calibrators_brier.pkl` | Brier-optimized per-over calibrators |
 | `data/bbl_feature_store_v2/` | Feature store (team, player, venue stats) |
 | `data/bbl_features_v2/training.parquet` | Training features |
 
