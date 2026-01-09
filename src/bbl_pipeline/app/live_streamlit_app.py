@@ -988,57 +988,62 @@ def main():
     with st.expander("📊 BBL Calibration Guidance - Which Probability to Trust?"):
         st.markdown("### BBL v10 Model Performance Analysis (141K+ samples)")
         st.markdown("""
-        **Detailed Brier, ECE & Log Loss by Over (based on ~3,500 samples per over):**
+        **Detailed Brier & Log Loss by Over (based on ~3,500 samples per over):**
         
-        #### Innings 1 - Brier-Optimized (Per-Over Cal) wins Log Loss for 19/20 overs
-        | Over | Brier_Raw | Brier_ECE | Brier_Opt | LL_Raw | LL_ECE | LL_Brier | Best Brier | Best LL |
-        |------|-----------|-----------|-----------|--------|--------|----------|------------|---------|
-        | 1 | 0.2115 | 0.2124 | **0.1990** | 0.6127 | 0.6155 | **0.5867** | Brier-Opt | Brier-Opt |
-        | 2 | 0.2019 | 0.2040 | **0.1884** | 0.5916 | 0.5972 | **0.5589** | Brier-Opt | Brier-Opt |
-        | 3 | 0.1928 | 0.1961 | **0.1827** | 0.5711 | 0.5800 | **0.5439** | Brier-Opt | Brier-Opt |
+        **Legend:**
+        - **Raw** = Raw model output (no calibration)
+        - **InnSpec** = Innings-Specific calibrator (1 per innings, from `isotonic_calibrator.pkl`)
+        - **PerOver** = Per-Over calibrator (1 per over × innings = 40 total, from `per_over_calibrators.pkl`)
+        
+        #### Innings 1 - Per-Over Calibrator wins for 19/20 overs
+        | Over | Brier_Raw | Brier_InnSpec | Brier_PerOver | LL_Raw | LL_InnSpec | LL_PerOver | Best Brier | Best LL |
+        |------|-----------|---------------|---------------|--------|------------|------------|------------|---------|
+        | 1 | 0.2115 | 0.2124 | **0.1990** | 0.6127 | 0.6155 | **0.5867** | PerOver | PerOver |
+        | 2 | 0.2019 | 0.2040 | **0.1884** | 0.5916 | 0.5972 | **0.5589** | PerOver | PerOver |
+        | 3 | 0.1928 | 0.1961 | **0.1827** | 0.5711 | 0.5800 | **0.5439** | PerOver | PerOver |
         | 4 | **0.1889** | 0.1920 | 0.2320 | **0.5617** | 0.5705 | 0.8722 | Raw | Raw |
-        | 5 | 0.1886 | 0.1924 | **0.1836** | 0.5593 | 0.5699 | **0.5437** | Brier-Opt | Brier-Opt |
-        | 6 | 0.1853 | 0.1900 | **0.1804** | 0.5508 | 0.5642 | **0.5334** | Brier-Opt | Brier-Opt |
-        | 7 | 0.1814 | 0.1876 | **0.1749** | 0.5409 | 0.5586 | **0.5142** | Brier-Opt | Brier-Opt |
-        | 8 | 0.1768 | 0.1844 | **0.1710** | 0.5292 | 0.5507 | **0.5048** | Brier-Opt | Brier-Opt |
-        | 9 | 0.1745 | 0.1811 | **0.1706** | 0.5228 | 0.5421 | **0.5022** | Brier-Opt | Brier-Opt |
-        | 10 | 0.1714 | 0.1779 | **0.1691** | 0.5157 | 0.5344 | **0.5058** | Brier-Opt | Brier-Opt |
-        | 11 | 0.1678 | 0.1743 | **0.1637** | 0.5065 | 0.5257 | **0.4866** | Brier-Opt | Brier-Opt |
-        | 12 | 0.1623 | 0.1690 | **0.1563** | 0.4932 | 0.5129 | **0.4668** | Brier-Opt | Brier-Opt |
-        | 13 | 0.1614 | 0.1680 | **0.1554** | 0.4896 | 0.5099 | **0.4613** | Brier-Opt | Brier-Opt |
-        | 14 | 0.1613 | 0.1677 | **0.1568** | 0.4901 | 0.5092 | **0.4705** | Brier-Opt | Brier-Opt |
-        | 15 | 0.1605 | 0.1673 | **0.1569** | 0.4882 | 0.5087 | **0.4715** | Brier-Opt | Brier-Opt |
-        | 16 | 0.1612 | 0.1681 | **0.1580** | 0.4897 | 0.5108 | **0.4712** | Brier-Opt | Brier-Opt |
-        | 17 | 0.1635 | 0.1704 | **0.1584** | 0.4960 | 0.5167 | **0.4755** | Brier-Opt | Brier-Opt |
-        | 18 | 0.1642 | 0.1718 | **0.1585** | 0.4980 | 0.5207 | **0.4735** | Brier-Opt | Brier-Opt |
-        | 19 | 0.1648 | 0.1734 | **0.1568** | 0.5006 | 0.5258 | **0.4726** | Brier-Opt | Brier-Opt |
-        | 20 | 0.1648 | 0.1755 | **0.1523** | 0.5011 | 0.5313 | **0.4613** | Brier-Opt | Brier-Opt |
+        | 5 | 0.1886 | 0.1924 | **0.1836** | 0.5593 | 0.5699 | **0.5437** | PerOver | PerOver |
+        | 6 | 0.1853 | 0.1900 | **0.1804** | 0.5508 | 0.5642 | **0.5334** | PerOver | PerOver |
+        | 7 | 0.1814 | 0.1876 | **0.1749** | 0.5409 | 0.5586 | **0.5142** | PerOver | PerOver |
+        | 8 | 0.1768 | 0.1844 | **0.1710** | 0.5292 | 0.5507 | **0.5048** | PerOver | PerOver |
+        | 9 | 0.1745 | 0.1811 | **0.1706** | 0.5228 | 0.5421 | **0.5022** | PerOver | PerOver |
+        | 10 | 0.1714 | 0.1779 | **0.1691** | 0.5157 | 0.5344 | **0.5058** | PerOver | PerOver |
+        | 11 | 0.1678 | 0.1743 | **0.1637** | 0.5065 | 0.5257 | **0.4866** | PerOver | PerOver |
+        | 12 | 0.1623 | 0.1690 | **0.1563** | 0.4932 | 0.5129 | **0.4668** | PerOver | PerOver |
+        | 13 | 0.1614 | 0.1680 | **0.1554** | 0.4896 | 0.5099 | **0.4613** | PerOver | PerOver |
+        | 14 | 0.1613 | 0.1677 | **0.1568** | 0.4901 | 0.5092 | **0.4705** | PerOver | PerOver |
+        | 15 | 0.1605 | 0.1673 | **0.1569** | 0.4882 | 0.5087 | **0.4715** | PerOver | PerOver |
+        | 16 | 0.1612 | 0.1681 | **0.1580** | 0.4897 | 0.5108 | **0.4712** | PerOver | PerOver |
+        | 17 | 0.1635 | 0.1704 | **0.1584** | 0.4960 | 0.5167 | **0.4755** | PerOver | PerOver |
+        | 18 | 0.1642 | 0.1718 | **0.1585** | 0.4980 | 0.5207 | **0.4735** | PerOver | PerOver |
+        | 19 | 0.1648 | 0.1734 | **0.1568** | 0.5006 | 0.5258 | **0.4726** | PerOver | PerOver |
+        | 20 | 0.1648 | 0.1755 | **0.1523** | 0.5011 | 0.5313 | **0.4613** | PerOver | PerOver |
         
-        #### Innings 2 - Brier-Optimized wins Log Loss for ALL 20 overs
-        | Over | Brier_Raw | Brier_ECE | Brier_Opt | LL_Raw | LL_ECE | LL_Brier | Best Brier | Best LL |
-        |------|-----------|-----------|-----------|--------|--------|----------|------------|---------|
-        | 1 | 0.1663 | 0.1654 | **0.1631** | 0.5016 | 0.4992 | **0.4861** | Brier-Opt | Brier-Opt |
-        | 2 | 0.1615 | 0.1611 | **0.1590** | 0.4888 | 0.4882 | **0.4745** | Brier-Opt | Brier-Opt |
-        | 3 | 0.1514 | 0.1504 | **0.1492** | 0.4639 | 0.4622 | **0.4530** | Brier-Opt | Brier-Opt |
-        | 4 | 0.1425 | 0.1417 | **0.1396** | 0.4420 | 0.4405 | **0.4303** | Brier-Opt | Brier-Opt |
-        | 5 | 0.1317 | 0.1307 | **0.1256** | 0.4137 | 0.4110 | **0.3891** | Brier-Opt | Brier-Opt |
-        | 6 | 0.1226 | 0.1220 | **0.1165** | 0.3881 | 0.3869 | **0.3582** | Brier-Opt | Brier-Opt |
-        | 7 | 0.1173 | 0.1164 | **0.1132** | 0.3729 | 0.3703 | **0.3533** | Brier-Opt | Brier-Opt |
-        | 8 | 0.1097 | 0.1090 | **0.1060** | 0.3532 | 0.3506 | **0.3382** | Brier-Opt | Brier-Opt |
-        | 9 | 0.1068 | 0.1065 | **0.1045** | 0.3435 | 0.3421 | **0.3298** | Brier-Opt | Brier-Opt |
-        | 10 | 0.1017 | 0.1010 | **0.0998** | 0.3279 | 0.3253 | **0.3134** | Brier-Opt | Brier-Opt |
-        | 11 | 0.0967 | 0.0959 | **0.0944** | 0.3139 | 0.3110 | **0.3028** | Brier-Opt | Brier-Opt |
-        | 12 | 0.0930 | 0.0931 | **0.0925** | 0.3023 | 0.3016 | **0.2904** | Brier-Opt | Brier-Opt |
-        | 13 | 0.0869 | 0.0861 | **0.0852** | 0.2860 | 0.2834 | **0.2722** | Brier-Opt | Brier-Opt |
-        | 14 | 0.0789 | 0.0783 | **0.0754** | 0.2617 | 0.2602 | **0.2405** | Brier-Opt | Brier-Opt |
-        | 15 | 0.0715 | 0.0714 | **0.0677** | 0.2410 | 0.2410 | **0.2204** | Brier-Opt | Brier-Opt |
-        | 16 | 0.0688 | 0.0694 | **0.0617** | 0.2306 | 0.2318 | **0.2039** | Brier-Opt | Brier-Opt |
-        | 17 | 0.0625 | 0.0631 | **0.0531** | 0.2128 | 0.2144 | **0.1765** | Brier-Opt | Brier-Opt |
-        | 18 | 0.0556 | 0.0562 | **0.0467** | 0.1912 | 0.1925 | **0.1551** | Brier-Opt | Brier-Opt |
-        | 19 | 0.0463 | 0.0467 | **0.0385** | 0.1564 | 0.1580 | **0.1241** | Brier-Opt | Brier-Opt |
-        | 20 | 0.0589 | **0.0577** | 0.0594 | 0.2571 | 0.2554 | **0.2482** | ECE-Opt | Brier-Opt |
+        #### Innings 2 - Per-Over Calibrator wins for ALL 20 overs
+        | Over | Brier_Raw | Brier_InnSpec | Brier_PerOver | LL_Raw | LL_InnSpec | LL_PerOver | Best Brier | Best LL |
+        |------|-----------|---------------|---------------|--------|------------|------------|------------|---------|
+        | 1 | 0.1663 | 0.1654 | **0.1631** | 0.5016 | 0.4992 | **0.4861** | PerOver | PerOver |
+        | 2 | 0.1615 | 0.1611 | **0.1590** | 0.4888 | 0.4882 | **0.4745** | PerOver | PerOver |
+        | 3 | 0.1514 | 0.1504 | **0.1492** | 0.4639 | 0.4622 | **0.4530** | PerOver | PerOver |
+        | 4 | 0.1425 | 0.1417 | **0.1396** | 0.4420 | 0.4405 | **0.4303** | PerOver | PerOver |
+        | 5 | 0.1317 | 0.1307 | **0.1256** | 0.4137 | 0.4110 | **0.3891** | PerOver | PerOver |
+        | 6 | 0.1226 | 0.1220 | **0.1165** | 0.3881 | 0.3869 | **0.3582** | PerOver | PerOver |
+        | 7 | 0.1173 | 0.1164 | **0.1132** | 0.3729 | 0.3703 | **0.3533** | PerOver | PerOver |
+        | 8 | 0.1097 | 0.1090 | **0.1060** | 0.3532 | 0.3506 | **0.3382** | PerOver | PerOver |
+        | 9 | 0.1068 | 0.1065 | **0.1045** | 0.3435 | 0.3421 | **0.3298** | PerOver | PerOver |
+        | 10 | 0.1017 | 0.1010 | **0.0998** | 0.3279 | 0.3253 | **0.3134** | PerOver | PerOver |
+        | 11 | 0.0967 | 0.0959 | **0.0944** | 0.3139 | 0.3110 | **0.3028** | PerOver | PerOver |
+        | 12 | 0.0930 | 0.0931 | **0.0925** | 0.3023 | 0.3016 | **0.2904** | PerOver | PerOver |
+        | 13 | 0.0869 | 0.0861 | **0.0852** | 0.2860 | 0.2834 | **0.2722** | PerOver | PerOver |
+        | 14 | 0.0789 | 0.0783 | **0.0754** | 0.2617 | 0.2602 | **0.2405** | PerOver | PerOver |
+        | 15 | 0.0715 | 0.0714 | **0.0677** | 0.2410 | 0.2410 | **0.2204** | PerOver | PerOver |
+        | 16 | 0.0688 | 0.0694 | **0.0617** | 0.2306 | 0.2318 | **0.2039** | PerOver | PerOver |
+        | 17 | 0.0625 | 0.0631 | **0.0531** | 0.2128 | 0.2144 | **0.1765** | PerOver | PerOver |
+        | 18 | 0.0556 | 0.0562 | **0.0467** | 0.1912 | 0.1925 | **0.1551** | PerOver | PerOver |
+        | 19 | 0.0463 | 0.0467 | **0.0385** | 0.1564 | 0.1580 | **0.1241** | PerOver | PerOver |
+        | 20 | 0.0589 | **0.0577** | 0.0594 | 0.2571 | 0.2554 | **0.2482** | InnSpec | PerOver |
         
-        *Lower is better for Brier & Log Loss. Brier-Opt = Per-Over Calibrated, ECE-Opt = Inn-Specific Calibrated*
+        *Lower is better for Brier & Log Loss. PerOver calibrator (more granular) beats InnSpec (innings-level) and Raw for nearly all overs.*
         """)
         
         st.markdown("---")
@@ -1051,36 +1056,36 @@ def main():
                 
                 ⚠️ **Use: Raw Model Probability ({raw_prob*100:.1f}%)**
                 
-                Over 4 is the ONLY over in Innings 1 where Raw beats Brier-Opt.
-                Brier-Opt has calibration issues for this specific over.
+                Over 4 is the ONLY over in Innings 1 where Raw beats Per-Over calibrator.
+                Per-Over has calibration issues for this specific over.
                 """)
             else:
                 st.success(f"""
                 **Innings 1 - Over {current_over} ({phase})**
                 
-                ✅ **For Best Accuracy (Brier & Log Loss):** Brier-Optimized (Per-Over Cal)
+                ✅ **For Best Accuracy (Brier & Log Loss):** Per-Over Calibrator
                 
-                Brier-Opt wins BOTH Brier and Log Loss for 19/20 overs in Innings 1.
+                Per-Over calibrator wins BOTH Brier and Log Loss for 19/20 overs in Innings 1.
                 Only exception: Over 4 (Raw wins due to calibration issue).
                 """)
         else:
             st.success(f"""
             **Innings 2 - Over {current_over} ({phase})**
             
-            ✅ **For Best Accuracy (Brier & Log Loss):** Brier-Optimized (Per-Over Cal)
+            ✅ **For Best Accuracy (Brier & Log Loss):** Per-Over Calibrator
             
-            Brier-Opt wins Log Loss for ALL 20 overs in Innings 2.
-            Brier-Opt wins Brier for 19/20 overs (ECE-Opt wins only Over 20).
+            Per-Over wins Log Loss for ALL 20 overs in Innings 2.
+            Per-Over wins Brier for 19/20 overs (Inn-Specific wins only Over 20).
             """)
         
         st.markdown("---")
         st.markdown("### 📖 Key Insights")
         st.markdown("""
-        - **Brier-Optimized (Per-Over Cal):** Wins Log Loss for 39/40 overs overall!
-        - **Innings 1:** Brier-Opt wins 19/20 overs (except Over 4 - calibration issue)
-        - **Innings 2:** Brier-Opt wins ALL 20 overs for Log Loss
-        - **ECE-Optimized:** Good for calibration, but worse for accuracy
-        - **Main Odds Display uses:** Inn-Specific Calibrated probability
+        - **Per-Over Calibrator:** Wins Log Loss for 39/40 overs overall!
+        - **Innings 1:** Per-Over wins 19/20 overs (except Over 4 - calibration issue)
+        - **Innings 2:** Per-Over wins ALL 20 overs for Log Loss
+        - **Innings-Specific (InnSpec):** Slightly better ECE, but worse accuracy
+        - **Main Odds Display uses:** Per-Over calibrated probability
         """)
     
     # SA20 Calibration Guidance

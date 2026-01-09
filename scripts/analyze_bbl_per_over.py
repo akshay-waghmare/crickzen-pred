@@ -47,7 +47,7 @@ y_true = df['is_winner'].values
 raw_probs = model.predict_proba(X)[:, 1]
 resource_probs = df['resource_win_prob'].values
 
-# Innings-specific calibrated probabilities (ECE-optimized)
+# Innings-specific calibrated probabilities (from isotonic_calibrator.pkl)
 innings_cal_probs = np.zeros_like(raw_probs)
 for innings in [1, 2]:
     mask = df['innings'] == innings
@@ -55,7 +55,7 @@ for innings in [1, 2]:
         calibrator = isotonic_cal[f'calibrator_innings{innings}']
         innings_cal_probs[mask] = calibrator.predict(raw_probs[mask].reshape(-1, 1)).ravel()
 
-# Per-over calibrated probabilities (Brier-optimized)
+# Per-over calibrated probabilities (from per_over_calibrators.pkl - ECE-optimized)
 per_over_cal_probs = np.zeros_like(raw_probs)
 df['over'] = (20 - df['overs_remaining']).astype(int)
 
