@@ -145,6 +145,28 @@ VENUE_ALIASES = {
     'Fitzherbert Park, Palmerston North': 'Fitzherbert Park, Palmerston North',
     'Cobham Oval': 'Cobham Oval (New), Whangarei',
     'Cobham Oval (New), Whangarei': 'Cobham Oval (New), Whangarei',
+    
+    # WPL (Women's Premier League - India) Venues
+    'Arun Jaitley Stadium': 'Arun Jaitley Stadium, Delhi',
+    'Arun Jaitley Stadium, Delhi': 'Arun Jaitley Stadium, Delhi',
+    'Feroz Shah Kotla': 'Arun Jaitley Stadium, Delhi',
+    'M Chinnaswamy Stadium': 'M Chinnaswamy Stadium, Bengaluru',
+    'M Chinnaswamy Stadium, Bengaluru': 'M Chinnaswamy Stadium, Bengaluru',
+    'Chinnaswamy Stadium': 'M Chinnaswamy Stadium, Bengaluru',
+    'Brabourne Stadium': 'Brabourne Stadium, Mumbai',
+    'Brabourne Stadium, Mumbai': 'Brabourne Stadium, Mumbai',
+    'CCI Brabourne Stadium': 'Brabourne Stadium, Mumbai',
+    'Dr DY Patil Sports Academy': 'Dr DY Patil Sports Academy, Mumbai',
+    'Dr DY Patil Sports Academy, Mumbai': 'Dr DY Patil Sports Academy, Mumbai',
+    'DY Patil Stadium': 'Dr DY Patil Sports Academy, Mumbai',
+    'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Ekana Cricket Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Ekana Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Lucknow Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Kotambi Stadium': 'Kotambi Stadium, Vadodara',
+    'Kotambi Stadium, Vadodara': 'Kotambi Stadium, Vadodara',
+    'Vadodara Stadium': 'Kotambi Stadium, Vadodara',
 }
 
 class FeatureStore(Protocol):
@@ -332,6 +354,18 @@ class InMemoryFeatureStore:
         'CHW': 'Central Districts',  # Central Hinds Women
         'NDW': 'Northern Districts', # Northern Brave Women
         'NBW': 'Northern Districts', # Northern Brave Women (alt code)
+        
+        # WPL (Women's Premier League - India)
+        'MIW': 'Mumbai Indians',           # Mumbai Indians Women
+        'RCBW': 'Royal Challengers Bengaluru',  # RCB Women (now Bengaluru)
+        'DCW': 'Delhi Capitals',           # Delhi Capitals Women
+        'GGW': 'Gujarat Giants',           # Gujarat Giants Women
+        'UPW': 'UP Warriorz',              # UP Warriorz Women
+        'MI-W': 'Mumbai Indians',          # Alternate format
+        'RCB-W': 'Royal Challengers Bengaluru',
+        'DC-W': 'Delhi Capitals',
+        'GG-W': 'Gujarat Giants',
+        'UP-W': 'UP Warriorz',
         
         # BPL (Bangladesh Premier League)
         'CV': 'Comilla Victorians',

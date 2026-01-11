@@ -273,6 +273,74 @@
         }
       }
     },
+    "WPL_FEMALE": {
+      "path": "models/wpl_female_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Innings-Specific Isotonic Calibration (Brier: 0.1660, ECE: 0.0000)",
+      "calibrator": {
+        "path": "models/wpl_female_v1/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2026-01-09T00:00:00",
+        "oof_metrics": {
+          "brier_raw": 0.1733430090140223,
+          "brier_calibrated": 0.16601420104290857,
+          "ece_raw": 0.04948149329971204,
+          "ece_calibrated": 1.4019856172533513e-17
+        },
+        "innings_specific": {
+          "innings1": {
+            "samples": 7985,
+            "brier_raw": 0.21315019721733647,
+            "brier_calibrated": 0.20226248513405248,
+            "ece_raw": 0.07818673505305898,
+            "ece_calibrated": 5.413466933472821e-17
+          },
+          "innings2": {
+            "samples": 7156,
+            "brier_raw": 0.12892428377597545,
+            "brier_calibrated": 0.12556666771873518,
+            "ece_raw": 0.029601380395718923,
+            "ece_calibrated": 3.208026354344141e-17
+          }
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
+      "feature_store": {
+        "path": "data/wpl_female_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-01-09",
+        "training_data_matches": 66,
+        "statistics": {
+          "teams": 5,
+          "players": "~150+",
+          "venues": 6,
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
+        },
+        "recent_changes": {
+          "date": "2026-01-09",
+          "description": "Initial WPL Female model trained on 66 matches (2023-2025) from Women's Premier League; includes innings-specific calibrators",
+          "impact": "First WPL model with 4.8% Brier improvement from calibration (0.1733 -> 0.1660)"
+        }
+      }
+    },
     "SSM": {
       "path": "models/ssm_v1",
       "version": "v1",
