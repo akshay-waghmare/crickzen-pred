@@ -78,6 +78,30 @@ TEAM_COLORS = {
     "DCW": "#004ba0", "DC-W": "#004ba0", "Delhi Capitals": "#004ba0",
     "GGW": "#ff6b35", "GG-W": "#ff6b35", "Gujarat Giants": "#ff6b35",
     "UPW": "#1e90ff", "UP-W": "#1e90ff", "UP Warriorz": "#1e90ff",
+    # T20 International Teams (Men's)
+    "Australia": "#FFD700", "AUS": "#FFD700",
+    "India": "#0033A0", "IND": "#0033A0",
+    "England": "#001840", "ENG": "#001840",
+    "New Zealand": "#000000", "NZ": "#000000",
+    "South Africa": "#006B3F", "SA": "#006B3F",
+    "Pakistan": "#006400", "PAK": "#006400",
+    "West Indies": "#800020", "WI": "#800020",
+    "Sri Lanka": "#0000FF", "SL": "#0000FF",
+    "Bangladesh": "#006A4E", "BAN": "#006A4E",
+    "Afghanistan": "#0066B3", "AFG": "#0066B3",
+    "Zimbabwe": "#FFD700", "ZIM": "#FFD700",
+    "Ireland": "#169B62", "IRE": "#169B62",
+    "Scotland": "#005EB8", "SCO": "#005EB8",
+    "Netherlands": "#FF6600", "NED": "#FF6600",
+    "Namibia": "#003580", "NAM": "#003580",
+    "United States of America": "#B22234", "USA": "#B22234",
+    "Canada": "#FF0000", "CAN": "#FF0000",
+    "Oman": "#EF3340", "OMA": "#EF3340",
+    "Nepal": "#DC143C", "NEP": "#DC143C",
+    "United Arab Emirates": "#00732F", "UAE": "#00732F",
+    "Papua New Guinea": "#FF0000", "PNG": "#FF0000",
+    "Hong Kong": "#DE2910", "HK": "#DE2910",
+    "Uganda": "#FCDC04", "UGA": "#FCDC04",
 }
 TEAM_NAMES = {
     # WBBL
@@ -110,6 +134,30 @@ TEAM_NAMES = {
     "DCW": "Delhi Capitals", "DC-W": "Delhi Capitals", "Delhi Capitals": "Delhi Capitals",
     "GGW": "Gujarat Giants", "GG-W": "Gujarat Giants", "Gujarat Giants": "Gujarat Giants",
     "UPW": "UP Warriorz", "UP-W": "UP Warriorz", "UP Warriorz": "UP Warriorz",
+    # T20 International Teams (Men's)
+    "Australia": "Australia", "AUS": "Australia",
+    "India": "India", "IND": "India",
+    "England": "England", "ENG": "England",
+    "New Zealand": "New Zealand", "NZ": "New Zealand",
+    "South Africa": "South Africa", "SA": "South Africa",
+    "Pakistan": "Pakistan", "PAK": "Pakistan",
+    "West Indies": "West Indies", "WI": "West Indies",
+    "Sri Lanka": "Sri Lanka", "SL": "Sri Lanka",
+    "Bangladesh": "Bangladesh", "BAN": "Bangladesh",
+    "Afghanistan": "Afghanistan", "AFG": "Afghanistan",
+    "Zimbabwe": "Zimbabwe", "ZIM": "Zimbabwe",
+    "Ireland": "Ireland", "IRE": "Ireland",
+    "Scotland": "Scotland",
+    "Netherlands": "Netherlands", "NED": "Netherlands",
+    "Namibia": "Namibia", "NAM": "Namibia",
+    "United States of America": "USA", "USA": "USA",
+    "Canada": "Canada", "CAN": "Canada",
+    "Oman": "Oman", "OMA": "Oman",
+    "Nepal": "Nepal", "NEP": "Nepal",
+    "United Arab Emirates": "UAE", "UAE": "UAE",
+    "Papua New Guinea": "PNG", "PNG": "PNG",
+    "Hong Kong": "Hong Kong", "HK": "Hong Kong",
+    "Uganda": "Uganda", "UGA": "Uganda",
 }
 
 DEFAULT_JSON = "data/live_state.json"
@@ -133,6 +181,11 @@ def load_per_over_calibrators():
         calibrators['sa20'] = joblib.load('models/sat_v1/per_over_calibrators.pkl')
     except:
         calibrators['sa20'] = None
+    # T20 Male (International): per-over calibrators for ECE optimization
+    try:
+        calibrators['t20i'] = joblib.load('models/t20_male_v1/per_over_calibrators_ece.pkl')
+    except:
+        calibrators['t20i'] = None
     return calibrators
 
 @st.cache_resource
@@ -181,6 +234,13 @@ def load_brier_calibrators():
     except Exception as e:
         print(f"[FAIL] Failed to load WPL Brier calibrators: {e}")
         calibrators['wpl'] = None
+    # T20 Male (International): per-over calibrators for Brier optimization
+    try:
+        calibrators['t20i'] = joblib.load('models/t20_male_v1/per_over_calibrators_brier.pkl')
+        print(f"[OK] Loaded T20I Brier calibrators: {list(calibrators['t20i'].keys())}")
+    except Exception as e:
+        print(f"[FAIL] Failed to load T20I Brier calibrators: {e}")
+        calibrators['t20i'] = None
     return calibrators
 
 PER_OVER_CALIBRATORS = load_per_over_calibrators()
@@ -767,12 +827,20 @@ def main():
     wpl_teams = {'MIW', 'MI-W', 'Mumbai Indians', 'RCBW', 'RCB-W', 'Royal Challengers Bengaluru',
                  'DCW', 'DC-W', 'Delhi Capitals', 'GGW', 'GG-W', 'Gujarat Giants', 
                  'UPW', 'UP-W', 'UP Warriorz'}
+    # T20 International teams (Men's)
+    t20i_teams = {'Australia', 'AUS', 'India', 'IND', 'England', 'ENG', 'New Zealand', 'NZ',
+                  'South Africa', 'SA', 'Pakistan', 'PAK', 'West Indies', 'WI', 'Sri Lanka', 'SL',
+                  'Bangladesh', 'BAN', 'Afghanistan', 'AFG', 'Zimbabwe', 'ZIM', 'Ireland', 'IRE',
+                  'Scotland', 'Netherlands', 'NED', 'Namibia', 'NAM', 'United States of America', 'USA',
+                  'Canada', 'CAN', 'Oman', 'OMA', 'Nepal', 'NEP', 'United Arab Emirates', 'UAE',
+                  'Papua New Guinea', 'PNG', 'Hong Kong', 'HK', 'Uganda', 'UGA'}
     
     batting_team = d.get("batting_team", "")
     is_bbl = batting_team in bbl_teams
     is_sa20 = batting_team in sa20_teams
     is_ssm = batting_team in ssm_teams
     is_wpl = batting_team in wpl_teams
+    is_t20i = batting_team in t20i_teams
     
     # Calculate ECE-optimized probability (for calibration display)
     ece_optimized_prob = None
@@ -799,6 +867,12 @@ def main():
     wpl_brier_source = None
     brier_cal_key = None
     brier_cals = None
+    
+    # T20I (International) calibrator variables
+    t20i_brier_prob = None
+    t20i_brier_source = None
+    t20i_ece_prob = None
+    t20i_ece_source = None
     
     if is_sa20:
         # SA20: Per-over calibrators for BRIER (0.0399), Phase calibrators for ECE (0.0047)
@@ -982,8 +1056,50 @@ def main():
                 wpl_brier_prob = brier_cal_info['calibrator'].predict([[brier_input]])[0]
                 wpl_brier_prob = np.clip(wpl_brier_prob, 0.01, 0.99)
 
+    # T20I: Apply per-over calibrators for both Brier and ECE optimization
+    if is_t20i:
+        # ECE-optimized calibrators
+        t20i_ece_cals = PER_OVER_CALIBRATORS.get('t20i')
+        calibrator_key = f'inn{inn_num}_over{current_over}'
+        if t20i_ece_cals is not None and calibrator_key in t20i_ece_cals:
+            cal_info = t20i_ece_cals[calibrator_key]
+            t20i_ece_source = cal_info['source']
+            cal_source = t20i_ece_source
+            cal_method = 'isotonic'
+            
+            # Get input based on ECE-optimal source
+            if t20i_ece_source == 'raw':
+                input_prob = raw_prob
+            elif t20i_ece_source == 'cal':
+                input_prob = inn_specific_prob if inn_specific_prob is not None else raw_prob
+            else:  # 'res'
+                input_prob = resource_prob
+            
+            # Apply ECE calibrator
+            t20i_ece_prob = cal_info['calibrator'].predict([[input_prob]])[0]
+            t20i_ece_prob = np.clip(t20i_ece_prob, 0.01, 0.99)
+            ece_optimized_prob = t20i_ece_prob
+        
+        # Brier-optimized calibrators
+        t20i_brier_cals = BRIER_CALIBRATORS.get('t20i')
+        if t20i_brier_cals is not None and calibrator_key in t20i_brier_cals:
+            brier_cal_info = t20i_brier_cals[calibrator_key]
+            t20i_brier_source = brier_cal_info['source']
+            
+            # Get input based on Brier-optimal source
+            if t20i_brier_source == 'raw':
+                brier_input = raw_prob
+            elif t20i_brier_source == 'cal':
+                brier_input = inn_specific_prob if inn_specific_prob is not None else raw_prob
+            else:  # 'res'
+                brier_input = resource_prob
+            
+            # Apply Brier calibrator
+            t20i_brier_prob = brier_cal_info['calibrator'].predict([[brier_input]])[0]
+            t20i_brier_prob = np.clip(t20i_brier_prob, 0.01, 0.99)
+
     # ECE-Optimized Decision Probabilities section
-    league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else ("🇮🇳 WPL" if is_wpl else "🏏 T20")))
+    league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else ("🇮🇳 WPL" if is_wpl else ("🌍 T20I" if is_t20i else "🏏 T20"))))
     st.markdown("---")
     st.subheader(f"{league_name} Decision Probabilities")
     method_label = "Platt" if cal_method == "platt" else "Isotonic"
@@ -993,6 +1109,8 @@ def main():
         st.caption(f"**Innings {inn_num} - Over {current_over} ({phase})** | Brier Cal: {brier_calibrator_key} | ECE Cal: {calibrator_key}")
     elif is_wpl:
         st.caption(f"**Innings {inn_num} - Over {current_over} ({phase})** | ECE Cal: {calibrator_key} | Brier Cal: {brier_cal_key if brier_cals and brier_cal_key in brier_cals else 'N/A'}")
+    elif is_t20i:
+        st.caption(f"**Innings {inn_num} - Over {current_over} ({phase})** | ECE Source: {t20i_ece_source or 'N/A'} | Brier Source: {t20i_brier_source or 'N/A'} | Key: {calibrator_key}")
     else:
         st.caption(f"**Innings {inn_num} - Over {current_over} ({phase})** | Calibrator: {calibrator_key} | Source: {cal_source or 'N/A'} | Method: {method_label}")
     
@@ -1027,6 +1145,12 @@ def main():
             brier_prob = raw_prob
             brier_label = "Raw Model Output"
             brier_desc = "Best Log Loss (sparse data)"
+        elif is_t20i and t20i_brier_prob is not None:
+            # T20I: Use per-over Brier-optimized calibrator
+            # Inn1: Raw wins (19/20 overs), Inn2: Calibrated wins (19/20 overs)
+            brier_prob = t20i_brier_prob
+            brier_label = f"Brier-Optimized ({t20i_brier_source})"
+            brier_desc = "Brier=0.1438, 672K samples"
         else:
             brier_prob = raw_prob
             brier_label = "Raw Model Output"
@@ -1074,6 +1198,9 @@ def main():
             if is_wpl:
                 ece_label = f"Phase ECE-Optimized ({adj_text})"
                 ece_desc = "ECE=0.0633 (Resource-based, best calibration)"
+            elif is_t20i:
+                ece_label = f"Per-Over ECE-Optimized ({adj_text})"
+                ece_desc = f"ECE=0.0000, Source: {t20i_ece_source or 'N/A'}"
             else:
                 ece_label = f"Historical Win Rate ({adj_text})"
                 ece_desc = "Model was under-confident in similar situations"
@@ -1488,6 +1615,77 @@ def main():
         - **Trade-off is GOOD:** Unlike SA20/SSM, perfect calibration improves Log Loss here
         - **Use Phase ECE-Optimized:** Best choice for accuracy, calibration, AND Log Loss
         - **Resource was baseline:** ECE 0.0307 shows resource is naturally well-calibrated
+        """)
+    
+    # T20 International Calibration Guidance
+    with st.expander("📊 T20 International (Men's) Calibration Guidance - Which Probability to Trust?"):
+        st.markdown("### T20 Male v1 Model Performance Analysis (672,542 samples)")
+        st.markdown("""
+        **🌍 Largest T20 Model:** Trained on 672K+ balls from international T20 matches!
+        
+        **Overall Model Performance:**
+        
+        | Metric | Raw Model | Inn-Calibrated | Resource | Winner |
+        |--------|-----------|----------------|----------|--------|
+        | **Brier Score** | 0.1517 | **0.1517** | 0.1934 | 🏆 Inn-Cal (tie) |
+        | **ECE** | 0.0149 | **0.0130** | 0.0765 | 🏆 Inn-Cal |
+        | **Log Loss** | 0.4557 | **0.4549** | 0.5609 | 🏆 Inn-Cal |
+        
+        **After Per-Over Calibration:**
+        | Calibrator Type | Avg Brier | ECE | Best For |
+        |-----------------|-----------|-----|----------|
+        | Brier-Optimized | **0.1438** | 0.0000 | 🏆 Accuracy |
+        | ECE-Optimized | 0.1459 | **0.0000** | 🏆 Calibration |
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 📊 By Innings Analysis")
+        st.markdown("""
+        **Innings 1 - Raw Model Wins (358K samples):**
+        | Metric | Raw | Inn-Cal | Resource | Winner |
+        |--------|-----|---------|----------|--------|
+        | Brier | **0.1880** | 0.1882 | 0.2317 | 🏆 Raw |
+        | ECE | **0.0123** | 0.0174 | 0.1323 | 🏆 Raw |
+        | Log Loss | **0.5519** | 0.5526 | 0.6533 | 🏆 Raw |
+        
+        **Innings 2 - Inn-Calibrated Wins (314K samples):**
+        | Metric | Raw | Inn-Cal | Resource | Winner |
+        |--------|-----|---------|----------|--------|
+        | Brier | 0.1104 | **0.1101** | 0.1497 | 🏆 Inn-Cal |
+        | ECE | 0.0186 | **0.0080** | 0.0749 | 🏆 Inn-Cal |
+        | Log Loss | 0.3458 | **0.3434** | 0.4555 | 🏆 Inn-Cal |
+        
+        **Per-Over Calibrator Performance:**
+        - **Brier-Optimized:** Inn1: 19 raw, 1 cal | Inn2: 19 cal, 1 raw
+        - **ECE-Optimized:** Inn1: 18 raw, 2 cal | Inn2: 20 cal
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 🎯 T20I Recommendation")
+        
+        st.success("""
+        **✅ Use Per-Over Calibrators for Best Results:**
+        
+        **For Betting/Accuracy (Brier):**
+        - **Innings 1:** Use Raw model (wins 19/20 overs)
+        - **Innings 2:** Use Calibrated model (wins 19/20 overs)
+        
+        **For Calibration (ECE):**
+        - **Innings 1:** Use Raw model (wins 18/20 overs)
+        - **Innings 2:** Use Calibrated model (wins ALL 20 overs)
+        
+        ✅ Per-Over calibrators auto-select best source!
+        """)
+        
+        st.markdown("---")
+        st.markdown("### 📖 Key Insights")
+        st.markdown("""
+        - **🏆 Massive dataset:** 672K samples make this model highly robust
+        - **Innings-specific patterns:** Inn1 favors Raw, Inn2 favors Calibrated
+        - **Perfect ECE:** Per-over calibrators achieve ECE 0.0000
+        - **Strong Brier improvement:** 0.1517 → 0.1438 (5% improvement)
+        - **Resource underperforms:** DLS-based probability worse than model predictions
+        - **Use display probabilities:** The Brier/ECE columns use optimized calibrators
         """)
     
     # Key metrics
