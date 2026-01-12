@@ -76,11 +76,22 @@ def main():
     raw_prob = model.predict_proba(X)[:, 1]
     resource_prob = df['resource_win_prob'].values
     
+    # Get innings-specific calibrated probabilities (needed for source='cal')
+    iso_cal = joblib.load(model_dir / "isotonic_calibrator.pkl")
+    cal_prob = np.zeros_like(raw_prob)
+    for i, inn in enumerate(df['innings'].values):
+        inn_key = int(inn)
+        if inn_key in iso_cal:
+            cal_prob[i] = iso_cal[inn_key].predict([[raw_prob[i]]])[0]
+        else:
+            cal_prob[i] = raw_prob[i]
+    cal_prob = np.clip(cal_prob, 1e-7, 1-1e-7)
+    
     # Calculate over
     over = np.ceil(20 - df['overs_remaining']).astype(int) + 1
     over = np.clip(over, 1, 20)
     
-    # Get per-over calibrated probs
+    # Get per-over calibrated probs (applying CORRECT source for each calibrator)
     per_over_prob = np.zeros_like(raw_prob)
     for innings in [1, 2]:
         for ov in range(1, 21):
@@ -89,7 +100,19 @@ def main():
                 continue
             key = f'inn{innings}_over{ov}'
             if key in per_over_cal and 'calibrator' in per_over_cal[key]:
-                per_over_prob[mask] = per_over_cal[key]['calibrator'].predict(raw_prob[mask])
+                cal_info = per_over_cal[key]
+                source = cal_info.get('source', 'raw')
+                calibrator = cal_info['calibrator']
+                
+                # Select input based on ECE calibrator's source
+                if source == 'raw':
+                    input_prob = raw_prob[mask]
+                elif source == 'cal':
+                    input_prob = cal_prob[mask]
+                else:  # 'res'
+                    input_prob = resource_prob[mask]
+                
+                per_over_prob[mask] = calibrator.predict(input_prob)
             else:
                 per_over_prob[mask] = raw_prob[mask]
     
@@ -136,7 +159,7 @@ def main():
                 'best_brier': best_brier
             })
             
-            marker = "🏆" if best == 'raw' else ("📊" if best == 'per' else "📐")
+            marker = "*" if best == 'raw' else ("^" if best == 'per' else "~")
             print(f"{innings:<4} {ov:<5} {n:<6} {b_raw:<8.4f} {b_per:<8.4f} {b_res:<8.4f} {marker} {best}")
     
     # Summary

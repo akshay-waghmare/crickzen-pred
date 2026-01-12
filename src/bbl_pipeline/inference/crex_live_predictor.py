@@ -248,12 +248,13 @@ class CrexLivePredictor:
                     
                     # Scale historical situation rates to current season win rate
                     # This preserves team's relative strength batting vs bowling first
+                    # BUT CAP the ratio to prevent extreme values (max 1.15 = 15% boost)
                     if hist_wr > 0:
-                        bat_first_ratio = hist_bat / hist_wr
-                        bowl_first_ratio = hist_bowl / hist_wr
-                        bat_first_wr = min(1.0, max(0.0, win_rate * bat_first_ratio))
-                        bowl_first_wr = min(1.0, max(0.0, win_rate * bowl_first_ratio))
-                        logger.info(f"Scaled team situation rates for '{full_name}': bat_first={bat_first_wr:.0%}, bowl_first={bowl_first_wr:.0%} (from historical ratios)")
+                        bat_first_ratio = min(1.15, max(0.85, hist_bat / hist_wr))  # Cap ratio to +/- 15%
+                        bowl_first_ratio = min(1.15, max(0.85, hist_bowl / hist_wr))  # Cap ratio to +/- 15%
+                        bat_first_wr = min(0.85, max(0.15, win_rate * bat_first_ratio))  # Also cap absolute value
+                        bowl_first_wr = min(0.85, max(0.15, win_rate * bowl_first_ratio))
+                        logger.info(f"Scaled team situation rates for '{full_name}': bat_first={bat_first_wr:.0%}, bowl_first={bowl_first_wr:.0%} (from historical ratios, capped)")
             
             # Final fallback to team's overall win rate
             if bat_first_wr is None:
@@ -397,7 +398,8 @@ class CrexLivePredictor:
                         r'(Seddon Park[\w\s,]*)',
                         r'(Bay Oval[\w\s,]*)',
                         r'(McLean Park[\w\s,]*)',
-                        r'(University Oval[\w\s,]*)',
+                        r'(University of Otago Oval[\w\s,]*)',  # Dunedin - exact name
+                        r'(University Oval[\w\s,]*)',  # Generic fallback
                         r'(Saxton Oval[\w\s,]*)',
                         r'(Pukekura Park[\w\s,]*)',
                         r'(Molyneux Park[\w\s,]*)',

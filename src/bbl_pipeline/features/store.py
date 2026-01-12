@@ -133,6 +133,8 @@ VENUE_ALIASES = {
     'McLean Park, Napier': 'McLean Park, Napier',
     'University Oval': 'University Oval, Dunedin',
     'University Oval, Dunedin': 'University Oval, Dunedin',
+    'University of Otago Oval': 'University Oval, Dunedin',  # Same venue, different name
+    'University of Otago Oval, Dunedin': 'University Oval, Dunedin',  # Same venue, different name
     'Saxton Oval': 'Saxton Oval, Nelson',
     'Saxton Oval, Nelson': 'Saxton Oval, Nelson',
     'Pukekura Park': 'Pukekura Park, New Plymouth',

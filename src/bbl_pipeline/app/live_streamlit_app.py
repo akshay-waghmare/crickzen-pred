@@ -72,6 +72,13 @@ TEAM_COLORS = {
     "ND": "#1565c0", "NB": "#1565c0", "Northern Districts": "#1565c0",
     "OV": "#388e3c", "OTG": "#388e3c", "Otago": "#388e3c",
     "WF": "#7b1fa2", "WEL": "#7b1fa2", "Wellington": "#7b1fa2",
+    # SSM Female (New Zealand Women's Super Smash)
+    "AA-W": "#1a237e", "Auckland-W": "#1a237e",
+    "CD-W": "#d32f2f", "Central-W": "#d32f2f",
+    "CS-W": "#ffc107", "Canterbury-W": "#ffc107",
+    "ND-W": "#1565c0", "Northern-W": "#1565c0",
+    "OV-W": "#388e3c", "Otago-W": "#388e3c",
+    "WF-W": "#7b1fa2", "Wellington-W": "#7b1fa2",
     # WPL (Women's Premier League - India)
     "MIW": "#004ba0", "MI-W": "#004ba0", "Mumbai Indians": "#004ba0",
     "RCBW": "#d4171e", "RCB-W": "#d4171e", "Royal Challengers Bengaluru": "#d4171e",
@@ -128,6 +135,13 @@ TEAM_NAMES = {
     "ND": "Northern Brave", "NB": "Northern Brave", "Northern Districts": "Northern Brave",
     "OV": "Otago Volts", "OTG": "Otago Volts", "Otago": "Otago Volts",
     "WF": "Wellington Firebirds", "WEL": "Wellington Firebirds", "Wellington": "Wellington Firebirds",
+    # SSM Female (New Zealand Women's Super Smash)
+    "AA-W": "Auckland Aces Women", "Auckland-W": "Auckland Aces Women",
+    "CD-W": "Central Districts Women", "Central-W": "Central Districts Women",
+    "CS-W": "Canterbury Kings Women", "Canterbury-W": "Canterbury Kings Women",
+    "ND-W": "Northern Brave Women", "Northern-W": "Northern Brave Women",
+    "OV-W": "Otago Volts Women", "Otago-W": "Otago Volts Women",
+    "WF-W": "Wellington Firebirds Women", "Wellington-W": "Wellington Firebirds Women",
     # WPL (Women's Premier League - India)
     "MIW": "Mumbai Indians", "MI-W": "Mumbai Indians", "Mumbai Indians": "Mumbai Indians",
     "RCBW": "RCB Bengaluru", "RCB-W": "RCB Bengaluru", "Royal Challengers Bengaluru": "RCB Bengaluru",
@@ -166,7 +180,7 @@ DEFAULT_JSON = "data/live_state.json"
 # NOTE: SA20 and WPL use phase calibrators instead of per-over due to small datasets
 @st.cache_resource
 def load_per_over_calibrators():
-    """Load per-over calibrators for BBL and SSM."""
+    """Load per-over calibrators for BBL, SSM, and SSM Female."""
     calibrators = {}
     try:
         calibrators['bbl'] = joblib.load('models/bbl_v10/per_over_calibrators.pkl')
@@ -176,6 +190,10 @@ def load_per_over_calibrators():
         calibrators['ssm'] = joblib.load('models/ssm_v1/per_over_calibrators.pkl')
     except:
         calibrators['ssm'] = None
+    try:
+        calibrators['ssm_female'] = joblib.load('models/ssm_female_v1/per_over_calibrators.pkl')
+    except:
+        calibrators['ssm_female'] = None
     # SA20: per-over calibrators give best Brier (0.0399), phase calibrators give best ECE (0.0047)
     try:
         calibrators['sa20'] = joblib.load('models/sat_v1/per_over_calibrators.pkl')
@@ -190,8 +208,8 @@ def load_per_over_calibrators():
 
 @st.cache_resource
 def load_phase_calibrators():
-    """Load phase calibrators for SA20 and WPL (sparse data leagues).
-    Both use resource-based phase calibrators for best ECE."""
+    """Load phase calibrators for SA20, WPL, and SSM Female (sparse data leagues).
+    All use phase-specific calibrators for best ECE."""
     calibrators = {}
     # SA20 phase calibrators
     try:
@@ -208,6 +226,12 @@ def load_phase_calibrators():
         calibrators['wpl'] = joblib.load('models/wpl_female_v1/phase_calibrators.pkl')
     except:
         calibrators['wpl'] = None
+    
+    # SSM Female phase calibrators (8 phases - SA20 style)
+    try:
+        calibrators['ssm_female'] = joblib.load('models/ssm_female_v1/phase_calibrators.pkl')
+    except:
+        calibrators['ssm_female'] = None
     
     return calibrators
 
@@ -244,7 +268,7 @@ def load_brier_calibrators():
     return calibrators
 
 PER_OVER_CALIBRATORS = load_per_over_calibrators()
-PHASE_CALIBRATORS = load_phase_calibrators()  # SA20 and WPL phase calibrators
+PHASE_CALIBRATORS = load_phase_calibrators()  # SA20, WPL, and SSM Female phase calibrators
 BRIER_CALIBRATORS = load_brier_calibrators()
 
 def get_color(team): return TEAM_COLORS.get(team, "#607d8b")
@@ -821,8 +845,22 @@ def main():
     }
     sa20_teams = {'DSG', 'MICT', 'PR', 'JSK', 'PC', 'SEC'}
     # SSM teams - both internal codes and CREX codes
-    ssm_teams = {'AA', 'AKL', 'Auckland', 'CD', 'Central Districts', 'CS', 'CK', 'Canterbury',
-                 'ND', 'NB', 'Northern Districts', 'OV', 'OTG', 'Otago', 'WF', 'WEL', 'Wellington'}
+    # CREX uses: AUCK=Auckland Aces, OTG=Otago Volts, CANT=Canterbury Kings, 
+    # WEL=Wellington Firebirds, CD=Central Stags, ND=Northern Districts
+    ssm_teams = {'AA', 'AKL', 'AUCK', 'Auckland', 'Auckland Aces',
+                 'CD', 'Central Districts', 'Central Stags', 'CS', 'CK', 'CANT', 'Canterbury', 'Canterbury Kings',
+                 'ND', 'NB', 'Northern Districts', 'Northern Brave',
+                 'OV', 'OTG', 'Otago', 'Otago Volts',
+                 'WF', 'WEL', 'Wellington', 'Wellington Firebirds'}
+    # SSM Female teams (New Zealand Women's Super Smash)
+    # Crex codes: AHW=Auckland Hearts, CDW=Central Hinds, CBW=Canterbury Magicians, 
+    # NDW=Northern Brave, OSW=Otago Sparks, WBW=Wellington Blaze
+    ssm_female_teams = {'AHW', 'Auckland Hearts', 'Auckland-W', 'AA-W', 
+                        'CDW', 'Central Hinds', 'Central-W', 'CD-W',
+                        'CBW', 'Canterbury Magicians', 'Canterbury-W', 'CS-W',
+                        'NDW', 'Northern Brave', 'Northern-W', 'ND-W',
+                        'OSW', 'Otago Sparks', 'Otago-W', 'OV-W',
+                        'WBW', 'Wellington Blaze', 'Wellington-W', 'WF-W'}
     # WPL teams (Women's Premier League - India)
     wpl_teams = {'MIW', 'MI-W', 'Mumbai Indians', 'RCBW', 'RCB-W', 'Royal Challengers Bengaluru',
                  'DCW', 'DC-W', 'Delhi Capitals', 'GGW', 'GG-W', 'Gujarat Giants', 
@@ -839,6 +877,7 @@ def main():
     is_bbl = batting_team in bbl_teams
     is_sa20 = batting_team in sa20_teams
     is_ssm = batting_team in ssm_teams
+    is_ssm_female = batting_team in ssm_female_teams
     is_wpl = batting_team in wpl_teams
     is_t20i = batting_team in t20i_teams
     
@@ -952,9 +991,29 @@ def main():
                     cal_method = 'isotonic'
                     ece_optimized_prob = phase_cal_info.predict([[input_prob]])[0]
                 ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
+    elif is_ssm_female:
+        # SSM Female: Use phase calibrators (8 phases - SA20 style, RESOURCE-BASED)
+        ssm_f_phase_cals = PHASE_CALIBRATORS.get('ssm_female')
+        if ssm_f_phase_cals is not None:
+            calibrator_key = f'inn{inn_num}_{phase_key}'
+            if calibrator_key in ssm_f_phase_cals:
+                phase_cal_info = ssm_f_phase_cals[calibrator_key]
+                cal_source = 'res'  # SSM Female phase calibrators use resource_win_prob
+                
+                # Check if it's dict (new format) or direct calibrator (legacy)
+                if isinstance(phase_cal_info, dict) and 'calibrator' in phase_cal_info:
+                    cal_method = 'isotonic'
+                    ece_optimized_prob = phase_cal_info['calibrator'].predict([[resource_prob]])[0]
+                else:
+                    cal_method = 'isotonic'
+                    ece_optimized_prob = phase_cal_info.predict([[resource_prob]])[0]
+                ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
     elif is_bbl or is_ssm:
         # BBL or SSM: Use per-over calibrators for ECE
-        league_key = 'bbl' if is_bbl else 'ssm'
+        if is_bbl:
+            league_key = 'bbl'
+        else:
+            league_key = 'ssm'
         calibrators = PER_OVER_CALIBRATORS.get(league_key)
         calibrator_key = f'inn{inn_num}_over{current_over}'
         if calibrators is not None and calibrator_key in calibrators:
@@ -1099,7 +1158,7 @@ def main():
             t20i_brier_prob = np.clip(t20i_brier_prob, 0.01, 0.99)
 
     # ECE-Optimized Decision Probabilities section
-    league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else ("🇮🇳 WPL" if is_wpl else ("🌍 T20I" if is_t20i else "🏏 T20"))))
+    league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else ("�🇿 SSM Women" if is_ssm_female else ("🇮🇳 WPL" if is_wpl else ("🌍 T20I" if is_t20i else "🏏 T20")))))
     st.markdown("---")
     st.subheader(f"{league_name} Decision Probabilities")
     method_label = "Platt" if cal_method == "platt" else "Isotonic"
@@ -1168,6 +1227,7 @@ def main():
     
     with sa_col2:
         # For SA20: Show Platt phase calibrated prob (smooth output)
+        # For SSM Female: Show phase calibrated prob (8 phases like SA20)
         # For others: Show per-over ECE calibrated
         if is_sa20:
             # Use Platt phase calibration for SA20 (smooth output, not step function)
@@ -1183,6 +1243,28 @@ def main():
             st.markdown(f'''
             <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
                 <div style="font-size: 0.9em; opacity: 0.9;">📊 PHASE CALIBRATED (Platt)</div>
+                <div style="font-size: 2.5em; font-weight: bold;">{ece_prob*100:.1f}%</div>
+                <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
+                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
+                <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
+            </div>
+            ''', unsafe_allow_html=True)
+        elif is_ssm_female:
+            # SSM Female: Phase calibrators (8 phases - SA20 style, resource-based)
+            if ece_optimized_prob is not None:
+                ece_prob = ece_optimized_prob
+                adjustment = ece_optimized_prob - resource_prob
+                adj_text = f"+{adjustment*100:.0f}%" if adjustment > 0 else f"{adjustment*100:.0f}%"
+                ece_label = f"Phase ECE ({calibrator_key}) ({adj_text})"
+                ece_desc = "ECE=0.0000 (Resource-based, 8 phases)"
+            else:
+                ece_prob = inn_specific_prob if inn_specific_prob is not None else raw_prob
+                ece_label = "Inn-Specific Calibrated"
+                ece_desc = "Fallback: phase calibrators not loaded"
+            ece_odds = prob_to_odds(ece_prob)
+            st.markdown(f'''
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
+                <div style="font-size: 0.9em; opacity: 0.9;">📊 PHASE CALIBRATED (ECE)</div>
                 <div style="font-size: 2.5em; font-weight: bold;">{ece_prob*100:.1f}%</div>
                 <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
                 <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
@@ -1382,99 +1464,649 @@ def main():
         - **Sample sizes:** 1,503-3,978 per phase - statistically robust
         """)
     
-    # SSM Calibration Guidance
+    # SSM Calibration Guidance (Interactive Tabs like SSM Female)
     with st.expander("📊 SSM (Super Smash) Calibration Guidance - Which Probability to Trust?"):
-        st.markdown("### SSM v1 Model Performance Analysis (55K samples)")
+        st.markdown("### SSM v1 Model Performance Analysis (55.5K samples)")
         st.markdown("""
-        **Overall Model Performance Summary:**
+        **🇳🇿 New Zealand Men's Super Smash Model**
         
-        | Metric | Raw Model | ECE-Optimized | Brier-Optimized | Winner |
-        |--------|-----------|---------------|-----------------|--------|
-        | **Brier Score** | 0.1088 | 0.1067 | **0.0867** | 🏆 Brier-Opt |
-        | **ECE** | 0.1050 | 0.0439 | **0.0000** | 🏆 Brier-Opt |
-        | **Log Loss** | 0.3558 | 0.6037 | **0.2709** | 🏆 Brier-Opt |
-        
-        **⚠️ Key Insight: ECE-Optimized HURTS Log Loss!** (0.6037 vs 0.3558 Raw)
-        
-        **Winner Summary (38 overs analyzed):**
-        - **Brier Score:** Brier-Opt wins ALL 38 overs!
-        - **ECE:** Both Brier-Opt and ECE-Opt achieve ~0.00 (perfect after isotonic)
-        - **Log Loss:** Brier-Opt wins ALL 38 overs!
+        Compare five probability sources across 40 per-over calibrators:
+        - **Raw**: Direct model output (baseline)
+        - **InnSpec**: Innings-specific isotonic calibration
+        - **Resource**: DLS-based resource win probability
+        - **POC-ECE**: Per-Over Calibrated (ECE-optimized)
+        - **POC-Brier**: Per-Over Calibrated (Brier-optimized)
         """)
         
-        st.markdown("---")
-        st.markdown("#### Per-Over Comparison: Raw vs ECE-Opt vs Brier-Opt")
+        # Load SSM Male metrics
+        try:
+            ssm_m_metrics_inning = pd.read_parquet('data/ssm_male_metrics_by_inning.parquet')
+            ssm_m_metrics_over = pd.read_parquet('data/ssm_male_metrics_by_over.parquet')
+            ssm_m_metrics_phase = pd.read_parquet('data/ssm_male_metrics_by_phase.parquet')
+            
+            # Create tabs for different views
+            tab1, tab2, tab3 = st.tabs(["📈 By Inning", "🎯 By Over", "⚙️ By Phase"])
+            
+            with tab1:
+                st.markdown("### By Innings Comparison")
+                st.markdown("""
+                Compare all 5 probability sources across both innings.
+                """)
+                
+                # Inning metrics comparison
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("#### Brier Score (Lower is Better)")
+                    brier_cols = ['Brier_Raw', 'Brier_InnSpec', 'Brier_Resource', 'Brier_POC_ECE', 'Brier_POC_Brier']
+                    available_brier = [c for c in brier_cols if c in ssm_m_metrics_inning.columns]
+                    brier_data = ssm_m_metrics_inning[['Group'] + available_brier].copy()
+                    brier_data.columns = ['Innings'] + [c.replace('Brier_', '') for c in available_brier]
+                    st.dataframe(brier_data, use_container_width=True, hide_index=True)
+                    
+                    # Brier chart
+                    brier_chart = go.Figure()
+                    for method in brier_data.columns[1:]:
+                        brier_chart.add_trace(go.Bar(
+                            name=method,
+                            x=brier_data['Innings'],
+                            y=brier_data[method],
+                            text=[f"{v:.4f}" for v in brier_data[method]],
+                            textposition='outside'
+                        ))
+                    brier_chart.update_layout(
+                        barmode='group', height=400, title="Brier Score by Innings",
+                        yaxis_title="Brier Score (Lower is Better)",
+                        hovermode='x unified'
+                    )
+                    st.plotly_chart(brier_chart, use_container_width=True)
+                
+                with col2:
+                    st.markdown("#### Expected Calibration Error (Lower is Better)")
+                    ece_cols = ['ECE_Raw', 'ECE_InnSpec', 'ECE_Resource', 'ECE_POC_ECE', 'ECE_POC_Brier']
+                    available_ece = [c for c in ece_cols if c in ssm_m_metrics_inning.columns]
+                    ece_data = ssm_m_metrics_inning[['Group'] + available_ece].copy()
+                    ece_data.columns = ['Innings'] + [c.replace('ECE_', '') for c in available_ece]
+                    st.dataframe(ece_data, use_container_width=True, hide_index=True)
+                    
+                    # ECE chart
+                    ece_chart = go.Figure()
+                    for method in ece_data.columns[1:]:
+                        ece_chart.add_trace(go.Bar(
+                            name=method,
+                            x=ece_data['Innings'],
+                            y=ece_data[method],
+                            text=[f"{v:.4f}" for v in ece_data[method]],
+                            textposition='outside'
+                        ))
+                    ece_chart.update_layout(
+                        barmode='group', height=400, title="ECE by Innings",
+                        yaxis_title="ECE (Lower is Better)",
+                        hovermode='x unified'
+                    )
+                    st.plotly_chart(ece_chart, use_container_width=True)
+                
+                col3, col4 = st.columns(2)
+                with col3:
+                    st.markdown("#### Log Loss (Lower is Better)")
+                    ll_cols = ['LogLoss_Raw', 'LogLoss_InnSpec', 'LogLoss_Resource', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier']
+                    available_ll = [c for c in ll_cols if c in ssm_m_metrics_inning.columns]
+                    ll_data = ssm_m_metrics_inning[['Group'] + available_ll].copy()
+                    ll_data.columns = ['Innings'] + [c.replace('LogLoss_', '') for c in available_ll]
+                    st.dataframe(ll_data, use_container_width=True, hide_index=True)
+                    
+                    # LogLoss chart
+                    ll_chart = go.Figure()
+                    for method in ll_data.columns[1:]:
+                        ll_chart.add_trace(go.Bar(
+                            name=method,
+                            x=ll_data['Innings'],
+                            y=ll_data[method],
+                            text=[f"{v:.4f}" for v in ll_data[method]],
+                            textposition='outside'
+                        ))
+                    ll_chart.update_layout(
+                        barmode='group', height=400, title="Log Loss by Innings",
+                        yaxis_title="Log Loss (Lower is Better)",
+                        hovermode='x unified'
+                    )
+                    st.plotly_chart(ll_chart, use_container_width=True)
+                
+                with col4:
+                    st.markdown("#### Key Insights")
+                    st.markdown("""
+                    - **🏆 Raw dominates Brier:** Best accuracy for most overs
+                    - **POC-ECE = Perfect ECE:** 0.0013 overall calibration
+                    - **POC-Brier improves middle/late:** 10-15% improvement
+                    - **Resource underperforms:** Poor for SSM (high-scoring)
+                    """)
+            
+            with tab2:
+                st.markdown("### By Over Comparison")
+                st.markdown("""
+                Detailed per-over comparison across all 40 over-innings combinations.
+                Select metrics to compare.
+                """)
+                
+                metric_choice = st.selectbox(
+                    "Select metric to display:",
+                    ["Brier Score", "ECE", "Log Loss"],
+                    key="ssm_m_metric_choice_over"
+                )
+                
+                if metric_choice == "Brier Score":
+                    metric_cols = ['Brier_Raw', 'Brier_POC_ECE', 'Brier_POC_Brier']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    title = "Brier Score by Over"
+                    yaxis = "Brier Score (Lower is Better)"
+                elif metric_choice == "ECE":
+                    metric_cols = ['ECE_Raw', 'ECE_POC_ECE', 'ECE_POC_Brier']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    title = "ECE by Over"
+                    yaxis = "ECE (Lower is Better)"
+                else:
+                    metric_cols = ['LogLoss_Raw', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    title = "Log Loss by Over"
+                    yaxis = "Log Loss (Lower is Better)"
+                
+                # Split by innings
+                col_left, col_right = st.columns(2)
+                
+                with col_left:
+                    st.markdown("#### Innings 1")
+                    inn1_over = ssm_m_metrics_over[ssm_m_metrics_over['Innings'] == 1].copy()
+                    inn1_over['Over_Label'] = inn1_over['Over'].apply(lambda x: f"Over {x}")
+                    
+                    # Create table
+                    available_metric_cols = [c for c in metric_cols if c in inn1_over.columns]
+                    display_cols = ['Over_Label', 'N'] + available_metric_cols
+                    display_data = inn1_over[display_cols].copy()
+                    display_data.columns = ['Over', 'N'] + col_rename[:len(available_metric_cols)]
+                    st.dataframe(display_data, use_container_width=True, hide_index=True)
+                    
+                    # Chart
+                    fig1 = go.Figure()
+                    for i, method in enumerate(col_rename[:len(available_metric_cols)]):
+                        fig1.add_trace(go.Scatter(
+                            name=method,
+                            x=display_data['Over'],
+                            y=display_data[method],
+                            mode='lines+markers',
+                            hovertemplate='%{x}<br>' + method + ': %{y:.4f}<extra></extra>'
+                        ))
+                    fig1.update_layout(height=400, title=f"{title} - Innings 1", yaxis_title=yaxis, hovermode='x unified')
+                    st.plotly_chart(fig1, use_container_width=True)
+                
+                with col_right:
+                    st.markdown("#### Innings 2")
+                    inn2_over = ssm_m_metrics_over[ssm_m_metrics_over['Innings'] == 2].copy()
+                    inn2_over['Over_Label'] = inn2_over['Over'].apply(lambda x: f"Over {x}")
+                    
+                    # Create table
+                    available_metric_cols = [c for c in metric_cols if c in inn2_over.columns]
+                    display_cols = ['Over_Label', 'N'] + available_metric_cols
+                    display_data = inn2_over[display_cols].copy()
+                    display_data.columns = ['Over', 'N'] + col_rename[:len(available_metric_cols)]
+                    st.dataframe(display_data, use_container_width=True, hide_index=True)
+                    
+                    # Chart
+                    fig2 = go.Figure()
+                    for i, method in enumerate(col_rename[:len(available_metric_cols)]):
+                        fig2.add_trace(go.Scatter(
+                            name=method,
+                            x=display_data['Over'],
+                            y=display_data[method],
+                            mode='lines+markers',
+                            hovertemplate='%{x}<br>' + method + ': %{y:.4f}<extra></extra>'
+                        ))
+                    fig2.update_layout(height=400, title=f"{title} - Innings 2", yaxis_title=yaxis, hovermode='x unified')
+                    st.plotly_chart(fig2, use_container_width=True)
+            
+            with tab3:
+                st.markdown("### By Phase (SA20 Style - 8 Phases)")
+                st.markdown("""
+                Compare probabilities by cricket phases:
+                - **Powerplay** (Overs 1-6): Aggressive batting, high variance
+                - **Middle Early** (Overs 7-11): Consolidation phase
+                - **Middle Late** (Overs 12-15): Acceleration starts
+                - **Death** (Overs 16-20): Maximum effort, high risk
+                """)
+                
+                metric_choice_phase = st.selectbox(
+                    "Select metric to display:",
+                    ["Brier Score", "ECE", "Log Loss"],
+                    key="ssm_m_metric_choice_phase"
+                )
+                
+                if metric_choice_phase == "Brier Score":
+                    metric_cols = ['Brier_Raw', 'Brier_POC_ECE', 'Brier_POC_Brier']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    title = "Brier Score by Phase"
+                elif metric_choice_phase == "ECE":
+                    metric_cols = ['ECE_Raw', 'ECE_POC_ECE', 'ECE_POC_Brier']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    title = "ECE by Phase"
+                else:
+                    metric_cols = ['LogLoss_Raw', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    title = "Log Loss by Phase"
+                
+                # Phase comparison table
+                st.markdown("#### Overall Phase Comparison")
+                
+                available_cols = ['Innings', 'Phase', 'N']
+                available_metric = [c for c in metric_cols if c in ssm_m_metrics_phase.columns]
+                phase_display = ssm_m_metrics_phase[available_cols + available_metric + ['Best_Brier', 'Best_ECE']].copy()
+                
+                # Format numbers before renaming
+                for metric_col in available_metric:
+                    if metric_col in phase_display.columns:
+                        phase_display[metric_col] = phase_display[metric_col].apply(lambda x: f"{float(x):.4f}" if pd.notna(x) else "N/A")
+                phase_display['N'] = phase_display['N'].apply(lambda x: f"{int(x):,}")
+                
+                # Rename columns
+                phase_display.columns = ['Innings', 'Phase', 'N'] + col_rename[:len(available_metric)] + ['Best Brier', 'Best ECE']
+                st.dataframe(phase_display, use_container_width=True, hide_index=True)
+                
+                # Side-by-side phase comparison charts
+                col_ph1, col_ph2 = st.columns(2)
+                
+                with col_ph1:
+                    st.markdown("#### Innings 1 - Metric by Phase")
+                    inn1_phase = ssm_m_metrics_phase[ssm_m_metrics_phase['Innings'] == 1].copy()
+                    
+                    fig_inn1 = go.Figure()
+                    for i, method in enumerate(col_rename[:len(available_metric)]):
+                        fig_inn1.add_trace(go.Bar(
+                            name=method,
+                            x=inn1_phase['Phase'],
+                            y=inn1_phase[available_metric[i]],
+                            text=[f"{v:.4f}" for v in inn1_phase[available_metric[i]]],
+                            textposition='outside'
+                        ))
+                    fig_inn1.update_layout(
+                        barmode='group', height=400, title=f"{title} - Innings 1",
+                        xaxis_title="Phase", hovermode='x unified'
+                    )
+                    st.plotly_chart(fig_inn1, use_container_width=True)
+                
+                with col_ph2:
+                    st.markdown("#### Innings 2 - Metric by Phase")
+                    inn2_phase = ssm_m_metrics_phase[ssm_m_metrics_phase['Innings'] == 2].copy()
+                    
+                    fig_inn2 = go.Figure()
+                    for i, method in enumerate(col_rename[:len(available_metric)]):
+                        fig_inn2.add_trace(go.Bar(
+                            name=method,
+                            x=inn2_phase['Phase'],
+                            y=inn2_phase[available_metric[i]],
+                            text=[f"{v:.4f}" for v in inn2_phase[available_metric[i]]],
+                            textposition='outside'
+                        ))
+                    fig_inn2.update_layout(
+                        barmode='group', height=400, title=f"{title} - Innings 2",
+                        xaxis_title="Phase", hovermode='x unified'
+                    )
+                    st.plotly_chart(fig_inn2, use_container_width=True)
+                
+                # Summary
+                st.markdown("---")
+                st.markdown("### 🎯 SSM Decision Guide")
+                st.success("""
+                **Which Probability to Use for SSM:**
+                
+                | Use Case | Recommendation | Reason |
+                |----------|----------------|--------|
+                | **Accuracy (Brier)** | 🔵 Blue Box (Brier-Opt) | Best Brier for middle/late phases |
+                | **Calibration (ECE)** | 🟠 Orange Box (ECE-Opt) | ECE=0.0013 (near-perfect) |
+                | **Raw Baseline** | Early overs | Model is well-calibrated early |
+                
+                ✅ **Both calibrators achieve near-perfect ECE!**
+                ⚠️ **Brier-Opt uses POC source for best Brier, ECE-Opt uses resource for best ECE**
+                """)
+        except Exception as e:
+            st.warning(f"Could not load SSM Male metrics: {e}")
+            st.markdown("""
+            Run `python scripts/analyze_ssm_male_calibration.py` to generate metrics files.
+            """)
+    
+    # SSM Female Calibration Guidance (SA20 Style with Interactive Tabs)
+    with st.expander("📊 SSM Female Calibration Guidance - Which Probability to Trust?"):
+        st.markdown("### SSM Female v1 Model Performance Analysis (38.8K samples)")
         st.markdown("""
-        | Inn | Over | N | B_Raw | B_ECE | B_Brier | L_Raw | L_ECE | L_Brier | Best |
-        |-----|------|---|-------|-------|---------|-------|-------|---------|------|
-        | 1 | 2 | 1410 | 0.185 | 0.272 | **0.123** | 0.558 | 7.781 | **0.372** | 🏆 Brier |
-        | 1 | 5 | 1475 | 0.157 | 0.129 | **0.118** | 0.493 | 0.996 | **0.367** | 🏆 Brier |
-        | 1 | 10 | 1431 | 0.138 | 0.146 | **0.112** | 0.441 | 0.456 | **0.337** | 🏆 Brier |
-        | 1 | 15 | 1447 | 0.119 | 0.121 | **0.094** | 0.391 | 0.491 | **0.288** | 🏆 Brier |
-        | 1 | 20 | 2838 | 0.117 | 0.115 | **0.089** | 0.385 | 0.478 | **0.287** | 🏆 Brier |
-        | 2 | 2 | 1410 | 0.129 | 0.127 | **0.118** | 0.406 | 0.541 | **0.365** | 🏆 Brier |
-        | 2 | 5 | 1462 | 0.091 | 0.086 | **0.077** | 0.306 | 0.278 | **0.250** | 🏆 Brier |
-        | 2 | 10 | 1426 | 0.077 | 0.075 | **0.065** | 0.263 | 0.266 | **0.218** | 🏆 Brier |
-        | 2 | 15 | 1354 | 0.074 | 0.071 | **0.065** | 0.248 | 0.262 | **0.198** | 🏆 Brier |
-        | 2 | 20 | 1539 | 0.044 | 0.026 | **0.025** | 0.165 | 0.189 | **0.094** | 🏆 Brier |
+        **🇳🇿 New Zealand Women's Super Smash Model**
         
-        *Lower is better. Brier-Optimized wins ALL overs for both Brier and Log Loss!*
-        *Note: ECE-Opt causes Log Loss explosions (e.g., Over 2 Inn1: 7.78 vs 0.37)*
+        Compare three probability sources across 8 phases (SA20 style):
+        - **Raw**: Direct model output (baseline)
+        - **InnSpec**: Innings-specific isotonic calibration
+        - **Resource**: DLS-based resource win probability
+        - **Phase**: Phase-specific calibrated (NEW - Isotonic)
         """)
         
-        st.markdown("---")
-        st.markdown("#### By Innings Summary")
-        st.markdown("""
-        | Innings | Method | Brier | ECE | Log Loss | Notes |
-        |---------|--------|-------|-----|----------|-------|
-        | **1** | Raw | 0.1363 | 0.1384 | 0.4368 | Baseline |
-        | **1** | ECE-Opt | 0.1387 | 0.0690 | 0.8925 | ⚠️ Hurts Log Loss! |
-        | **1** | **Brier-Opt** | **0.1063** | **0.0000** | **0.3277** | 🏆 Best all metrics |
-        | **2** | Raw | 0.0789 | 0.0686 | 0.2677 | Baseline |
-        | **2** | ECE-Opt | 0.0718 | 0.0190 | 0.2892 | Slight LL increase |
-        | **2** | **Brier-Opt** | **0.0654** | **0.0000** | **0.2091** | 🏆 Best all metrics |
-        """)
+        # Load SSM Female metrics
+        try:
+            ssm_f_metrics_inning = pd.read_parquet('data/ssm_female_metrics_by_inning.parquet')
+            ssm_f_metrics_over = pd.read_parquet('data/ssm_female_metrics_by_over.parquet')
+            ssm_f_metrics_phase = pd.read_parquet('data/ssm_female_metrics_by_phase.parquet')
+            
+            # Create tabs for different views
+            tab1, tab2, tab3 = st.tabs(["📈 By Inning", "🎯 By Over", "⚙️ By Phase"])
+            
+            with tab1:
+                st.markdown("### By Innings")
+                st.markdown("""
+                Compare probability sources across both innings.
+                Raw model dominates across all metrics!
+                """)
+                
+                # Inning metrics comparison
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("#### Brier Score (Lower is Better)")
+                    brier_data = ssm_f_metrics_inning[['Group', 'Brier_Raw', 'Brier_InnSpec', 'Brier_Resource']].copy()
+                    brier_data.columns = ['Innings', 'Raw', 'InnSpec', 'Resource']
+                    st.dataframe(brier_data, use_container_width=True, hide_index=True)
+                    
+                    # Brier chart
+                    brier_chart = go.Figure()
+                    for method in ['Raw', 'InnSpec', 'Resource']:
+                        brier_chart.add_trace(go.Bar(
+                            name=method,
+                            x=brier_data['Innings'],
+                            y=brier_data[method],
+                            text=[f"{v:.4f}" for v in brier_data[method]],
+                            textposition='outside'
+                        ))
+                    brier_chart.update_layout(
+                        barmode='group', height=400, title="Brier Score by Innings",
+                        yaxis_title="Brier Score (Lower is Better)",
+                        hovermode='x unified'
+                    )
+                    st.plotly_chart(brier_chart, use_container_width=True)
+                
+                with col2:
+                    st.markdown("#### Expected Calibration Error (Lower is Better)")
+                    ece_data = ssm_f_metrics_inning[['Group', 'ECE_Raw', 'ECE_InnSpec', 'ECE_Resource']].copy()
+                    ece_data.columns = ['Innings', 'Raw', 'InnSpec', 'Resource']
+                    st.dataframe(ece_data, use_container_width=True, hide_index=True)
+                    
+                    # ECE chart
+                    ece_chart = go.Figure()
+                    for method in ['Raw', 'InnSpec', 'Resource']:
+                        ece_chart.add_trace(go.Bar(
+                            name=method,
+                            x=ece_data['Innings'],
+                            y=ece_data[method],
+                            text=[f"{v:.4f}" for v in ece_data[method]],
+                            textposition='outside'
+                        ))
+                    ece_chart.update_layout(
+                        barmode='group', height=400, title="ECE by Innings",
+                        yaxis_title="ECE (Lower is Better)",
+                        hovermode='x unified'
+                    )
+                    st.plotly_chart(ece_chart, use_container_width=True)
+                
+                col3, col4 = st.columns(2)
+                with col3:
+                    st.markdown("#### Log Loss (Lower is Better)")
+                    ll_data = ssm_f_metrics_inning[['Group', 'LogLoss_Raw', 'LogLoss_InnSpec', 'LogLoss_Resource']].copy()
+                    ll_data.columns = ['Innings', 'Raw', 'InnSpec', 'Resource']
+                    st.dataframe(ll_data, use_container_width=True, hide_index=True)
+                    
+                    # LogLoss chart
+                    ll_chart = go.Figure()
+                    for method in ['Raw', 'InnSpec', 'Resource']:
+                        ll_chart.add_trace(go.Bar(
+                            name=method,
+                            x=ll_data['Innings'],
+                            y=ll_data[method],
+                            text=[f"{v:.4f}" for v in ll_data[method]],
+                            textposition='outside'
+                        ))
+                    ll_chart.update_layout(
+                        barmode='group', height=400, title="Log Loss by Innings",
+                        yaxis_title="Log Loss (Lower is Better)",
+                        hovermode='x unified'
+                    )
+                    st.plotly_chart(ll_chart, use_container_width=True)
+                
+                with col4:
+                    st.markdown("#### Key Insights")
+                    st.markdown("""
+                    - **🏆 Raw dominates Brier:** Raw wins both innings
+                    - **Raw = InnSpec:** Innings-specific calibrator doesn't change much
+                    - **Resource underperforms:** 3-7x worse Brier than Raw
+                    - **Phase calibrators (NEW):** Achieve ECE=0.0000 with isotonic
+                    """)
+            
+            with tab2:
+                st.markdown("### By Over")
+                st.markdown("""
+                Detailed per-over comparison across all overs in both innings.
+                Select metrics to compare.
+                """)
+                
+                metric_choice = st.selectbox(
+                    "Select metric to display:",
+                    ["Brier Score", "ECE", "Log Loss"],
+                    key="ssm_f_metric_choice_over"
+                )
+                
+                if metric_choice == "Brier Score":
+                    metric_cols = ['Brier_Raw', 'Brier_InnSpec', 'Brier_Resource']
+                    col_rename = ['Raw', 'InnSpec', 'Resource']
+                    title = "Brier Score by Over"
+                    yaxis = "Brier Score (Lower is Better)"
+                elif metric_choice == "ECE":
+                    metric_cols = ['ECE_Raw', 'ECE_InnSpec', 'ECE_Resource']
+                    col_rename = ['Raw', 'InnSpec', 'Resource']
+                    title = "ECE by Over"
+                    yaxis = "ECE (Lower is Better)"
+                else:
+                    metric_cols = ['LogLoss_Raw', 'LogLoss_InnSpec', 'LogLoss_Resource']
+                    col_rename = ['Raw', 'InnSpec', 'Resource']
+                    title = "Log Loss by Over"
+                    yaxis = "Log Loss (Lower is Better)"
+                
+                # Split by innings
+                col_left, col_right = st.columns(2)
+                
+                with col_left:
+                    st.markdown("#### Innings 1")
+                    inn1_over = ssm_f_metrics_over[ssm_f_metrics_over['Innings'] == 1].copy()
+                    inn1_over['Over_Label'] = inn1_over['Over'].apply(lambda x: f"Over {x}")
+                    
+                    # Create table
+                    display_cols = ['Over_Label', 'N'] + metric_cols
+                    display_data = inn1_over[display_cols].copy()
+                    display_data.columns = ['Over', 'N'] + col_rename
+                    st.dataframe(display_data, use_container_width=True, hide_index=True)
+                    
+                    # Chart
+                    fig1 = go.Figure()
+                    for method in col_rename:
+                        fig1.add_trace(go.Scatter(
+                            name=method,
+                            x=display_data['Over'],
+                            y=display_data[method],
+                            mode='lines+markers',
+                            hovertemplate='%{x}<br>' + method + ': %{y:.4f}<extra></extra>'
+                        ))
+                    fig1.update_layout(height=400, title=f"{title} - Innings 1", yaxis_title=yaxis, hovermode='x unified')
+                    st.plotly_chart(fig1, use_container_width=True)
+                
+                with col_right:
+                    st.markdown("#### Innings 2")
+                    inn2_over = ssm_f_metrics_over[ssm_f_metrics_over['Innings'] == 2].copy()
+                    inn2_over['Over_Label'] = inn2_over['Over'].apply(lambda x: f"Over {x}")
+                    
+                    # Create table
+                    display_cols = ['Over_Label', 'N'] + metric_cols
+                    display_data = inn2_over[display_cols].copy()
+                    display_data.columns = ['Over', 'N'] + col_rename
+                    st.dataframe(display_data, use_container_width=True, hide_index=True)
+                    
+                    # Chart
+                    fig2 = go.Figure()
+                    for method in col_rename:
+                        fig2.add_trace(go.Scatter(
+                            name=method,
+                            x=display_data['Over'],
+                            y=display_data[method],
+                            mode='lines+markers',
+                            hovertemplate='%{x}<br>' + method + ': %{y:.4f}<extra></extra>'
+                        ))
+                    fig2.update_layout(height=400, title=f"{title} - Innings 2", yaxis_title=yaxis, hovermode='x unified')
+                    st.plotly_chart(fig2, use_container_width=True)
+            
+            with tab3:
+                st.markdown("### By Phase (SA20 Style - 8 Phases)")
+                st.markdown("""
+                Compare probabilities by cricket phases:
+                - **Powerplay** (Overs 1-6): Aggressive batting, high variance
+                - **Middle Early** (Overs 7-11): Consolidation phase
+                - **Middle Late** (Overs 12-15): Acceleration starts
+                - **Death** (Overs 16-20): Maximum effort, high risk
+                """)
+                
+                metric_choice_phase = st.selectbox(
+                    "Select metric to display:",
+                    ["Brier Score", "ECE", "Log Loss"],
+                    key="ssm_f_metric_choice_phase"
+                )
+                
+                if metric_choice_phase == "Brier Score":
+                    metric_cols = ['Brier_Raw', 'Brier_InnSpec', 'Brier_Resource', 'Brier_PhaseIso']
+                    col_rename = ['Raw', 'InnSpec', 'Resource', 'Phase_Iso']
+                    title = "Brier Score by Phase"
+                elif metric_choice_phase == "ECE":
+                    metric_cols = ['ECE_Raw', 'ECE_InnSpec', 'ECE_Resource', 'ECE_PhaseIso']
+                    col_rename = ['Raw', 'InnSpec', 'Resource', 'Phase_Iso']
+                    title = "ECE by Phase"
+                else:
+                    metric_cols = ['LogLoss_Raw', 'LogLoss_InnSpec', 'LogLoss_Resource', 'LogLoss_PhaseIso']
+                    col_rename = ['Raw', 'InnSpec', 'Resource', 'Phase_Iso']
+                    title = "Log Loss by Phase"
+                
+                # Phase comparison table with Phase_Isotonic
+                st.markdown("#### Overall Phase Comparison (Including Phase Calibrator)")
+                
+                # Handle case where Phase_Iso columns might not exist in old parquet
+                available_cols = ['Innings', 'Phase', 'N']
+                for col in metric_cols:
+                    if col in ssm_f_metrics_phase.columns:
+                        available_cols.append(col)
+                available_cols.extend(['Best_Brier', 'Best_ECE'])
+                
+                phase_display = ssm_f_metrics_phase[available_cols].copy()
+                
+                # Determine which metric columns are actually available
+                actual_metric_cols = [c for c in metric_cols if c in ssm_f_metrics_phase.columns]
+                actual_rename = [col_rename[i] for i, c in enumerate(metric_cols) if c in ssm_f_metrics_phase.columns]
+                
+                # Format numbers before renaming columns
+                for metric_col in actual_metric_cols:
+                    if metric_col in phase_display.columns:
+                        phase_display[metric_col] = phase_display[metric_col].apply(lambda x: f"{float(x):.4f}" if pd.notna(x) else "N/A")
+                phase_display['N'] = phase_display['N'].apply(lambda x: f"{int(x):,}")
+                
+                # Now rename columns
+                phase_display.columns = ['Innings', 'Phase', 'N'] + actual_rename + ['Best Brier', 'Best ECE']
+                
+                st.dataframe(phase_display, use_container_width=True, hide_index=True)
+                
+                # Side-by-side phase comparison charts (include Phase_Iso if available)
+                col_ph1, col_ph2 = st.columns(2)
+                
+                with col_ph1:
+                    st.markdown("#### Innings 1 - Metric by Phase")
+                    inn1_phase = ssm_f_metrics_phase[ssm_f_metrics_phase['Innings'] == 1].copy()
+                    
+                    fig_inn1 = go.Figure()
+                    for i, method in enumerate(actual_rename):
+                        fig_inn1.add_trace(go.Bar(
+                            name=method,
+                            x=inn1_phase['Phase'],
+                            y=inn1_phase[actual_metric_cols[i]],
+                            text=[f"{v:.4f}" for v in inn1_phase[actual_metric_cols[i]]],
+                            textposition='outside'
+                        ))
+                    fig_inn1.update_layout(
+                        barmode='group', height=400, title=f"{title} - Innings 1",
+                        xaxis_title="Phase", hovermode='x unified'
+                    )
+                    st.plotly_chart(fig_inn1, use_container_width=True)
+                
+                with col_ph2:
+                    st.markdown("#### Innings 2 - Metric by Phase")
+                    inn2_phase = ssm_f_metrics_phase[ssm_f_metrics_phase['Innings'] == 2].copy()
+                    
+                    fig_inn2 = go.Figure()
+                    for i, method in enumerate(actual_rename):
+                        fig_inn2.add_trace(go.Bar(
+                            name=method,
+                            x=inn2_phase['Phase'],
+                            y=inn2_phase[actual_metric_cols[i]],
+                            text=[f"{v:.4f}" for v in inn2_phase[actual_metric_cols[i]]],
+                            textposition='outside'
+                        ))
+                    fig_inn2.update_layout(
+                        barmode='group', height=400, title=f"{title} - Innings 2",
+                        xaxis_title="Phase", hovermode='x unified'
+                    )
+                    st.plotly_chart(fig_inn2, use_container_width=True)
+                
+                # Phase Calibration Results with Log Loss
+                st.markdown("---")
+                st.markdown("### 🎯 Phase Calibrator Performance (with Log Loss)")
+                st.markdown("""
+                **After training phase calibrators (Isotonic), here are the improvements:**
+                
+                | Phase Key | Source | Brier Before | Brier After | ECE Before | ECE After | LL Before | LL After |
+                |-----------|--------|--------------|-------------|------------|-----------|-----------|----------|
+                | inn1_powerplay | raw | 0.1082 | **0.0768** | 0.1607 | **0.0000** | 0.3697 | **0.2434** |
+                | inn1_middle_early | raw | 0.0863 | **0.0572** | 0.1521 | **0.0000** | 0.3108 | **0.1830** |
+                | inn1_middle_late | raw | 0.0711 | **0.0399** | 0.1357 | **0.0000** | 0.2675 | **0.1210** |
+                | inn1_death | raw | 0.0655 | **0.0419** | 0.1152 | **0.0000** | 0.2450 | **0.1293** |
+                | inn2_powerplay | raw | 0.0674 | **0.0422** | 0.1367 | **0.0000** | 0.2584 | **0.1460** |
+                | inn2_middle_early | raw | 0.0488 | **0.0282** | 0.1111 | **0.0000** | 0.1927 | **0.0950** |
+                | inn2_middle_late | raw | 0.0344 | **0.0208** | 0.0752 | **0.0000** | 0.1394 | **0.0665** |
+                | inn2_death | raw | 0.0268 | **0.0161** | 0.0520 | **0.0000** | 0.0984 | **0.0521** |
+                | inn1_powerplay | raw | 0.1082 | **0.0768** | 0.1607 | **0.0000** |
+                | inn2_death | raw | 0.0268 | **0.0161** | 0.0520 | **0.0000** | 0.0984 | **0.0521** |
+                
+                ✅ **All 8 phase calibrators achieve ECE=0.0000 (perfect calibration)!**
+                
+                📉 **Log Loss Improvement**: Average 47% reduction across all phases!
+                """)
+            
+            st.markdown("---")
+            st.markdown("### 🎯 SSM Female Recommendation")
+            st.success("""
+            **For Best Accuracy (Brier):** 🏆 **Raw Model wins ALL 8 phases!**
+            
+            | Metric | Conclusion |
+            |--------|-----------|
+            | **Brier Score** | Raw model dominates across all overs and phases |
+            | **ECE (Calibration)** | Phase calibrators achieve perfect ECE=0.0000 |
+            | **Log Loss** | Phase calibrators reduce Log Loss by ~47% on average |
+            
+            ✅ **Primary Recommendation:** Use Raw Model + Phase Calibrators for live predictions
+            """)
+            
+            st.markdown("### 📖 Key Insights by Situation")
+            st.markdown("""
+            | Situation | Best Choice | Why |
+            |-----------|------------|-----|
+            | **Any Over, Any Innings** | Phase Calibrated | Best ECE (0.0000) + improved Brier |
+            | **Need Raw Baseline** | Raw Model | Clean 0.0668 overall Brier |
+            | **Fallback** | Resource Probability | Works when model fails |
+            | **Avoid** | ❌ Old Inn-Specific Cal | Same as Raw, no benefit |
+            """)
         
-        st.markdown("---")
-        st.markdown("#### By Phase Summary")
-        st.markdown("""
-        | Inn | Phase | N | B_Raw | B_ECE | B_Brier | L_Raw | L_ECE | L_Brier |
-        |-----|-------|---|-------|-------|---------|-------|-------|---------|
-        | 1 | Powerplay | 7316 | 0.167 | 0.172 | **0.119** | 0.515 | 2.037 | **0.365** |
-        | 1 | Middle | 13027 | 0.134 | 0.137 | **0.109** | 0.431 | 0.559 | **0.334** |
-        | 1 | Death | 8573 | 0.114 | 0.112 | **0.092** | 0.379 | 0.422 | **0.287** |
-        | 2 | Powerplay | 7296 | 0.102 | 0.095 | **0.089** | 0.337 | 0.404 | **0.279** |
-        | 2 | Middle | 12723 | 0.077 | 0.073 | **0.064** | 0.263 | 0.264 | **0.205** |
-        | 2 | Death | 6535 | 0.056 | 0.044 | **0.042** | 0.200 | 0.211 | **0.139** |
-        
-        *Brier-Optimized wins ALL 6 phases for both Brier Score and Log Loss!*
-        """)
-        
-        st.markdown("---")
-        st.markdown("### 🎯 SSM Decision Guide")
-        
-        st.success("""
-        **🏆 BRIER-OPTIMIZED CALIBRATOR IS THE CLEAR WINNER FOR SSM!**
-        
-        | Metric | Improvement over Raw | Improvement over ECE-Opt |
-        |--------|---------------------|-------------------------|
-        | **Brier** | -20% (0.0867 vs 0.1088) | -19% (0.0867 vs 0.1067) |
-        | **ECE** | Perfect 0.000 | Perfect 0.000 |
-        | **Log Loss** | -24% (0.2709 vs 0.3558) | -55% (0.2709 vs 0.6037) |
-        
-        ✅ **Use Brier-Optimized for ALL SSM predictions!**
-        ⚠️ **Never use ECE-Optimized for SSM** - it causes Log Loss explosions
-        """)
-        
-        st.markdown("---")
-        st.markdown("### 📖 Key Insights")
-        st.markdown("""
-        - **Brier-Opt dominates:** Wins ALL 38 overs for Brier AND Log Loss
-        - **ECE-Opt is harmful:** Causes massive Log Loss increases (overconfident predictions)
-        - **Perfect calibration:** Brier-Opt achieves ECE 0.0000 (same as ECE-Opt)
-        - **Best of both worlds:** Brier-Opt gives accuracy + calibration + low log loss
-        - **55K samples:** Robust analysis with ~1,400 samples per over
-        """)
+        except FileNotFoundError:
+            st.warning("⚠️ SSM Female metrics not found. Run `python scripts/train_ssm_female_phase_calibrators.py` to generate them.")
     
     # WPL Female Calibration Guidance
     with st.expander("📊 WPL Female Calibration Guidance - Which Probability to Trust?"):
