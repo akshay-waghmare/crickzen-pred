@@ -204,6 +204,8 @@ def main():
                     input_prob = cal_probs[i]
                 elif source == 'per':
                     input_prob = per_over_probs[i]
+                elif source == 'bri':
+                    input_prob = brier_probs[i]
                 else:  # 'res'
                     input_prob = resource_probs[i]
                 

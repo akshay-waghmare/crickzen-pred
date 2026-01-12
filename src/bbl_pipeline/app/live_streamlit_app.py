@@ -1232,7 +1232,7 @@ def main():
                 else:
                     brier_prob = bbl_brier_prob
                     brier_label = f"POC-Brier ({bbl_brier_source})"
-                    brier_desc = "Brier=0.1385"
+                    brier_desc = "Brier=0.1433, LL=0.4720"
             else:
                 brier_prob = raw_prob
                 brier_label = "Raw Model"
@@ -1253,7 +1253,7 @@ def main():
             if bbl_logloss_prob is not None:
                 logloss_prob = bbl_logloss_prob
                 logloss_label = f"POC-LL ({bbl_logloss_source})"
-                logloss_desc = "Log Loss=0.4100"
+                logloss_desc = "LL=0.4102, Brier=0.1367"
             else:
                 logloss_prob = raw_prob
                 logloss_label = "Raw Model"
@@ -1274,7 +1274,7 @@ def main():
             if ece_optimized_prob is not None:
                 ece_prob = ece_optimized_prob
                 ece_label = f"POC-ECE ({cal_source})"
-                ece_desc = "ECE=0.0000"
+                ece_desc = "Brier=0.1392, LL=0.4186"
             else:
                 ece_prob = raw_prob
                 ece_label = "Raw Model"
@@ -1521,11 +1521,11 @@ def main():
                 with col4:
                     st.markdown("#### Key Insights")
                     st.markdown("""
-                    - **🏆 POC-Brier best accuracy:** Brier=0.1385
-                    - **🏆 POC-LL best log loss:** LL=0.4100
-                    - **🏆 POC-ECE perfect calibration:** ECE=0.0000
-                    - **Resource underperforms:** High Brier & LL
-                    - **Inn1 harder to predict:** Higher Brier than Inn2
+                    - **🏆 POC-LL best all-rounder:** Brier=0.1367, LL=0.4102, ECE=0.0002
+                    - **🥇 Best Brier:** POC-LL (0.1367) > POC-ECE (0.1392) > POC-Brier (0.1433)
+                    - **🥇 Best Log Loss:** POC-ECE (0.4186) but POC-LL close (0.4102)
+                    - **🥇 Best calibration:** POC-LL (ECE=0.0002) > POC-ECE (0.0045)
+                    - **Resource underperforms:** High Brier & LL vs calibrated
                     """)
             
             with tab2:
@@ -1681,14 +1681,16 @@ def main():
                 st.markdown("#### 🎯 BBL Calibrator Recommendations")
                 st.success("""
                 **Summary of Best Probability Sources:**
-                - **For Best Accuracy (Brier):** POC-Brier (Brier=0.1385)
-                - **For Best Log Loss:** POC-LL (LL=0.4100)  
-                - **For Best Calibration (ECE):** POC-ECE (ECE=0.0000)
+                - **🥇 Best All-Rounder:** POC-LL (Brier=0.1367, LL=0.4102, ECE=0.0002)
+                - **For Lowest Log Loss:** POC-ECE (0.4186) but POC-LL very close (0.4102)
+                - **For Best Accuracy (Brier):** POC-LL (0.1367) beats all others
+                - **For Perfect Calibration:** POC-LL (ECE=0.0002) nearly perfect
                 
                 **By Phase:**
-                - Inn1 Powerplay: POC-Brier wins Brier & Log Loss
-                - Inn1 Middle/Death: POC-ECE competitive with POC-Brier
-                - Inn2 All Phases: POC-Brier dominates for accuracy
+                - Inn1 Powerplay: POC-Brier best for Brier
+                - Inn1 Middle/Death: POC-ECE/POC-LL competitive
+                - Inn2 Powerplay: POC-LL best overall (0.1452 Brier)
+                - Inn2 Middle/Death: POC-Brier for accuracy
                 """)
         
         except Exception as e:
