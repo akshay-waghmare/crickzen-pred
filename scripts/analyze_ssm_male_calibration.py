@@ -6,7 +6,7 @@ Generates comprehensive calibration metrics:
 - By over (all 40 over-innings combinations)
 - By phase (for reference comparison)
 
-Analyzes: Brier Score, ECE, Log Loss for Raw, InnSpec Cal, Resource, Per-Over ECE, Per-Over Brier
+Analyzes: Brier Score, ECE, Log Loss for Raw, InnSpec Cal, Resource, Per-Over ECE, Per-Over Brier, LL-Opt
 
 Outputs:
 - ssm_male_metrics_by_inning.parquet
@@ -28,6 +28,7 @@ DATA_DIR = Path("data")
 FEATURES_FILE = DATA_DIR / "ssm_features_v1" / "training.parquet"
 OUTPUT_DIR = DATA_DIR
 BRIER_CALS_FILE = MODEL_DIR / "brier_calibrators.pkl"  # Brier-optimized calibrators
+LOGLOSS_CALS_FILE = MODEL_DIR / "logloss_calibrators.pkl"  # Log loss-optimized calibrators
 
 # Phase definitions (SA20 style - 4 phases per innings)
 PHASES = {
@@ -85,7 +86,8 @@ def main():
     iso_cal = joblib.load(MODEL_DIR / "isotonic_calibrator.pkl")
     per_over_cals = joblib.load(MODEL_DIR / "per_over_calibrators.pkl")
     brier_cals = joblib.load(BRIER_CALS_FILE)  # Brier-optimized calibrators
-    print(f"[OK] Model loaded, {len(per_over_cals)} per-over ECE cals, {len(brier_cals)} brier cals")
+    logloss_cals = joblib.load(LOGLOSS_CALS_FILE)  # Log loss-optimized calibrators
+    print(f"[OK] Model loaded, {len(per_over_cals)} per-over ECE cals, {len(brier_cals)} brier cals, {len(logloss_cals)} LL cals")
     
     # Derive over numbers
     df['derived_over'] = derive_over_from_resources(df)
@@ -165,12 +167,41 @@ def main():
             brier_probs[i] = raw_probs[i]
     brier_probs = np.clip(brier_probs, 0.001, 0.999)
     
+    # Log loss-optimized per-over calibrated predictions
+    logloss_probs = np.zeros(len(df))
+    for i in range(len(df)):
+        inn = int(innings[i])
+        over = int(overs[i])
+        cal_key = f'inn{inn}_over{over}'
+        
+        if cal_key in logloss_cals:
+            cal_info = logloss_cals[cal_key]
+            source = cal_info.get('source', 'raw')
+            calibrator = cal_info['calibrator']
+            
+            if source == 'raw':
+                input_prob = raw_probs[i]
+            elif source == 'cal':
+                input_prob = cal_probs[i]
+            elif source == 'per':  # Use ECE-calibrated per-over
+                input_prob = per_over_probs[i]
+            elif source == 'bri':  # Use Brier-calibrated per-over
+                input_prob = brier_probs[i]
+            else:  # 'res'
+                input_prob = resource_probs[i]
+            
+            logloss_probs[i] = calibrator.predict([[input_prob]])[0]
+        else:
+            logloss_probs[i] = raw_probs[i]
+    logloss_probs = np.clip(logloss_probs, 0.001, 0.999)
+    
     # Store in DataFrame
     df['raw_prob'] = raw_probs
     df['cal_prob'] = cal_probs
     df['resource_prob'] = resource_probs
     df['per_over_prob'] = per_over_probs
     df['brier_prob'] = brier_probs
+    df['logloss_prob'] = logloss_probs
     
     # ==========================================================================
     # ANALYSIS BY INNING
@@ -190,16 +221,19 @@ def main():
             'Brier_Resource': brier_score_loss(y_true[mask], resource_probs[mask]),
             'Brier_POC_ECE': brier_score_loss(y_true[mask], per_over_probs[mask]),
             'Brier_POC_Brier': brier_score_loss(y_true[mask], brier_probs[mask]),
+            'Brier_LL_Opt': brier_score_loss(y_true[mask], logloss_probs[mask]),
             'ECE_Raw': calculate_ece(y_true[mask], raw_probs[mask]),
             'ECE_InnSpec': calculate_ece(y_true[mask], cal_probs[mask]),
             'ECE_Resource': calculate_ece(y_true[mask], resource_probs[mask]),
             'ECE_POC_ECE': calculate_ece(y_true[mask], per_over_probs[mask]),
             'ECE_POC_Brier': calculate_ece(y_true[mask], brier_probs[mask]),
+            'ECE_LL_Opt': calculate_ece(y_true[mask], logloss_probs[mask]),
             'LogLoss_Raw': log_loss(y_true[mask], raw_probs[mask]),
             'LogLoss_InnSpec': log_loss(y_true[mask], cal_probs[mask]),
             'LogLoss_Resource': log_loss(y_true[mask], resource_probs[mask]),
             'LogLoss_POC_ECE': log_loss(y_true[mask], per_over_probs[mask]),
             'LogLoss_POC_Brier': log_loss(y_true[mask], brier_probs[mask]),
+            'LogLoss_LL_Opt': log_loss(y_true[mask], logloss_probs[mask]),
         })
     
     inning_df = pd.DataFrame(inning_metrics)
@@ -231,35 +265,42 @@ def main():
             res_over = resource_probs[mask]
             poc_over = per_over_probs[mask]
             brier_over = brier_probs[mask]
+            ll_over = logloss_probs[mask]
             
             brier_raw = brier_score_loss(y_over, raw_over)
             brier_cal = brier_score_loss(y_over, cal_over)
             brier_res = brier_score_loss(y_over, res_over)
             brier_poc = brier_score_loss(y_over, poc_over)
             brier_bri = brier_score_loss(y_over, brier_over)
+            brier_ll = brier_score_loss(y_over, ll_over)
             
             ece_raw = calculate_ece(y_over, raw_over)
             ece_cal = calculate_ece(y_over, cal_over)
             ece_res = calculate_ece(y_over, res_over)
             ece_poc = calculate_ece(y_over, poc_over)
             ece_bri = calculate_ece(y_over, brier_over)
+            ece_ll = calculate_ece(y_over, ll_over)
             
             ll_raw = log_loss(y_over, raw_over)
             ll_cal = log_loss(y_over, cal_over)
             ll_res = log_loss(y_over, res_over)
             ll_poc = log_loss(y_over, poc_over)
             ll_bri = log_loss(y_over, brier_over)
+            ll_ll = log_loss(y_over, ll_over)
             
             # Determine best sources
-            briers = {'raw': brier_raw, 'cal': brier_cal, 'res': brier_res, 'poc_ece': brier_poc, 'poc_brier': brier_bri}
-            eces = {'raw': ece_raw, 'cal': ece_cal, 'res': ece_res, 'poc_ece': ece_poc, 'poc_brier': ece_bri}
+            briers = {'raw': brier_raw, 'cal': brier_cal, 'res': brier_res, 'poc_ece': brier_poc, 'poc_brier': brier_bri, 'll_opt': brier_ll}
+            eces = {'raw': ece_raw, 'cal': ece_cal, 'res': ece_res, 'poc_ece': ece_poc, 'poc_brier': ece_bri, 'll_opt': ece_ll}
+            logloss_scores = {'raw': ll_raw, 'cal': ll_cal, 'res': ll_res, 'poc_ece': ll_poc, 'poc_brier': ll_bri, 'll_opt': ll_ll}
             best_brier = min(briers, key=briers.get)
             best_ece = min(eces, key=eces.get)
+            best_logloss = min(logloss_scores, key=logloss_scores.get)
             
             # Get source used by per-over calibrators
             cal_key = f'inn{inn}_over{over}'
             poc_source = per_over_cals.get(cal_key, {}).get('source', 'N/A')
             brier_source = brier_cals.get(cal_key, {}).get('source', 'N/A')
+            ll_source = logloss_cals.get(cal_key, {}).get('source', 'N/A')
             
             over_metrics.append({
                 'Innings': inn,
@@ -270,20 +311,25 @@ def main():
                 'Brier_Resource': brier_res,
                 'Brier_POC_ECE': brier_poc,
                 'Brier_POC_Brier': brier_bri,
+                'Brier_LL_Opt': brier_ll,
                 'ECE_Raw': ece_raw,
                 'ECE_InnSpec': ece_cal,
                 'ECE_Resource': ece_res,
                 'ECE_POC_ECE': ece_poc,
                 'ECE_POC_Brier': ece_bri,
+                'ECE_LL_Opt': ece_ll,
                 'LogLoss_Raw': ll_raw,
                 'LogLoss_InnSpec': ll_cal,
                 'LogLoss_Resource': ll_res,
                 'LogLoss_POC_ECE': ll_poc,
                 'LogLoss_POC_Brier': ll_bri,
+                'LogLoss_LL_Opt': ll_ll,
                 'Best_Brier': best_brier,
                 'Best_ECE': best_ece,
+                'Best_LogLoss': best_logloss,
                 'POC_ECE_Source': poc_source,
                 'POC_Brier_Source': brier_source,
+                'LL_Opt_Source': ll_source,
             })
             
             print(f"{inn:>3} {over:>4} {n:>6} | {brier_raw:>8.4f} {brier_poc:>8.4f} {brier_bri:>8.4f} | {ece_raw:>6.4f} {ece_poc:>6.4f} {ece_bri:>6.4f} | {best_brier:>10} {best_ece:>10}")
@@ -315,30 +361,36 @@ def main():
             res_phase = resource_probs[mask]
             poc_phase = per_over_probs[mask]
             brier_phase = brier_probs[mask]
+            ll_phase = logloss_probs[mask]
             
             brier_raw = brier_score_loss(y_phase, raw_phase)
             brier_cal = brier_score_loss(y_phase, cal_phase)
             brier_res = brier_score_loss(y_phase, res_phase)
             brier_poc = brier_score_loss(y_phase, poc_phase)
             brier_bri = brier_score_loss(y_phase, brier_phase)
+            brier_ll = brier_score_loss(y_phase, ll_phase)
             
             ece_raw = calculate_ece(y_phase, raw_phase)
             ece_cal = calculate_ece(y_phase, cal_phase)
             ece_res = calculate_ece(y_phase, res_phase)
             ece_poc = calculate_ece(y_phase, poc_phase)
             ece_bri = calculate_ece(y_phase, brier_phase)
+            ece_ll = calculate_ece(y_phase, ll_phase)
             
             ll_raw = log_loss(y_phase, raw_phase)
             ll_cal = log_loss(y_phase, cal_phase)
             ll_res = log_loss(y_phase, res_phase)
             ll_poc = log_loss(y_phase, poc_phase)
             ll_bri = log_loss(y_phase, brier_phase)
+            ll_ll = log_loss(y_phase, ll_phase)
             
             # Determine best sources
-            briers = {'raw': brier_raw, 'cal': brier_cal, 'res': brier_res, 'poc_ece': brier_poc, 'poc_brier': brier_bri}
-            eces = {'raw': ece_raw, 'cal': ece_cal, 'res': ece_res, 'poc_ece': ece_poc, 'poc_brier': ece_bri}
+            briers = {'raw': brier_raw, 'cal': brier_cal, 'res': brier_res, 'poc_ece': brier_poc, 'poc_brier': brier_bri, 'll_opt': brier_ll}
+            eces = {'raw': ece_raw, 'cal': ece_cal, 'res': ece_res, 'poc_ece': ece_poc, 'poc_brier': ece_bri, 'll_opt': ece_ll}
+            logloss_scores = {'raw': ll_raw, 'cal': ll_cal, 'res': ll_res, 'poc_ece': ll_poc, 'poc_brier': ll_bri, 'll_opt': ll_ll}
             best_brier = min(briers, key=briers.get)
             best_ece = min(eces, key=eces.get)
+            best_logloss = min(logloss_scores, key=logloss_scores.get)
             
             phase_metrics.append({
                 'Innings': inn,
@@ -349,18 +401,22 @@ def main():
                 'Brier_Resource': brier_res,
                 'Brier_POC_ECE': brier_poc,
                 'Brier_POC_Brier': brier_bri,
+                'Brier_LL_Opt': brier_ll,
                 'ECE_Raw': ece_raw,
                 'ECE_InnSpec': ece_cal,
                 'ECE_Resource': ece_res,
                 'ECE_POC_ECE': ece_poc,
                 'ECE_POC_Brier': ece_bri,
+                'ECE_LL_Opt': ece_ll,
                 'LogLoss_Raw': ll_raw,
                 'LogLoss_InnSpec': ll_cal,
                 'LogLoss_Resource': ll_res,
                 'LogLoss_POC_ECE': ll_poc,
                 'LogLoss_POC_Brier': ll_bri,
+                'LogLoss_LL_Opt': ll_ll,
                 'Best_Brier': best_brier,
-                'Best_ECE': best_ece
+                'Best_ECE': best_ece,
+                'Best_LogLoss': best_logloss
             })
             
             print(f"Inn{inn} {phase_name:12s} N={n:5d} | Brier: Raw={brier_raw:.4f} ECE={brier_poc:.4f} Bri={brier_bri:.4f} | Best: {best_brier} | ECE Best: {best_ece}")

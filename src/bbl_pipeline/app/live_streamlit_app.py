@@ -269,7 +269,7 @@ def load_brier_calibrators():
 
 @st.cache_resource
 def load_logloss_calibrators():
-    """Load Log Loss-optimized calibrators for BBL.
+    """Load Log Loss-optimized calibrators for BBL and SSM.
     These select best source per over for Log Loss optimization."""
     calibrators = {}
     try:
@@ -278,6 +278,12 @@ def load_logloss_calibrators():
     except Exception as e:
         print(f"[FAIL] Failed to load BBL Log Loss calibrators: {e}")
         calibrators['bbl'] = None
+    try:
+        calibrators['ssm'] = joblib.load('models/ssm_v1/logloss_calibrators.pkl')
+        print(f"[OK] Loaded SSM Log Loss calibrators: {len(calibrators['ssm'])} overs")
+    except Exception as e:
+        print(f"[FAIL] Failed to load SSM Log Loss calibrators: {e}")
+        calibrators['ssm'] = None
     return calibrators
 
 PER_OVER_CALIBRATORS = load_per_over_calibrators()
@@ -911,6 +917,10 @@ def main():
     ssm_brier_prob = None
     ssm_brier_source = None
     
+    # SSM Log Loss-optimized calibrator variables
+    ssm_logloss_prob = None
+    ssm_logloss_source = None
+    
     # BBL Brier-optimized calibrator variables
     bbl_brier_prob = None
     bbl_brier_source = None
@@ -1084,6 +1094,31 @@ def main():
                     # Apply Brier calibrator (always isotonic)
                     ssm_brier_prob = brier_cal_info['calibrator'].predict([[brier_input]])[0]
                     ssm_brier_prob = np.clip(ssm_brier_prob, 0.01, 0.99)
+            
+            # SSM: Apply Log Loss-optimized calibrators
+            logloss_cals = LOGLOSS_CALIBRATORS.get('ssm')
+            if logloss_cals is not None:
+                logloss_cal_key = calibrator_key  # e.g., inn2_over1
+                
+                if logloss_cal_key in logloss_cals:
+                    ll_cal_info = logloss_cals[logloss_cal_key]
+                    ssm_logloss_source = ll_cal_info['source']
+                    
+                    # Get input based on Log Loss-optimal source
+                    if ssm_logloss_source == 'raw':
+                        ll_input = raw_prob
+                    elif ssm_logloss_source == 'per':
+                        # Use the ECE-optimized prob as input
+                        ll_input = ece_optimized_prob if ece_optimized_prob is not None else raw_prob
+                    elif ssm_logloss_source == 'bri':
+                        # Use the Brier-optimized prob as input
+                        ll_input = ssm_brier_prob if ssm_brier_prob is not None else raw_prob
+                    else:
+                        ll_input = resource_prob
+                    
+                    # Apply Log Loss calibrator (always isotonic)
+                    ssm_logloss_prob = ll_cal_info['calibrator'].predict([[ll_input]])[0]
+                    ssm_logloss_prob = np.clip(ssm_logloss_prob, 0.01, 0.99)
         
         # BBL: Apply Brier-optimized calibrators (separate from ECE calibrators)
         if is_bbl:
@@ -1290,128 +1325,221 @@ def main():
             </div>
             ''', unsafe_allow_html=True)
     else:
-        # Non-BBL: Use original 2-column layout
-        sa_col1, sa_col2 = st.columns(2)
-        with sa_col1:
-            # SA20: Use raw model output for display (calibrators output 1.0 at high probs)
-            # SSM: Use Brier-optimized calibrator (best accuracy)
-            # WPL: Use Brier-optimized phase calibrated (wins ALL metrics)
-            if is_sa20:
-                brier_prob = raw_prob
-                brier_label = "Raw Model Output"
-                brier_desc = "Brier=0.0773 (Well-calibrated)"
-            elif is_ssm and ssm_brier_prob is not None:
-                brier_prob = ssm_brier_prob
-                brier_label = f"Brier-Optimized ({ssm_brier_source})"
-                brier_desc = "Brier=0.0867, ECE=0.000"
-            elif is_wpl:
-                # WPL: Use raw model output (sparse data - phase calibrators don't work)
-                # Raw model has best Log Loss for sparse WPL data
-                brier_prob = raw_prob
-                brier_label = "Raw Model Output"
-                brier_desc = "Best Log Loss (sparse data)"
-            elif is_t20i and t20i_brier_prob is not None:
-                # T20I: Use per-over Brier-optimized calibrator
-                # Inn1: Raw wins (19/20 overs), Inn2: Calibrated wins (19/20 overs)
-                brier_prob = t20i_brier_prob
-                brier_label = f"Brier-Optimized ({t20i_brier_source})"
-                brier_desc = "Brier=0.1438, 672K samples"
-            else:
-                brier_prob = raw_prob
-                brier_label = "Raw Model Output"
-                brier_desc = "Use for Expected Value"
+        # Non-BBL leagues
+        # Check if SSM male has all 3 calibrators (Brier, LogLoss, ECE)
+        if is_ssm and not is_ssm_female and ssm_brier_prob is not None and ssm_logloss_prob is not None and ece_optimized_prob is not None:
+            # SSM Male: 3-column layout like BBL
+            ssm_col1, ssm_col2, ssm_col3 = st.columns(3)
             
-            st.markdown(f'''
-            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #2196F3, #1565C0); border-radius: 15px; color: white; margin: 5px;">
-                <div style="font-size: 0.9em; opacity: 0.9;">🎯 BEST ACCURACY (Brier)</div>
-                <div style="font-size: 2.5em; font-weight: bold;">{brier_prob*100:.1f}%</div>
-                <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(brier_prob)}</b></div>
-                <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{brier_label}</div>
-                <div style="font-size: 0.75em; opacity: 0.7;">{brier_desc}</div>
-            </div>
-            ''', unsafe_allow_html=True)
-        
-        with sa_col2:
-            # For SA20: Show Platt phase calibrated prob (smooth output)
-            # For SSM Female: Show phase calibrated prob (8 phases like SA20)
-            # For others: Show per-over ECE calibrated
-            if is_sa20:
-                # Use Platt phase calibration for SA20 (smooth output, not step function)
-                if ece_optimized_prob is not None:
-                    ece_prob = ece_optimized_prob
-                    ece_label = f"Phase Platt ({calibrator_key})"
-                    ece_desc = "Smooth calibration by phase"
-                else:
-                    ece_prob = inn_specific_prob if inn_specific_prob is not None else raw_prob
-                    ece_label = "Inn-Specific Calibrated"
-                    ece_desc = "Fallback: innings context"
-                ece_odds = prob_to_odds(ece_prob)
+            # Column 1: Brier-optimized (Blue)
+            with ssm_col1:
+                brier_prob = ssm_brier_prob
+                brier_label = f"POC-Brier ({ssm_brier_source})"
+                brier_desc = "Brier=0.0835, LL=0.2877"
+                
                 st.markdown(f'''
-                <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
-                    <div style="font-size: 0.9em; opacity: 0.9;">📊 PHASE CALIBRATED (Platt)</div>
-                    <div style="font-size: 2.5em; font-weight: bold;">{ece_prob*100:.1f}%</div>
-                    <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
-                    <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
-                    <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
+                <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #2196F3, #1565C0); border-radius: 15px; color: white; margin: 3px;">
+                    <div style="font-size: 0.85em; opacity: 0.9;">🎯 BRIER-OPTIMAL</div>
+                    <div style="font-size: 2.2em; font-weight: bold;">{brier_prob*100:.1f}%</div>
+                    <div style="font-size: 1.1em;">Odds: <b>{prob_to_odds(brier_prob)}</b></div>
+                    <div style="font-size: 0.75em; margin-top: 5px; opacity: 0.8;">{brier_label}</div>
+                    <div style="font-size: 0.65em; opacity: 0.7;">{brier_desc}</div>
                 </div>
                 ''', unsafe_allow_html=True)
-            elif is_ssm_female:
-                # SSM Female: Phase calibrators (8 phases - SA20 style, resource-based)
-                if ece_optimized_prob is not None:
-                    ece_prob = ece_optimized_prob
-                    adjustment = ece_optimized_prob - resource_prob
-                    adj_text = f"+{adjustment*100:.0f}%" if adjustment > 0 else f"{adjustment*100:.0f}%"
-                    ece_label = f"Phase ECE ({calibrator_key}) ({adj_text})"
-                    ece_desc = "ECE=0.0000 (Resource-based, 8 phases)"
-                else:
-                    ece_prob = inn_specific_prob if inn_specific_prob is not None else raw_prob
-                    ece_label = "Inn-Specific Calibrated"
-                    ece_desc = "Fallback: phase calibrators not loaded"
-                ece_odds = prob_to_odds(ece_prob)
+            
+            # Column 2: Log Loss-optimized (Green)
+            with ssm_col2:
+                logloss_prob = ssm_logloss_prob
+                logloss_label = f"POC-LL ({ssm_logloss_source})"
+                logloss_desc = "LL=0.2566, Brier=0.0835"
+                
                 st.markdown(f'''
-                <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
-                    <div style="font-size: 0.9em; opacity: 0.9;">📊 PHASE CALIBRATED (ECE)</div>
-                    <div style="font-size: 2.5em; font-weight: bold;">{ece_prob*100:.1f}%</div>
-                    <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
-                    <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
-                    <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
+                <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #4CAF50, #2E7D32); border-radius: 15px; color: white; margin: 3px;">
+                    <div style="font-size: 0.85em; opacity: 0.9;">📊 LOGLOSS-OPTIMAL</div>
+                    <div style="font-size: 2.2em; font-weight: bold;">{logloss_prob*100:.1f}%</div>
+                    <div style="font-size: 1.1em;">Odds: <b>{prob_to_odds(logloss_prob)}</b></div>
+                    <div style="font-size: 0.75em; margin-top: 5px; opacity: 0.8;">{logloss_label}</div>
+                    <div style="font-size: 0.65em; opacity: 0.7;">{logloss_desc}</div>
                 </div>
                 ''', unsafe_allow_html=True)
-            elif ece_optimized_prob is not None:
-                ece_odds = prob_to_odds(ece_optimized_prob)
-                # Calculate the adjustment for display
-                adjustment = ece_optimized_prob - raw_prob
-                adj_text = f"+{adjustment*100:.0f}%" if adjustment > 0 else f"{adjustment*100:.0f}%"
+            
+            # Column 3: ECE-optimized (Orange)
+            with ssm_col3:
+                ece_prob = ece_optimized_prob
+                ece_label = f"POC-ECE ({cal_source})"
+                ece_desc = "ECE=0.0013, Brier=0.1452"
                 
-                if is_wpl:
-                    ece_label = f"Phase ECE-Optimized ({adj_text})"
-                    ece_desc = "ECE=0.0633 (Resource-based, best calibration)"
-                elif is_t20i:
-                    ece_label = f"Per-Over ECE-Optimized ({adj_text})"
-                    ece_desc = f"ECE=0.0000, Source: {t20i_ece_source or 'N/A'}"
-                else:
-                    ece_label = f"Historical Win Rate ({adj_text})"
-                    ece_desc = "Model was under-confident in similar situations"
-                
+                st.markdown(f'''
+                <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 3px;">
+                    <div style="font-size: 0.85em; opacity: 0.9;">⚖️ ECE-OPTIMAL</div>
+                    <div style="font-size: 2.2em; font-weight: bold;">{ece_prob*100:.1f}%</div>
+                    <div style="font-size: 1.1em;">Odds: <b>{prob_to_odds(ece_prob)}</b></div>
+                    <div style="font-size: 0.75em; margin-top: 5px; opacity: 0.8;">{ece_label}</div>
+                    <div style="font-size: 0.65em; opacity: 0.7;">{ece_desc}</div>
+                </div>
+                ''', unsafe_allow_html=True)
+        elif is_ssm and not is_ssm_female and ssm_brier_prob is not None and ssm_logloss_prob is not None and ece_optimized_prob is not None:
+            # SSM Male with all 3 calibrators: Use 3-column layout (Blue, Green, Orange)
+            ssm_col1, ssm_col2, ssm_col3 = st.columns(3)
+            
+            with ssm_col1:
+                # Blue box: Brier-optimized
+                st.markdown(f'''
+                <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #2196F3, #1565C0); border-radius: 15px; color: white; margin: 5px;">
+                    <div style="font-size: 0.9em; opacity: 0.9;">🎯 BEST ACCURACY (Brier)</div>
+                    <div style="font-size: 2.5em; font-weight: bold;">{ssm_brier_prob*100:.1f}%</div>
+                    <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(ssm_brier_prob)}</b></div>
+                    <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">Brier-Optimized ({ssm_brier_source})</div>
+                    <div style="font-size: 0.75em; opacity: 0.7;">Brier=0.0867, ECE=0.000</div>
+                </div>
+                ''', unsafe_allow_html=True)
+            
+            with ssm_col2:
+                # Green box: Log Loss-optimized
+                st.markdown(f'''
+                <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #4CAF50, #2E7D32); border-radius: 15px; color: white; margin: 5px;">
+                    <div style="font-size: 0.9em; opacity: 0.9;">📈 LOG LOSS OPTIMIZED</div>
+                    <div style="font-size: 2.5em; font-weight: bold;">{ssm_logloss_prob*100:.1f}%</div>
+                    <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(ssm_logloss_prob)}</b></div>
+                    <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">LL-Optimized ({ssm_logloss_source})</div>
+                    <div style="font-size: 0.75em; opacity: 0.7;">LogLoss=0.2566 (27.9% better)</div>
+                </div>
+                ''', unsafe_allow_html=True)
+            
+            with ssm_col3:
+                # Orange box: ECE-optimized
                 st.markdown(f'''
                 <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
                     <div style="font-size: 0.9em; opacity: 0.9;">📊 BEST CALIBRATION (ECE)</div>
                     <div style="font-size: 2.5em; font-weight: bold;">{ece_optimized_prob*100:.1f}%</div>
-                    <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
-                    <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
-                    <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
+                    <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(ece_optimized_prob)}</b></div>
+                    <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">ECE-Optimized ({calibrator_key})</div>
+                    <div style="font-size: 0.75em; opacity: 0.7;">ECE=0.0000 (Perfect)</div>
                 </div>
                 ''', unsafe_allow_html=True)
-            else:
+        else:
+            # Non-BBL, non-SSM-male: Use original 2-column layout
+            sa_col1, sa_col2 = st.columns(2)
+            with sa_col1:
+                # SA20: Use raw model output for display (calibrators output 1.0 at high probs)
+                # SSM: Use Brier-optimized calibrator (best accuracy)
+                # WPL: Use Brier-optimized phase calibrated (wins ALL metrics)
+                if is_sa20:
+                    brier_prob = raw_prob
+                    brier_label = "Raw Model Output"
+                    brier_desc = "Brier=0.0773 (Well-calibrated)"
+                elif is_ssm and ssm_brier_prob is not None:
+                    brier_prob = ssm_brier_prob
+                    brier_label = f"Brier-Optimized ({ssm_brier_source})"
+                    brier_desc = "Brier=0.0867, ECE=0.000"
+                elif is_wpl:
+                    # WPL: Use raw model output (sparse data - phase calibrators don't work)
+                    # Raw model has best Log Loss for sparse WPL data
+                    brier_prob = raw_prob
+                    brier_label = "Raw Model Output"
+                    brier_desc = "Best Log Loss (sparse data)"
+                elif is_t20i and t20i_brier_prob is not None:
+                    # T20I: Use per-over Brier-optimized calibrator
+                    # Inn1: Raw wins (19/20 overs), Inn2: Calibrated wins (19/20 overs)
+                    brier_prob = t20i_brier_prob
+                    brier_label = f"Brier-Optimized ({t20i_brier_source})"
+                    brier_desc = "Brier=0.1438, 672K samples"
+                else:
+                    brier_prob = raw_prob
+                    brier_label = "Raw Model Output"
+                    brier_desc = "Use for Expected Value"
+                
                 st.markdown(f'''
-                <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
-                    <div style="font-size: 0.9em; opacity: 0.9;">📊 RESOURCE PROBABILITY</div>
-                    <div style="font-size: 2.5em; font-weight: bold;">{resource_prob*100:.1f}%</div>
-                    <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(resource_prob)}</b></div>
-                    <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">DLS-based Win Prob</div>
-                    <div style="font-size: 0.75em; opacity: 0.7;">Per-over calibrators not loaded</div>
+                <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #2196F3, #1565C0); border-radius: 15px; color: white; margin: 5px;">
+                    <div style="font-size: 0.9em; opacity: 0.9;">🎯 BEST ACCURACY (Brier)</div>
+                    <div style="font-size: 2.5em; font-weight: bold;">{brier_prob*100:.1f}%</div>
+                    <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(brier_prob)}</b></div>
+                    <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{brier_label}</div>
+                    <div style="font-size: 0.75em; opacity: 0.7;">{brier_desc}</div>
                 </div>
                 ''', unsafe_allow_html=True)
+            
+            with sa_col2:
+                # For SA20: Show Platt phase calibrated prob (smooth output)
+                # For SSM Female: Show phase calibrated prob (8 phases like SA20)
+                # For others: Show per-over ECE calibrated
+                if is_sa20:
+                    # Use Platt phase calibration for SA20 (smooth output, not step function)
+                    if ece_optimized_prob is not None:
+                        ece_prob = ece_optimized_prob
+                        ece_label = f"Phase Platt ({calibrator_key})"
+                        ece_desc = "Smooth calibration by phase"
+                    else:
+                        ece_prob = inn_specific_prob if inn_specific_prob is not None else raw_prob
+                        ece_label = "Inn-Specific Calibrated"
+                        ece_desc = "Fallback: innings context"
+                    ece_odds = prob_to_odds(ece_prob)
+                    st.markdown(f'''
+                    <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
+                        <div style="font-size: 0.9em; opacity: 0.9;">📊 PHASE CALIBRATED (Platt)</div>
+                        <div style="font-size: 2.5em; font-weight: bold;">{ece_prob*100:.1f}%</div>
+                        <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
+                        <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
+                        <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif is_ssm_female:
+                    # SSM Female: Phase calibrators (8 phases - SA20 style, resource-based)
+                    if ece_optimized_prob is not None:
+                        ece_prob = ece_optimized_prob
+                        adjustment = ece_optimized_prob - resource_prob
+                        adj_text = f"+{adjustment*100:.0f}%" if adjustment > 0 else f"{adjustment*100:.0f}%"
+                        ece_label = f"Phase ECE ({calibrator_key}) ({adj_text})"
+                        ece_desc = "ECE=0.0000 (Resource-based, 8 phases)"
+                    else:
+                        ece_prob = inn_specific_prob if inn_specific_prob is not None else raw_prob
+                        ece_label = "Inn-Specific Calibrated"
+                        ece_desc = "Fallback: phase calibrators not loaded"
+                    ece_odds = prob_to_odds(ece_prob)
+                    st.markdown(f'''
+                    <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
+                        <div style="font-size: 0.9em; opacity: 0.9;">📊 PHASE CALIBRATED (ECE)</div>
+                        <div style="font-size: 2.5em; font-weight: bold;">{ece_prob*100:.1f}%</div>
+                        <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
+                        <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
+                        <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                elif ece_optimized_prob is not None:
+                    ece_odds = prob_to_odds(ece_optimized_prob)
+                    # Calculate the adjustment for display
+                    adjustment = ece_optimized_prob - raw_prob
+                    adj_text = f"+{adjustment*100:.0f}%" if adjustment > 0 else f"{adjustment*100:.0f}%"
+                    
+                    if is_wpl:
+                        ece_label = f"Phase ECE-Optimized ({adj_text})"
+                        ece_desc = "ECE=0.0633 (Resource-based, best calibration)"
+                    elif is_t20i:
+                        ece_label = f"Per-Over ECE-Optimized ({adj_text})"
+                        ece_desc = f"ECE=0.0000, Source: {t20i_ece_source or 'N/A'}"
+                    else:
+                        ece_label = f"Historical Win Rate ({adj_text})"
+                        ece_desc = "Model was under-confident in similar situations"
+                    
+                    st.markdown(f'''
+                    <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
+                        <div style="font-size: 0.9em; opacity: 0.9;">📊 BEST CALIBRATION (ECE)</div>
+                        <div style="font-size: 2.5em; font-weight: bold;">{ece_optimized_prob*100:.1f}%</div>
+                        <div style="font-size: 1.3em;">Odds: <b>{ece_odds}</b></div>
+                        <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">{ece_label}</div>
+                        <div style="font-size: 0.75em; opacity: 0.7;">{ece_desc}</div>
+                    </div>
+                    ''', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'''
+                    <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9800, #e65100); border-radius: 15px; color: white; margin: 5px;">
+                        <div style="font-size: 0.9em; opacity: 0.9;">📊 RESOURCE PROBABILITY</div>
+                        <div style="font-size: 2.5em; font-weight: bold;">{resource_prob*100:.1f}%</div>
+                        <div style="font-size: 1.3em;">Odds: <b>{prob_to_odds(resource_prob)}</b></div>
+                        <div style="font-size: 0.85em; margin-top: 8px; opacity: 0.8;">DLS-based Win Prob</div>
+                        <div style="font-size: 0.75em; opacity: 0.7;">Per-over calibrators not loaded</div>
+                    </div>
+                    ''', unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     # BBL-specific guidance based on analysis (Interactive Tabs like SSM Female)
@@ -1788,7 +1916,7 @@ def main():
                 col1, col2 = st.columns(2)
                 with col1:
                     st.markdown("#### Brier Score (Lower is Better)")
-                    brier_cols = ['Brier_Raw', 'Brier_InnSpec', 'Brier_Resource', 'Brier_POC_ECE', 'Brier_POC_Brier']
+                    brier_cols = ['Brier_Raw', 'Brier_InnSpec', 'Brier_Resource', 'Brier_POC_ECE', 'Brier_POC_Brier', 'Brier_LL_Opt']
                     available_brier = [c for c in brier_cols if c in ssm_m_metrics_inning.columns]
                     brier_data = ssm_m_metrics_inning[['Group'] + available_brier].copy()
                     brier_data.columns = ['Innings'] + [c.replace('Brier_', '') for c in available_brier]
@@ -1813,7 +1941,7 @@ def main():
                 
                 with col2:
                     st.markdown("#### Expected Calibration Error (Lower is Better)")
-                    ece_cols = ['ECE_Raw', 'ECE_InnSpec', 'ECE_Resource', 'ECE_POC_ECE', 'ECE_POC_Brier']
+                    ece_cols = ['ECE_Raw', 'ECE_InnSpec', 'ECE_Resource', 'ECE_POC_ECE', 'ECE_POC_Brier', 'ECE_LL_Opt']
                     available_ece = [c for c in ece_cols if c in ssm_m_metrics_inning.columns]
                     ece_data = ssm_m_metrics_inning[['Group'] + available_ece].copy()
                     ece_data.columns = ['Innings'] + [c.replace('ECE_', '') for c in available_ece]
@@ -1836,10 +1964,9 @@ def main():
                     )
                     st.plotly_chart(ece_chart, use_container_width=True)
                 
-                col3, col4 = st.columns(2)
                 with col3:
                     st.markdown("#### Log Loss (Lower is Better)")
-                    ll_cols = ['LogLoss_Raw', 'LogLoss_InnSpec', 'LogLoss_Resource', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier']
+                    ll_cols = ['LogLoss_Raw', 'LogLoss_InnSpec', 'LogLoss_Resource', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier', 'LogLoss_LL_Opt']
                     available_ll = [c for c in ll_cols if c in ssm_m_metrics_inning.columns]
                     ll_data = ssm_m_metrics_inning[['Group'] + available_ll].copy()
                     ll_data.columns = ['Innings'] + [c.replace('LogLoss_', '') for c in available_ll]
@@ -1885,18 +2012,18 @@ def main():
                 )
                 
                 if metric_choice == "Brier Score":
-                    metric_cols = ['Brier_Raw', 'Brier_POC_ECE', 'Brier_POC_Brier']
-                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    metric_cols = ['Brier_Raw', 'Brier_POC_ECE', 'Brier_POC_Brier', 'Brier_LL_Opt']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier', 'LL-Opt']
                     title = "Brier Score by Over"
                     yaxis = "Brier Score (Lower is Better)"
                 elif metric_choice == "ECE":
-                    metric_cols = ['ECE_Raw', 'ECE_POC_ECE', 'ECE_POC_Brier']
-                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    metric_cols = ['ECE_Raw', 'ECE_POC_ECE', 'ECE_POC_Brier', 'ECE_LL_Opt']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier', 'LL-Opt']
                     title = "ECE by Over"
                     yaxis = "ECE (Lower is Better)"
                 else:
-                    metric_cols = ['LogLoss_Raw', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier']
-                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    metric_cols = ['LogLoss_Raw', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier', 'LogLoss_LL_Opt']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier', 'LL-Opt']
                     title = "Log Loss by Over"
                     yaxis = "Log Loss (Lower is Better)"
                 
@@ -1970,16 +2097,16 @@ def main():
                 )
                 
                 if metric_choice_phase == "Brier Score":
-                    metric_cols = ['Brier_Raw', 'Brier_POC_ECE', 'Brier_POC_Brier']
-                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    metric_cols = ['Brier_Raw', 'Brier_POC_ECE', 'Brier_POC_Brier', 'Brier_LL_Opt']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier', 'LL-Opt']
                     title = "Brier Score by Phase"
                 elif metric_choice_phase == "ECE":
-                    metric_cols = ['ECE_Raw', 'ECE_POC_ECE', 'ECE_POC_Brier']
-                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    metric_cols = ['ECE_Raw', 'ECE_POC_ECE', 'ECE_POC_Brier', 'ECE_LL_Opt']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier', 'LL-Opt']
                     title = "ECE by Phase"
                 else:
-                    metric_cols = ['LogLoss_Raw', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier']
-                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier']
+                    metric_cols = ['LogLoss_Raw', 'LogLoss_POC_ECE', 'LogLoss_POC_Brier', 'LogLoss_LL_Opt']
+                    col_rename = ['Raw', 'POC-ECE', 'POC-Brier', 'LL-Opt']
                     title = "Log Loss by Phase"
                 
                 # Phase comparison table
@@ -1987,7 +2114,7 @@ def main():
                 
                 available_cols = ['Innings', 'Phase', 'N']
                 available_metric = [c for c in metric_cols if c in ssm_m_metrics_phase.columns]
-                phase_display = ssm_m_metrics_phase[available_cols + available_metric + ['Best_Brier', 'Best_ECE']].copy()
+                phase_display = ssm_m_metrics_phase[available_cols + available_metric + ['Best_Brier', 'Best_ECE', 'Best_LogLoss']].copy()
                 
                 # Format numbers before renaming
                 for metric_col in available_metric:
@@ -1996,7 +2123,7 @@ def main():
                 phase_display['N'] = phase_display['N'].apply(lambda x: f"{int(x):,}")
                 
                 # Rename columns
-                phase_display.columns = ['Innings', 'Phase', 'N'] + col_rename[:len(available_metric)] + ['Best Brier', 'Best ECE']
+                phase_display.columns = ['Innings', 'Phase', 'N'] + col_rename[:len(available_metric)] + ['Best Brier', 'Best ECE', 'Best LogLoss']
                 st.dataframe(phase_display, use_container_width=True, hide_index=True)
                 
                 # Side-by-side phase comparison charts
