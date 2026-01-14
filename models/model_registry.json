@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-11",
+  "last_updated": "2026-01-14",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v10",
@@ -8,28 +8,12 @@
       "calibrator": {
         "path": "models/bbl_v10/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-31T08:53:48",
+        "generated_date": "2026-01-14T17:35:40.139601",
         "oof_metrics": {
           "brier_raw": 0.18176028345833248,
-          "brier_calibrated": 0.18000851883037436,
+          "brier_calibrated": 0.18001131073555973,
           "ece_raw": 0.014380847856989556,
-          "ece_calibrated": 1.3503798425911217e-17
-        },
-        "innings_specific": {
-          "innings1": {
-            "samples": 73875,
-            "brier_raw": 0.2202595549354694,
-            "brier_calibrated": 0.2175900466723535,
-            "ece_raw": 0.029600909991345497,
-            "ece_calibrated": 1.465794960498337e-17
-          },
-          "innings2": {
-            "samples": 67560,
-            "brier_raw": 0.1396623900247403,
-            "brier_calibrated": 0.13891415279535055,
-            "ece_raw": 0.014244988173846765,
-            "ece_calibrated": 2.6033382409875263e-17
-          }
+          "ece_calibrated": 0.00029172411355039726
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
@@ -217,12 +201,12 @@
           "brier_raw": 0.1517,
           "brier_calibrated": 0.1517,
           "ece_raw": 0.0149,
-          "ece_calibrated": 0.0130
+          "ece_calibrated": 0.013
         },
         "innings_specific": {
           "innings1": {
             "samples": 358395,
-            "brier_raw": 0.1880,
+            "brier_raw": 0.188,
             "brier_calibrated": 0.1882,
             "ece_raw": 0.0123,
             "ece_calibrated": 0.0174,
@@ -233,7 +217,7 @@
             "brier_raw": 0.1104,
             "brier_calibrated": 0.1101,
             "ece_raw": 0.0186,
-            "ece_calibrated": 0.0080,
+            "ece_calibrated": 0.008,
             "winner": "calibrated"
           }
         },
@@ -249,7 +233,7 @@
               "inn2_source": "cal (19/20 overs)"
             },
             "ece_optimized": {
-              "ece_after": 0.0000,
+              "ece_after": 0.0,
               "inn1_source": "raw (18/20 overs)",
               "inn2_source": "cal (20/20 overs)"
             }
@@ -433,7 +417,7 @@
         "oof_metrics": {
           "brier_raw": 0.1088,
           "brier_per_over_cal": 0.1062,
-          "ece_raw": 0.1050,
+          "ece_raw": 0.105,
           "ece_per_over_cal": 0.0343,
           "logloss_raw": 0.3558,
           "logloss_per_over_cal": 0.3378
@@ -449,7 +433,7 @@
           "innings2": {
             "samples": 26554,
             "brier_raw": 0.0789,
-            "brier_per_over_cal": 0.0710,
+            "brier_per_over_cal": 0.071,
             "ece_raw": 0.0686,
             "ece_per_over_cal": 0.0237
           }

@@ -552,9 +552,16 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
 
     # Check if innings column exists for innings-specific calibration
     has_innings = 'innings' in df.columns
+    has_phase = all(col in df.columns for col in ['is_powerplay', 'is_death_overs'])
+    
     if has_innings:
         logger.info('Innings column detected - will generate innings-specific calibrators')
         innings_col = df['innings'].copy()
+    
+    if has_phase:
+        logger.info('Phase columns detected - will generate innings×phase specific calibrators')
+        powerplay_col = df['is_powerplay'].copy()
+        death_col = df['is_death_overs'].copy()
     
     y = df[target_col]
 
@@ -596,13 +603,13 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
         oof_probs[val_idx] = model.predict_proba(X.iloc[val_idx])[:, 1]
         logger.info('OOF fold complete', fold=fold_idx, train_size=len(train_idx), val_size=len(val_idx))
 
-    # Create innings-specific calibrators if innings column exists
+    # Create innings-specific and innings×phase-specific calibrators
     if has_innings:
         # Train separate calibrators for each innings
-        iso_inn1 = IsotonicRegression(out_of_bounds='clip')
-        iso_inn2 = IsotonicRegression(out_of_bounds='clip')
+        iso_inn1 = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
+        iso_inn2 = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
         # Also train a combined calibrator for comparison
-        iso_combined = IsotonicRegression(out_of_bounds='clip')
+        iso_combined = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
         
         mask_inn1 = (innings_col == 1).values
         mask_inn2 = (innings_col == 2).values
@@ -653,6 +660,56 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
         oof_probs_cal[mask_inn2] = oof_probs_cal_inn2
         oof_brier_cal = float(brier_score_loss(y, oof_probs_cal))
         oof_ece_cal = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs_cal))
+        
+        # Generate innings×phase specific calibrators if phase columns exist
+        phase_calibrators = {}
+        phase_metrics = {}
+        
+        if has_phase:
+            logger.info('Generating innings×phase specific calibrators')
+            
+            # Define phase masks
+            powerplay_mask = (powerplay_col == 1).values
+            death_mask = (death_col == 1).values
+            middle_mask = ~powerplay_mask & ~death_mask
+            
+            # Train calibrator for each innings × phase combination
+            for inn in [1, 2]:
+                inn_mask = (innings_col == inn).values
+                
+                for phase_name, phase_mask in [('powerplay', powerplay_mask), 
+                                                ('middle', middle_mask), 
+                                                ('death', death_mask)]:
+                    mask = inn_mask & phase_mask
+                    if mask.sum() >= 10:  # Minimum samples requirement
+                        cal = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
+                        y_phase = y.values[mask] if hasattr(y, 'values') else y[mask]
+                        cal.fit(oof_probs[mask], y_phase)
+                        
+                        key = f'inn{inn}_{phase_name}'
+                        phase_calibrators[key] = cal
+                        
+                        # Calculate metrics for this combination
+                        probs_raw = oof_probs[mask]
+                        probs_cal = cal.predict(probs_raw)
+                        
+                        phase_metrics[key] = {
+                            'samples': int(mask.sum()),
+                            'brier_raw': float(brier_score_loss(y_phase, probs_raw)),
+                            'brier_calibrated': float(brier_score_loss(y_phase, probs_cal)),
+                            'ece_raw': float(expected_calibration_error(y_phase, probs_raw)),
+                            'ece_calibrated': float(expected_calibration_error(y_phase, probs_cal)),
+                        }
+                        
+                        logger.info(
+                            f'Phase calibrator: {key}',
+                            samples=phase_metrics[key]['samples'],
+                            brier_raw=phase_metrics[key]['brier_raw'],
+                            brier_cal=phase_metrics[key]['brier_calibrated'],
+                            ece_raw=phase_metrics[key]['ece_raw'],
+                            ece_cal=phase_metrics[key]['ece_calibrated'],
+                        )
+
     else:
         # Single calibrator for all data (backward compatible)
         iso = IsotonicRegression(out_of_bounds='clip')
@@ -680,7 +737,7 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     if has_innings:
         # Innings-specific calibrators
         calibrator_metadata = {
-            'type': 'innings_specific',
+            'type': 'innings_phase_specific' if (has_phase and phase_calibrators) else 'innings_specific',
             'calibrator_innings1': iso_inn1,
             'calibrator_innings2': iso_inn2,
             'calibrator_combined': iso_combined,  # For comparison
@@ -708,6 +765,12 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
                 'ece_calibrated': inn2_ece_cal,
             },
         }
+        
+        # Add phase calibrators if available
+        if has_phase and phase_calibrators:
+            calibrator_metadata['phase_calibrators'] = phase_calibrators
+            calibrator_metadata['phase_metrics'] = phase_metrics
+            logger.info(f'Generated {len(phase_calibrators)} innings×phase calibrators')
     else:
         # Single calibrator (backward compatible)
         calibrator_metadata = {
@@ -727,11 +790,13 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     calibrator_out = model_path / 'isotonic_calibrator.pkl'
     joblib.dump(calibrator_metadata, calibrator_out)
     if has_innings:
+        cal_type = 'innings_phase_specific' if (has_phase and phase_calibrators) else 'innings_specific'
         logger.info(
-            'Saved innings-specific calibrators with metadata',
+            f'Saved {cal_type} calibrators with metadata',
             path=str(calibrator_out),
             feature_hash=feature_hash,
-            type='innings_specific'
+            type=cal_type,
+            n_phase_calibrators=len(phase_calibrators) if phase_calibrators else 0
         )
     else:
         logger.info(

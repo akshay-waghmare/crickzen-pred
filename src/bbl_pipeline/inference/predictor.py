@@ -66,7 +66,7 @@ class Predictor:
     Enhanced with resource-based features and innings-specific calibration.
     """
     def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], 
-                 calibrator=None, calibrator_inn1=None, calibrator_inn2=None, calibrator_type='none'):
+                 calibrator=None, calibrator_inn1=None, calibrator_inn2=None, phase_calibrators=None, calibrator_type='none'):
         # Wrap ensemble model dict if needed
         if isinstance(model, dict) and 'xgb_model' in model:
             self.model = EnsembleModelWrapper(model)
@@ -77,7 +77,8 @@ class Predictor:
         self.calibrator = calibrator  # Single calibrator (legacy/backward compatible)
         self.calibrator_inn1 = calibrator_inn1  # Innings 1 calibrator
         self.calibrator_inn2 = calibrator_inn2  # Innings 2 calibrator
-        self.calibrator_type = calibrator_type  # 'innings_specific', 'single', 'legacy', or 'none'
+        self.phase_calibrators = phase_calibrators  # Innings×phase calibrators dict
+        self.calibrator_type = calibrator_type  # 'innings_phase_specific', 'innings_specific', 'single', 'legacy', or 'none'
         self.resource_calculator = ResourceFeatureCalculator()
         # Use RealTimeFeatureMapper for proper feature generation
         self.feature_mapper = RealTimeFeatureMapper(feature_store, global_stats)
@@ -161,6 +162,7 @@ class Predictor:
         calibrator = None
         calibrator_inn1 = None
         calibrator_inn2 = None
+        phase_calibrators = None
         calibrator_type = 'none'
         calibrator_path = path / "isotonic_calibrator.pkl"
         if calibrator_path.exists():
@@ -175,8 +177,23 @@ class Predictor:
                 # Check calibrator type
                 cal_type = calibrator_data.get('type', 'unknown') if isinstance(calibrator_data, dict) else 'legacy'
                 
-                if cal_type == 'innings_specific':
-                    # Innings-specific calibrators
+                if cal_type == 'innings_phase_specific':
+                    # Innings×phase specific calibrators (6 calibrators)
+                    calibrator_inn1 = calibrator_data['calibrator_innings1']
+                    calibrator_inn2 = calibrator_data['calibrator_innings2']
+                    calibrator = calibrator_data.get('calibrator_combined', None)  # Optional combined for comparison
+                    phase_calibrators = calibrator_data.get('phase_calibrators', {})
+                    calibrator_type = 'innings_phase_specific'
+                    logger.info(
+                        "Loaded innings×phase specific calibrators",
+                        created=calibrator_data.get('created_date', 'unknown'),
+                        n_phase_calibrators=len(phase_calibrators),
+                        phase_keys=list(phase_calibrators.keys())
+                    )
+                    cal_features = calibrator_data.get('features', [])
+                    cal_feature_hash = calibrator_data.get('feature_hash', '')
+                elif cal_type == 'innings_specific':
+                    # Innings-specific calibrators (2 calibrators)
                     calibrator_inn1 = calibrator_data['calibrator_innings1']
                     calibrator_inn2 = calibrator_data['calibrator_innings2']
                     calibrator = calibrator_data.get('calibrator_combined', None)  # Optional combined for comparison
@@ -235,6 +252,7 @@ class Predictor:
                             calibrator = None
                             calibrator_inn1 = None
                             calibrator_inn2 = None
+                            phase_calibrators = None
                             calibrator_type = 'none'
                         else:
                             logger.info(
@@ -242,13 +260,16 @@ class Predictor:
                                 type=calibrator_type,
                                 feature_hash=cal_feature_hash,
                                 n_features=len(cal_features),
+                                n_phase_calibrators=len(phase_calibrators) if phase_calibrators else 0,
                                 created=calibrator_data.get('created_date', 'unknown')
                             )
                     else:
                         logger.warning("Could not validate calibrator - model has no feature list")
                 
-                if calibrator or calibrator_inn1 or calibrator_inn2:
-                    if calibrator_type == 'innings_specific':
+                if calibrator or calibrator_inn1 or calibrator_inn2 or phase_calibrators:
+                    if calibrator_type == 'innings_phase_specific':
+                        logger.info(f"Loaded innings×phase specific isotonic calibrators ({len(phase_calibrators)} calibrators)")
+                    elif calibrator_type == 'innings_specific':
                         logger.info("Loaded innings-specific isotonic calibrators for probability calibration")
                     elif calibrator_type == 'single':
                         logger.info("Loaded isotonic calibrator for probability calibration")
@@ -260,7 +281,7 @@ class Predictor:
             except Exception as e:
                 logger.warning(f"Failed to load calibrator: {e}")
         
-        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, calibrator_type)
+        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, calibrator_type)
 
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
@@ -430,12 +451,42 @@ class Predictor:
             self.last_smoothed_prob = raw_prob
             self.last_calibrated_prob = raw_prob
             self.last_calibrated_combined = raw_prob  # For comparison when using innings-specific
+            self.last_calibrated_phase = raw_prob  # For innings×phase specific
             
-            # Select appropriate calibrator based on innings
+            # Select appropriate calibrator based on innings and phase
             active_calibrator = None
             combined_calibrator = None
+            phase_calibrator = None
             
-            if self.calibrator_type == 'innings_specific':
+            # Determine phase
+            current_over = int(state.over) + 1  # state.over is 0-19, we need 1-20
+            if current_over <= 6:
+                phase = 'powerplay'
+            elif current_over <= 15:
+                phase = 'middle'
+            else:
+                phase = 'death'
+            
+            phase_key = f'inn{state.innings}_{phase}'
+            
+            # Try innings×phase specific first (best performance)
+            if self.calibrator_type == 'innings_phase_specific' and self.phase_calibrators:
+                if phase_key in self.phase_calibrators:
+                    phase_calibrator = self.phase_calibrators[phase_key]
+                    # Also get innings-level calibrator for comparison
+                    if state.innings == 1 and self.calibrator_inn1 is not None:
+                        active_calibrator = self.calibrator_inn1
+                    elif state.innings == 2 and self.calibrator_inn2 is not None:
+                        active_calibrator = self.calibrator_inn2
+                    combined_calibrator = self.calibrator
+                else:
+                    logger.warning(f"No phase calibrator for {phase_key}, falling back to innings-level")
+                    # Fall back to innings-specific
+                    if state.innings == 1 and self.calibrator_inn1 is not None:
+                        active_calibrator = self.calibrator_inn1
+                    elif state.innings == 2 and self.calibrator_inn2 is not None:
+                        active_calibrator = self.calibrator_inn2
+            elif self.calibrator_type == 'innings_specific':
                 if state.innings == 1 and self.calibrator_inn1 is not None:
                     active_calibrator = self.calibrator_inn1
                 elif state.innings == 2 and self.calibrator_inn2 is not None:
@@ -460,14 +511,21 @@ class Predictor:
                 self.last_smoothed_prob = smoothed_prob
                 self.last_calibrated_prob = calibrated_prob
                 
+                # Calculate phase-specific calibration if available
+                if phase_calibrator is not None:
+                    calibrated_phase = float(phase_calibrator.predict([raw_prob])[0])
+                    self.last_calibrated_phase = calibrated_phase
+                
                 # Also calculate combined calibrator if available (for comparison)
                 if combined_calibrator is not None:
                     calibrated_combined = float(combined_calibrator.predict([raw_prob])[0])
                     self.last_calibrated_combined = calibrated_combined
                 
                 if debug:
-                    cal_label = f"Inn{state.innings}" if self.calibrator_type == 'innings_specific' else "Single"
-                    if self.calibrator_type == 'innings_specific' and combined_calibrator is not None:
+                    cal_label = f"Inn{state.innings}" if self.calibrator_type in ['innings_specific', 'innings_phase_specific'] else "Single"
+                    if phase_calibrator is not None:
+                        print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Inn-Specific: {calibrated_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%}")
+                    elif self.calibrator_type in ['innings_specific', 'innings_phase_specific'] and combined_calibrator is not None:
                         print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Combined: {calibrated_combined:.1%} | Inn-Specific ({cal_label}): {calibrated_prob:.1%}")
                     else:
                         print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Calibrated ({cal_label}): {calibrated_prob:.1%}")

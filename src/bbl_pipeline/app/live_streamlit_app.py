@@ -750,11 +750,12 @@ def main():
     # Header with odds summary
     st.subheader("🎯 Win Probability & Odds")
     
-    # Display Raw, Smoothed, Combined, and Inn-Specific probabilities
+    # Display Raw, Smoothed, Combined, Inn-Specific, and Phase-Specific probabilities
     raw_prob = d.get("raw_win_prob", d["bat_win_prob"])
     smoothed_prob = d.get("smoothed_win_prob", d["bat_win_prob"])
     combined_prob = d.get("calibrated_combined_prob", d["bat_win_prob"])
     inn_specific_prob = d.get("calibrated_win_prob", d["bat_win_prob"])
+    phase_specific_prob = d.get("calibrated_phase_prob", None)
     
     # Calculate odds for each
     raw_odds = prob_to_odds(raw_prob)
@@ -762,8 +763,17 @@ def main():
     combined_odds = prob_to_odds(combined_prob)
     inn_specific_odds = prob_to_odds(inn_specific_prob)
     
-    prob_col1, prob_col2, prob_col3, prob_col4 = st.columns(4)
-    with prob_col1:
+    # Decide number of columns based on whether phase-specific is available
+    has_phase = phase_specific_prob is not None and abs(phase_specific_prob - inn_specific_prob) > 0.001
+    num_cols = 5 if has_phase else 4
+    
+    if has_phase:
+        prob_cols = st.columns(5)
+        phase_specific_odds = prob_to_odds(phase_specific_prob)
+    else:
+        prob_cols = st.columns(4)
+    
+    with prob_cols[0]:
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #2196F3;">
             <b>📊 Raw Model</b><br>
@@ -772,7 +782,7 @@ def main():
             <span style="font-size: 0.9em; color: #666;">XGB+LogReg Ensemble</span>
         </div>
         ''', unsafe_allow_html=True)
-    with prob_col2:
+    with prob_cols[1]:
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #FF9800;">
             <b>🔄 Smoothed</b><br>
@@ -781,7 +791,7 @@ def main():
             <span style="font-size: 0.9em; color: #666;">30% Calibrated Blend</span>
         </div>
         ''', unsafe_allow_html=True)
-    with prob_col3:
+    with prob_cols[2]:
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #9C27B0;">
             <b>🎯 Combined</b><br>
@@ -790,7 +800,7 @@ def main():
             <span style="font-size: 0.9em; color: #666;">Combined Isotonic</span>
         </div>
         ''', unsafe_allow_html=True)
-    with prob_col4:
+    with prob_cols[3]:
         innings_label = "Inn1" if not d.get("is_second_innings") else "Inn2"
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #4CAF50;">
@@ -800,6 +810,27 @@ def main():
             <span style="font-size: 0.9em; color: #666;">{innings_label} Isotonic</span>
         </div>
         ''', unsafe_allow_html=True)
+    
+    if has_phase:
+        with prob_cols[4]:
+            # Determine phase
+            overs_float = d.get("overs", 0.0)
+            import math
+            current_over = max(1, min(20, math.ceil(overs_float) if overs_float > 0 else 1))
+            if current_over <= 6:
+                phase_label = "PP"
+            elif current_over <= 15:
+                phase_label = "Mid"
+            else:
+                phase_label = "Death"
+            st.markdown(f'''
+            <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #FF5722;">
+                <b>🎪 Inn×Phase</b><br>
+                <span style="font-size: 1.5em; color: #FF5722;">{phase_specific_prob*100:.1f}%</span><br>
+                <span style="font-size: 1.1em; color: #333;">Odds: <b>{phase_specific_odds}</b></span><br>
+                <span style="font-size: 0.9em; color: #666;">{innings_label}-{phase_label}</span>
+            </div>
+            ''', unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     

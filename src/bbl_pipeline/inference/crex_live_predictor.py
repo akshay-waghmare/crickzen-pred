@@ -1183,6 +1183,7 @@ class CrexLivePredictor:
                 "smoothed_win_prob": getattr(self, 'last_smoothed_prob', win_prob),
                 "calibrated_combined_prob": getattr(self, 'last_calibrated_combined', win_prob),
                 "calibrated_win_prob": getattr(self, 'last_calibrated_prob', win_prob),
+                "calibrated_phase_prob": getattr(self, 'last_calibrated_phase', win_prob),
                 "features": features,
                 "history": self._prediction_history[-50:]  # Last 50 data points
             }
