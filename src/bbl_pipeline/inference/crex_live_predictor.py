@@ -870,6 +870,7 @@ class CrexLivePredictor:
             self.last_smoothed_prob = getattr(self.predictor, 'last_smoothed_prob', win_prob)
             self.last_calibrated_prob = getattr(self.predictor, 'last_calibrated_prob', win_prob)
             self.last_calibrated_combined = getattr(self.predictor, 'last_calibrated_combined', win_prob)
+            self.last_calibrated_phase = getattr(self.predictor, 'last_calibrated_phase', win_prob)
             
             return float(win_prob)
             

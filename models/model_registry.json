@@ -277,28 +277,12 @@
       "calibrator": {
         "path": "models/sat_v1/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2025-12-31T15:56:17.473343",
+        "generated_date": "2026-01-14T20:25:55.128661",
         "oof_metrics": {
           "brier_raw": 0.19174002716944485,
-          "brier_calibrated": 0.17975095565381222,
+          "brier_calibrated": 0.17976052078670698,
           "ece_raw": 0.06290362025497906,
-          "ece_calibrated": 7.362684469047435e-17
-        },
-        "innings_specific": {
-          "innings1": {
-            "samples": 11470,
-            "brier_raw": 0.23475590836138072,
-            "brier_calibrated": 0.21952151769297049,
-            "ece_raw": 0.0940381151533315,
-            "ece_calibrated": 5.191254526897429e-17
-          },
-          "innings2": {
-            "samples": 10323,
-            "brier_raw": 0.14394460362284942,
-            "brier_calibrated": 0.13556144227696965,
-            "ece_raw": 0.05210787477275786,
-            "ece_calibrated": 2.163875545428475e-17
-          }
+          "ece_calibrated": 0.0009686596613592268
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
