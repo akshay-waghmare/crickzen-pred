@@ -122,6 +122,56 @@ See `docs/FEATURE_STORE.md` for detailed schema documentation.
 
 - **Live Visualization:** Run `streamlit run src/bbl_pipeline/app/live_streamlit_app.py`
 - **Calibration Analysis:** See `docs/BBL_V10_MODEL.md` for detailed Brier/ECE breakdown.
+- **Comprehensive OOF Calibration Analysis:** 
+  - See `BBL_CALIBRATION_OOF_ANALYSIS.md` for complete 7-method comparison
+  - Run `python analyze_bbl_calibrators_oof.py` to regenerate analysis
+  - Interactive OOF analysis available in Streamlit app under "🔬 BBL Comprehensive OOF Calibration Analysis"
+
+## 📊 BBL Calibration Analysis (Updated Jan 15, 2026)
+
+### Comprehensive OOF Comparison (7 Methods)
+A rigorous 5-fold cross-validation analysis compared 7 calibration approaches for BBL v10:
+
+| Rank | Method | Calibrators | Brier | ECE | LogLoss | Best For |
+|:----:|--------|:-----------:|:-----:|:---:|:-------:|----------|
+| 🥇 | **ECE-Optimized** | 6 (histogram) | **0.1426** | 0.0091 | **0.4306** | Overall accuracy & sharpness |
+| 🥈 | Combined | 1 (isotonic) | 0.1428 | **0.0053** | 0.4312 | Best calibration (near-perfect ECE) |
+| 🥉 | Innings×Phase | 6 (isotonic) | 0.1430 | 0.0117 | 0.4374 | Balanced approach |
+| 4 | LogLoss-Optimized | 6 (Platt) | 0.1432 | 0.0199 | 0.4370 | Probabilistic sharpness |
+| 5 | Innings-Specific | 2 (isotonic) | 0.1435 | 0.0055 | 0.4328 | Simplicity + strong ECE |
+| 6 | Brier-Optimized | 40 (per-over) | 0.1440 | 0.0132 | 0.4642 | ❌ Avoid - overfits |
+| 7 | Raw | 0 | 0.1456 | 0.0558 | 0.4449 | Baseline |
+
+**Key Findings:**
+- **ECE-Optimized** (histogram binning, 6 calibrators) is best overall: +2.07% Brier, +3.21% LogLoss
+- **Combined** (single isotonic) achieves near-perfect ECE (0.0053) with +90.43% improvement
+- **Brier-Optimized** (40 per-over calibrators) actually hurts LogLoss (-4.35% vs raw) - overfitting
+- All calibration methods improve over raw, but ECE-Optimized provides best balance
+
+**Documentation:**
+- Full analysis: `BBL_CALIBRATION_OOF_ANALYSIS.md`
+- Analysis script: `analyze_bbl_calibrators_oof.py`
+- Training script: `scripts/train_bbl_ece_calibrators.py`
+- Active calibrators: `models/bbl_v10/ece_optimized_calibrators.pkl`
+
+### ECE-Optimized Calibrators (Production)
+The BBL v10 model now uses **ECE-Optimized calibrators** with histogram binning:
+- **Method:** 15-bin histogram → isotonic regression per innings×phase
+- **OOF Metrics:** Brier=0.1426, ECE=0.0091, LogLoss=0.4306
+- **In-Sample (trained model):** Brier=0.1403, ECE=0.0040 (near-perfect), LogLoss=0.4230
+- **File:** `models/bbl_v10/ece_optimized_calibrators.pkl`
+- **Streamlit App:** Automatically loads and uses these calibrators for BBL matches
+
+**Training Process:**
+1. Generate OOF predictions using 5-fold CV (no shuffle)
+2. For each innings×phase: create 15-bin histogram of predicted probabilities
+3. Fit isotonic regression on bin centers vs actual win rates
+4. Result: 6 calibrators (inn1_powerplay, inn1_middle, inn1_death, inn2_powerplay, inn2_middle, inn2_death)
+
+**To retrain:**
+```bash
+python scripts/train_bbl_ece_calibrators.py
+```
 
 ## ⚠️ Important Notes for Copilot
 
@@ -132,10 +182,11 @@ See `docs/FEATURE_STORE.md` for detailed schema documentation.
      - Adding/modifying feature store columns
      - See `docs/MODEL_REGISTRY_GUIDE.md` for detailed procedures
 3.  **Prefer CLI:** Use `bbl-pipeline` for standard tasks.
-4.  **Calibration:** Use innings-specific isotonic calibration for innings 2; raw model for innings 1.
+4.  **Calibration - ECE-Optimized (NEW):** BBL v10 now uses ECE-optimized histogram binning calibrators (6 calibrators, best overall performance). See `BBL_CALIBRATION_OOF_ANALYSIS.md`.
 5.  **ECE Optimization:** After training any new model, run `scripts/train_phase_calibrators.py` to create phase calibrators for perfect ECE (0.0000).
 6.  **Imports:** Use absolute imports from `bbl_pipeline`.
 7.  **Wicket Penalty:** The wicket penalty in ResourceFeatureCalculator now only applies to future projected runs, not runs already scored.
+8.  **OOF Analysis:** For comprehensive calibration evaluation, use `analyze_bbl_calibrators_oof.py` which compares 7 different methods with proper cross-validation.
 
 ### Model Artifacts Checklist
 After training a new model, ensure these files exist:

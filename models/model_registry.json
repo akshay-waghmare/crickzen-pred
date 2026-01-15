@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-14",
+  "last_updated": "2026-01-15",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v10",
@@ -395,36 +395,17 @@
       "version": "v1",
       "description": "XGBLogRegEnsemble (25 features) + Per-Over Isotonic Calibration (Brier: 0.1062, ECE: 0.0343)",
       "calibrator": {
-        "path": "models/ssm_v1/per_over_calibrators.pkl",
-        "type": "per_over_isotonic",
-        "generated_date": "2026-01-04T09:48:58",
+        "path": "models/ssm_v1/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2026-01-15T11:24:09.260775",
         "oof_metrics": {
-          "brier_raw": 0.1088,
-          "brier_per_over_cal": 0.1062,
-          "ece_raw": 0.105,
-          "ece_per_over_cal": 0.0343,
-          "logloss_raw": 0.3558,
-          "logloss_per_over_cal": 0.3378
-        },
-        "innings_specific": {
-          "innings1": {
-            "samples": 28916,
-            "brier_raw": 0.1363,
-            "brier_per_over_cal": 0.1385,
-            "ece_raw": 0.1384,
-            "ece_per_over_cal": 0.0499
-          },
-          "innings2": {
-            "samples": 26554,
-            "brier_raw": 0.0789,
-            "brier_per_over_cal": 0.071,
-            "ece_raw": 0.0686,
-            "ece_per_over_cal": 0.0237
-          }
+          "brier_raw": 0.18621677693629884,
+          "brier_calibrated": 0.18118905615410544,
+          "ece_raw": 0.04312780038057058,
+          "ece_calibrated": 0.00029241031188032034
         },
         "n_features": 25,
-        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8",
-        "notes": "Per-Over calibration is superior to Inn-Specific for SSM. Inn-Cal HURTS performance (Brier 0.1257 > 0.1088)"
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
         "path": "data/ssm_feature_store_v1",
