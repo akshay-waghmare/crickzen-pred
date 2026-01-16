@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-01-15",
+  "last_updated": "2026-01-16",
   "active_models": {
     "BBL": {
-      "path": "models/bbl_v10",
-      "version": "v10",
-      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Innings-Specific Isotonic Calibration (Brier: 0.1800, ECE: 0.0000)",
+      "path": "models/bbl_v12",
+      "version": "v12",
+      "description": "XGBLogRegEnsemble (25 features) + Empirically Calibrated Wicket Penalties (Brier: 0.1825, ECE: 0.0162)",
       "calibrator": {
-        "path": "models/bbl_v10/isotonic_calibrator.pkl",
-        "type": "isotonic_regression",
-        "generated_date": "2026-01-14T17:35:40.139601",
+        "path": "models/bbl_v12/oof_calibrators.pkl",
+        "type": "7-method OOF comparison (brier_optimized recommended)",
+        "generated_date": "2026-01-16",
         "oof_metrics": {
-          "brier_raw": 0.18176028345833248,
-          "brier_calibrated": 0.18001131073555973,
-          "ece_raw": 0.014380847856989556,
-          "ece_calibrated": 0.00029172411355039726
+          "brier_raw": 0.1825,
+          "brier_optimized": 0.1760,
+          "ece_raw": 0.0162,
+          "best_method": "brier_optimized"
         },
         "n_features": 25,
-        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+        "feature_hash": "empirical_penalties_v4"
       },
       "feature_store": {
         "path": "data/bbl_feature_store_v2",
@@ -47,9 +47,9 @@
           ]
         },
         "recent_changes": {
-          "date": "2025-12-15",
-          "description": "Added bat_first_wr and bowl_first_wr for situation-specific predictions",
-          "impact": "Improves situation_advantage feature accuracy in innings 1 vs innings 2"
+          "date": "2026-01-16",
+          "description": "v12: Empirically calibrated FIRST_INNINGS_WICKET_PENALTY_3D using actual projected score ratios. Death phase penalties now 0.88-1.00 (was 0.33-0.84). Wickets have minimal impact in death overs.",
+          "impact": "Overall -0.30% Brier, Inn1 death -0.40%, Inn2 death -3.00%. Key insight: In death overs, actual score matters far more than wickets."
         }
       }
     },
@@ -271,26 +271,26 @@
       }
     },
     "SAT": {
-      "path": "models/sat_v1",
-      "version": "v1",
-      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Innings-Specific Isotonic Calibration (Brier: 0.1798, ECE: 0.0000)",
+      "path": "models/sat_v2",
+      "version": "v2",
+      "description": "XGBLogRegEnsemble (25 features) + Empirically Calibrated Wicket Penalties (Brier: 0.1908, ECE: 0.0610)",
       "calibrator": {
-        "path": "models/sat_v1/isotonic_calibrator.pkl",
-        "type": "isotonic_regression",
-        "generated_date": "2026-01-14T20:25:55.128661",
+        "path": "models/sat_v2/oof_calibrators.pkl",
+        "type": "7-method OOF comparison (brier_optimized recommended)",
+        "generated_date": "2026-01-16",
         "oof_metrics": {
-          "brier_raw": 0.19174002716944485,
-          "brier_calibrated": 0.17976052078670698,
-          "ece_raw": 0.06290362025497906,
-          "ece_calibrated": 0.0009686596613592268
+          "brier_raw": 0.1908,
+          "brier_optimized": 0.1677,
+          "ece_raw": 0.0610,
+          "best_method": "brier_optimized"
         },
         "n_features": 25,
-        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+        "feature_hash": "empirical_penalties_v2"
       },
       "feature_store": {
-        "path": "data/sat_feature_store_v1",
-        "version": "v1",
-        "generated_date": "2025-12-31",
+        "path": "data/sat_feature_store_v2",
+        "version": "v2",
+        "generated_date": "2026-01-16",
         "training_data_matches": 99,
         "statistics": {
           "teams": 6,
@@ -316,9 +316,9 @@
           ]
         },
         "recent_changes": {
-          "date": "2025-12-31",
-          "description": "Cleanly retrained SA20 v1 from scratch with CV-OOF Innings-Specific Isotonic Calibration",
-          "impact": "6.3% Brier improvement with calibration (0.1917 -> 0.1798); calibration helps in BOTH innings unlike BBL"
+          "date": "2026-01-16",
+          "description": "v2: Empirically calibrated wicket penalties using actual projected score ratios. Death penalties now 0.88-1.00 (was 0.33-0.84).",
+          "impact": "Overall -1.40% Brier, Inn1 death -1.03%, Inn2 death -7.07%. Huge improvement in chase predictions!"
         }
       }
     },
@@ -329,28 +329,12 @@
       "calibrator": {
         "path": "models/wpl_female_v1/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2026-01-09T00:00:00",
+        "generated_date": "2026-01-15T20:01:04.697150",
         "oof_metrics": {
           "brier_raw": 0.1733430090140223,
-          "brier_calibrated": 0.16601420104290857,
+          "brier_calibrated": 0.16602292300706278,
           "ece_raw": 0.04948149329971204,
-          "ece_calibrated": 1.4019856172533513e-17
-        },
-        "innings_specific": {
-          "innings1": {
-            "samples": 7985,
-            "brier_raw": 0.21315019721733647,
-            "brier_calibrated": 0.20226248513405248,
-            "ece_raw": 0.07818673505305898,
-            "ece_calibrated": 5.413466933472821e-17
-          },
-          "innings2": {
-            "samples": 7156,
-            "brier_raw": 0.12892428377597545,
-            "brier_calibrated": 0.12556666771873518,
-            "ece_raw": 0.029601380395718923,
-            "ece_calibrated": 3.208026354344141e-17
-          }
+          "ece_calibrated": 0.0008770886995574932
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
