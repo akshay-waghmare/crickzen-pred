@@ -2,7 +2,7 @@
 
 This repository contains the machine learning pipelines for predicting T20 cricket match outcomes.
 **Active Models:**
-- **BBL v10** (Big Bash League) - 618 matches, Brier 0.1800
+- **BBL v12** (Big Bash League) - 618 matches, Brier 0.1825 (empirically calibrated penalties)
 - **ILT20 v5** (International League T20) - 99 matches, Brier 0.1886
 
 All other models have been archived in `models/archive/`.
@@ -18,14 +18,14 @@ All other models have been archived in `models/archive/`.
 - **`data/`**: Data storage (gitignored).
   - **`raw_json/`**: Source JSON files (organized by league: `bbl`, `ilt20`, `npl`, etc.).
   - **`bbl_raw/`**, **`ilt_raw/`**: Ingested Parquet files.
-  - **`bbl_features_v2/`**: Processed features for training.
+  - **`bbl_features_v4/`**: Processed features for training (empirical penalties).
   - **`bbl_feature_store_v2/`**: Artifacts for inference.
 - **`models/`**: Trained models.
-  - **`bbl_v10/`**: Champion BBL model.
+  - **`bbl_v12/`**: Champion BBL model (empirically calibrated).
   - **`ilt20_v5/`**: Champion ILT20 model.
-  - **`archive/`**: Deprecated models (v1-v9, etc.).
+  - **`archive/`**: Deprecated models (v1-v11, etc.).
 - **`docs/`**: Documentation.
-  - **`BBL_V10_MODEL.md`**: BBL model details + calibration analysis.
+  - **`BBL_V12_MODEL.md`**: BBL model details + calibration analysis.
   - **`ILT20_V4_MODEL.md`**: ILT20 model details.
   - **`BBL_V8_CALIBRATION_GUIDE.md`**: Calibration methodology.
 
@@ -58,7 +58,31 @@ bbl-pipeline train \
 ```
 *Note: Always use `--calibration` for production models.*
 
-### 4. ECE Optimization (Perfect Calibration)
+### 4. OOF Calibration Analysis (Compare All Methods)
+Comprehensive OOF cross-validation analysis comparing 7 calibration strategies:
+```bash
+bbl-pipeline analyze-oof \
+  --input-file data/bbl_features_v2/training.parquet \
+  --model-dir models/bbl_v10 \
+  --n-splits 5
+```
+**Outputs:**
+- `oof_calibration_results.csv` - Detailed metrics by segment (overall, innings, phase)
+- `oof_calibrators.pkl` - Trained calibrators for all 7 methods
+- `OOF_CALIBRATION_REPORT.md` - Formatted markdown report
+
+**7 Methods Compared:**
+1. **Raw** - Uncalibrated base model
+2. **Combined** - Single isotonic calibrator
+3. **Innings-Specific** - 2 calibrators (one per innings)
+4. **Innings×Phase** - 6 calibrators (powerplay/middle/death per innings)
+5. **Brier-Optimized** - Per-over calibrators (40 total)
+6. **ECE-Optimized** - Histogram binning + isotonic per innings×phase
+7. **LogLoss-Optimized** - Platt scaling per innings×phase
+
+**Metrics Reported:** Brier Score, ECE (10-bin), Log Loss
+
+### 5. ECE Optimization (Perfect Calibration)
 After training, create phase-specific calibrators to achieve ECE ≈ 0.0000:
 ```bash
 python scripts/train_phase_calibrators.py \
@@ -143,55 +167,49 @@ A rigorous 5-fold cross-validation analysis compared 7 calibration approaches fo
 | 7 | Raw | 0 | 0.1456 | 0.0558 | 0.4449 | Baseline |
 
 **Key Findings:**
-- **ECE-Optimized** (histogram binning, 6 calibrators) is best overall: +2.07% Brier, +3.21% LogLoss
-- **Combined** (single isotonic) achieves near-perfect ECE (0.0053) with +90.43% improvement
-- **Brier-Optimized** (40 per-over calibrators) actually hurts LogLoss (-4.35% vs raw) - overfitting
-- All calibration methods improve over raw, but ECE-Optimized provides best balance
+- **Brier-Optimized** (40 per-over calibrators) achieves best Brier but may overfit
+- All calibration methods improve over raw
 
 **Documentation:**
 - Full analysis: `BBL_CALIBRATION_OOF_ANALYSIS.md`
 - Analysis script: `analyze_bbl_calibrators_oof.py`
-- Training script: `scripts/train_bbl_ece_calibrators.py`
-- Active calibrators: `models/bbl_v10/ece_optimized_calibrators.pkl`
+- Model documentation: `docs/BBL_V12_MODEL.md`
 
-### ECE-Optimized Calibrators (Production)
-The BBL v10 model now uses **ECE-Optimized calibrators** with histogram binning:
-- **Method:** 15-bin histogram → isotonic regression per innings×phase
-- **OOF Metrics:** Brier=0.1426, ECE=0.0091, LogLoss=0.4306
-- **In-Sample (trained model):** Brier=0.1403, ECE=0.0040 (near-perfect), LogLoss=0.4230
-- **File:** `models/bbl_v10/ece_optimized_calibrators.pkl`
-- **Streamlit App:** Automatically loads and uses these calibrators for BBL matches
+### Empirically Calibrated Wicket Penalties (v12)
+BBL v12 uses **empirically calibrated wicket penalties** for first innings:
+- **Method:** Derived from actual projected score ratios by phase/ease/wickets
+- **Key Insight:** In death overs, wickets have minimal impact (~0.90-1.00 penalty)
+- **Results:** 
+  - Overall Brier: 0.1825 (-0.30% vs v10)
+  - Inn1 death Brier: 0.2033 (-0.40% vs v10)  
+  - Inn2 death Brier: 0.0859 (-3.00% vs v10)
 
-**Training Process:**
-1. Generate OOF predictions using 5-fold CV (no shuffle)
-2. For each innings×phase: create 15-bin histogram of predicted probabilities
-3. Fit isotonic regression on bin centers vs actual win rates
-4. Result: 6 calibrators (inn1_powerplay, inn1_middle, inn1_death, inn2_powerplay, inn2_middle, inn2_death)
-
-**To retrain:**
-```bash
-python scripts/train_bbl_ece_calibrators.py
+**Penalty Philosophy:**
+```
+In T20 death overs:
+- Actual score and run rate matter far more than wickets
+- Wickets lost late have diminishing negative effect on projected score
+- Even 7-8 wickets down, teams maintain ~90% of projected output
 ```
 
 ## ⚠️ Important Notes for Copilot
 
-1.  **Active Models Only:** Only use `models/bbl_v10`, `models/sat_v1`, and `models/ilt20_v5`. Ignore everything in `models/archive/`.
+1.  **Active Models Only:** Only use `models/bbl_v12`, `models/sat_v1`, and `models/ilt20_v5`. Ignore everything in `models/archive/`.
 2.  **Model Registry:** Keep `models/model_registry.json` updated whenever:
      - Regenerating feature stores (`bbl-pipeline process`)
      - Retraining models (`bbl-pipeline train`)
      - Adding/modifying feature store columns
      - See `docs/MODEL_REGISTRY_GUIDE.md` for detailed procedures
 3.  **Prefer CLI:** Use `bbl-pipeline` for standard tasks.
-4.  **Calibration - ECE-Optimized (NEW):** BBL v10 now uses ECE-optimized histogram binning calibrators (6 calibrators, best overall performance). See `BBL_CALIBRATION_OOF_ANALYSIS.md`.
-5.  **ECE Optimization:** After training any new model, run `scripts/train_phase_calibrators.py` to create phase calibrators for perfect ECE (0.0000).
+4.  **Empirical Penalties:** BBL v12 uses empirically calibrated `FIRST_INNINGS_WICKET_PENALTY_3D` derived from actual projected score data.
+5.  **OOF Analysis:** After training, run `bbl-pipeline analyze-oof` to generate calibrators and metrics.
 6.  **Imports:** Use absolute imports from `bbl_pipeline`.
-7.  **Wicket Penalty:** The wicket penalty in ResourceFeatureCalculator now only applies to future projected runs, not runs already scored.
-8.  **OOF Analysis:** For comprehensive calibration evaluation, use `analyze_bbl_calibrators_oof.py` which compares 7 different methods with proper cross-validation.
+7.  **Wicket Penalty:** The wicket penalty in ResourceFeatureCalculator only applies to future projected runs, not runs already scored. Death phase penalties are ~0.90-1.00 (minimal impact).
+8.  **Features:** BBL v12 uses `data/bbl_features_v4/` with empirically calibrated penalties.
 
 ### Model Artifacts Checklist
 After training a new model, ensure these files exist:
 - `champion_model.joblib` - Main XGBLogRegEnsemble model
-- `isotonic_calibrator.pkl` - Innings-specific OOF calibrators
-- `phase_calibrators.pkl` - Phase-specific ECE calibrators (run `train_phase_calibrators.py`)
-- `training_metadata.json` - Training config and metrics
-- `feature_importance.csv` - Top 25 features
+- `oof_calibrators.pkl` - OOF calibrators from analyze-oof
+- `oof_calibration_results.csv` - Detailed metrics by segment
+- `OOF_CALIBRATION_REPORT.md` - Auto-generated report
