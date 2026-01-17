@@ -2,7 +2,7 @@
 
 This repository contains the machine learning pipelines for predicting T20 cricket match outcomes.
 **Active Models:**
-- **BBL v12** (Big Bash League) - 618 matches, Brier 0.1825 (empirically calibrated penalties)
+- **BBL v12** (Big Bash League) - 141,435 samples, Brier 0.1760 (per-over brier-optimized calibration)
 - **ILT20 v5** (International League T20) - 99 matches, Brier 0.1886
 
 All other models have been archived in `models/archive/`.
@@ -95,31 +95,36 @@ This creates `models/bbl_v10/phase_calibrators.pkl` with isotonic calibrators fo
 
 ## 🧠 Model Architectures
 
-### BBL v10 & ILT20 v5
+### BBL v12 & ILT20 v5
 Both champion models share the same architecture:
 - **Type:** `XGBLogRegEnsemble` (50% XGBoost + 50% Logistic Regression).
-- **Calibration:** Innings-Specific Isotonic Regression (CV-OOF fitted).
+- **Calibration:** BBL v12 uses per-over brier-optimized isotonic (38 calibrators); ILT20 v5 uses innings-specific.
 - **Features:** Top 25 features including `resource_win_prob`, `score_vs_par`, and rolling stats.
 - **Key Class:** `src/bbl_pipeline/training/trainer.py:XGBLogRegEnsemble`
 
-### Calibration Guidance (BBL v10)
-Based on Brier/ECE analysis, use different probability sources by situation:
+### Calibration Strategy (BBL v12)
+**Production Calibrators:**
+- **Per-Over Brier-Optimized** (38 calibrators): inn1_over2-20, inn2_over2-20 → Brier 0.1760, ECE 0.0000
+- **Phase-Specific** (6 calibrators): Fallback for over 1 → Brier 0.1787, ECE 0.0000
+- **Missing overs:** inn1_over1, inn2_over1 (no variation at match start)
 
-| Innings | Phase | Best for Accuracy | Best for Calibration |
-|---------|-------|-------------------|---------------------|
-| **1** | All | Raw Model | Raw Model |
-| **2** | Powerplay | Inn-Specific Cal | Inn-Specific Cal |
-| **2** | Middle | Inn-Specific Cal | Resource Win Prob |
-| **2** | Death | Raw Model | Inn-Specific Cal |
+**OOF Performance (5-fold CV, 141,435 samples):**
+| Method | Brier | ECE | LogLoss | Description |
+|--------|-------|-----|---------|-------------|
+| **Brier-Optimized** | **0.1760** | 0.0000 | 0.5190 | Per-over isotonic (best overall) |
+| Innings×Phase | 0.1787 | 0.0000 | 0.5269 | 6 phase-level calibrators |
+| ECE-Optimized | 0.1796 | 0.0038 | 0.5300 | Histogram + isotonic |
+| Innings-Specific | 0.1809 | 0.0000 | 0.5327 | 2 innings-level calibrators |
+| Raw | 0.1825 | 0.0162 | 0.5381 | Uncalibrated model |
 
-**Key Insight:** BBL's raw model is well-calibrated in innings 1 (no calibration needed).
+**Key Insight:** Per-over granularity captures within-phase variation (-2.7% Brier vs phase, -3.6% vs raw).
 
 ### Feature Stores
 Each model relies on a specific feature store for inference (player stats, venue stats):
-- **BBL v10:** `data/bbl_feature_store_v2`
+- **BBL v12:** `data/bbl_feature_store_v2`
   - 8 teams, 508 players, 31 venues
   - Columns: team, win_rate, matches, bat_first_wr, bowl_first_wr
-  - Generated: 2025-12-31
+  - Generated: 2026-01-17
 - **ILT20 v5:** `data/ilt_feature_store_v3`
   - 6 teams, 320 players, 3 venues
   - Columns: team, win_rate, matches, bat_first_wr, bowl_first_wr
@@ -138,16 +143,18 @@ See `docs/FEATURE_STORE.md` for detailed schema documentation.
   ```bash
   python -m src.bbl_pipeline.inference.crex_live_predictor \
     --match-url "CREX_MATCH_URL" \
-    --model-dir models/bbl_v10 \
+    --model-dir models/bbl_v12 \
     --feature-store-dir data/bbl_feature_store_v2 \
     --output-json data/live_state.json
   ```
   *(For ILT20, change model-dir to `models/ilt20_v5`)*
 
 - **Live Visualization:** Run `streamlit run src/bbl_pipeline/app/live_streamlit_app.py`
-- **Calibration Analysis:** See `docs/BBL_V10_MODEL.md` for detailed Brier/ECE breakdown.
+- **Calibration Analysis:** See `docs/BBL_V12_MODEL.md` for detailed Brier/ECE breakdown.
 - **Comprehensive OOF Calibration Analysis:** 
   - See `BBL_CALIBRATION_OOF_ANALYSIS.md` for complete 7-method comparison
+  - Run `python analyze_bbl_calibrators_oof.py` to regenerate analysis
+  - Interactive OOF analysis available in Streamlit app under "🔬 BBL Comprehensive OOF Calibration Analysis"
   - Run `python analyze_bbl_calibrators_oof.py` to regenerate analysis
   - Interactive OOF analysis available in Streamlit app under "🔬 BBL Comprehensive OOF Calibration Analysis"
 

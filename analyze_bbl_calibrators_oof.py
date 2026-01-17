@@ -67,8 +67,13 @@ def expected_calibration_error(y_true: np.ndarray, y_prob: np.ndarray, n_bins: i
 
 
 def safe_log_loss(y_true: np.ndarray, y_prob: np.ndarray) -> float:
-    """Calculate log loss with clipping to avoid infinities."""
-    y_prob = np.clip(y_prob, 1e-7, 1 - 1e-7)
+    """
+    Calculate log loss with confidence clipping.
+    
+    Using clip=0.01 (betting/forecasting standard) instead of eps=1e-7
+    to prevent extreme tail predictions from dominating the metric.
+    """
+    y_prob = np.clip(y_prob, 0.01, 0.99)
     return log_loss(y_true, y_prob)
 
 

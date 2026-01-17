@@ -484,7 +484,13 @@ def main():
         predictor.feature_mapper.ball_history = ball_history
         
         # Make prediction (get features for display)
-        batting_prob = predictor.predict(match_state, debug=False, ball_history=ball_history)
+        raw_batting_prob = predictor.predict(match_state, debug=False, ball_history=ball_history)
+        
+        # Use brier_optimized (per-over) calibration if available, else fall back to raw
+        if hasattr(predictor, 'last_calibrated_per_over') and predictor.last_calibrated_per_over != raw_batting_prob:
+            batting_prob = predictor.last_calibrated_per_over
+        else:
+            batting_prob = raw_batting_prob
         bowling_prob = 1 - batting_prob
         
         # Get features from mapper for display

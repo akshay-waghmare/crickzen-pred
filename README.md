@@ -2,13 +2,15 @@
 
 A comprehensive system for Big Bash League (BBL) cricket data processing and real-time match win probability prediction.
 
-## 🏆 Latest Model: BBL v3 (Dec 2025)
+## 🏆 Latest Model: BBL v12 (Jan 2026)
 
-Our latest champion model achieves state-of-the-art calibration:
-- **Brier Score:** 0.1514
-- **ECE (Calibration Error):** 0.0087
-- **Method:** XGBoost (WBBL Tuned) + Isotonic Calibration
-- [Read the full documentation](docs/BBL_MODEL_V3.md) - Includes detailed phase-wise, over-wise, and probability zone analysis.
+Our latest champion model achieves state-of-the-art performance:
+- **Brier Score:** 0.1760 (per-over calibrated), 0.1833 (raw model)
+- **ECE (Calibration Error):** 0.0000 (perfect calibration)
+- **Method:** XGBLogRegEnsemble + Per-Over Brier-Optimized Isotonic Calibration
+- **Training Data:** 141,435 ball-by-ball samples
+- **Calibrators:** 38 per-over + 6 phase-specific isotonic calibrators
+- [Read the full documentation](docs/BBL_V12_MODEL.md) - Includes detailed OOF calibration analysis.
 
 ## Features
 

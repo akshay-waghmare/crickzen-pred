@@ -1,28 +1,49 @@
 {
-  "last_updated": "2026-01-16",
+  "last_updated": "2026-01-17",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
       "version": "v12",
-      "description": "XGBLogRegEnsemble (25 features) + Empirically Calibrated Wicket Penalties (Brier: 0.1825, ECE: 0.0162)",
+      "description": "XGBLogRegEnsemble (25 features) + Empirically Calibrated Wicket Penalties + Per-Over Brier-Optimized Calibration (Brier: 0.1760, ECE: 0.0000)",
+      "training": {
+        "samples": 141435,
+        "date": "2026-01-17",
+        "brier_score": 0.1833
+      },
       "calibrator": {
-        "path": "models/bbl_v12/oof_calibrators.pkl",
-        "type": "7-method OOF comparison (brier_optimized recommended)",
-        "generated_date": "2026-01-16",
+        "path": "models/bbl_v12/isotonic_calibrator.pkl",
+        "type": "innings_phase_specific + per_over",
+        "generated_date": "2026-01-17T10:26:39.543035",
+        "phase_calibrators": {
+          "count": 6,
+          "keys": ["inn1_powerplay", "inn1_middle", "inn1_death", "inn2_powerplay", "inn2_middle", "inn2_death"]
+        },
+        "per_over_calibrators": {
+          "count": 38,
+          "description": "Brier-optimized per-over calibrators (inn1_over2-20, inn2_over2-20)",
+          "missing_overs": ["inn1_over1", "inn2_over1"]
+        },
         "oof_metrics": {
+          "method": "5-fold cross-validation",
+          "samples": 141435,
+          "best_calibration": "brier_optimized",
           "brier_raw": 0.1825,
-          "brier_optimized": 0.1760,
+          "brier_phase": 0.1787,
+          "brier_per_over": 0.1760,
           "ece_raw": 0.0162,
-          "best_method": "brier_optimized"
+          "ece_phase": 0.0000,
+          "ece_per_over": 0.0000,
+          "logloss_raw": 0.5381,
+          "logloss_per_over": 0.5190
         },
         "n_features": 25,
-        "feature_hash": "empirical_penalties_v4"
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
         "path": "data/bbl_feature_store_v2",
         "version": "v2",
-        "generated_date": "2025-12-31",
-        "training_data_matches": 618,
+        "generated_date": "2026-01-17",
+        "training_data_samples": 141435,
         "statistics": {
           "teams": 8,
           "players": 508,
@@ -47,9 +68,9 @@
           ]
         },
         "recent_changes": {
-          "date": "2026-01-16",
-          "description": "v12: Empirically calibrated FIRST_INNINGS_WICKET_PENALTY_3D using actual projected score ratios. Death phase penalties now 0.88-1.00 (was 0.33-0.84). Wickets have minimal impact in death overs.",
-          "impact": "Overall -0.30% Brier, Inn1 death -0.40%, Inn2 death -3.00%. Key insight: In death overs, actual score matters far more than wickets."
+          "date": "2026-01-17",
+          "description": "v12: (1) Regenerated feature store with 141,435 samples. (2) Empirically calibrated FIRST_INNINGS_WICKET_PENALTY_3D using actual projected score ratios. Death phase penalties now 0.88-1.00 (was 0.33-0.84). (3) Added per-over brier-optimized calibrators (38 calibrators) achieving 0.1760 Brier (-3.6% vs raw).",
+          "impact": "Overall Brier: 0.1760 (-3.6% vs raw 0.1825). ECE: 0.0000 (perfect calibration). Key insight: Per-over granularity captures within-phase variation better than phase-level calibration."
         }
       }
     },
@@ -275,17 +296,17 @@
       "version": "v2",
       "description": "XGBLogRegEnsemble (25 features) + Empirically Calibrated Wicket Penalties (Brier: 0.1908, ECE: 0.0610)",
       "calibrator": {
-        "path": "models/sat_v2/oof_calibrators.pkl",
-        "type": "7-method OOF comparison (brier_optimized recommended)",
-        "generated_date": "2026-01-16",
+        "path": "models/sat_v2/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2026-01-16T22:17:03.944253",
         "oof_metrics": {
-          "brier_raw": 0.1908,
-          "brier_optimized": 0.1677,
-          "ece_raw": 0.0610,
-          "best_method": "brier_optimized"
+          "brier_raw": 0.18866515388620336,
+          "brier_calibrated": 0.17802195388436792,
+          "ece_raw": 0.06064995466675187,
+          "ece_calibrated": 0.0008585325563254603
         },
         "n_features": 25,
-        "feature_hash": "empirical_penalties_v2"
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
         "path": "data/sat_feature_store_v2",

@@ -524,6 +524,124 @@ def analyze(input_file, model_name):
         raise click.ClickException(str(e))
 
 
+@main.command(name='analyze-oof')
+@click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
+@click.option('--model-dir', type=click.Path(exists=True), required=True, help='Model directory containing champion_model.joblib')
+@click.option('--n-splits', type=int, default=5, show_default=True, help='Number of folds for cross-validation')
+@click.option('--target-col', default='is_winner', show_default=True, help='Target column name')
+@click.option('--innings-col', default='innings', show_default=True, help='Innings column name (optional)')
+@click.option('--overs-col', default='overs_remaining', show_default=True, help='Overs remaining column (optional, for phase analysis)')
+def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_col):
+    """
+    Comprehensive OOF calibration analysis comparing 7 methods:
+    - Raw (uncalibrated)
+    - Combined (single isotonic)
+    - Innings-Specific (2 calibrators)
+    - Innings×Phase (6 calibrators)
+    - Brier-Optimized (per-over)
+    - ECE-Optimized (histogram binning)
+    - LogLoss-Optimized (Platt scaling)
+    
+    Generates detailed metrics breakdown by innings, phase, and overall.
+    """
+    from bbl_pipeline.training.oof_analyzer import OOFAnalyzer
+    from sklearn.base import clone
+    import joblib
+    
+    input_path = Path(input_file)
+    model_path = Path(model_dir)
+    champion_path = model_path / 'champion_model.joblib'
+    
+    if not champion_path.exists():
+        raise click.ClickException(f"champion_model.joblib not found at {champion_path}")
+    
+    logger.info('Loading training data', path=str(input_path))
+    df = pd.read_parquet(input_path)
+    
+    if target_col not in df.columns:
+        raise click.ClickException(f"Target column '{target_col}' not found in dataset")
+    
+    y = df[target_col].values
+    
+    # Get innings and overs columns if available
+    innings = df[innings_col].values if innings_col in df.columns else None
+    overs_remaining = df[overs_col].values if overs_col in df.columns else None
+    
+    if overs_remaining is not None:
+        # Calculate over number from overs_remaining
+        over = np.ceil(20 - overs_remaining).astype(int) + 1
+        over = np.clip(over, 1, 20)
+    else:
+        over = None
+    
+    # Prepare features
+    X = df.drop(columns=[target_col])
+    
+    # Drop non-feature columns
+    for col in list(X.columns):
+        if str(col).startswith('__') or col in [innings_col, overs_col, 'is_powerplay', 'is_death_overs']:
+            if col in X.columns:
+                X = X.drop(columns=[col])
+    
+    # Keep numeric features only
+    X = X.select_dtypes(include=[np.number]).fillna(0)
+    
+    logger.info('Loading champion model', path=str(champion_path))
+    champion_model = joblib.load(champion_path)
+    
+    # Extract base model if wrapped
+    from bbl_pipeline.training.calibration import CalibratedModel
+    base_model = champion_model
+    if isinstance(champion_model, CalibratedModel) and hasattr(champion_model, 'base_estimator'):
+        base_model = champion_model.base_estimator
+        logger.info('Using base estimator from calibrated model')
+    
+    # Align features if model has feature list
+    if hasattr(base_model, 'selected_features_') and base_model.selected_features_:
+        selected_features = [c for c in base_model.selected_features_ if c in X.columns]
+        X = X[selected_features]
+    elif hasattr(base_model, 'feature_names_in_') and base_model.feature_names_in_ is not None:
+        selected_features = [c for c in list(base_model.feature_names_in_) if c in X.columns]
+        X = X[selected_features]
+    
+    logger.info('Starting OOF analysis', samples=len(X), features=X.shape[1], n_splits=n_splits)
+    
+    # Run analysis
+    analyzer = OOFAnalyzer(
+        model=base_model,
+        X=X,
+        y=y,
+        innings=innings,
+        over=over,
+        n_splits=n_splits
+    )
+    
+    calibrators, results_df = analyzer.run_analysis(output_dir=model_path)
+    
+    # Display summary
+    click.echo("\n" + "="*80)
+    click.echo("OOF CALIBRATION ANALYSIS COMPLETE")
+    click.echo("="*80)
+    
+    # Overall results
+    overall = results_df[results_df['segment'] == 'overall'].sort_values('brier')
+    click.echo("\n📊 OVERALL PERFORMANCE:\n")
+    click.echo(overall[['method', 'brier', 'ece', 'logloss']].to_string(index=False, float_format=lambda x: f'{x:.4f}'))
+    
+    # Rankings
+    click.echo("\n🏆 RANKINGS:\n")
+    click.echo(f"Best Brier:   {overall.iloc[0]['method']} ({overall.iloc[0]['brier']:.4f})")
+    ece_best = overall.sort_values('ece').iloc[0]
+    click.echo(f"Best ECE:     {ece_best['method']} ({ece_best['ece']:.4f})")
+    ll_best = overall.sort_values('logloss').iloc[0]
+    click.echo(f"Best LogLoss: {ll_best['method']} ({ll_best['logloss']:.4f})")
+    
+    click.echo(f"\n✅ Results saved to: {model_path}")
+    click.echo(f"   - oof_calibration_results.csv (detailed metrics)")
+    click.echo(f"   - oof_calibrators.pkl (trained calibrators)")
+    click.echo(f"   - OOF_CALIBRATION_REPORT.md (markdown report)")
+
+
 @main.command(name='generate-oof')
 @click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
 @click.option('--model-dir', type=click.Path(exists=True), required=True, help='Model directory containing champion_model.joblib')
@@ -553,10 +671,18 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     # Check if innings column exists for innings-specific calibration
     has_innings = 'innings' in df.columns
     has_phase = all(col in df.columns for col in ['is_powerplay', 'is_death_overs'])
+    has_overs = 'overs_remaining' in df.columns
     
     if has_innings:
         logger.info('Innings column detected - will generate innings-specific calibrators')
         innings_col = df['innings'].copy()
+    
+    if has_overs:
+        logger.info('Overs column detected - will generate per-over (brier_optimized) calibrators')
+        overs_remaining_col = df['overs_remaining'].copy()
+        # Calculate over number from overs_remaining
+        over_col = np.ceil(20 - overs_remaining_col.values).astype(int) + 1
+        over_col = np.clip(over_col, 1, 20)
     
     if has_phase:
         logger.info('Phase columns detected - will generate innings×phase specific calibrators')
@@ -710,6 +836,40 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
                             ece_cal=phase_metrics[key]['ece_calibrated'],
                         )
 
+        # Generate per-over (brier_optimized) calibrators if overs column exists
+        per_over_calibrators = {}
+        per_over_metrics = {}
+        
+        if has_overs:
+            logger.info('Generating per-over (brier_optimized) calibrators')
+            
+            for inn in [1, 2]:
+                inn_mask = (innings_col == inn).values
+                
+                for ov in range(1, 21):
+                    mask = inn_mask & (over_col == ov)
+                    if mask.sum() >= 30:  # Minimum samples requirement
+                        cal = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
+                        y_over = y.values[mask] if hasattr(y, 'values') else y[mask]
+                        cal.fit(oof_probs[mask], y_over)
+                        
+                        key = f'inn{inn}_over{ov}'
+                        per_over_calibrators[key] = cal
+                        
+                        # Calculate metrics for this combination
+                        probs_raw = oof_probs[mask]
+                        probs_cal = cal.predict(probs_raw)
+                        
+                        per_over_metrics[key] = {
+                            'samples': int(mask.sum()),
+                            'brier_raw': float(brier_score_loss(y_over, probs_raw)),
+                            'brier_calibrated': float(brier_score_loss(y_over, probs_cal)),
+                            'ece_raw': float(expected_calibration_error(y_over, probs_raw)),
+                            'ece_calibrated': float(expected_calibration_error(y_over, probs_cal)),
+                        }
+            
+            logger.info(f'Generated {len(per_over_calibrators)} per-over calibrators')
+
     else:
         # Single calibrator for all data (backward compatible)
         iso = IsotonicRegression(out_of_bounds='clip')
@@ -771,6 +931,12 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
             calibrator_metadata['phase_calibrators'] = phase_calibrators
             calibrator_metadata['phase_metrics'] = phase_metrics
             logger.info(f'Generated {len(phase_calibrators)} innings×phase calibrators')
+        
+        # Add per-over (brier_optimized) calibrators if available
+        if has_overs and per_over_calibrators:
+            calibrator_metadata['per_over_calibrators'] = per_over_calibrators
+            calibrator_metadata['per_over_metrics'] = per_over_metrics
+            logger.info(f'Added {len(per_over_calibrators)} per-over (brier_optimized) calibrators')
     else:
         # Single calibrator (backward compatible)
         calibrator_metadata = {

@@ -66,7 +66,8 @@ class Predictor:
     Enhanced with resource-based features and innings-specific calibration.
     """
     def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], 
-                 calibrator=None, calibrator_inn1=None, calibrator_inn2=None, phase_calibrators=None, calibrator_type='none'):
+                 calibrator=None, calibrator_inn1=None, calibrator_inn2=None, phase_calibrators=None, 
+                 per_over_calibrators=None, calibrator_type='none'):
         # Wrap ensemble model dict if needed
         if isinstance(model, dict) and 'xgb_model' in model:
             self.model = EnsembleModelWrapper(model)
@@ -78,6 +79,7 @@ class Predictor:
         self.calibrator_inn1 = calibrator_inn1  # Innings 1 calibrator
         self.calibrator_inn2 = calibrator_inn2  # Innings 2 calibrator
         self.phase_calibrators = phase_calibrators  # Innings×phase calibrators dict
+        self.per_over_calibrators = per_over_calibrators  # Per-over (brier_optimized) calibrators dict
         self.calibrator_type = calibrator_type  # 'innings_phase_specific', 'innings_specific', 'single', 'legacy', or 'none'
         self.resource_calculator = ResourceFeatureCalculator()
         # Use RealTimeFeatureMapper for proper feature generation
@@ -177,6 +179,9 @@ class Predictor:
                 # Check calibrator type
                 cal_type = calibrator_data.get('type', 'unknown') if isinstance(calibrator_data, dict) else 'legacy'
                 
+                # Load per-over calibrators if available (brier_optimized)
+                per_over_calibrators = calibrator_data.get('per_over_calibrators', {}) if isinstance(calibrator_data, dict) else {}
+                
                 if cal_type == 'innings_phase_specific':
                     # Innings×phase specific calibrators (6 calibrators)
                     calibrator_inn1 = calibrator_data['calibrator_innings1']
@@ -188,6 +193,7 @@ class Predictor:
                         "Loaded innings×phase specific calibrators",
                         created=calibrator_data.get('created_date', 'unknown'),
                         n_phase_calibrators=len(phase_calibrators),
+                        n_per_over_calibrators=len(per_over_calibrators),
                         phase_keys=list(phase_calibrators.keys())
                     )
                     cal_features = calibrator_data.get('features', [])
@@ -281,7 +287,7 @@ class Predictor:
             except Exception as e:
                 logger.warning(f"Failed to load calibrator: {e}")
         
-        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, calibrator_type)
+        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type)
 
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
@@ -452,13 +458,15 @@ class Predictor:
             self.last_calibrated_prob = raw_prob
             self.last_calibrated_combined = raw_prob  # For comparison when using innings-specific
             self.last_calibrated_phase = raw_prob  # For innings×phase specific
+            self.last_calibrated_per_over = raw_prob  # For per-over (brier_optimized)
             
             # Select appropriate calibrator based on innings and phase
             active_calibrator = None
             combined_calibrator = None
             phase_calibrator = None
+            per_over_calibrator = None
             
-            # Determine phase
+            # Determine phase and over
             current_over = int(state.over) + 1  # state.over is 0-19, we need 1-20
             if current_over <= 6:
                 phase = 'powerplay'
@@ -468,6 +476,11 @@ class Predictor:
                 phase = 'death'
             
             phase_key = f'inn{state.innings}_{phase}'
+            
+            # Try per-over (brier_optimized) calibrator first if available
+            over_key = f'inn{state.innings}_over{current_over}'
+            if self.per_over_calibrators and over_key in self.per_over_calibrators:
+                per_over_calibrator = self.per_over_calibrators[over_key]
             
             # Try innings×phase specific first (best performance)
             if self.calibrator_type == 'innings_phase_specific' and self.phase_calibrators:
@@ -516,6 +529,11 @@ class Predictor:
                     calibrated_phase = float(phase_calibrator.predict([raw_prob])[0])
                     self.last_calibrated_phase = calibrated_phase
                 
+                # Calculate per-over (brier_optimized) calibration if available
+                if per_over_calibrator is not None:
+                    calibrated_per_over = float(per_over_calibrator.predict([raw_prob])[0])
+                    self.last_calibrated_per_over = calibrated_per_over
+                
                 # Also calculate combined calibrator if available (for comparison)
                 if combined_calibrator is not None:
                     calibrated_combined = float(combined_calibrator.predict([raw_prob])[0])
@@ -523,13 +541,19 @@ class Predictor:
                 
                 if debug:
                     cal_label = f"Inn{state.innings}" if self.calibrator_type in ['innings_specific', 'innings_phase_specific'] else "Single"
-                    if phase_calibrator is not None:
+                    if per_over_calibrator is not None:
+                        print(f"📊 Raw: {raw_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%} | Brier ({over_key}): {self.last_calibrated_per_over:.1%}")
+                    elif phase_calibrator is not None:
                         print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Inn-Specific: {calibrated_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%}")
                     elif self.calibrator_type in ['innings_specific', 'innings_phase_specific'] and combined_calibrator is not None:
                         print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Combined: {calibrated_combined:.1%} | Inn-Specific ({cal_label}): {calibrated_prob:.1%}")
                     else:
                         print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Calibrated ({cal_label}): {calibrated_prob:.1%}")
             else:
+                # Still calculate per-over if available even without other calibrators
+                if per_over_calibrator is not None:
+                    calibrated_per_over = float(per_over_calibrator.predict([raw_prob])[0])
+                    self.last_calibrated_per_over = calibrated_per_over
                 if debug:
                     print(f"📊 Model probability: {model_prob:.1%}")
             
