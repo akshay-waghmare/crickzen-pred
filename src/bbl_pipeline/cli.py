@@ -105,18 +105,21 @@ def ingest(ctx, input_dir, output_dir, incremental):
     try:
         logger.info("Starting ingestion", input_dir=str(input_path), incremental=is_incremental)
         
-        for file_path in iter_match_files(input_path):
+        for file_path in iter_match_files(input_path, recursive=True):
             summary["total_files_scanned"] += 1
             
             if is_incremental and state.is_processed(file_path):
                 summary["skipped_incremental"] += 1
                 continue
+            
+            # Extract league slug from parent directory (for multi-league structure)
+            league_slug = file_path.parent.name if file_path.parent != input_path else None
                 
             try:
                 data = load_match_file(file_path)
                 match_id = file_path.stem
                 
-                main_recs, super_recs = process_match(data, match_id, resolver)
+                main_recs, super_recs = process_match(data, match_id, resolver, league_slug)
                 
                 main_buffer.extend(main_recs)
                 super_over_buffer.extend(super_recs)
@@ -1457,6 +1460,161 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     click.echo(f"\n📌 Next steps:")
     click.echo(f"   1. Review OOF report: cat {model_dir}/OOF_CALIBRATION_REPORT.md")
     click.echo(f"   2. Test inference: python -m src.bbl_pipeline.inference.crex_live_predictor --model-dir {model_dir} --feature-store-dir {feature_store_dir}")
+
+
+@main.command(name='calibrate-league')
+@click.option('--global-model', type=click.Path(exists=True), required=True,
+              help='Path to global unified model directory (e.g., models/t20_male_v1)')
+@click.option('--input-file', type=click.Path(exists=True), required=True,
+              help='Training parquet with league/date/innings columns')
+@click.option('--league', type=str, required=True,
+              help='League to calibrate (e.g., bbl, ipl, psl)')
+@click.option('--output-dir', type=click.Path(), default=None,
+              help='Output directory (default: global-model/league_calibrators/<league>)')
+@click.option('--method', type=click.Choice(['temperature', 'platt']), default='temperature',
+              help='Calibration method (temperature recommended)')
+@click.pass_context
+def calibrate_league(ctx, global_model, input_file, league, output_dir, method):
+    """
+    Fit league-specific calibration using Temperature/Platt scaling.
+    
+    Recommended approach:
+    1. Global model trained on all T20s (frozen)
+    2. League adaptation via Temperature/Platt scaling (not isotonic - too steppy)
+    3. Innings-wise calibrators for stability
+    
+    Example:
+        bbl-pipeline calibrate-league \\
+            --global-model models/t20_male_v1 \\
+            --input-file data/t20_male_features_v1/training.parquet \\
+            --league bbl \\
+            --method temperature
+    """
+    import joblib
+    from bbl_pipeline.training.league_calibrator import LeagueCalibrator
+    
+    global_model_path = Path(global_model)
+    input_path = Path(input_file)
+    
+    # Load global model
+    model_file = global_model_path / 'champion_model.joblib'
+    if not model_file.exists():
+        click.echo(f"❌ Model not found: {model_file}")
+        return
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  LEAGUE CALIBRATION: {league.upper()}")
+    click.echo(f"  Method: {method} | Innings-specific: Yes")
+    click.echo(f"{'='*60}\n")
+    
+    model = joblib.load(model_file)
+    click.echo(f"✅ Loaded global model from {model_file}")
+    
+    # Load training data
+    df = pd.read_parquet(input_path)
+    click.echo(f"✅ Loaded {len(df):,} samples from {input_path}")
+    
+    # Filter to league
+    if 'league' in df.columns:
+        league_df = df[df['league'].str.lower() == league.lower()].copy()
+        click.echo(f"   Filtered to {len(league_df):,} samples for {league}")
+    else:
+        # Try to infer from file path or use all
+        click.echo(f"   ⚠️ No 'league' column - using all data")
+        league_df = df.copy()
+    
+    if len(league_df) == 0:
+        click.echo(f"❌ No data found for league: {league}")
+        available = df['league'].unique().tolist() if 'league' in df.columns else []
+        click.echo(f"   Available leagues: {available}")
+        return
+    
+    # Get feature columns from model
+    feature_cols = getattr(model, 'selected_features_', None) or getattr(model, 'feature_columns_', None)
+    if feature_cols is None:
+        click.echo("❌ Model does not have selected_features_ or feature_columns_ attribute")
+        return
+    
+    click.echo(f"   Using {len(feature_cols)} features from model")
+    
+    # Ensure all columns exist
+    missing = [c for c in feature_cols if c not in league_df.columns]
+    if missing:
+        click.echo(f"❌ Missing feature columns: {missing[:5]}...")
+        return
+    
+    # Get raw predictions - pass DataFrame to model (it expects named columns)
+    X = league_df[feature_cols]
+    raw_probs = model.predict_proba(X)[:, 1]
+    y_true = league_df['is_winner'].values
+    
+    click.echo(f"\n📊 Fitting {method} calibrator (innings-specific)...")
+    
+    # Fit league calibrator
+    calibrator = LeagueCalibrator(method=method, innings_specific=True)
+    calibrator.fit(league_df, raw_probs, y_true, league)
+    
+    # Output directory
+    if output_dir is None:
+        output_path = global_model_path / 'league_calibrators' / league
+    else:
+        output_path = Path(output_dir)
+    
+    calibrator.save(output_path)
+    
+    # Display metrics
+    metrics = calibrator.metrics_log
+    overall = metrics['overall']
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  CALIBRATION RESULTS: {league.upper()}")
+    click.echo(f"{'='*60}")
+    click.echo(f"\n  Overall ({overall['samples']:,} samples):")
+    click.echo(f"    Brier:   {overall['brier_raw']:.4f} → {overall['brier_calibrated']:.4f} "
+               f"({(1 - overall['brier_calibrated']/overall['brier_raw'])*100:+.1f}%)")
+    click.echo(f"    LogLoss: {overall['logloss_raw']:.4f} → {overall['logloss_calibrated']:.4f} "
+               f"({(1 - overall['logloss_calibrated']/overall['logloss_raw'])*100:+.1f}%)")
+    
+    # By innings
+    click.echo(f"\n  By Innings:")
+    for inn_key, inn_metrics in metrics['by_innings'].items():
+        click.echo(f"    {inn_key}: Brier {inn_metrics['brier_raw']:.4f} → {inn_metrics['brier_calibrated']:.4f} "
+                   f"| LogLoss {inn_metrics['logloss_raw']:.4f} → {inn_metrics['logloss_calibrated']:.4f}")
+    
+    # Calibrator details
+    click.echo(f"\n  Calibrator Details:")
+    for key, cal in calibrator.calibrators.items():
+        if hasattr(cal, 'temperature'):
+            click.echo(f"    {key}: T = {cal.temperature:.4f}")
+        elif hasattr(cal, 'model'):
+            coef = cal.model.coef_[0][0] if hasattr(cal.model, 'coef_') else 'N/A'
+            intercept = cal.model.intercept_[0] if hasattr(cal.model, 'intercept_') else 'N/A'
+            click.echo(f"    {key}: a = {coef:.4f}, b = {intercept:.4f}")
+    
+    # Show temporal trends if available
+    if metrics.get('by_date'):
+        click.echo(f"\n  Temporal Trends (by month):")
+        for item in metrics['by_date'][-6:]:  # Last 6 months
+            click.echo(f"    {item['month']}: Brier {item['brier_calibrated']:.4f} | "
+                       f"LogLoss {item['logloss_calibrated']:.4f} ({item['samples']} samples)")
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  ✅ Saved to: {output_path}")
+    click.echo(f"     - league_calibrator.pkl")
+    click.echo(f"     - calibration_metrics.json")
+    click.echo(f"{'='*60}")
+    
+    # Also export in OOF format for Streamlit app compatibility
+    oof_output = output_path / 'isotonic_calibrator.pkl'
+    calibrator.export_oof_format(output_path, feature_cols)
+    click.echo(f"\n  📦 OOF-Compatible Export:")
+    click.echo(f"     - {oof_output}")
+    click.echo(f"     (Compatible with Streamlit app calibrator loading)")
+    
+    click.echo(f"\n📌 Usage in inference:")
+    click.echo(f"   from bbl_pipeline.training.league_calibrator import LeagueCalibrator")
+    click.echo(f"   calibrator = LeagueCalibrator.load('{output_path}')")
+    click.echo(f"   calibrated = calibrator.predict(df, raw_probs)")
 
 
 if __name__ == '__main__':

@@ -241,9 +241,38 @@ In T20 death overs:
 7.  **Wicket Penalty:** The wicket penalty in ResourceFeatureCalculator only applies to future projected runs, not runs already scored. Death phase penalties are ~0.90-1.00 (minimal impact).
 8.  **Features:** BBL v12 uses `data/bbl_features_v4/` with empirically calibrated penalties.
 
+### League-Specific Calibration (Recommended Approach)
+For adapting the global unified T20 model to specific leagues:
+
+```bash
+bbl-pipeline calibrate-league \
+  --global-model models/t20_male_v1 \
+  --input-file data/<league>_features/training.parquet \
+  --league <league> \
+  --method temperature  # or platt
+```
+
+**Architecture:**
+1. **Global model** trained on all T20s (frozen)
+2. **League adaptation** via Temperature/Platt scaling (NOT isotonic - too steppy)
+3. **Innings-wise calibrators** for stability (2 calibrators per league)
+
+**Temperature vs Platt:**
+- **Temperature**: Single parameter T - divides logits by T before sigmoid
+  - T > 1: Softer predictions (toward 0.5)
+  - T < 1: Sharper predictions (toward 0/1)
+- **Platt**: Two parameters (a, b) - sigmoid(a * logit(p) + b)
+  - More flexible than temperature
+  - Can shift and scale predictions
+
+**When to Use:**
+- 200-500+ league matches: Fit temperature/platt on league data
+- Limited data: Use global model with dampener or last season's calibrator
+
 ### Model Artifacts Checklist
 After training a new model, ensure these files exist:
 - `champion_model.joblib` - Main XGBLogRegEnsemble model
 - `oof_calibrators.pkl` - OOF calibrators from analyze-oof
 - `oof_calibration_results.csv` - Detailed metrics by segment
 - `OOF_CALIBRATION_REPORT.md` - Auto-generated report
+- `league_calibrators/<league>/` - League-specific calibrators (optional)

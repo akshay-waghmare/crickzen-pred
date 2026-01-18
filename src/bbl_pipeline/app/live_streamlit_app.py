@@ -1830,13 +1830,14 @@ def main():
             # Non-BBL, non-SSM-male: Use original 2-column layout
             sa_col1, sa_col2 = st.columns(2)
             with sa_col1:
-                # SA20: Use raw model output for display (calibrators output 1.0 at high probs)
+                # SA20: Use per-over brier-optimized calibrator (best accuracy)
                 # SSM: Use Brier-optimized calibrator (best accuracy)
                 # WPL: Use Brier-optimized phase calibrated (wins ALL metrics)
                 if is_sa20:
-                    brier_prob = raw_prob
-                    brier_label = "Raw Model Output"
-                    brier_desc = "Brier=0.0773 (Well-calibrated)"
+                    # SA20 v2 has per-over brier-optimized calibrators
+                    brier_prob = d.get('calibrated_per_over_prob', raw_prob)
+                    brier_label = "Brier-Optimized (per-over)"
+                    brier_desc = "Brier=0.1597, ECE=0.000"
                 elif is_ssm and ssm_brier_prob is not None:
                     brier_prob = ssm_brier_prob
                     brier_label = f"Brier-Optimized ({ssm_brier_source})"

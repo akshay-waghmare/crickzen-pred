@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-18",
+  "last_updated": "2026-01-19",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -197,63 +197,35 @@
     "T20_MALE": {
       "path": "models/t20_male_v1",
       "version": "v1",
-      "description": "XGBLogRegEnsemble (50 features) + Per-Over Brier/ECE Calibrators (Brier: 0.1438, ECE: 0.0000)",
+      "description": "Unified T20 Male Model - XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1723, ECE: 0.0000)",
+      "training": {
+        "samples": 1893892,
+        "matches": 5353,
+        "leagues": 11,
+        "date": "2026-01-19",
+        "brier_score": 0.1726
+      },
       "calibrator": {
         "path": "models/t20_male_v1/isotonic_calibrator.pkl",
-        "type": "isotonic_regression",
-        "generated_date": "2026-01-11",
+        "type": "innings_phase_specific",
+        "generated_date": "2026-01-19T00:52:17",
         "oof_metrics": {
-          "brier_raw": 0.1517,
-          "brier_calibrated": 0.1517,
-          "ece_raw": 0.0149,
-          "ece_calibrated": 0.013
+          "brier_raw": 0.1735,
+          "brier_calibrated": 0.1723,
+          "ece_raw": 0.0055,
+          "ece_calibrated": 0.0000
         },
-        "innings_specific": {
-          "innings1": {
-            "samples": 358395,
-            "brier_raw": 0.188,
-            "brier_calibrated": 0.1882,
-            "ece_raw": 0.0123,
-            "ece_calibrated": 0.0174,
-            "winner": "raw"
-          },
-          "innings2": {
-            "samples": 314147,
-            "brier_raw": 0.1104,
-            "brier_calibrated": 0.1101,
-            "ece_raw": 0.0186,
-            "ece_calibrated": 0.008,
-            "winner": "calibrated"
-          }
-        },
-        "n_features": 50,
-        "per_over_calibrators": {
-          "brier_path": "models/t20_male_v1/per_over_calibrators_brier.pkl",
-          "ece_path": "models/t20_male_v1/per_over_calibrators_ece.pkl",
-          "generated_date": "2026-01-11",
-          "performance": {
-            "brier_optimized": {
-              "avg_brier": 0.1438,
-              "inn1_source": "raw (19/20 overs)",
-              "inn2_source": "cal (19/20 overs)"
-            },
-            "ece_optimized": {
-              "ece_after": 0.0,
-              "inn1_source": "raw (18/20 overs)",
-              "inn2_source": "cal (20/20 overs)"
-            }
-          }
-        }
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
         "path": "data/t20_male_feature_store_v1",
         "version": "v1",
-        "generated_date": "2026-01-11",
-        "training_data_samples": 672542,
+        "generated_date": "2026-01-19",
+        "training_data_samples": 1893892,
         "statistics": {
-          "teams": 106,
-          "players": "5000+",
-          "venues": "200+",
+          "teams": 245,
+          "leagues": ["bbl", "ipl", "psl", "cpl", "sat", "bpl", "lpl", "ilt", "mlc", "ssm", "ntb"],
           "team_columns": [
             "team",
             "win_rate",
@@ -269,9 +241,62 @@
           ]
         },
         "recent_changes": {
-          "date": "2026-01-11",
-          "description": "T20 International Men's model with per-over Brier and ECE optimized calibrators",
-          "impact": "672K samples; Inn1 uses raw, Inn2 uses calibrated; Perfect ECE after per-over calibration"
+          "date": "2026-01-19",
+          "description": "Unified T20 Male Model trained on 11 leagues (5,353 matches). Leagues: BBL, IPL, PSL, CPL, SA20, BPL, LPL, ILT20, MLC, Super Smash, T20 Blast",
+          "impact": "+9.1% improvement vs resource_win_prob baseline. Per-over brier-optimized calibration achieves perfect ECE."
+        }
+      }
+    },
+    "T20_FEMALE": {
+      "path": "models/t20_female_v1",
+      "version": "v1",
+      "description": "Unified T20 Female Model - XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1510, ECE: 0.0000)",
+      "training": {
+        "samples": 17062,
+        "matches": 74,
+        "leagues": 1,
+        "date": "2026-01-19",
+        "brier_score": 0.1929
+      },
+      "calibrator": {
+        "path": "models/t20_female_v1/isotonic_calibrator.pkl",
+        "type": "innings_phase_specific",
+        "generated_date": "2026-01-19T01:04:36",
+        "oof_metrics": {
+          "brier_raw": 0.1729,
+          "brier_calibrated": 0.1510,
+          "ece_raw": 0.0436,
+          "ece_calibrated": 0.0000
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
+      "feature_store": {
+        "path": "data/t20_female_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-01-19",
+        "training_data_samples": 17062,
+        "statistics": {
+          "teams": 6,
+          "leagues": ["wpl"],
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ]
+        },
+        "recent_changes": {
+          "date": "2026-01-19",
+          "description": "Unified T20 Female Model trained on WPL (74 matches). Additional leagues (WBBL, WCPL) to be added when Cricsheet provides separate downloads.",
+          "impact": "+12.7% improvement vs resource_win_prob baseline. Per-over brier-optimized calibration achieves perfect ECE."
         }
       }
     },
