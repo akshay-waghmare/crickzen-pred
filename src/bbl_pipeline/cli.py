@@ -567,6 +567,11 @@ def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_
     innings = df[innings_col].values if innings_col in df.columns else None
     overs_remaining = df[overs_col].values if overs_col in df.columns else None
     
+    # Get resource_win_prob if available (for baseline comparison)
+    resource_win_prob = df['resource_win_prob'].values if 'resource_win_prob' in df.columns else None
+    if resource_win_prob is not None:
+        logger.info('Found resource_win_prob feature for baseline comparison')
+    
     if overs_remaining is not None:
         # Calculate over number from overs_remaining
         over = np.ceil(20 - overs_remaining).astype(int) + 1
@@ -615,6 +620,7 @@ def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_
         y=y,
         innings=innings,
         over=over,
+        resource_win_prob=resource_win_prob,
         n_splits=n_splits
     )
     
@@ -1051,6 +1057,407 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
                 logger.warning(f'Model {model_dir_rel} not found in registry - skipping registry update')
     except Exception as e:
         logger.warning(f'Failed to update model registry: {e}')
+
+@main.command()
+@click.option('--source-dir', type=click.Path(exists=True), default='recently_played_30_male',
+              help='Source directory containing recently played JSON files (default: recently_played_30_male)')
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'all']), required=True,
+              help='League to extract matches for')
+@click.option('--dry-run', is_flag=True, help='Show which files would be copied without actually copying')
+@click.pass_context  
+def update_matches(ctx, source_dir, league, dry_run):
+    """
+    Update league JSON folder with matches from recently_played folder.
+    
+    Scans the source directory for matches matching the specified league
+    and copies them to the appropriate league folder (e.g., sat_male_json for SA20).
+    Existing files are overwritten.
+    
+    Examples:
+        bbl-pipeline update-matches --league sa20
+        bbl-pipeline update-matches --league bbl --source-dir recently_played_30_male
+        bbl-pipeline update-matches --league all --dry-run
+    """
+    import shutil
+    
+    source_path = Path(source_dir)
+    
+    # League name patterns to match in event.name
+    league_patterns = {
+        'bbl': ['Big Bash League'],
+        'sa20': ['SA20'],
+        'ilt20': ['International League T20', 'ILT20'],
+        'bpl': ['Bangladesh Premier League', 'BPL'],
+        'ssm': ['Super Smash'],
+        'wpl': ['Women\'s Premier League', 'WPL'],
+    }
+    
+    # Target directories for each league
+    target_dirs = {
+        'bbl': 'bbl_male_json',
+        'sa20': 'sat_male_json',
+        'ilt20': 'ilt_male_json',
+        'bpl': 'bpl_male_json',
+        'ssm': 'ssm_male_json',
+        'wpl': 'wpl_female_json',
+    }
+    
+    leagues_to_process = list(league_patterns.keys()) if league == 'all' else [league]
+    
+    total_copied = 0
+    results = {}
+    
+    for lg in leagues_to_process:
+        patterns = league_patterns[lg]
+        target_dir = Path(target_dirs[lg])
+        
+        if not target_dir.exists():
+            logger.warning(f'Target directory {target_dir} does not exist, creating it')
+            if not dry_run:
+                target_dir.mkdir(parents=True, exist_ok=True)
+        
+        matches_found = []
+        
+        for json_file in sorted(source_path.glob('*.json')):
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                event_name = data.get('info', {}).get('event', {}).get('name', '')
+                match_type = data.get('info', {}).get('match_type', '')
+                
+                # Check if this matches any of the league patterns
+                if any(pattern.lower() in event_name.lower() for pattern in patterns):
+                    # Also check it's a T20 match
+                    if match_type == 'T20':
+                        match_num = data.get('info', {}).get('event', {}).get('match_number', '?')
+                        teams = data.get('info', {}).get('teams', [])
+                        dates = data.get('info', {}).get('dates', ['?'])
+                        matches_found.append({
+                            'file': json_file.name,
+                            'match_num': match_num,
+                            'teams': teams,
+                            'date': dates[0] if dates else '?'
+                        })
+                        
+            except Exception as e:
+                logger.error(f'Error reading {json_file.name}: {e}')
+        
+        results[lg] = matches_found
+        
+        if matches_found:
+            click.echo(f'\n{lg.upper()}: Found {len(matches_found)} matches')
+            for m in matches_found:
+                team_str = ' vs '.join(m['teams']) if m['teams'] else 'Unknown'
+                click.echo(f"  {m['file']}: Match {m['match_num']} - {team_str} ({m['date']})")
+            
+            if not dry_run:
+                for m in matches_found:
+                    src = source_path / m['file']
+                    dst = target_dir / m['file']
+                    shutil.copy2(src, dst)
+                    total_copied += 1
+                click.echo(f'  Copied {len(matches_found)} files to {target_dir}')
+        else:
+            click.echo(f'\n{lg.upper()}: No matches found')
+    
+    # Summary
+    if dry_run:
+        total_would_copy = sum(len(m) for m in results.values())
+        click.echo(f'\nDRY RUN: Would copy {total_would_copy} files total')
+    else:
+        click.echo(f'\nTotal: Copied {total_copied} files')
+
+
+@main.command()
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl']), required=True,
+              help='League to retrain model for')
+@click.option('--version', type=str, required=True,
+              help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
+@click.option('--clean', is_flag=True, default=True,
+              help='Delete existing raw/features before reprocessing (default: True)')
+@click.option('--skip-ingest', is_flag=True, help='Skip ingestion step (use existing raw data)')
+@click.option('--skip-process', is_flag=True, help='Skip processing step (use existing features)')
+@click.option('--n-splits', type=int, default=5, help='Number of CV splits for OOF analysis')
+@click.pass_context
+def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
+    """
+    Full retraining pipeline for a league model.
+    
+    Runs the complete pipeline: ingest → process → train → generate-oof → analyze-oof
+    
+    Examples:
+        bbl-pipeline retrain --league sa20 --version v2
+        bbl-pipeline retrain --league bbl --version v13 --skip-ingest
+        bbl-pipeline retrain --league wpl --version v3 --n-splits 3
+    """
+    import shutil
+    import subprocess
+    import sys
+    
+    # League configurations
+    league_config = {
+        'bbl': {
+            'json_dir': 'bbl_male_json',
+            'raw_dir': 'data/bbl_raw',
+            'features_dir': 'data/bbl_features',
+            'feature_store_dir': 'data/bbl_feature_store',
+            'model_prefix': 'bbl',
+        },
+        'sa20': {
+            'json_dir': 'sat_male_json',
+            'raw_dir': 'data/sat_raw',
+            'features_dir': 'data/sat_features',
+            'feature_store_dir': 'data/sat_feature_store',
+            'model_prefix': 'sat',
+        },
+        'ilt20': {
+            'json_dir': 'ilt_male_json',
+            'raw_dir': 'data/ilt_raw',
+            'features_dir': 'data/ilt_features',
+            'feature_store_dir': 'data/ilt_feature_store',
+            'model_prefix': 'ilt20',
+        },
+        'bpl': {
+            'json_dir': 'bpl_male_json',
+            'raw_dir': 'data/bpl_raw',
+            'features_dir': 'data/bpl_features',
+            'feature_store_dir': 'data/bpl_feature_store',
+            'model_prefix': 'bpl',
+        },
+        'ssm': {
+            'json_dir': 'ssm_male_json',
+            'raw_dir': 'data/ssm_raw',
+            'features_dir': 'data/ssm_features',
+            'feature_store_dir': 'data/ssm_feature_store',
+            'model_prefix': 'ssm',
+        },
+        'wpl': {
+            'json_dir': 'wpl_female_json',
+            'raw_dir': 'data/wpl_raw',
+            'features_dir': 'data/wpl_features',
+            'feature_store_dir': 'data/wpl_feature_store',
+            'model_prefix': 'wpl',
+        },
+    }
+    
+    cfg = league_config[league]
+    
+    # Append version to directories
+    features_dir = f"{cfg['features_dir']}_{version}"
+    feature_store_dir = f"{cfg['feature_store_dir']}_{version}"
+    model_dir = f"models/{cfg['model_prefix']}_{version}"
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  RETRAINING {league.upper()} MODEL - {version}")
+    click.echo(f"{'='*60}")
+    click.echo(f"  JSON Source:    {cfg['json_dir']}")
+    click.echo(f"  Raw Data:       {cfg['raw_dir']}")
+    click.echo(f"  Features:       {features_dir}")
+    click.echo(f"  Feature Store:  {feature_store_dir}")
+    click.echo(f"  Model Output:   {model_dir}")
+    click.echo(f"{'='*60}\n")
+    
+    # Count source files
+    json_path = Path(cfg['json_dir'])
+    if json_path.exists():
+        json_count = len(list(json_path.glob('*.json')))
+        click.echo(f"📁 Found {json_count} JSON files in {cfg['json_dir']}")
+    else:
+        click.echo(f"❌ JSON directory not found: {cfg['json_dir']}")
+        return
+    
+    # Step 0: Clean if requested
+    if clean and not skip_ingest:
+        click.echo(f"\n🧹 Cleaning existing data...")
+        for dir_path in [cfg['raw_dir'], features_dir, feature_store_dir]:
+            p = Path(dir_path)
+            if p.exists():
+                shutil.rmtree(p)
+                click.echo(f"   Deleted: {dir_path}")
+    
+    # Step 1: Ingest
+    if not skip_ingest:
+        click.echo(f"\n📥 Step 1/6: INGESTION (JSON → Parquet)")
+        click.echo(f"   bbl-pipeline ingest --input-dir {cfg['json_dir']} --output-dir {cfg['raw_dir']}")
+        result = subprocess.run([
+            sys.executable, '-m', 'bbl_pipeline.cli', 'ingest',
+            '--input-dir', cfg['json_dir'],
+            '--output-dir', cfg['raw_dir']
+        ], capture_output=False)
+        if result.returncode != 0:
+            click.echo(f"❌ Ingestion failed!")
+            return
+        click.echo(f"   ✅ Ingestion complete")
+    else:
+        click.echo(f"\n⏭️  Step 1/6: INGESTION (skipped)")
+    
+    # Step 2: Process
+    if not skip_process:
+        click.echo(f"\n⚙️  Step 2/6: PROCESSING (Parquet → Features)")
+        click.echo(f"   bbl-pipeline process --input-dir {cfg['raw_dir']}/matches --output-dir {features_dir} --feature-store-dir {feature_store_dir}")
+        result = subprocess.run([
+            sys.executable, '-m', 'bbl_pipeline.cli', 'process',
+            '--input-dir', f"{cfg['raw_dir']}/matches",
+            '--output-dir', features_dir,
+            '--feature-store-dir', feature_store_dir
+        ], capture_output=False)
+        if result.returncode != 0:
+            click.echo(f"❌ Processing failed!")
+            return
+        click.echo(f"   ✅ Processing complete")
+    else:
+        click.echo(f"\n⏭️  Step 2/6: PROCESSING (skipped)")
+    
+    # Step 3: Train (without --calibration, calibration comes from generate-oof)
+    click.echo(f"\n🎯 Step 3/6: TRAINING (Features → Model)")
+    click.echo(f"   bbl-pipeline train --input-file {features_dir}/training.parquet --output-dir {model_dir}")
+    result = subprocess.run([
+        sys.executable, '-m', 'bbl_pipeline.cli', 'train',
+        '--input-file', f"{features_dir}/training.parquet",
+        '--output-dir', model_dir
+    ], capture_output=False)
+    if result.returncode != 0:
+        click.echo(f"❌ Training failed!")
+        return
+    click.echo(f"   ✅ Training complete")
+    
+    # Step 4: Generate OOF
+    click.echo(f"\n🔧 Step 4/6: GENERATE-OOF (Create calibrators for inference)")
+    click.echo(f"   bbl-pipeline generate-oof --input-file {features_dir}/training.parquet --model-dir {model_dir}")
+    result = subprocess.run([
+        sys.executable, '-m', 'bbl_pipeline.cli', 'generate-oof',
+        '--input-file', f"{features_dir}/training.parquet",
+        '--model-dir', model_dir
+    ], capture_output=False)
+    if result.returncode != 0:
+        click.echo(f"❌ Generate-OOF failed!")
+        return
+    click.echo(f"   ✅ Generate-OOF complete")
+    
+    # Step 5: Analyze OOF
+    click.echo(f"\n📊 Step 5/6: ANALYZE-OOF (Detailed calibration analysis)")
+    click.echo(f"   bbl-pipeline analyze-oof --input-file {features_dir}/training.parquet --model-dir {model_dir} --n-splits {n_splits}")
+    result = subprocess.run([
+        sys.executable, '-m', 'bbl_pipeline.cli', 'analyze-oof',
+        '--input-file', f"{features_dir}/training.parquet",
+        '--model-dir', model_dir,
+        '--n-splits', str(n_splits)
+    ], capture_output=False)
+    if result.returncode != 0:
+        click.echo(f"❌ Analyze-OOF failed!")
+        return
+    click.echo(f"   ✅ Analyze-OOF complete")
+    
+    # Step 6: Update Model Registry
+    click.echo(f"\n📝 Step 6/6: UPDATING MODEL REGISTRY")
+    
+    # League name mapping for registry
+    registry_league_names = {
+        'bbl': 'BBL',
+        'sa20': 'SAT',
+        'ilt20': 'ILT20',
+        'bpl': 'BPL',
+        'ssm': 'SSM',
+        'wpl': 'WPL',
+    }
+    
+    registry_path = Path('models/model_registry.json')
+    if registry_path.exists():
+        try:
+            with open(registry_path, 'r') as f:
+                registry = json.load(f)
+            
+            league_key = registry_league_names.get(league, league.upper())
+            
+            # Read OOF results for metrics
+            oof_results_path = Path(model_dir) / 'oof_calibration_results.csv'
+            brier_score = None
+            ece_score = None
+            if oof_results_path.exists():
+                oof_df = pd.read_csv(oof_results_path)
+                # Get brier_optimized overall metrics
+                brier_row = oof_df[(oof_df['method'] == 'brier_optimized') & (oof_df['segment'] == 'overall')]
+                if len(brier_row) > 0:
+                    brier_score = float(brier_row['brier'].iloc[0])
+                    ece_score = float(brier_row['ece'].iloc[0])
+            
+            # Count samples from training data
+            training_path = Path(features_dir) / 'training.parquet'
+            samples = 0
+            if training_path.exists():
+                training_df = pd.read_parquet(training_path)
+                samples = len(training_df)
+            
+            # Read calibrator metadata
+            calibrator_path = Path(model_dir) / 'isotonic_calibrator.pkl'
+            calibrator_info = {}
+            if calibrator_path.exists():
+                import joblib
+                cal_data = joblib.load(calibrator_path)
+                if isinstance(cal_data, dict) and 'metadata' in cal_data:
+                    meta = cal_data['metadata']
+                    calibrator_info = {
+                        'path': f"{model_dir}/isotonic_calibrator.pkl",
+                        'type': meta.get('type', 'innings_phase_specific'),
+                        'generated_date': meta.get('created_date', datetime.now().isoformat()),
+                        'oof_metrics': {
+                            'brier_raw': meta.get('oof_brier_raw', 0),
+                            'brier_calibrated': meta.get('oof_brier_calibrated', 0),
+                            'ece_raw': meta.get('oof_ece_raw', 0),
+                            'ece_calibrated': meta.get('oof_ece_calibrated', 0)
+                        },
+                        'n_features': meta.get('n_features', 25),
+                        'feature_hash': meta.get('feature_hash', '')
+                    }
+            
+            # Update or create model entry
+            model_entry = {
+                'path': model_dir,
+                'version': version,
+                'description': f"XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: {brier_score:.4f}, ECE: {ece_score:.4f})" if brier_score else f"XGBLogRegEnsemble retrained {version}",
+                'training': {
+                    'samples': samples,
+                    'date': datetime.now().strftime('%Y-%m-%d'),
+                    'brier_score': brier_score
+                },
+                'calibrator': calibrator_info,
+                'feature_store': {
+                    'path': feature_store_dir,
+                    'version': version,
+                    'generated_date': datetime.now().strftime('%Y-%m-%d'),
+                    'training_data_samples': samples
+                }
+            }
+            
+            # Update active_models
+            registry['active_models'][league_key] = model_entry
+            registry['last_updated'] = datetime.now().strftime('%Y-%m-%d')
+            
+            with open(registry_path, 'w') as f:
+                json.dump(registry, f, indent=2)
+            
+            click.echo(f"   ✅ Updated model_registry.json for {league_key}")
+            
+        except Exception as e:
+            click.echo(f"   ⚠️ Failed to update registry: {e}")
+    else:
+        click.echo(f"   ⚠️ Model registry not found at {registry_path}")
+    
+    # Summary
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  ✅ RETRAINING COMPLETE: {league.upper()} {version}")
+    click.echo(f"{'='*60}")
+    click.echo(f"  Model:         {model_dir}/champion_model.joblib")
+    click.echo(f"  Calibrator:    {model_dir}/isotonic_calibrator.pkl")
+    click.echo(f"  Feature Store: {feature_store_dir}")
+    click.echo(f"  OOF Report:    {model_dir}/OOF_CALIBRATION_REPORT.md")
+    click.echo(f"  Registry:      models/model_registry.json (updated)")
+    click.echo(f"{'='*60}")
+    click.echo(f"\n📌 Next steps:")
+    click.echo(f"   1. Review OOF report: cat {model_dir}/OOF_CALIBRATION_REPORT.md")
+    click.echo(f"   2. Test inference: python -m src.bbl_pipeline.inference.crex_live_predictor --model-dir {model_dir} --feature-store-dir {feature_store_dir}")
+
 
 if __name__ == '__main__':
     main()

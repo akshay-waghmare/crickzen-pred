@@ -65,6 +65,7 @@ class OOFAnalyzer:
     
     def __init__(self, model, X: pd.DataFrame, y: np.ndarray, 
                  innings: np.ndarray = None, over: np.ndarray = None, 
+                 resource_win_prob: np.ndarray = None,
                  n_splits: int = 5):
         """
         Initialize analyzer.
@@ -75,6 +76,7 @@ class OOFAnalyzer:
             y: Target values
             innings: Innings indicator (1 or 2), optional
             over: Over number (1-20), optional
+            resource_win_prob: Resource-based win probability feature, optional
             n_splits: Number of folds for cross-validation
         """
         self.model = model
@@ -82,6 +84,7 @@ class OOFAnalyzer:
         self.y = y
         self.innings = innings
         self.over = over
+        self.resource_win_prob = resource_win_prob
         self.n_splits = n_splits
         
         # Calculate phases if over is provided
@@ -326,6 +329,111 @@ class OOFAnalyzer:
         
         return pd.DataFrame(results)
     
+    def analyze_probability_bins(self, calibrated_probs: Dict[str, np.ndarray], 
+                                  n_bins: int = 10) -> pd.DataFrame:
+        """
+        Analyze calibration quality across probability bins.
+        
+        Args:
+            calibrated_probs: Dict of method -> calibrated probabilities
+            n_bins: Number of probability bins
+            
+        Returns:
+            DataFrame with bin-level metrics for each method
+        """
+        results = []
+        bin_edges = np.linspace(0, 1, n_bins + 1)
+        
+        for method, probs in calibrated_probs.items():
+            for i in range(n_bins):
+                low, high = bin_edges[i], bin_edges[i + 1]
+                if i == n_bins - 1:
+                    mask = (probs >= low) & (probs <= high)
+                else:
+                    mask = (probs >= low) & (probs < high)
+                
+                n = mask.sum()
+                if n > 0:
+                    mean_pred = probs[mask].mean()
+                    mean_actual = self.y[mask].mean()
+                    calibration_error = abs(mean_pred - mean_actual)
+                    brier = ((probs[mask] - self.y[mask]) ** 2).mean()
+                    
+                    results.append({
+                        'method': method,
+                        'bin': f'{low:.1f}-{high:.1f}',
+                        'bin_low': low,
+                        'bin_high': high,
+                        'n_samples': int(n),
+                        'mean_predicted': mean_pred,
+                        'mean_actual': mean_actual,
+                        'calibration_error': calibration_error,
+                        'brier': brier
+                    })
+        
+        return pd.DataFrame(results)
+    
+    def analyze_resource_win_prob(self, calibrated_probs: Dict[str, np.ndarray]) -> pd.DataFrame:
+        """
+        Analyze model predictions vs resource_win_prob baseline.
+        
+        Compares the calibrated model predictions against the resource-based
+        win probability feature to quantify model improvement.
+        
+        Returns:
+            DataFrame with comparison metrics
+        """
+        if self.resource_win_prob is None:
+            logger.warning('resource_win_prob not provided, skipping analysis')
+            return pd.DataFrame()
+        
+        results = []
+        
+        # Resource win prob baseline metrics
+        rwp_brier = brier_score(self.y, self.resource_win_prob)
+        rwp_ece = calculate_ece(self.y, self.resource_win_prob)
+        rwp_logloss = safe_log_loss(self.y, self.resource_win_prob)
+        
+        results.append({
+            'method': 'resource_win_prob',
+            'segment': 'overall',
+            'brier': rwp_brier,
+            'ece': rwp_ece,
+            'logloss': rwp_logloss,
+            'n_samples': len(self.y)
+        })
+        
+        # Per-innings
+        if self.innings is not None:
+            for inn in [1, 2]:
+                mask = self.innings == inn
+                if mask.sum() > 0:
+                    results.append({
+                        'method': 'resource_win_prob',
+                        'segment': f'innings_{inn}',
+                        'brier': brier_score(self.y[mask], self.resource_win_prob[mask]),
+                        'ece': calculate_ece(self.y[mask], self.resource_win_prob[mask]),
+                        'logloss': safe_log_loss(self.y[mask], self.resource_win_prob[mask]),
+                        'n_samples': int(mask.sum())
+                    })
+        
+        # Per-innings×phase
+        if self.innings is not None and self.phases is not None:
+            for inn in [1, 2]:
+                for phase in ['powerplay', 'middle', 'death']:
+                    mask = (self.innings == inn) & (self.phases == phase)
+                    if mask.sum() > 0:
+                        results.append({
+                            'method': 'resource_win_prob',
+                            'segment': f'inn{inn}_{phase}',
+                            'brier': brier_score(self.y[mask], self.resource_win_prob[mask]),
+                            'ece': calculate_ece(self.y[mask], self.resource_win_prob[mask]),
+                            'logloss': safe_log_loss(self.y[mask], self.resource_win_prob[mask]),
+                            'n_samples': int(mask.sum())
+                        })
+        
+        return pd.DataFrame(results)
+    
     def run_analysis(self, output_dir: Path = None) -> Tuple[Dict, pd.DataFrame]:
         """
         Run complete OOF calibration analysis.
@@ -348,6 +456,16 @@ class OOFAnalyzer:
         # Calculate metrics
         results_df = self.calculate_metrics(calibrated_probs)
         
+        # Add resource_win_prob baseline if available
+        if self.resource_win_prob is not None:
+            resource_df = self.analyze_resource_win_prob(calibrated_probs)
+            if not resource_df.empty:
+                results_df = pd.concat([results_df, resource_df], ignore_index=True)
+                logger.info('Added resource_win_prob baseline comparison')
+        
+        # Calculate probability bin analysis
+        prob_bins_df = self.analyze_probability_bins(calibrated_probs)
+        
         # Save results if output_dir provided
         if output_dir:
             output_dir = Path(output_dir)
@@ -357,19 +475,23 @@ class OOFAnalyzer:
             results_df.to_csv(output_dir / 'oof_calibration_results.csv', index=False)
             logger.info('Saved detailed results', path=str(output_dir / 'oof_calibration_results.csv'))
             
+            # Save probability bin analysis
+            prob_bins_df.to_csv(output_dir / 'oof_probability_bins.csv', index=False)
+            logger.info('Saved probability bin analysis', path=str(output_dir / 'oof_probability_bins.csv'))
+            
             # Save calibrators
             calibrators_path = output_dir / 'oof_calibrators.pkl'
             joblib.dump(calibrators, calibrators_path)
             logger.info('Saved calibrators', path=str(calibrators_path))
             
             # Generate summary report
-            self._generate_report(results_df, output_dir)
+            self._generate_report(results_df, prob_bins_df, output_dir)
         
         logger.info('OOF analysis complete')
         
         return calibrators, results_df
     
-    def _generate_report(self, results_df: pd.DataFrame, output_dir: Path):
+    def _generate_report(self, results_df: pd.DataFrame, prob_bins_df: pd.DataFrame, output_dir: Path):
         """Generate markdown report."""
         report_lines = [
             "# OOF Calibration Analysis Report",
@@ -508,6 +630,71 @@ class OOFAnalyzer:
                 top_method = max(wins.keys(), key=lambda m: wins[m])
                 report_lines.append(f"- **{metric_display[metric]}**: `{top_method}` wins in {wins[top_method]} segments")
         
+        # Add resource_win_prob comparison if available
+        if self.resource_win_prob is not None:
+            report_lines.append("\n\n## Resource Win Prob Baseline Comparison\n")
+            report_lines.append("Comparing model predictions vs the `resource_win_prob` feature (DLS-based baseline):\n")
+            
+            rwp_results = results_df[results_df['method'] == 'resource_win_prob']
+            if not rwp_results.empty:
+                # Overall comparison
+                rwp_overall = rwp_results[rwp_results['segment'] == 'overall']
+                if not rwp_overall.empty:
+                    rwp_brier = rwp_overall['brier'].values[0]
+                    rwp_logloss = rwp_overall['logloss'].values[0]
+                    
+                    # Get best model metrics
+                    model_methods = [m for m in results_df['method'].unique() if m != 'resource_win_prob']
+                    overall_df = results_df[(results_df['segment'] == 'overall') & (results_df['method'].isin(model_methods))]
+                    
+                    if not overall_df.empty:
+                        best_brier_method = overall_df.loc[overall_df['brier'].idxmin()]
+                        best_logloss_method = overall_df.loc[overall_df['logloss'].idxmin()]
+                        
+                        brier_improvement = (rwp_brier - best_brier_method['brier']) / rwp_brier * 100
+                        logloss_improvement = (rwp_logloss - best_logloss_method['logloss']) / rwp_logloss * 100
+                        
+                        report_lines.append(f"\n| Metric | resource_win_prob | Best Model | Improvement |")
+                        report_lines.append(f"| --- | --- | --- | --- |")
+                        report_lines.append(f"| Brier | {rwp_brier:.4f} | {best_brier_method['brier']:.4f} ({best_brier_method['method']}) | **{brier_improvement:+.1f}%** |")
+                        report_lines.append(f"| LogLoss | {rwp_logloss:.4f} | {best_logloss_method['logloss']:.4f} ({best_logloss_method['method']}) | **{logloss_improvement:+.1f}%** |")
+        
+        # Add probability bin analysis
+        if not prob_bins_df.empty:
+            report_lines.append("\n\n## Probability Bin Calibration Analysis\n")
+            report_lines.append("Calibration quality by predicted probability range (10 bins):\n")
+            
+            # Show for key methods: raw, brier_optimized, innings_phase
+            key_methods = ['raw', 'brier_optimized', 'innings_phase']
+            available_methods = [m for m in key_methods if m in prob_bins_df['method'].unique()]
+            
+            for method in available_methods:
+                method_bins = prob_bins_df[prob_bins_df['method'] == method].copy()
+                if not method_bins.empty:
+                    report_lines.append(f"\n### {method}\n")
+                    report_lines.append("| Bin | N | Mean Pred | Mean Actual | Cal Error | Brier |")
+                    report_lines.append("| --- | --- | --- | --- | --- | --- |")
+                    
+                    for _, row in method_bins.iterrows():
+                        ce_flag = "⚠️" if row['calibration_error'] > 0.05 else ""
+                        report_lines.append(
+                            f"| {row['bin']} | {row['n_samples']:,} | {row['mean_predicted']:.3f} | "
+                            f"{row['mean_actual']:.3f} | {row['calibration_error']:.4f} {ce_flag} | {row['brier']:.4f} |"
+                        )
+            
+            # Add problematic bins summary
+            report_lines.append("\n### Problematic Bins (Calibration Error > 0.05)\n")
+            for method in available_methods:
+                method_bins = prob_bins_df[prob_bins_df['method'] == method]
+                problems = method_bins[method_bins['calibration_error'] > 0.05]
+                if len(problems) > 0:
+                    report_lines.append(f"\n**{method}:**")
+                    for _, row in problems.iterrows():
+                        direction = "over-predicting" if row['mean_predicted'] > row['mean_actual'] else "under-predicting"
+                        report_lines.append(f"- Bin {row['bin']}: CE={row['calibration_error']:.4f} ({direction})")
+                else:
+                    report_lines.append(f"\n**{method}:** ✅ All bins have CE ≤ 0.05")
+        
         # Add ECE warning
         report_lines.append("\n\n## Important Note on ECE = 0.0000\n")
         report_lines.append("""
@@ -534,7 +721,7 @@ For production, use **Brier Score** as the primary selection criterion.
         
         # Write report
         report_path = output_dir / 'OOF_CALIBRATION_REPORT.md'
-        with open(report_path, 'w') as f:
+        with open(report_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join(report_lines))
         
         logger.info('Generated markdown report', path=str(report_path))

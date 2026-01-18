@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-17",
+  "last_updated": "2026-01-18",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -12,29 +12,13 @@
       },
       "calibrator": {
         "path": "models/bbl_v12/isotonic_calibrator.pkl",
-        "type": "innings_phase_specific + per_over",
-        "generated_date": "2026-01-17T10:26:39.543035",
-        "phase_calibrators": {
-          "count": 6,
-          "keys": ["inn1_powerplay", "inn1_middle", "inn1_death", "inn2_powerplay", "inn2_middle", "inn2_death"]
-        },
-        "per_over_calibrators": {
-          "count": 38,
-          "description": "Brier-optimized per-over calibrators (inn1_over2-20, inn2_over2-20)",
-          "missing_overs": ["inn1_over1", "inn2_over1"]
-        },
+        "type": "isotonic_regression",
+        "generated_date": "2026-01-17T13:12:44.996989",
         "oof_metrics": {
-          "method": "5-fold cross-validation",
-          "samples": 141435,
-          "best_calibration": "brier_optimized",
-          "brier_raw": 0.1825,
-          "brier_phase": 0.1787,
-          "brier_per_over": 0.1760,
-          "ece_raw": 0.0162,
-          "ece_phase": 0.0000,
-          "ece_per_over": 0.0000,
-          "logloss_raw": 0.5381,
-          "logloss_per_over": 0.5190
+          "brier_raw": 0.18163431461491575,
+          "brier_calibrated": 0.18007254992621005,
+          "ece_raw": 0.01482426139591423,
+          "ece_calibrated": 0.0002292219040548864
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
@@ -294,53 +278,18 @@
     "SAT": {
       "path": "models/sat_v2",
       "version": "v2",
-      "description": "XGBLogRegEnsemble (25 features) + Empirically Calibrated Wicket Penalties (Brier: 0.1908, ECE: 0.0610)",
-      "calibrator": {
-        "path": "models/sat_v2/isotonic_calibrator.pkl",
-        "type": "isotonic_regression",
-        "generated_date": "2026-01-16T22:17:03.944253",
-        "oof_metrics": {
-          "brier_raw": 0.18866515388620336,
-          "brier_calibrated": 0.17802195388436792,
-          "ece_raw": 0.06064995466675187,
-          "ece_calibrated": 0.0008585325563254603
-        },
-        "n_features": 25,
-        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1597, ECE: 0.0000)",
+      "training": {
+        "samples": 26121,
+        "date": "2026-01-18",
+        "brier_score": 0.1597261259354372
       },
+      "calibrator": {},
       "feature_store": {
         "path": "data/sat_feature_store_v2",
         "version": "v2",
-        "generated_date": "2026-01-16",
-        "training_data_matches": 99,
-        "statistics": {
-          "teams": 6,
-          "players": 184,
-          "venues": 6,
-          "team_columns": [
-            "team",
-            "win_rate",
-            "matches",
-            "bat_first_wr",
-            "bowl_first_wr"
-          ],
-          "player_columns": [
-            "batsman_rolling_avg",
-            "batsman_rolling_sr",
-            "bowler_rolling_econ",
-            "bowler_rolling_sr"
-          ],
-          "venue_columns": [
-            "venue_avg_score",
-            "venue_avg_wickets",
-            "venue_bat_first_win_rate"
-          ]
-        },
-        "recent_changes": {
-          "date": "2026-01-16",
-          "description": "v2: Empirically calibrated wicket penalties using actual projected score ratios. Death penalties now 0.88-1.00 (was 0.33-0.84).",
-          "impact": "Overall -1.40% Brier, Inn1 death -1.03%, Inn2 death -7.07%. Huge improvement in chase predictions!"
-        }
+        "generated_date": "2026-01-18",
+        "training_data_samples": 26121
       }
     },
     "WPL_FEMALE": {
@@ -350,7 +299,7 @@
       "calibrator": {
         "path": "models/wpl_female_v1/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2026-01-15T20:01:04.697150",
+        "generated_date": "2026-01-17T19:39:45.748535",
         "oof_metrics": {
           "brier_raw": 0.1733430090140223,
           "brier_calibrated": 0.16602292300706278,

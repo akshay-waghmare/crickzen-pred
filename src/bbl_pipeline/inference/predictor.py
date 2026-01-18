@@ -28,6 +28,11 @@ class DummyFeatureStore:
         pass
 
 
+# NOTE: S-curve correction was removed after temporal holdout validation showed it hurt performance.
+# The per-over isotonic calibrators provide sufficient calibration.
+# See analyze_temporal_holdout.py for details.
+
+
 class EnsembleModelWrapper:
     """Wrapper to make ensemble model dict behave like a sklearn model."""
     
@@ -542,7 +547,7 @@ class Predictor:
                 if debug:
                     cal_label = f"Inn{state.innings}" if self.calibrator_type in ['innings_specific', 'innings_phase_specific'] else "Single"
                     if per_over_calibrator is not None:
-                        print(f"📊 Raw: {raw_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%} | Brier ({over_key}): {self.last_calibrated_per_over:.1%}")
+                        print(f"📊 Raw: {raw_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%} | PerOver ({over_key}): {self.last_calibrated_per_over:.1%}")
                     elif phase_calibrator is not None:
                         print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Inn-Specific: {calibrated_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%}")
                     elif self.calibrator_type in ['innings_specific', 'innings_phase_specific'] and combined_calibrator is not None:
@@ -557,17 +562,31 @@ class Predictor:
                 if debug:
                     print(f"📊 Model probability: {model_prob:.1%}")
             
-            # Get resource-based probability for extreme edge case guardrail
+            # Get resource-based probability for constraint layer
             resource_prob = X['resource_win_prob'].iloc[0] if 'resource_win_prob' in X.columns else 0.5
             
-            # Minimal guardrail: Only apply in extreme edge cases (>97% or <3%)
-            # The Brier score analysis shows model is better calibrated than DLS-based
-            # in all phases, so we only override for near-certain outcomes
+            # Use calibrated model probability as the base (isotonic-calibrated = truth)
+            # Per-over calibrator is most accurate, then phase, then innings-level
+            if per_over_calibrator is not None:
+                base_prob = self.last_calibrated_per_over
+            elif phase_calibrator is not None:
+                base_prob = self.last_calibrated_phase
+            elif active_calibrator is not None:
+                base_prob = calibrated_prob
+            else:
+                base_prob = raw_prob
+            
+            # --- CONSTRAINT LAYER (Second Innings) ---
+            # Principle: NEVER push probabilities upward beyond calibrated model output.
+            # Only apply mathematical constraints and downward caps.
+            # This preserves calibration integrity and makes evaluation straightforward.
             if state.innings == 2 and state.target_runs:
                 runs_needed = state.target_runs - state.current_score
                 balls_remaining = (20 - state.over) * 6 - state.ball
                 wickets_remaining = 10 - state.wickets_lost
+                rrr = runs_needed / (balls_remaining / 6) if balls_remaining > 0 else float('inf')
                 
+                # === MATHEMATICAL CONSTRAINTS (non-controversial) ===
                 # Match already won
                 if runs_needed <= 0:
                     prob = 1.0
@@ -577,63 +596,34 @@ class Predictor:
                     prob = 0.0
                 
                 # Mathematically impossible: Need more runs than max possible
-                # Max possible = 6 runs per ball (all sixes, no wides/noballs considered)
                 elif runs_needed > balls_remaining * 6:
                     prob = 0.0
                 
+                # === DOWNWARD CAPS ONLY (never boost) ===
                 # Near-impossible: Need >5 runs per ball on average
                 elif runs_needed > balls_remaining * 5:
-                    # e.g. 22 off 4 balls = 5.5 per ball, very unlikely
-                    prob = min(model_prob, 0.02)
+                    prob = min(base_prob, 0.02)
                 
                 # Very difficult: Need >4 runs per ball on average  
                 elif runs_needed > balls_remaining * 4:
-                    # e.g. 20 off 4 balls = 5 per ball
-                    prob = min(model_prob, 0.05)
+                    prob = min(base_prob, 0.05)
                 
-                # --- ENDGAME GUARDRAILS ---
-                # Only apply these in late-game situations (after 10 overs)
-                # Early innings have too much variance to apply resource-based floors
-                
-                # 1. "Victory Lap" Scenarios: Explicitly handle obvious wins
-                # The model can be conservative (e.g. 92%) due to calibration bins, but
-                # humans know these are 99%+ situations.
-                elif runs_needed <= 6 and wickets_remaining >= 3:
-                    # One hit away with wickets in hand -> 99%
-                    prob = max(model_prob, 0.99)
-                    
-                elif runs_needed <= 12 and runs_needed < balls_remaining and wickets_remaining >= 4:
-                    # Two hits away, run-a-ball, plenty of wickets -> 98%
-                    prob = max(model_prob, 0.98)
-
-                # 2. Resource-based Guardrails (ONLY in late game - after 10 overs)
-                # Early innings have too much variance - trust the model
-                elif state.over >= 10 and resource_prob > 0.99:
-                    # Very late game with near-certain DLS position
-                    prob = max(model_prob, 0.95)
-                    
-                elif state.over >= 15 and resource_prob > 0.97:
-                    # Death overs with strong DLS position  
-                    prob = max(model_prob, 0.90)
-
-                # 3. Loss Guardrails - Smooth continuous capping
-                # If resource_prob is low, the model shouldn't be too optimistic
+                # Loss guardrails - cap optimism in bad situations
                 elif resource_prob < 0.20:
                     # Game Over: No resources left = 0% win probability
                     if resource_prob == 0.0:
                         prob = 0.0
                     else:
-                        # Smooth cap: Allow model to be slightly higher than resource_prob, but not much
-                        # e.g. res=0.01 -> cap=0.025
-                        #      res=0.05 -> cap=0.085
-                        #      res=0.10 -> cap=0.16
-                        #      res=0.15 -> cap=0.235
+                        # Cap: Model can't be much higher than resource_prob in dire situations
                         max_allowed = (resource_prob * 1.5) + 0.01
-                        prob = min(model_prob, max_allowed)
+                        prob = min(base_prob, max_allowed)
+                
+                # Normal case: trust the calibrated model
                 else:
-                    prob = model_prob
+                    prob = base_prob
             else:
-                prob = model_prob
+                # First innings: trust the calibrated model
+                prob = base_prob
             
             return float(prob)
         except Exception as e:

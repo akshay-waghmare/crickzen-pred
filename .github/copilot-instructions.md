@@ -1,9 +1,12 @@
 # GitHub Copilot Instructions for Win Probability Models
 
 This repository contains the machine learning pipelines for predicting T20 cricket match outcomes.
+
 **Active Models:**
 - **BBL v12** (Big Bash League) - 141,435 samples, Brier 0.1760 (per-over brier-optimized calibration)
+- **SA20 v2** (South Africa T20 League) - 121 matches, 26,121 samples, Brier 0.1597
 - **ILT20 v5** (International League T20) - 99 matches, Brier 0.1886
+- **WPL v2** (Women's Premier League) - 74 matches, 17,062 samples, Brier 0.1510
 
 All other models have been archived in `models/archive/`.
 
@@ -33,14 +36,31 @@ All other models have been archived in `models/archive/`.
 
 Use the `bbl-pipeline` CLI for the standard end-to-end workflow.
 
-### 1. Ingestion (JSON → Parquet)
+### Quick Start: Full Retrain (Recommended)
+The `retrain` command runs the complete pipeline in one step:
+```bash
+bbl-pipeline retrain --league sa20 --version v2
+```
+This runs: ingest → process → train → generate-oof → analyze-oof → update-registry
+
+### Update Matches from Recently Played
+Copy new matches from the recently_played folder to league-specific folders:
+```bash
+bbl-pipeline update-matches --league sa20 --dry-run  # Preview
+bbl-pipeline update-matches --league sa20            # Copy files
+bbl-pipeline update-matches --league all             # All leagues
+```
+
+### Individual Pipeline Steps
+
+#### 1. Ingestion (JSON → Parquet)
 ```bash
 bbl-pipeline ingest \
   --input-dir data/raw_json/bbl \
   --output-dir data/bbl_raw
 ```
 
-### 2. Feature Engineering (Parquet → Features)
+#### 2. Feature Engineering (Parquet → Features)
 ```bash
 bbl-pipeline process \
   --input-dir data/bbl_raw/matches \
@@ -48,18 +68,24 @@ bbl-pipeline process \
   --feature-store-dir data/bbl_feature_store_v2
 ```
 
-### 3. Model Training (Features → Model)
-Trains the `XGBLogRegEnsemble` model with Isotonic Calibration.
+#### 3. Model Training (Features → Model)
+Trains the `XGBLogRegEnsemble` model. Do NOT use `--calibration` (calibration comes from generate-oof).
 ```bash
 bbl-pipeline train \
   --input-file data/bbl_features_v2/training.parquet \
-  --output-dir models/bbl_v10 \
-  --calibration
+  --output-dir models/bbl_v10
 ```
-*Note: Always use `--calibration` for production models.*
 
-### 4. OOF Calibration Analysis (Compare All Methods)
-Comprehensive OOF cross-validation analysis comparing 7 calibration strategies:
+#### 4. Generate OOF Calibrators (For Inference)
+Creates `isotonic_calibrator.pkl` used by the predictor and Streamlit app:
+```bash
+bbl-pipeline generate-oof \
+  --input-file data/bbl_features_v2/training.parquet \
+  --model-dir models/bbl_v10
+```
+
+#### 5. OOF Calibration Analysis (Compare All Methods)
+Comprehensive OOF cross-validation analysis comparing 7+ calibration strategies:
 ```bash
 bbl-pipeline analyze-oof \
   --input-file data/bbl_features_v2/training.parquet \
@@ -68,10 +94,11 @@ bbl-pipeline analyze-oof \
 ```
 **Outputs:**
 - `oof_calibration_results.csv` - Detailed metrics by segment (overall, innings, phase)
+- `oof_probability_bins.csv` - Probability bin analysis
 - `oof_calibrators.pkl` - Trained calibrators for all 7 methods
-- `OOF_CALIBRATION_REPORT.md` - Formatted markdown report
+- `OOF_CALIBRATION_REPORT.md` - Formatted markdown report with resource baseline comparison
 
-**7 Methods Compared:**
+**8 Methods Compared:**
 1. **Raw** - Uncalibrated base model
 2. **Combined** - Single isotonic calibrator
 3. **Innings-Specific** - 2 calibrators (one per innings)
