@@ -183,7 +183,9 @@ def load_per_over_calibrators():
     """Load per-over calibrators for BBL, SSM, and SSM Female."""
     calibrators = {}
     try:
-        calibrators['bbl'] = joblib.load('models/bbl_v10/per_over_calibrators.pkl')
+        # BBL v12: per-over calibrators are inside isotonic_calibrator.pkl
+        bbl_cal = joblib.load('models/bbl_v12/isotonic_calibrator.pkl')
+        calibrators['bbl'] = bbl_cal.get('per_over_calibrators', {})
     except:
         calibrators['bbl'] = None
     try:
@@ -219,16 +221,16 @@ def load_ece_optimized_calibrators():
     """
     calibrators = {}
     
-    # BBL: Use calibrator_combined from isotonic_calibrator.pkl (Best ECE performer!)
+    # BBL v12: Use calibrator_combined from isotonic_calibrator.pkl (Best ECE performer!)
     try:
-        iso_data = joblib.load('models/bbl_v10/isotonic_calibrator.pkl')
+        iso_data = joblib.load('models/bbl_v12/isotonic_calibrator.pkl')
         calibrators['bbl'] = {
             'combined': {
                 'calibrator': iso_data['calibrator_combined'],
                 'source': 'raw',
                 'method': 'combined_isotonic',
-                'oof_brier': iso_data.get('oof_brier_calibrated', 0.1428),
-                'oof_ece': iso_data.get('oof_ece_calibrated', 0.0003)
+                'oof_brier': iso_data.get('oof_brier_calibrated', 0.1810),
+                'oof_ece': iso_data.get('oof_ece_calibrated', 0.0000)
             }
         }
     except:
@@ -250,9 +252,10 @@ def load_phase_calibrators():
     """
     calibrators = {}
     
-    # BBL phase calibrators (6 calibrators - fallback if ECE-optimized not available)
+    # BBL v12 phase calibrators (6 calibrators - fallback if ECE-optimized not available)
     try:
-        calibrators['bbl'] = joblib.load('models/bbl_v10/phase_calibrators.pkl')
+        bbl_cal = joblib.load('models/bbl_v12/isotonic_calibrator.pkl')
+        calibrators['bbl'] = bbl_cal.get('phase_calibrators', {})
     except:
         calibrators['bbl'] = None
     
@@ -289,9 +292,11 @@ def load_brier_calibrators():
     except Exception as e:
         print(f"[FAIL] Failed to load SSM Brier calibrators: {e}")
         calibrators['ssm'] = None
+    # BBL v12: Brier-optimized per-over calibrators from isotonic_calibrator.pkl
     try:
-        calibrators['bbl'] = joblib.load('models/bbl_v10/per_over_calibrators_brier.pkl')
-        print(f"[OK] Loaded BBL Brier calibrators: {list(calibrators['bbl'].keys())}")
+        bbl_cal = joblib.load('models/bbl_v12/isotonic_calibrator.pkl')
+        calibrators['bbl'] = bbl_cal.get('per_over_calibrators', {})
+        print(f"[OK] Loaded BBL v12 Brier calibrators: {len(calibrators['bbl'])} per-over")
     except Exception as e:
         print(f"[FAIL] Failed to load BBL Brier calibrators: {e}")
         calibrators['bbl'] = None
@@ -315,9 +320,11 @@ def load_logloss_calibrators():
     """Load Log Loss-optimized calibrators for BBL and SSM.
     These select best source per over for Log Loss optimization."""
     calibrators = {}
+    # BBL v12: LogLoss calibrators from oof_calibrators.pkl (analyze-oof output)
     try:
-        calibrators['bbl'] = joblib.load('models/bbl_v10/logloss_calibrators.pkl')
-        print(f"[OK] Loaded BBL Log Loss calibrators: {len(calibrators['bbl'])} overs")
+        bbl_oof = joblib.load('models/bbl_v12/oof_calibrators.pkl')
+        calibrators['bbl'] = bbl_oof.get('logloss_optimized', {})
+        print(f"[OK] Loaded BBL v12 Log Loss calibrators: {len(calibrators['bbl'])} phases")
     except Exception as e:
         print(f"[FAIL] Failed to load BBL Log Loss calibrators: {e}")
         calibrators['bbl'] = None
@@ -828,6 +835,7 @@ def main():
     combined_prob = d.get("calibrated_combined_prob", d["bat_win_prob"])
     inn_specific_prob = d.get("calibrated_win_prob", d["bat_win_prob"])
     phase_specific_prob = d.get("calibrated_phase_prob", None)
+    per_over_prob = d.get("calibrated_per_over_prob", None)  # Per-over brier-optimized
     
     # Detect if this is SA20 and recalculate calibrated probabilities client-side
     batting_team = d.get("batting_team", "")
@@ -968,6 +976,93 @@ def main():
     st.plotly_chart(
         create_gauges(d["batting_team"], d["bowling_team"], d["bat_win_prob"], d["bowl_win_prob"])
     )
+    
+    # Market Odds from CREX (if available)
+    market_fav_team = d.get("market_fav_team", "")
+    market_back_odds = d.get("market_back_odds", "")
+    market_lay_odds = d.get("market_lay_odds", "")
+    market_fav_prob = d.get("market_fav_prob", 0.0)
+    
+    if market_fav_team and market_back_odds:
+        st.markdown("---")
+        st.subheader("📈 CREX Market Odds")
+        
+        # Calculate underdog probability and identify teams
+        fav_team = market_fav_team
+        underdog_prob = 1.0 - market_fav_prob if market_fav_prob > 0 else 0.0
+        
+        # Determine which team is the favorite based on match state
+        batting_team = d.get("batting_team", "")
+        bowling_team = d.get("bowling_team", "")
+        
+        # Match favorite team to batting/bowling
+        is_fav_batting = fav_team == batting_team or fav_team in batting_team or batting_team in fav_team
+        is_fav_bowling = fav_team == bowling_team or fav_team in bowling_team or bowling_team in fav_team
+        
+        if is_fav_batting:
+            fav_full_name = get_name(batting_team)
+            underdog_full_name = get_name(bowling_team)
+            fav_color = get_color(batting_team)
+            underdog_color = get_color(bowling_team)
+        elif is_fav_bowling:
+            fav_full_name = get_name(bowling_team)
+            underdog_full_name = get_name(batting_team)
+            fav_color = get_color(bowling_team)
+            underdog_color = get_color(batting_team)
+        else:
+            fav_full_name = fav_team
+            underdog_full_name = "Opponent"
+            fav_color = "#4CAF50"
+            underdog_color = "#f44336"
+        
+        mcol1, mcol2, mcol3 = st.columns([2, 1, 2])
+        
+        with mcol1:
+            st.markdown(f'''
+            <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, {fav_color}, #333); 
+                 border-radius: 10px; color: white;">
+                <span style="font-size: 0.9em;">⭐ FAVORITE</span><br>
+                <b style="font-size: 1.4em;">{fav_full_name}</b><br>
+                <span style="font-size: 2em;">{market_fav_prob*100:.1f}%</span><br>
+                <span style="font-size: 1em;">Back: <b>{market_back_odds}</b> | Lay: <b>{market_lay_odds}</b></span>
+            </div>
+            ''', unsafe_allow_html=True)
+        
+        with mcol2:
+            st.markdown(f'''
+            <div style="text-align: center; padding: 25px;">
+                <span style="font-size: 1.5em; color: #666;">VS</span>
+            </div>
+            ''', unsafe_allow_html=True)
+        
+        with mcol3:
+            st.markdown(f'''
+            <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, {underdog_color}, #333); 
+                 border-radius: 10px; color: white;">
+                <span style="font-size: 0.9em;">UNDERDOG</span><br>
+                <b style="font-size: 1.4em;">{underdog_full_name}</b><br>
+                <span style="font-size: 2em;">{underdog_prob*100:.1f}%</span><br>
+                <span style="font-size: 1em;">Implied from odds</span>
+            </div>
+            ''', unsafe_allow_html=True)
+        
+        # Model vs Market comparison
+        model_prob = d["bat_win_prob"]
+        if is_fav_batting:
+            market_bat_prob = market_fav_prob
+        else:
+            market_bat_prob = underdog_prob
+        
+        diff = model_prob - market_bat_prob
+        if abs(diff) > 0.03:  # 3% threshold for edge
+            edge_color = "#4CAF50" if diff > 0 else "#f44336"
+            edge_text = "Model sees VALUE on batting team" if diff > 0 else "Market favors batting team more"
+            st.markdown(f'''
+            <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; 
+                 border-left: 4px solid {edge_color}; margin-top: 10px;">
+                <b>Model vs Market Edge:</b> {abs(diff)*100:.1f}% - <span style="color: {edge_color};">{edge_text}</span>
+            </div>
+            ''', unsafe_allow_html=True)
     
     # BBL Calibration Guidance
     resource_prob = d.get("features", {}).get("resource_win_prob", 0.5)
@@ -1219,11 +1314,17 @@ def main():
             # Fallback to phase calibrators if ECE-optimized not available
             bbl_phase_cals = PHASE_CALIBRATORS.get('bbl')
             if bbl_phase_cals is not None and calibrator_key in bbl_phase_cals:
-                phase_cal_info = bbl_phase_cals[calibrator_key]
-                cal_source = phase_cal_info.get('source', 'raw')
-                cal_method = 'isotonic'
-                input_prob = raw_prob
-                ece_optimized_prob = phase_cal_info['calibrator'].predict([[input_prob]])[0]
+                phase_cal = bbl_phase_cals[calibrator_key]
+                # Handle both dict format (old) and plain IsotonicRegression (v12)
+                if hasattr(phase_cal, 'predict'):
+                    # Plain IsotonicRegression object
+                    input_prob = raw_prob
+                    ece_optimized_prob = phase_cal.predict([[input_prob]])[0]
+                else:
+                    # Dict format with 'calibrator' key
+                    cal_source = phase_cal.get('source', 'raw')
+                    input_prob = raw_prob
+                    ece_optimized_prob = phase_cal['calibrator'].predict([[input_prob]])[0]
                 ece_optimized_prob = np.clip(ece_optimized_prob, 0.01, 0.99)
     elif is_ssm:
         # SSM: Use per-over calibrators for ECE
@@ -1311,19 +1412,22 @@ def main():
             if brier_cals is not None:
                 brier_cal_key = calibrator_key  # e.g., inn1_over14
                 if brier_cal_key in brier_cals:
-                    brier_cal_info = brier_cals[brier_cal_key]
-                    bbl_brier_source = brier_cal_info['source']
-                    
-                    # Get input based on Brier-optimal source
-                    if bbl_brier_source == 'raw':
-                        brier_input = raw_prob
-                    elif bbl_brier_source == 'cal':
-                        brier_input = inn_specific_prob if inn_specific_prob is not None else raw_prob
-                    else:  # 'res'
-                        brier_input = resource_prob
-                    
-                    # Apply Brier calibrator (always isotonic)
-                    bbl_brier_prob = brier_cal_info['calibrator'].predict([[brier_input]])[0]
+                    brier_cal = brier_cals[brier_cal_key]
+                    # Handle both dict format (old) and plain IsotonicRegression (v12)
+                    if hasattr(brier_cal, 'predict'):
+                        # Plain IsotonicRegression object (v12 format)
+                        bbl_brier_source = 'raw'
+                        bbl_brier_prob = brier_cal.predict([[raw_prob]])[0]
+                    else:
+                        # Dict format with 'source' and 'calibrator' keys
+                        bbl_brier_source = brier_cal['source']
+                        if bbl_brier_source == 'raw':
+                            brier_input = raw_prob
+                        elif bbl_brier_source == 'cal':
+                            brier_input = inn_specific_prob if inn_specific_prob is not None else raw_prob
+                        else:  # 'res'
+                            brier_input = resource_prob
+                        bbl_brier_prob = brier_cal['calibrator'].predict([[brier_input]])[0]
                     bbl_brier_prob = np.clip(bbl_brier_prob, 0.01, 0.99)
         
         # BBL: Apply Log Loss-optimized calibrators
@@ -1351,32 +1455,34 @@ def main():
                     bbl_logloss_prob = logloss_cal_info['calibrator'].predict([[logloss_input]])[0]
                     bbl_logloss_prob = np.clip(bbl_logloss_prob, 0.01, 0.99)
     
-    # WPL: Apply Brier-optimized calibrators (separate from ECE-optimized block above)
+    # WPL: Apply per-over Brier-optimized calibrators from isotonic_calibrator.pkl
+    # Inn1: Use raw (more aligned with reality per user observation)
+    # Inn2: Use brier_optimized (significantly better: 0.1109 vs 0.1295)
     if is_wpl:
-        brier_cals = BRIER_CALIBRATORS.get('wpl')
-        # Fallback: Try loading directly if cached value is None
-        if brier_cals is None:
+        if inn_num == 1:
+            # Innings 1: Raw model is more realistic
+            wpl_brier_prob = raw_prob
+            wpl_brier_source = "raw"
+        else:
+            # Innings 2: Use per-over calibrator (much better than raw)
+            wpl_per_over_cals = None
             try:
-                brier_cals = joblib.load('models/wpl_female_v1/per_over_calibrators_brier.pkl')
+                # Load from isotonic_calibrator.pkl (generated by bbl-pipeline generate-oof)
+                cal_data = joblib.load('models/wpl_female_v1/isotonic_calibrator.pkl')
+                wpl_per_over_cals = cal_data.get('per_over_calibrators', {})
             except:
-                brier_cals = None
-        if brier_cals is not None:
-            brier_cal_key = f'inn{inn_num}_{phase_key}'
-            if brier_cal_key in brier_cals:
-                brier_cal_info = brier_cals[brier_cal_key]
-                wpl_brier_source = brier_cal_info['source']
-                
-                # Get input based on Brier-optimal source
-                if wpl_brier_source == 'raw':
-                    brier_input = raw_prob
-                elif wpl_brier_source == 'resource':
-                    brier_input = resource_prob
-                else:  # 'inn_specific'
-                    brier_input = inn_specific_prob if inn_specific_prob is not None else raw_prob
-                
-                # Apply Brier calibrator (always isotonic)
-                wpl_brier_prob = brier_cal_info['calibrator'].predict([[brier_input]])[0]
+                wpl_per_over_cals = {}
+            
+            # Try per-over calibrator (inn2_over3, etc)
+            over_key = f'inn{inn_num}_over{current_over}'
+            if over_key in wpl_per_over_cals:
+                wpl_brier_prob = float(wpl_per_over_cals[over_key].predict([[raw_prob]])[0])
                 wpl_brier_prob = np.clip(wpl_brier_prob, 0.01, 0.99)
+                wpl_brier_source = f"over{current_over}"
+            else:
+                # Fallback to raw if calibrator not found
+                wpl_brier_prob = raw_prob
+                wpl_brier_source = "raw"
 
     # T20I: Apply per-over calibrators for both Brier and ECE optimization
     if is_t20i:
@@ -1444,7 +1550,12 @@ def main():
         
         # Column 1: Brier-optimized (Blue)
         with bbl_col1:
-            if bbl_brier_prob is not None:
+            # Use per-over probability from predictor if available
+            if per_over_prob is not None and per_over_prob != raw_prob:
+                brier_prob = per_over_prob
+                brier_label = "Per-Over (Brier)"
+                brier_desc = "OOF: Brier=0.1760, ECE=0.0000"
+            elif bbl_brier_prob is not None:
                 if inn_num == 1 and current_over == 4:
                     brier_prob = raw_prob
                     brier_label = "Raw Model"
@@ -1617,12 +1728,15 @@ def main():
                     brier_prob = ssm_brier_prob
                     brier_label = f"Brier-Optimized ({ssm_brier_source})"
                     brier_desc = "Brier=0.0867, ECE=0.000"
-                elif is_wpl:
-                    # WPL: Use raw model output (sparse data - phase calibrators don't work)
-                    # Raw model has best Log Loss for sparse WPL data
-                    brier_prob = raw_prob
-                    brier_label = "Raw Model Output"
-                    brier_desc = "Best Log Loss (sparse data)"
+                elif is_wpl and wpl_brier_prob is not None:
+                    # WPL: Inn1 uses raw (realistic), Inn2 uses brier_optimized (accurate)
+                    brier_prob = wpl_brier_prob
+                    if wpl_brier_source == "raw":
+                        brier_label = "Raw Model Output"
+                        brier_desc = "Inn1: Realistic (no calibration)"
+                    else:
+                        brier_label = f"Brier-Optimized ({wpl_brier_source})"
+                        brier_desc = "Inn2: Brier=0.1109, ECE=0.000"
                 elif is_t20i and t20i_brier_prob is not None:
                     # T20I: Use per-over Brier-optimized calibrator
                     # Inn1: Raw wins (19/20 overs), Inn2: Calibrated wins (19/20 overs)

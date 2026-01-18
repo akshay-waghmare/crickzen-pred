@@ -70,6 +70,11 @@ class MatchState:
     toss_winner: str = ""
     toss_decision: str = ""
     balls_data: List[BallData] = field(default_factory=list)
+    # Market odds from CREX API
+    market_fav_team: str = ""
+    market_back_odds: str = ""
+    market_lay_odds: str = ""
+    market_fav_prob: float = 0.0  # Implied probability from back odds
 
 
 class CrexLivePredictor:
@@ -101,6 +106,7 @@ class CrexLivePredictor:
         self._running = False
         self._first_prediction = True  # Debug flag for first prediction
         self._prediction_history = []  # Track predictions over time
+        self.local_storage = {}  # CREX localStorage for resolving team/player codes
         
         # Persist history to separate file for Streamlit page refresh resilience
         if output_json:
@@ -507,6 +513,17 @@ class CrexLivePredictor:
         
         print(f"✅ Page loaded: {title}")
         
+        # Extract localStorage for team/player code resolution
+        try:
+            self.local_storage = await self.page.evaluate(
+                "() => Object.fromEntries(Object.entries(localStorage).map(([k, v]) => [k, v]))"
+            )
+            team_entries = sum(1 for k in self.local_storage if k.startswith('t_'))
+            print(f"📦 Loaded localStorage: {len(self.local_storage)} entries ({team_entries} teams)")
+        except Exception as e:
+            print(f"⚠️ Could not extract localStorage: {e}")
+            self.local_storage = {}
+        
         # Extract initial match info from live page
         await self._extract_match_info()
         
@@ -585,6 +602,42 @@ class CrexLivePredictor:
                         if not any(b.ball_number == ball_num for b in self.match_state.balls_data):
                             self.match_state.balls_data.append(ball)
                             
+            # Extract market odds from API (fields F and R)
+            # F = Favorite team code, R = Odds in format "back+diff"
+            fav_team_code = data.get("F", "").replace("^", "")
+            if fav_team_code:
+                # Resolve team code to name using localStorage
+                fav_team_name = self.local_storage.get(f"t_{fav_team_code}_name", fav_team_code)
+                self.match_state.market_fav_team = fav_team_name
+            
+            r_val = data.get("R", "")
+            if r_val:
+                r_str = str(r_val)
+                if "+" in r_str:
+                    parts = r_str.split("+")
+                    back = parts[0]
+                    diff = parts[1] if len(parts) > 1 else "0"
+                    try:
+                        lay = str(int(back) + int(diff))
+                        self.match_state.market_back_odds = back
+                        self.match_state.market_lay_odds = lay
+                        # Calculate implied probability: 100 / (100 + odds)
+                        # E.g., odds of 90 means favorite has ~52.6% implied prob
+                        back_int = int(back)
+                        if back_int > 0:
+                            self.match_state.market_fav_prob = 100.0 / (100.0 + back_int)
+                    except ValueError:
+                        pass
+                else:
+                    self.match_state.market_back_odds = r_str
+                    self.match_state.market_lay_odds = r_str
+                    try:
+                        back_int = int(r_str)
+                        if back_int > 0:
+                            self.match_state.market_fav_prob = 100.0 / (100.0 + back_int)
+                    except ValueError:
+                        pass
+                        
         except Exception as e:
             print(f"⚠️ Error processing API data: {e}")
     
@@ -871,6 +924,7 @@ class CrexLivePredictor:
             self.last_calibrated_prob = getattr(self.predictor, 'last_calibrated_prob', win_prob)
             self.last_calibrated_combined = getattr(self.predictor, 'last_calibrated_combined', win_prob)
             self.last_calibrated_phase = getattr(self.predictor, 'last_calibrated_phase', win_prob)
+            self.last_calibrated_per_over = getattr(self.predictor, 'last_calibrated_per_over', win_prob)
             
             return float(win_prob)
             
@@ -1185,8 +1239,14 @@ class CrexLivePredictor:
                 "calibrated_combined_prob": getattr(self, 'last_calibrated_combined', win_prob),
                 "calibrated_win_prob": getattr(self, 'last_calibrated_prob', win_prob),
                 "calibrated_phase_prob": getattr(self, 'last_calibrated_phase', win_prob),
+                "calibrated_per_over_prob": getattr(self, 'last_calibrated_per_over', win_prob),
                 "features": features,
-                "history": self._prediction_history[-50:]  # Last 50 data points
+                "history": self._prediction_history[-50:],  # Last 50 data points
+                # Market odds from CREX
+                "market_fav_team": state.market_fav_team,
+                "market_back_odds": state.market_back_odds,
+                "market_lay_odds": state.market_lay_odds,
+                "market_fav_prob": state.market_fav_prob
             }
             
             # Write atomically

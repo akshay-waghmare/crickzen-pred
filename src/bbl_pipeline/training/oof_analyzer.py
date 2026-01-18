@@ -430,6 +430,108 @@ class OOFAnalyzer:
                         phase_table = df_to_markdown_simple(phase_df[['method', 'brier', 'ece', 'logloss', 'n_samples']])
                         report_lines.append(phase_table)
         
+        # Best Method by Segment Summary
+        report_lines.append("\n\n## Best Method by Segment\n")
+        report_lines.append("This section shows which calibration method performs best for each segment, broken down by metric.\n")
+        
+        # Build best method summary for each metric
+        for metric in ['brier', 'ece', 'logloss']:
+            metric_display = {'brier': 'Brier Score', 'ece': 'ECE', 'logloss': 'LogLoss'}[metric]
+            report_lines.append(f"\n### Best by {metric_display}\n")
+            
+            summary_rows = []
+            
+            # Overall
+            overall_df = results_df[results_df['segment'] == 'overall']
+            if not overall_df.empty:
+                best = overall_df.loc[overall_df[metric].idxmin()]
+                summary_rows.append({
+                    'Segment': 'Overall',
+                    'Best Method': best['method'],
+                    metric_display: f"{best[metric]:.4f}"
+                })
+            
+            # Per-innings
+            if self.innings is not None:
+                for inn in [1, 2]:
+                    segment = f'innings_{inn}'
+                    seg_df = results_df[results_df['segment'] == segment]
+                    if not seg_df.empty:
+                        best = seg_df.loc[seg_df[metric].idxmin()]
+                        summary_rows.append({
+                            'Segment': f'Innings {inn}',
+                            'Best Method': best['method'],
+                            metric_display: f"{best[metric]:.4f}"
+                        })
+            
+            # Per-innings×phase
+            if self.innings is not None and self.phases is not None:
+                for inn in [1, 2]:
+                    for phase in ['powerplay', 'middle', 'death']:
+                        segment = f'inn{inn}_{phase}'
+                        seg_df = results_df[results_df['segment'] == segment]
+                        if not seg_df.empty:
+                            best = seg_df.loc[seg_df[metric].idxmin()]
+                            summary_rows.append({
+                                'Segment': f'Inn{inn} {phase.title()}',
+                                'Best Method': best['method'],
+                                metric_display: f"{best[metric]:.4f}"
+                            })
+            
+            if summary_rows:
+                summary_df = pd.DataFrame(summary_rows)
+                summary_table = df_to_markdown_simple(summary_df)
+                report_lines.append(summary_table)
+        
+        # Recommendation summary
+        report_lines.append("\n\n## Recommendations\n")
+        report_lines.append("Based on the analysis above:\n")
+        
+        # Count wins per method per metric
+        metric_winners = {}
+        for metric in ['brier', 'ece', 'logloss']:
+            segments = ['overall'] + [f'innings_{inn}' for inn in [1, 2]]
+            if self.innings is not None and self.phases is not None:
+                segments += [f'inn{inn}_{phase}' for inn in [1, 2] for phase in ['powerplay', 'middle', 'death']]
+            
+            wins = {}
+            for segment in segments:
+                seg_df = results_df[results_df['segment'] == segment]
+                if not seg_df.empty:
+                    best_method = seg_df.loc[seg_df[metric].idxmin(), 'method']
+                    wins[best_method] = wins.get(best_method, 0) + 1
+            metric_winners[metric] = wins
+        
+        metric_display = {'brier': 'Brier Score', 'ece': 'ECE', 'logloss': 'LogLoss'}
+        for metric, wins in metric_winners.items():
+            if wins:
+                top_method = max(wins.keys(), key=lambda m: wins[m])
+                report_lines.append(f"- **{metric_display[metric]}**: `{top_method}` wins in {wins[top_method]} segments")
+        
+        # Add ECE warning
+        report_lines.append("\n\n## Important Note on ECE = 0.0000\n")
+        report_lines.append("""
+ECE values of exactly 0.0000 for isotonic-calibrated methods are **mathematically expected**, not a bug:
+
+**Root Cause:**
+- Isotonic regression ensures: `E[Y | P_calibrated = p] = p` by construction
+- ECE measures: `|E[Y in bin] - E[P_calibrated in bin]|`  
+- After isotonic calibration: `E[Y] = E[P]` within each bin BY DESIGN
+- This makes ECE = 0 a **tautology**, not an empirical measurement
+
+**Interpretation:**
+- ECE = 0 does NOT mean the calibrator is "perfect"
+- It means ECE is measuring the calibrator's own constraint
+- This is true for: `brier_optimized`, `innings_phase`, `innings_specific`, `combined`
+
+**Recommended Decision Metrics:**
+1. **Brier Score** (primary) - Measures accuracy + calibration together
+2. **LogLoss** - Measures probabilistic sharpness  
+3. **ECE** - Only meaningful for `raw` (uncalibrated) model comparison
+
+For production, use **Brier Score** as the primary selection criterion.
+""")
+        
         # Write report
         report_path = output_dir / 'OOF_CALIBRATION_REPORT.md'
         with open(report_path, 'w') as f:

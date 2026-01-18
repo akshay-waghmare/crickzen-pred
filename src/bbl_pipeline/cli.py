@@ -577,9 +577,11 @@ def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_
     # Prepare features
     X = df.drop(columns=[target_col])
     
-    # Drop non-feature columns
+    # Drop non-feature columns (but keep overs_remaining, is_powerplay, is_death_overs as they ARE features)
+    # Only drop innings (metadata) and is_middle_overs (not used in model)
+    non_feature_cols = [innings_col, 'is_middle_overs']
     for col in list(X.columns):
-        if str(col).startswith('__') or col in [innings_col, overs_col, 'is_powerplay', 'is_death_overs']:
+        if str(col).startswith('__') or col in non_feature_cols:
             if col in X.columns:
                 X = X.drop(columns=[col])
     
