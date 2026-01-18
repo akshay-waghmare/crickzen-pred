@@ -7,6 +7,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-09
 - [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (002-bbl-model-training)
 - [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (002-bbl-model-training)
 - Python 3.10+ + scikit-learn, xgboost, pandas, (002-bbl-model-training)
+- Python 3.10+ (from pyproject.toml) + NumPy (vectorization), Pandas (data), joblib (serialization), existing bbl_pipeline (004-monte-carlo-engine)
+- N/A (in-memory simulation, optional pickle caching) (004-monte-carlo-engine)
 
 - Python 3.10+ (001-bbl-data-pipeline)
 
@@ -26,9 +28,9 @@ cd src; pytest; ruff check .
 Python 3.10+: Follow standard conventions
 
 ## Recent Changes
+- 004-monte-carlo-engine: Added Python 3.10+ (from pyproject.toml) + NumPy (vectorization), Pandas (data), joblib (serialization), existing bbl_pipeline
 - 002-bbl-model-training: Added Python 3.10+
 - 002-bbl-model-training: Added Python 3.10+
-- 002-bbl-model-training: Added Python 3.10+ + scikit-learn, xgboost, pandas,
 
 
 <!-- MANUAL ADDITIONS START -->

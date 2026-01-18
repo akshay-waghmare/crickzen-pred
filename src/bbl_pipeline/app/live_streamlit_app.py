@@ -3838,6 +3838,108 @@ def main():
             except Exception as e:
                 st.error(f"⚠️ Error loading SA20 OOF metrics: {e}")
     
+    # Monte Carlo Simulation Panel
+    mc_data = d.get("monte_carlo", {})
+    if mc_data and mc_data.get("available", False):
+        st.markdown("---")
+        with st.expander("🎲 Monte Carlo Simulation (Uncertainty Quantification)", expanded=True):
+            st.markdown("### Forward-Looking Win Probability with Confidence Intervals")
+            
+            sim_1ball = mc_data.get("simulation_1ball", {})
+            sim_6ball = mc_data.get("simulation_6ball", {})
+            betting = mc_data.get("betting_decision", {})
+            
+            # 1-Ball and 6-Ball simulation results side by side
+            sim_col1, sim_col2 = st.columns(2)
+            
+            with sim_col1:
+                st.markdown("#### 🎯 Next Ball Simulation")
+                if sim_1ball:
+                    mean_1 = sim_1ball.get("mean", 0) * 100
+                    std_1 = sim_1ball.get("std", 0) * 100
+                    p5_1 = sim_1ball.get("p5", 0) * 100
+                    p95_1 = sim_1ball.get("p95", 0) * 100
+                    n_sims_1 = sim_1ball.get("n_simulations", 0)
+                    
+                    st.metric(
+                        f"Mean Win Prob (n={n_sims_1:,})",
+                        f"{mean_1:.1f}%",
+                        f"±{std_1:.1f}% (1σ)"
+                    )
+                    st.caption(f"90% CI: [{p5_1:.1f}% — {p95_1:.1f}%]")
+                    
+                    # Visual confidence bar
+                    st.progress(mean_1 / 100, text=f"Batting Team: {mean_1:.1f}%")
+                else:
+                    st.info("1-ball simulation not available")
+            
+            with sim_col2:
+                st.markdown("#### 🎲 Next Over Simulation")
+                if sim_6ball:
+                    mean_6 = sim_6ball.get("mean", 0) * 100
+                    std_6 = sim_6ball.get("std", 0) * 100
+                    p5_6 = sim_6ball.get("p5", 0) * 100
+                    p95_6 = sim_6ball.get("p95", 0) * 100
+                    n_sims_6 = sim_6ball.get("n_simulations", 0)
+                    
+                    st.metric(
+                        f"Mean Win Prob (n={n_sims_6:,})",
+                        f"{mean_6:.1f}%",
+                        f"±{std_6:.1f}% (1σ)"
+                    )
+                    st.caption(f"90% CI: [{p5_6:.1f}% — {p95_6:.1f}%]")
+                    
+                    # Visual confidence bar
+                    st.progress(mean_6 / 100, text=f"Batting Team: {mean_6:.1f}%")
+                else:
+                    st.info("6-ball simulation not available")
+            
+            # Betting Decision Support
+            st.markdown("---")
+            st.markdown("#### 💰 Betting Decision Support")
+            
+            if betting:
+                bet_col1, bet_col2, bet_col3 = st.columns(3)
+                
+                with bet_col1:
+                    action = betting.get("action", "HOLD")
+                    if action == "BET":
+                        st.success(f"🎯 **{action}** on Batting Team")
+                    elif action == "HOLD":
+                        st.warning(f"⏸️ **{action}** - No Edge")
+                    else:
+                        st.info(f"📊 **{action}**")
+                
+                with bet_col2:
+                    edge = betting.get("edge", 0) * 100
+                    edge_color = "normal" if edge >= 0 else "inverse"
+                    st.metric("Model Edge", f"{edge:+.1f}%", delta_color=edge_color)
+                
+                with bet_col3:
+                    kelly = betting.get("kelly_fraction", 0) * 100
+                    st.metric("Kelly Stake", f"{kelly:.2f}%")
+                
+                # Thresholds info
+                thresh = betting.get("thresholds", {})
+                if thresh:
+                    st.caption(
+                        f"Phase: {thresh.get('phase', 'unknown')} | "
+                        f"Min Edge: {thresh.get('min_edge', 0)*100:.1f}% | "
+                        f"Kelly Cap: {thresh.get('kelly_cap', 0)*100:.0f}%"
+                    )
+            else:
+                st.info("Betting analysis not available (requires market odds)")
+            
+            # Explanation
+            st.markdown("---")
+            st.markdown("""
+            **How Monte Carlo Simulation Works:**
+            - **1-Ball**: Simulates all possible outcomes of the next delivery (dot, 1-6 runs, wicket)
+            - **6-Ball**: Simulates the next over with temperature-scaled probabilities for variance
+            - **Confidence Interval**: 90% of simulated outcomes fall within the p5-p95 range
+            - **Kelly Criterion**: Optimal bet sizing based on edge and phase-specific thresholds
+            """)
+    
     # Probability timeline - ESPN SmartStats style
     history = d.get("history", [])
     timeline = create_probability_timeline(history, d.get("batting_team"), d.get("bowling_team"))

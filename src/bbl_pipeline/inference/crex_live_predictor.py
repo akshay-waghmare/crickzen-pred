@@ -3,6 +3,7 @@ Crex Live Match Predictor
 
 Uses the existing Crex scraper to get live match data and runs predictions.
 Optionally outputs state to a JSON file for Streamlit integration.
+Includes Monte Carlo simulation for uncertainty quantification.
 """
 
 import asyncio
@@ -17,6 +18,20 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List
 
 logger = structlog.get_logger()
+
+# Monte Carlo simulation imports
+try:
+    from bbl_pipeline.simulation import (
+        MatchState as SimMatchState,
+        simulate,
+        simulate_one_over,
+        evaluate_bet,
+        BettingThresholds,
+    )
+    SIMULATION_AVAILABLE = True
+except ImportError:
+    SIMULATION_AVAILABLE = False
+    logger.warning("Monte Carlo simulation module not available")
 
 # Add scraper to path
 SCRAPER_PATH = Path(__file__).parent.parent.parent.parent.parent / "scraper" / "crex_scraper_python"
@@ -171,6 +186,103 @@ class CrexLivePredictor:
         except Exception as e:
             logger.warning(f"Could not save history: {e}")
     
+    def _run_monte_carlo_simulation(self) -> Optional[Dict[str, Any]]:
+        """
+        Run Monte Carlo simulation for uncertainty quantification.
+        
+        Returns dict with simulation results or None if unavailable.
+        """
+        if not SIMULATION_AVAILABLE:
+            return None
+        
+        try:
+            state = self.match_state
+            
+            # Calculate balls remaining
+            overs_float = state.overs
+            balls_bowled = int(overs_float) * 6 + int(round((overs_float - int(overs_float)) * 10))
+            balls_remaining = 120 - balls_bowled
+            
+            if balls_remaining <= 0:
+                return None
+            
+            # Detect league from model_dir
+            league = "bbl"  # Default
+            if "sa20" in self.model_dir.lower():
+                league = "sa20"
+            elif "ilt20" in self.model_dir.lower() or "ilt" in self.model_dir.lower():
+                league = "ilt20"
+            elif "wpl" in self.model_dir.lower():
+                league = "wpl"
+            
+            # Create simulation state
+            sim_state = SimMatchState(
+                innings=2 if state.is_second_innings else 1,
+                score=state.total_runs,
+                wickets_lost=state.wickets,
+                balls_remaining=balls_remaining,
+                target_runs=state.target if state.is_second_innings else None,
+                batting_team=state.batting_team,
+                bowling_team=state.bowling_team,
+                league=league,
+                venue=state.venue,
+            )
+            
+            # Run 1-ball simulation (fast)
+            result_1ball = simulate(sim_state, horizon=1, n_simulations=1000)
+            
+            # Run 6-ball (1 over) simulation
+            result_6ball = simulate_one_over(sim_state, n_simulations=2000)
+            
+            # Evaluate betting decision if market odds available
+            betting_decision = None
+            if state.market_back_odds:
+                try:
+                    odds = float(state.market_back_odds)
+                    if odds > 1.0:
+                        decision = evaluate_bet(
+                            simulation_result=result_6ball,
+                            market_odds=odds,
+                            balls_remaining=balls_remaining,
+                        )
+                        betting_decision = {
+                            "decision": decision.decision.value,
+                            "edge": decision.edge,
+                            "kelly_stake": decision.kelly_stake,
+                            "confidence": decision.confidence,
+                            "phase": decision.phase,
+                            "rationale": decision.rationale,
+                        }
+                except (ValueError, TypeError):
+                    pass
+            
+            return {
+                "available": True,
+                "league": league,
+                "balls_remaining": balls_remaining,
+                "simulation_1ball": {
+                    "mean_prob": result_1ball.mean_prob,
+                    "std_prob": result_1ball.std_prob,
+                    "p5": result_1ball.p5,
+                    "p95": result_1ball.p95,
+                    "n_sims": result_1ball.n_sims,
+                    "time_ms": result_1ball.time_taken_ms,
+                },
+                "simulation_6ball": {
+                    "mean_prob": result_6ball.mean_prob,
+                    "std_prob": result_6ball.std_prob,
+                    "p5": result_6ball.p5,
+                    "p95": result_6ball.p95,
+                    "n_sims": result_6ball.n_sims,
+                    "time_ms": result_6ball.time_taken_ms,
+                },
+                "betting_decision": betting_decision,
+            }
+            
+        except Exception as e:
+            logger.warning(f"Monte Carlo simulation failed: {e}")
+            return {"available": False, "error": str(e)}
+
     def _get_info_url(self) -> str:
         """Convert live URL to info URL."""
         return self.match_url.replace("/live", "/info")
@@ -1246,7 +1358,9 @@ class CrexLivePredictor:
                 "market_fav_team": state.market_fav_team,
                 "market_back_odds": state.market_back_odds,
                 "market_lay_odds": state.market_lay_odds,
-                "market_fav_prob": state.market_fav_prob
+                "market_fav_prob": state.market_fav_prob,
+                # Monte Carlo simulation results
+                "monte_carlo": self._run_monte_carlo_simulation()
             }
             
             # Write atomically

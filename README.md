@@ -28,6 +28,14 @@ Our latest champion model achieves state-of-the-art performance:
 - **Match Analysis**: Pressure metrics, run rate tracking, and situation assessment
 - **Auto Export**: Save all predictions to CSV for post-match analysis
 
+### Monte Carlo Simulation 🎲 **NEW**
+- **Uncertainty Quantification**: 1-ball and 6-ball forward simulations
+- **Confidence Intervals**: 90% CI (p5-p95) for win probability
+- **Betting Decision Support**: Phase-aware Kelly criterion with risk guardrails
+- **Temperature Calibration**: League-specific probability adjustments (BBL, SA20, ILT20, WPL)
+- **Performance**: <200ms for 1-ball, <500ms for 6-ball simulations
+- [Full Documentation](docs/MONTE_CARLO_SIMULATION.md)
+
 ## Installation
 
 ### Basic Installation
