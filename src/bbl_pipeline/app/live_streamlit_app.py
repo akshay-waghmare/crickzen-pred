@@ -341,6 +341,31 @@ PHASE_CALIBRATORS = load_phase_calibrators()  # SA20, WPL, and SSM Female phase 
 BRIER_CALIBRATORS = load_brier_calibrators()
 LOGLOSS_CALIBRATORS = load_logloss_calibrators()
 
+@st.cache_resource
+def load_oof_calibration_metrics():
+    """Load OOF calibration metrics for BBL brier_optimized method.
+    Returns dict with phase -> {brier, ece, logloss, n_samples}"""
+    metrics = {}
+    try:
+        import pandas as pd
+        df = pd.read_csv('models/bbl_v12/oof_calibration_results.csv')
+        # Filter to brier_optimized method only
+        brier_df = df[df['method'] == 'brier_optimized']
+        for _, row in brier_df.iterrows():
+            segment = row['segment']
+            metrics[segment] = {
+                'brier': row['brier'],
+                'ece': row['ece'],
+                'logloss': row['logloss'],
+                'n_samples': row['n_samples']
+            }
+        print(f"[OK] Loaded BBL OOF metrics for {len(metrics)} segments")
+    except Exception as e:
+        print(f"[FAIL] Failed to load BBL OOF metrics: {e}")
+    return metrics
+
+OOF_CALIBRATION_METRICS = load_oof_calibration_metrics()
+
 # Load SA20 full calibrator data for client-side recalculation
 @st.cache_resource
 def load_sa20_full_calibrators():
@@ -995,9 +1020,20 @@ def main():
         batting_team = d.get("batting_team", "")
         bowling_team = d.get("bowling_team", "")
         
-        # Match favorite team to batting/bowling
-        is_fav_batting = fav_team == batting_team or fav_team in batting_team or batting_team in fav_team
-        is_fav_bowling = fav_team == bowling_team or fav_team in bowling_team or bowling_team in fav_team
+        # Get full names for comparison (fav_team from CREX is already resolved name)
+        batting_team_full = get_name(batting_team)
+        bowling_team_full = get_name(bowling_team)
+        
+        # Match favorite team to batting/bowling using full names
+        # fav_team is resolved name like "Sydney Sixers", batting_team might be code "SYS"
+        is_fav_batting = (fav_team == batting_team_full or 
+                         fav_team == batting_team or 
+                         fav_team.lower() in batting_team_full.lower() or 
+                         batting_team_full.lower() in fav_team.lower())
+        is_fav_bowling = (fav_team == bowling_team_full or 
+                         fav_team == bowling_team or 
+                         fav_team.lower() in bowling_team_full.lower() or 
+                         bowling_team_full.lower() in fav_team.lower())
         
         if is_fav_batting:
             fav_full_name = get_name(batting_team)
@@ -1046,21 +1082,98 @@ def main():
             </div>
             ''', unsafe_allow_html=True)
         
-        # Model vs Market comparison
-        model_prob = d["bat_win_prob"]
+        # Model vs Market comparison - ALWAYS compare same team
+        # Model gives bat_win_prob = probability BATTING team wins
+        # Market gives favorite probability - need to convert to batting team's probability
+        model_bat_prob = d["bat_win_prob"]
+        model_bowl_prob = 1 - model_bat_prob
+        batting_team_name = get_name(d.get("batting_team", "Batting Team"))
+        bowling_team_name = get_name(d.get("bowling_team", "Bowling Team"))
+        
+        # Convert market odds to batting team's probability
         if is_fav_batting:
             market_bat_prob = market_fav_prob
+            market_bowl_prob = underdog_prob
         else:
+            # Batting team is the underdog
             market_bat_prob = underdog_prob
+            market_bowl_prob = market_fav_prob
         
-        diff = model_prob - market_bat_prob
-        if abs(diff) > 0.03:  # 3% threshold for edge
-            edge_color = "#4CAF50" if diff > 0 else "#f44336"
-            edge_text = "Model sees VALUE on batting team" if diff > 0 else "Market favors batting team more"
+        # Show edge comparison for BOTH teams to be completely transparent
+        bat_diff = model_bat_prob - market_bat_prob
+        bowl_diff = model_bowl_prob - market_bowl_prob
+        
+        if abs(bat_diff) > 0.03:  # 3% threshold for edge
+            # Determine which team model favors more than market
+            if bat_diff > 0:
+                edge_team = batting_team_name
+                edge_role = "batting"
+                edge_diff = bat_diff
+                edge_color = "#4CAF50"
+            else:
+                edge_team = bowling_team_name
+                edge_role = "bowling"
+                edge_diff = bowl_diff
+                edge_color = "#4CAF50"
+            
+            edge_text = f"Model sees VALUE on <b>{edge_team}</b> ({edge_role})"
+            
+            # Show detailed comparison
+            comparison_detail = f"<br><span style='font-size: 0.85em; color: #888;'>{batting_team_name}: Model {model_bat_prob*100:.1f}% vs Market {market_bat_prob*100:.1f}% | {bowling_team_name}: Model {model_bowl_prob*100:.1f}% vs Market {market_bowl_prob*100:.1f}%</span>"
+            
+            # Get phase-specific OOF metrics for confidence assessment
+            import math
+            overs_float = d.get("overs", 0.0)
+            current_over = max(1, min(20, math.ceil(overs_float) if overs_float > 0 else 1))
+            is_inn2 = d.get("is_second_innings", False)
+            inn_num = 2 if is_inn2 else 1
+            
+            # Determine phase key for OOF metrics
+            if current_over <= 6:
+                phase_key = f"inn{inn_num}_powerplay"
+                phase_label = "Powerplay"
+            elif current_over <= 15:
+                phase_key = f"inn{inn_num}_middle"
+                phase_label = "Middle"
+            else:
+                phase_key = f"inn{inn_num}_death"
+                phase_label = "Death"
+            
+            # Get OOF metrics for this phase
+            oof_metrics = OOF_CALIBRATION_METRICS.get(phase_key, {})
+            oof_logloss = oof_metrics.get('logloss', None)
+            oof_brier = oof_metrics.get('brier', None)
+            oof_n = oof_metrics.get('n_samples', 0)
+            
+            # Detect which model is being used based on teams
+            batting_team = d.get("batting_team", "")
+            bbl_teams = {'SYS', 'SYT', 'SIX', 'THU', 'PRS', 'SCO', 'PS', 'ADS', 'STR', 'AS', 
+                         'BRH', 'HEA', 'BH', 'MLR', 'REN', 'MR', 'MLS', 'STA', 'MS', 'HBH', 'HUR', 'HH', 'STH'}
+            is_bbl_match = batting_team in bbl_teams
+            
+            # Only show OOF metrics if this is a BBL match (metrics are from BBL v12)
+            if is_bbl_match and oof_logloss is not None:
+                # Lower log loss = more reliable
+                if oof_logloss < 0.35:
+                    confidence = "🟢 High"
+                    conf_color = "#4CAF50"
+                elif oof_logloss < 0.50:
+                    confidence = "🟡 Medium"
+                    conf_color = "#FF9800"
+                else:
+                    confidence = "🟠 Lower"
+                    conf_color = "#f44336"
+                
+                # OOF metrics are phase-based (all batting teams), not team-specific
+                # Edge comparison is for batting team, OOF shows model reliability in this phase
+                oof_info = f"<br><span style='font-size: 0.85em; color: #666;'>BBL v12 OOF Inn{inn_num} {phase_label}: LogLoss={oof_logloss:.3f}, Brier={oof_brier:.3f} (n={oof_n:,}) → <span style='color: {conf_color};'>{confidence} confidence</span></span>"
+            else:
+                oof_info = ""
+            
             st.markdown(f'''
             <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; 
                  border-left: 4px solid {edge_color}; margin-top: 10px;">
-                <b>Model vs Market Edge:</b> {abs(diff)*100:.1f}% - <span style="color: {edge_color};">{edge_text}</span>
+                <b>Model vs Market Edge:</b> {abs(edge_diff)*100:.1f}% - <span style="color: {edge_color};">{edge_text}</span>{comparison_detail}{oof_info}
             </div>
             ''', unsafe_allow_html=True)
     
