@@ -3,12 +3,17 @@
 This repository contains the machine learning pipelines for predicting T20 cricket match outcomes.
 
 **Active Models:**
+- **T20 Male v2** (Global Unified Model) - Trained on all T20 leagues, uses league-specific calibrators
 - **BBL v12** (Big Bash League) - 141,435 samples, Brier 0.1760 (per-over brier-optimized calibration)
 - **SA20 v2** (South Africa T20 League) - 121 matches, 26,121 samples, Brier 0.1597
 - **ILT20 v5** (International League T20) - 99 matches, Brier 0.1886
 - **WPL v2** (Women's Premier League) - 74 matches, 17,062 samples, Brier 0.1510
 
 All other models have been archived in `models/archive/`.
+
+**Global Model Architecture (Recommended):**
+- Use `models/t20_male_v2` with `--league` parameter for league-specific calibration
+- Calibration chain: Raw → Phase → PerOver → League (final adjustment)
 
 ## 📂 Project Structure
 
@@ -168,13 +173,26 @@ See `docs/FEATURE_STORE.md` for detailed schema documentation.
 
 - **Live Prediction (CLI):** Run the Crex live predictor:
   ```bash
+  # Using global model with league calibration (RECOMMENDED)
+  python -m src.bbl_pipeline.inference.crex_live_predictor \
+    --match-url "CREX_MATCH_URL" \
+    --model-dir models/t20_male_v2 \
+    --feature-store-dir data/t20_male_feature_store_v2 \
+    --league ssm \
+    --output-json data/live_state.json
+  
+  # Available leagues: ssm, bbl, sa20, ilt20, wpl, etc.
+  # Output shows calibration chain:
+  #   Raw: 6.7% | Phase (inn2_middle): 6.4% | PerOver (inn2_over11): 7.0%
+  #   League (SSM): 7.0% -> 4.1%
+  
+  # Using league-specific model (legacy)
   python -m src.bbl_pipeline.inference.crex_live_predictor \
     --match-url "CREX_MATCH_URL" \
     --model-dir models/bbl_v12 \
     --feature-store-dir data/bbl_feature_store_v2 \
     --output-json data/live_state.json
   ```
-  *(For ILT20, change model-dir to `models/ilt20_v5`)*
 
 - **Live Visualization:** Run `streamlit run src/bbl_pipeline/app/live_streamlit_app.py`
 - **Calibration Analysis:** See `docs/BBL_V12_MODEL.md` for detailed Brier/ECE breakdown.
@@ -246,7 +264,7 @@ For adapting the global unified T20 model to specific leagues:
 
 ```bash
 bbl-pipeline calibrate-league \
-  --global-model models/t20_male_v1 \
+  --global-model models/t20_male_v2 \
   --input-file data/<league>_features/training.parquet \
   --league <league> \
   --method temperature  # or platt
