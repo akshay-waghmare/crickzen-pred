@@ -1173,7 +1173,7 @@ def update_matches(ctx, source_dir, league, dry_run):
 
 
 @main.command()
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 't20_male', 't20_female']), required=True,
               help='League to retrain model for')
 @click.option('--version', type=str, required=True,
               help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
@@ -1193,6 +1193,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
         bbl-pipeline retrain --league sa20 --version v2
         bbl-pipeline retrain --league bbl --version v13 --skip-ingest
         bbl-pipeline retrain --league wpl --version v3 --n-splits 3
+        bbl-pipeline retrain --league t20_male --version v2
     """
     import shutil
     import subprocess
@@ -1241,6 +1242,20 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/wpl_features',
             'feature_store_dir': 'data/wpl_feature_store',
             'model_prefix': 'wpl',
+        },
+        't20_male': {
+            'json_dir': 'data/t20_male_json',  # Combined 11 leagues
+            'raw_dir': 'data/t20_male_raw',
+            'features_dir': 'data/t20_male_features',
+            'feature_store_dir': 'data/t20_male_feature_store',
+            'model_prefix': 't20_male',
+        },
+        't20_female': {
+            'json_dir': 'wpl_female_json',  # Currently only WPL for female
+            'raw_dir': 'data/t20_female_raw',
+            'features_dir': 'data/t20_female_features',
+            'feature_store_dir': 'data/t20_female_feature_store',
+            'model_prefix': 't20_female',
         },
     }
     
@@ -1358,11 +1373,13 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     # League name mapping for registry
     registry_league_names = {
         'bbl': 'BBL',
-        'sa20': 'SAT',
+        'sa20': 'SA20',
         'ilt20': 'ILT20',
         'bpl': 'BPL',
         'ssm': 'SSM',
         'wpl': 'WPL',
+        't20_male': 'T20_MALE',
+        't20_female': 'T20_FEMALE',
     }
     
     registry_path = Path('models/model_registry.json')

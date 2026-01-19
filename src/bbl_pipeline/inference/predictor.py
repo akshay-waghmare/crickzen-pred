@@ -72,7 +72,7 @@ class Predictor:
     """
     def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], 
                  calibrator=None, calibrator_inn1=None, calibrator_inn2=None, phase_calibrators=None, 
-                 per_over_calibrators=None, calibrator_type='none'):
+                 per_over_calibrators=None, calibrator_type='none', league_calibrator=None):
         # Wrap ensemble model dict if needed
         if isinstance(model, dict) and 'xgb_model' in model:
             self.model = EnsembleModelWrapper(model)
@@ -86,18 +86,20 @@ class Predictor:
         self.phase_calibrators = phase_calibrators  # Innings×phase calibrators dict
         self.per_over_calibrators = per_over_calibrators  # Per-over (brier_optimized) calibrators dict
         self.calibrator_type = calibrator_type  # 'innings_phase_specific', 'innings_specific', 'single', 'legacy', or 'none'
+        self.league_calibrator = league_calibrator  # League-specific temperature/platt calibrator
         self.resource_calculator = ResourceFeatureCalculator()
         # Use RealTimeFeatureMapper for proper feature generation
         self.feature_mapper = RealTimeFeatureMapper(feature_store, global_stats)
 
     @classmethod
-    def load(cls, model_dir: str | Path, feature_store_dir: str | Path = None):
+    def load(cls, model_dir: str | Path, feature_store_dir: str | Path = None, league: str = None):
         """
         Loads the champion model and associated artifacts.
         
         Args:
             model_dir: Path to model directory containing champion_model.joblib
             feature_store_dir: Path to feature store directory (defaults to data/feature_store)
+            league: Optional league code (e.g., 'ssm', 'bbl') to load league-specific calibrator
         """
         path = Path(model_dir)
         
@@ -292,7 +294,27 @@ class Predictor:
             except Exception as e:
                 logger.warning(f"Failed to load calibrator: {e}")
         
-        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type)
+        # Load league-specific calibrator if league is specified
+        league_calibrator = None
+        if league:
+            league_cal_path = path / "league_calibrators" / league / "league_calibrator.pkl"
+            if league_cal_path.exists():
+                try:
+                    league_calibrator = joblib.load(league_cal_path)
+                    cal_method = league_calibrator.get('method', 'unknown')
+                    logger.info(
+                        f"Loaded {league.upper()} league calibrator",
+                        method=cal_method,
+                        t1=league_calibrator.get('T1'),
+                        t2=league_calibrator.get('T2'),
+                        created=league_calibrator.get('created_date', 'unknown')
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to load league calibrator for {league}: {e}")
+            else:
+                logger.warning(f"League calibrator not found at {league_cal_path}")
+        
+        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type, league_calibrator)
 
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
@@ -624,6 +646,42 @@ class Predictor:
             else:
                 # First innings: trust the calibrated model
                 prob = base_prob
+            
+            # Apply league-specific calibrator if available (temperature/platt scaling)
+            pre_league_prob = prob  # Save for debug output
+            if self.league_calibrator:
+                method = self.league_calibrator.get('method', 'temperature')
+                calibrators = self.league_calibrator.get('calibrators', {})
+                innings_key = f'innings_{state.innings}'
+                league_name = self.league_calibrator.get('league', 'unknown').upper()
+                
+                if calibrators and innings_key in calibrators:
+                    # New format: TemperatureScaler/PlattScaler objects in calibrators dict
+                    scaler = calibrators[innings_key]
+                    if hasattr(scaler, 'predict'):
+                        import numpy as np
+                        prob = float(scaler.predict(np.array([[prob]]))[0])
+                        if debug:
+                            print(f"🌍 League ({league_name}): {pre_league_prob:.1%} → {prob:.1%}")
+                elif method == 'temperature':
+                    # Legacy format: T1/T2 keys
+                    T = self.league_calibrator.get('T1' if state.innings == 1 else 'T2', 1.0)
+                    if T and prob > 0.001 and prob < 0.999:
+                        import numpy as np
+                        logit = np.log(prob / (1 - prob))
+                        prob = 1 / (1 + np.exp(-logit / T))
+                        if debug:
+                            print(f"🌍 League ({league_name}, T={T:.2f}): {pre_league_prob:.1%} → {prob:.1%}")
+                elif method == 'platt':
+                    # Legacy format: a1/b1/a2/b2 keys
+                    a = self.league_calibrator.get('a1' if state.innings == 1 else 'a2', 1.0)
+                    b = self.league_calibrator.get('b1' if state.innings == 1 else 'b2', 0.0)
+                    if prob > 0.001 and prob < 0.999:
+                        import numpy as np
+                        logit = np.log(prob / (1 - prob))
+                        prob = 1 / (1 + np.exp(-(a * logit + b)))
+                        if debug:
+                            print(f"🌍 League ({league_name}, Platt): {pre_league_prob:.1%} → {prob:.1%}")
             
             return float(prob)
         except Exception as e:

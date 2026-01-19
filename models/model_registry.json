@@ -195,37 +195,64 @@
       }
     },
     "T20_MALE": {
-      "path": "models/t20_male_v1",
-      "version": "v1",
-      "description": "Unified T20 Male Model - XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1723, ECE: 0.0000)",
+      "path": "models/t20_male_v2",
+      "version": "v2",
+      "description": "Unified T20 Franchise Male Model (11 leagues) - XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1788, ECE: 0.0000)",
       "training": {
-        "samples": 1893892,
-        "matches": 5353,
+        "samples": 1221350,
+        "matches": 5195,
         "leagues": 11,
+        "league_list": [
+          "bbl",
+          "bpl",
+          "cpl",
+          "ilt",
+          "ipl",
+          "lpl",
+          "mlc",
+          "ntb",
+          "psl",
+          "sat",
+          "ssm"
+        ],
         "date": "2026-01-19",
-        "brier_score": 0.1726
+        "brier_score": 0.1788
       },
       "calibrator": {
-        "path": "models/t20_male_v1/isotonic_calibrator.pkl",
-        "type": "innings_phase_specific",
-        "generated_date": "2026-01-19T00:52:17",
+        "path": "models/t20_male_v2/isotonic_calibrator.pkl",
+        "type": "per_over_brier_optimized",
+        "generated_date": "2026-01-19",
         "oof_metrics": {
-          "brier_raw": 0.1735,
-          "brier_calibrated": 0.1723,
+          "brier_raw": 0.1793,
+          "brier_calibrated": 0.1788,
           "ece_raw": 0.0055,
-          "ece_calibrated": 0.0000
+          "ece_calibrated": 0.0
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
-        "path": "data/t20_male_feature_store_v1",
-        "version": "v1",
+        "path": "data/t20_male_feature_store_v2",
+        "version": "v2",
         "generated_date": "2026-01-19",
-        "training_data_samples": 1893892,
+        "training_data_samples": 1221350,
         "statistics": {
-          "teams": 245,
-          "leagues": ["bbl", "ipl", "psl", "cpl", "sat", "bpl", "lpl", "ilt", "mlc", "ssm", "ntb"],
+          "teams": 139,
+          "players": 2897,
+          "venues": 100,
+          "leagues": [
+            "BBL",
+            "BPL",
+            "CPL",
+            "ILT20",
+            "IPL",
+            "LPL",
+            "MLC",
+            "NTB",
+            "PSL",
+            "SA20",
+            "SSM"
+          ],
           "team_columns": [
             "team",
             "win_rate",
@@ -238,12 +265,17 @@
             "batsman_rolling_sr",
             "bowler_rolling_econ",
             "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
           ]
         },
         "recent_changes": {
           "date": "2026-01-19",
-          "description": "Unified T20 Male Model trained on 11 leagues (5,353 matches). Leagues: BBL, IPL, PSL, CPL, SA20, BPL, LPL, ILT20, MLC, Super Smash, T20 Blast",
-          "impact": "+9.1% improvement vs resource_win_prob baseline. Per-over brier-optimized calibration achieves perfect ECE."
+          "description": "V2: Pure franchise leagues only (excludes T10, The Hundred, T20I). 11 leagues: BBL, BPL, CPL, ILT20, IPL, LPL, MLC, NTB (Blast), PSL, SA20, SSM.",
+          "impact": "Brier: 0.1788, ECE: 0.0000. Cleaner model for T20 franchise cricket."
         }
       }
     },
@@ -264,9 +296,9 @@
         "generated_date": "2026-01-19T01:04:36",
         "oof_metrics": {
           "brier_raw": 0.1729,
-          "brier_calibrated": 0.1510,
+          "brier_calibrated": 0.151,
           "ece_raw": 0.0436,
-          "ece_calibrated": 0.0000
+          "ece_calibrated": 0.0
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
@@ -278,7 +310,9 @@
         "training_data_samples": 17062,
         "statistics": {
           "teams": 6,
-          "leagues": ["wpl"],
+          "leagues": [
+            "wpl"
+          ],
           "team_columns": [
             "team",
             "win_rate",
@@ -300,27 +334,126 @@
         }
       }
     },
-    "SAT": {
+    "SA20": {
       "path": "models/sat_v2",
       "version": "v2",
       "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1597, ECE: 0.0000)",
       "training": {
         "samples": 26121,
+        "matches": 121,
         "date": "2026-01-18",
-        "brier_score": 0.1597261259354372
+        "brier_score": 0.1597
       },
-      "calibrator": {},
+      "calibrator": {
+        "path": "models/sat_v2/isotonic_calibrator.pkl",
+        "type": "innings_phase_specific",
+        "generated_date": "2026-01-18",
+        "oof_metrics": {
+          "brier_raw": 0.1816,
+          "brier_calibrated": 0.1597,
+          "ece_raw": 0.0142,
+          "ece_calibrated": 0.0
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
       "feature_store": {
         "path": "data/sat_feature_store_v2",
         "version": "v2",
         "generated_date": "2026-01-18",
-        "training_data_samples": 26121
+        "training_data_samples": 26121,
+        "statistics": {
+          "teams": 6,
+          "players": 320,
+          "venues": 3,
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
+        },
+        "recent_changes": {
+          "date": "2026-01-18",
+          "description": "SA20 v2 retrained with 121 matches and per-over brier-optimized calibration",
+          "impact": "Brier score: 0.1597 (-12.1% vs raw); ECE: 0.0000 (perfect calibration)"
+        }
       }
     },
-    "WPL_FEMALE": {
+    "WPL": {
+      "path": "models/wpl_v2",
+      "version": "v2",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1510, ECE: 0.0000)",
+      "training": {
+        "samples": 17062,
+        "matches": 74,
+        "date": "2026-01-19",
+        "brier_score": 0.151
+      },
+      "calibrator": {
+        "path": "models/wpl_v2/isotonic_calibrator.pkl",
+        "type": "innings_phase_specific",
+        "generated_date": "2026-01-19",
+        "oof_metrics": {
+          "brier_raw": 0.1729,
+          "brier_calibrated": 0.151,
+          "ece_raw": 0.0436,
+          "ece_calibrated": 0.0
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
+      "feature_store": {
+        "path": "data/wpl_feature_store_v2",
+        "version": "v2",
+        "generated_date": "2026-01-19",
+        "training_data_samples": 17062,
+        "statistics": {
+          "teams": 6,
+          "players": 150,
+          "venues": 6,
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
+        },
+        "recent_changes": {
+          "date": "2026-01-19",
+          "description": "WPL v2 retrained with 74 matches and per-over brier-optimized calibration",
+          "impact": "Brier score: 0.1510 (-12.7% vs raw); ECE: 0.0000 (perfect calibration)"
+        }
+      }
+    },
+    "WPL_FEMALE_V1": {
       "path": "models/wpl_female_v1",
       "version": "v1",
-      "description": "XGBLogRegEnsemble (25 features) + CV-OOF Innings-Specific Isotonic Calibration (Brier: 0.1660, ECE: 0.0000)",
+      "description": "[DEPRECATED - Use WPL v2] XGBLogRegEnsemble (25 features) + CV-OOF Innings-Specific Isotonic Calibration (Brier: 0.1660, ECE: 0.0000)",
       "calibrator": {
         "path": "models/wpl_female_v1/isotonic_calibrator.pkl",
         "type": "isotonic_regression",

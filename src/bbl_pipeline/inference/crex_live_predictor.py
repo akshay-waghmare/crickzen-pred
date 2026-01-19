@@ -100,11 +100,12 @@ class CrexLivePredictor:
     
     def __init__(self, match_url: str, model_dir: str, headless: bool = True,
                  feature_store_dir: str = None, output_json: str = None,
-                 live_match_json: str = None, venue: str = None):
+                 live_match_json: str = None, venue: str = None, league: str = None):
         self.match_url = match_url
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
+        self.league = league  # League code for league-specific calibration
         self.output_json = output_json  # Path for JSON output (for Streamlit)
         self.venue_override = venue
         # Optional richer debug output (defaults to sibling livematch.json if output_json is set)
@@ -138,11 +139,13 @@ class CrexLivePredictor:
         """Load the trained prediction model."""
         try:
             from bbl_pipeline.inference.predictor import Predictor
-            self.predictor = Predictor.load(self.model_dir, self.feature_store_dir)
+            self.predictor = Predictor.load(self.model_dir, self.feature_store_dir, league=self.league)
             self.model = self.predictor.model
             print(f"✅ Model loaded from {self.model_dir}")
             if self.feature_store_dir:
                 print(f"📊 Feature store: {self.feature_store_dir}")
+            if self.league:
+                print(f"🏏 League calibrator: {self.league}")
         except Exception as e:
             print(f"⚠️ Could not load model: {e}")
             print("   Will run in scraper-only mode (no predictions)")
@@ -1457,6 +1460,11 @@ async def main():
         default=None,
         help="Optional richer per-match debug JSON (defaults to sibling livematch.json when --output-json is set)",
     )
+    parser.add_argument(
+        "--league",
+        default=None,
+        help="League code for league-specific calibration (e.g., 'ssm', 'bbl', 'sa20')",
+    )
     
     args = parser.parse_args()
     
@@ -1468,6 +1476,7 @@ async def main():
         output_json=args.output_json,
         live_match_json=args.live_match_json,
         venue=args.venue,
+        league=args.league,
     )
     
     await predictor.run(poll_interval=args.poll_interval)

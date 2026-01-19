@@ -861,6 +861,8 @@ def main():
     inn_specific_prob = d.get("calibrated_win_prob", d["bat_win_prob"])
     phase_specific_prob = d.get("calibrated_phase_prob", None)
     per_over_prob = d.get("calibrated_per_over_prob", None)  # Per-over brier-optimized
+    league_calibrated_prob = d.get("league_calibrated_prob", None)  # League-specific (temperature/platt)
+    league = d.get("league", None)  # League code if specified
     
     # Detect if this is SA20 and recalculate calibrated probabilities client-side
     batting_team = d.get("batting_team", "")
@@ -907,15 +909,22 @@ def main():
     combined_odds = prob_to_odds(combined_prob)
     inn_specific_odds = prob_to_odds(inn_specific_prob)
     
-    # Decide number of columns based on whether phase-specific is available
+    # Decide number of columns based on whether phase-specific and league-specific are available
     has_phase = phase_specific_prob is not None and abs(phase_specific_prob - inn_specific_prob) > 0.001
-    num_cols = 5 if has_phase else 4
+    has_league = league_calibrated_prob is not None and league is not None
     
+    # Calculate number of columns
+    num_cols = 4
     if has_phase:
-        prob_cols = st.columns(5)
+        num_cols += 1
+    if has_league:
+        num_cols += 1
+    
+    prob_cols = st.columns(num_cols)
+    if has_phase:
         phase_specific_odds = prob_to_odds(phase_specific_prob)
-    else:
-        prob_cols = st.columns(4)
+    if has_league:
+        league_calibrated_odds = prob_to_odds(league_calibrated_prob)
     
     with prob_cols[0]:
         st.markdown(f'''
@@ -973,6 +982,20 @@ def main():
                 <span style="font-size: 1.5em; color: #FF5722;">{phase_specific_prob*100:.1f}%</span><br>
                 <span style="font-size: 1.1em; color: #333;">Odds: <b>{phase_specific_odds}</b></span><br>
                 <span style="font-size: 0.9em; color: #666;">{innings_label}-{phase_label}</span>
+            </div>
+            ''', unsafe_allow_html=True)
+    
+    # League-specific calibration column (temperature/platt scaling)
+    if has_league:
+        col_idx = 5 if has_phase else 4
+        with prob_cols[col_idx]:
+            league_upper = league.upper() if league else "League"
+            st.markdown(f'''
+            <div style="text-align: center; padding: 10px; background: #e8f5e9; border-radius: 10px; border-left: 4px solid #00796b;">
+                <b>🏏 {league_upper}</b><br>
+                <span style="font-size: 1.5em; color: #00796b;">{league_calibrated_prob*100:.1f}%</span><br>
+                <span style="font-size: 1.1em; color: #333;">Odds: <b>{league_calibrated_odds}</b></span><br>
+                <span style="font-size: 0.9em; color: #666;">League-Calibrated</span>
             </div>
             ''', unsafe_allow_html=True)
     
@@ -3855,11 +3878,11 @@ def main():
             with sim_col1:
                 st.markdown("#### 🎯 Next Ball Simulation")
                 if sim_1ball:
-                    mean_1 = sim_1ball.get("mean", 0) * 100
-                    std_1 = sim_1ball.get("std", 0) * 100
+                    mean_1 = sim_1ball.get("mean_prob", sim_1ball.get("mean", 0)) * 100
+                    std_1 = sim_1ball.get("std_prob", sim_1ball.get("std", 0)) * 100
                     p5_1 = sim_1ball.get("p5", 0) * 100
                     p95_1 = sim_1ball.get("p95", 0) * 100
-                    n_sims_1 = sim_1ball.get("n_simulations", 0)
+                    n_sims_1 = sim_1ball.get("n_sims", sim_1ball.get("n_simulations", 0))
                     
                     st.metric(
                         f"Mean Win Prob (n={n_sims_1:,})",
@@ -3876,11 +3899,11 @@ def main():
             with sim_col2:
                 st.markdown("#### 🎲 Next Over Simulation")
                 if sim_6ball:
-                    mean_6 = sim_6ball.get("mean", 0) * 100
-                    std_6 = sim_6ball.get("std", 0) * 100
+                    mean_6 = sim_6ball.get("mean_prob", sim_6ball.get("mean", 0)) * 100
+                    std_6 = sim_6ball.get("std_prob", sim_6ball.get("std", 0)) * 100
                     p5_6 = sim_6ball.get("p5", 0) * 100
                     p95_6 = sim_6ball.get("p95", 0) * 100
-                    n_sims_6 = sim_6ball.get("n_simulations", 0)
+                    n_sims_6 = sim_6ball.get("n_sims", sim_6ball.get("n_simulations", 0))
                     
                     st.metric(
                         f"Mean Win Prob (n={n_sims_6:,})",
