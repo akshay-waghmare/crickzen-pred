@@ -2,20 +2,60 @@
   "last_updated": "2026-01-19",
   "active_models": {
     "BBL": {
-      "path": "models/bbl_v13",
-      "version": "v13",
-      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1763, ECE: 0.0000)",
+      "path": "models/bbl_v12",
+      "version": "v12",
+      "description": "XGBLogRegEnsemble (25 features) + Empirically Calibrated Wicket Penalties + Per-Over Brier-Optimized Calibration (Brier: 0.1760, ECE: 0.0000)",
       "training": {
         "samples": 141435,
-        "date": "2026-01-19",
-        "brier_score": 0.1763232632321907
+        "date": "2026-01-17",
+        "brier_score": 0.1833
       },
-      "calibrator": {},
+      "calibrator": {
+        "path": "models/bbl_v12/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2026-01-17T13:12:44.996989",
+        "oof_metrics": {
+          "brier_raw": 0.18163431461491575,
+          "brier_calibrated": 0.18007254992621005,
+          "ece_raw": 0.01482426139591423,
+          "ece_calibrated": 0.0002292219040548864
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
       "feature_store": {
-        "path": "data/bbl_feature_store_v13",
-        "version": "v13",
-        "generated_date": "2026-01-19",
-        "training_data_samples": 141435
+        "path": "data/bbl_feature_store_v2",
+        "version": "v2",
+        "generated_date": "2026-01-17",
+        "training_data_samples": 141435,
+        "statistics": {
+          "teams": 8,
+          "players": 508,
+          "venues": 31,
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
+        },
+        "recent_changes": {
+          "date": "2026-01-17",
+          "description": "v12: (1) Regenerated feature store with 141,435 samples. (2) Empirically calibrated FIRST_INNINGS_WICKET_PENALTY_3D using actual projected score ratios. Death phase penalties now 0.88-1.00 (was 0.33-0.84). (3) Added per-over brier-optimized calibrators (38 calibrators) achieving 0.1760 Brier (-3.6% vs raw).",
+          "impact": "Overall Brier: 0.1760 (-3.6% vs raw 0.1825). ECE: 0.0000 (perfect calibration). Key insight: Per-over granularity captures within-phase variation better than phase-level calibration."
+        }
       }
     },
     "ILT20": {
