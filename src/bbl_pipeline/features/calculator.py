@@ -511,10 +511,6 @@ class ResourceFeatureCalculator:
         
         The regression factor increases as more overs are bowled (more data = more trust
         in the current run rate).
-        
-        CRITICAL FIX (Jan 2026): In death overs (12+), use conservative projection
-        for low-scoring scenarios to avoid over-optimism. The DLS projection tends
-        to regress toward par too strongly for struggling sides.
         """
         # If all out (10 wickets), the innings is over - return actual score
         if wickets_lost >= 10:
@@ -536,14 +532,8 @@ class ResourceFeatureCalculator:
         
         if resource_used <= 0:
             return self.PAR_SCORE_T20
-        
-        # Current run rate
-        current_rr = current_score / overs_bowled
-        
-        # CRR-based projection (assumes current rate maintained)
-        crr_projection = current_score + (current_rr * overs_remaining)
             
-        # Raw DLS projection based on runs per resource
+        # Raw projection based on runs per resource
         runs_per_resource = current_score / resource_used
         raw_projection = current_score + (runs_per_resource * resource_remaining)
         
@@ -556,14 +546,6 @@ class ResourceFeatureCalculator:
         
         # Regressed projection
         regressed_projection = (trajectory_weight * raw_projection) + ((1 - trajectory_weight) * self.PAR_SCORE_T20)
-        
-        # CRITICAL FIX: In death overs, use conservative projection for low-scoring scenarios
-        # The DLS method over-projects for struggling sides by regressing toward par
-        # Solution: Use minimum of CRR and DLS projections after overs 12
-        # This prevents 110/3 at 15 overs being projected as 160 when CRR says 147
-        if overs_bowled >= 12 and current_rr < 8.0:  # Below par run rate
-            # Use the more conservative projection for struggling sides
-            regressed_projection = min(crr_projection, regressed_projection)
         
         # Also cap the projection at reasonable T20 bounds (100-280)
         return max(100.0, min(280.0, regressed_projection))
