@@ -517,6 +517,79 @@ class TestBetting:
         # Death overs allow higher uncertainty
         assert thresholds.get_sigma_max('death') > thresholds.get_sigma_max('middle')
 
+    def test_evaluate_bet_with_model_prob_override(self):
+        """Test evaluate_bet uses explicit model_prob for edge calculation instead of simulation mean.
+        
+        This is the recommended approach for betting: use league-calibrated model probability
+        from predictor.predict() for edge calculation, while using Monte Carlo simulation
+        only for uncertainty estimation (σ).
+        """
+        # Simulation result with mean_prob = 0.50 (resource_win_prob heuristic)
+        result = SimulationResult(
+            mean_prob=0.50,  # This is the Monte Carlo mean (less accurate)
+            std_prob=0.03,
+            p5=0.45,
+            p95=0.55,
+            n_sims=2000,
+            horizon_balls=6,
+            time_taken_ms=50.0,
+            league="bbl",
+        )
+        
+        # Market implies 55% (odds 1.82)
+        market_odds = 1.82
+        
+        # Without model_prob override: edge = 0.50 - 0.549 = -0.049 (NO_BET)
+        decision_without = evaluate_bet(
+            simulation_result=result,
+            market_odds=market_odds,
+            balls_remaining=60,  # Middle overs
+        )
+        assert decision_without.decision == BetDecision.NO_BET
+        assert decision_without.model_prob == 0.50  # Uses simulation mean
+        assert decision_without.edge < 0  # Negative edge
+        
+        # With model_prob override = 0.65 (league-calibrated ML model)
+        # Edge = 0.65 - 0.549 = 0.10 (BET!)
+        decision_with = evaluate_bet(
+            simulation_result=result,
+            market_odds=market_odds,
+            balls_remaining=60,
+            model_prob=0.65,  # League-calibrated probability
+        )
+        assert decision_with.decision == BetDecision.BET
+        assert decision_with.model_prob == 0.65  # Uses provided model_prob
+        assert decision_with.edge > 0.05  # Positive edge
+        
+        # Verify σ still comes from simulation (uncertainty quantification)
+        assert decision_with.sigma == 0.03  # From simulation result, not model_prob
+
+    def test_evaluate_bet_model_prob_used_for_kelly_stake(self):
+        """Test that Kelly stake uses the model_prob (not simulation mean) when provided."""
+        result = SimulationResult(
+            mean_prob=0.50,
+            std_prob=0.02,
+            p5=0.47,
+            p95=0.53,
+            n_sims=2000,
+            horizon_balls=6,
+            time_taken_ms=50.0,
+            league="bbl",
+        )
+        
+        # With model_prob = 0.70, odds = 2.0
+        # Kelly = (b * p - q) / b where b = 1.0, p = 0.70, q = 0.30
+        # = (1.0 * 0.70 - 0.30) / 1.0 = 0.40 * fraction
+        decision = evaluate_bet(
+            simulation_result=result,
+            market_odds=2.0,
+            balls_remaining=60,
+            model_prob=0.70,
+        )
+        
+        assert decision.kelly_stake > 0  # Should recommend stake
+        # Kelly stake uses prob_for_edge (0.70), not simulation mean (0.50)
+
 
 class TestGetPhase:
     """Tests for phase detection."""
@@ -614,6 +687,100 @@ class TestSimulateIntegration:
         
         assert result.horizon_balls == 6
         assert result.n_sims == 1000
+
+
+class TestMLModelBatchEvaluation:
+    """Tests for ML model-based batch evaluation in simulation."""
+    
+    def test_simulate_with_mock_predictor(self):
+        """Test simulate() accepts predictor parameter and uses it for evaluation."""
+        from bbl_pipeline.simulation.engine import simulate_vectorized
+        
+        # Create mock predictor
+        mock_predictor = MagicMock()
+        # predict_batch returns array of probabilities
+        mock_predictor.predict_batch.return_value = np.full(1000, 0.65)
+        
+        state = MatchState(
+            innings=2,
+            score=80,
+            wickets_lost=3,
+            balls_remaining=48,
+            target_runs=160,
+            batting_team="A",
+            bowling_team="B",
+            league="bbl",
+        )
+        
+        result = simulate_vectorized(state, horizon=6, n_simulations=1000, predictor=mock_predictor)
+        
+        # Verify predictor was used
+        assert mock_predictor.predict_batch.called
+        assert result.mean_prob == pytest.approx(0.65, abs=0.05)  # Should be close to 0.65
+    
+    def test_simulate_without_predictor_uses_resource_prob(self):
+        """Test simulate() without predictor falls back to resource_win_prob."""
+        from bbl_pipeline.simulation.engine import simulate_vectorized
+        
+        state = MatchState(
+            innings=1,
+            score=50,
+            wickets_lost=2,
+            balls_remaining=60,
+            batting_team="A",
+            bowling_team="B",
+            league="bbl",
+        )
+        
+        # Without predictor, should use resource_win_prob evaluator
+        result = simulate_vectorized(state, horizon=1, n_simulations=500)
+        
+        # Result should be valid
+        assert 0 <= result.mean_prob <= 1
+        assert result.n_sims == 500
+    
+    def test_terminal_state_evaluator_with_predictor(self):
+        """Test TerminalStateEvaluator uses predictor for batch evaluation."""
+        from bbl_pipeline.simulation.evaluator import TerminalStateEvaluator
+        
+        mock_predictor = MagicMock()
+        mock_predictor.predict_batch.return_value = np.array([0.7, 0.8, 0.9])
+        
+        evaluator = TerminalStateEvaluator(predictor=mock_predictor)
+        
+        states = [
+            MatchState(innings=1, score=50, wickets_lost=2, balls_remaining=60,
+                      batting_team="A", bowling_team="B", league="bbl"),
+            MatchState(innings=1, score=70, wickets_lost=3, balls_remaining=48,
+                      batting_team="A", bowling_team="B", league="bbl"),
+            MatchState(innings=1, score=90, wickets_lost=4, balls_remaining=36,
+                      batting_team="A", bowling_team="B", league="bbl"),
+        ]
+        
+        probs = evaluator.evaluate_batch_with_model(states)
+        
+        assert mock_predictor.predict_batch.called
+        assert len(probs) == 3
+        np.testing.assert_array_almost_equal(probs, [0.7, 0.8, 0.9])
+    
+    def test_terminal_state_evaluator_without_predictor_fallback(self):
+        """Test TerminalStateEvaluator falls back to resource_win_prob without predictor."""
+        from bbl_pipeline.simulation.evaluator import TerminalStateEvaluator
+        
+        evaluator = TerminalStateEvaluator()  # No predictor
+        
+        states = [
+            MatchState(innings=1, score=50, wickets_lost=2, balls_remaining=60,
+                      batting_team="A", bowling_team="B", league="bbl"),
+            MatchState(innings=1, score=70, wickets_lost=3, balls_remaining=48,
+                      batting_team="A", bowling_team="B", league="bbl"),
+        ]
+        
+        probs = evaluator.evaluate_batch_with_model(states)
+        
+        # Should still return valid probabilities
+        assert len(probs) == 2
+        assert all(0 <= p <= 1 for p in probs)
 
 
 if __name__ == "__main__":

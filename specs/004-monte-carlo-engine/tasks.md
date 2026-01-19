@@ -80,7 +80,23 @@
 - [X] T024 [US2] Verify 6-ball simulation completes in <500ms (optimized) in `scripts/benchmark_simulation.py` (~60ms actual)
 - [X] T025 [US2] Add integration test with real match state in `tests/integration/test_simulation_integration.py`
 
-**Checkpoint**: User Story 2 complete - 6-ball simulation works with timing < 500ms
+### ML Model Batch Evaluation (Accuracy Mode)
+
+**Goal**: Use league-calibrated ML model instead of resource_win_prob for more accurate Monte Carlo probabilities
+
+- [X] T055 [US2] Add `predict_batch()` method to Predictor for batch evaluation of multiple states in `src/bbl_pipeline/inference/predictor.py`
+- [X] T056 [US2] Update `TerminalStateEvaluator` to accept optional Predictor in `src/bbl_pipeline/simulation/evaluator.py`
+- [X] T057 [US2] Add `evaluate_batch_with_model()` method to TerminalStateEvaluator for batch ML evaluation
+- [X] T058 [US2] Update `simulate()` and `simulate_vectorized()` to accept optional `predictor` parameter in `src/bbl_pipeline/simulation/engine.py`
+- [X] T059 [US2] Update `crex_live_predictor.py` to pass predictor to simulate() for ML model evaluation
+- [X] T060 [P] [US2] Create unit test for batch ML model evaluation in `tests/test_simulation.py`
+- [X] T061 [US2] Verify ML model batch simulation completes in <1000ms in `scripts/benchmark_simulation.py`
+  - **COMPLETED**: Optimized with vectorized feature generation - ~49ms for 2000 sims (20x faster than target)
+  - **Implementation**: Vectorized numpy operations for all dynamic features, batch model prediction, batch calibration
+
+**Checkpoint**: User Story 2 enhanced - ML model batch evaluation fully optimized
+- Default (fast): ~100ms using resource_win_prob heuristic
+- ML model mode: ~49ms (faster than resource_win_prob!) using vectorized feature generation
 
 ---
 
@@ -119,8 +135,11 @@
 - [X] T037 [P] [US4] Create unit test for betting decision logic in `tests/test_simulation.py`
 - [X] T038 [US4] Test phase-aware thresholds (inn2_death=15%, inn1_middle=30%) in `tests/test_simulation.py`
 - [ ] T039 [US4] Test 1-ball/6-ball disagreement detection in `tests/test_simulation.py`
+- [X] T052 [US4] Add `model_prob` parameter to `evaluate_bet()` in `src/bbl_pipeline/simulation/betting.py` to use league-calibrated probability for edge calculation (instead of simulation mean)
+- [X] T053 [US4] Update `crex_live_predictor.py` to pass league-calibrated model probability to `evaluate_bet()`
+- [X] T054 [P] [US4] Create unit test for `evaluate_bet()` with explicit `model_prob` override in `tests/test_simulation.py`
 
-**Checkpoint**: User Story 4 complete - betting decisions work with phase-aware thresholds
+**Checkpoint**: User Story 4 complete - betting decisions work with phase-aware thresholds and use league-calibrated model probability for edge calculation
 
 ---
 

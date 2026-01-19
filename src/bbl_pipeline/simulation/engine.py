@@ -2,10 +2,11 @@
 Monte Carlo Simulation Engine for T20 Win Probability.
 
 Provides single-ball and multi-ball simulation with uncertainty quantification.
+Supports optional ML model (Predictor) for accurate terminal state evaluation.
 """
 
 import numpy as np
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, TYPE_CHECKING
 import structlog
 import time
 
@@ -13,6 +14,10 @@ from .config import get_phase, EDGE_MIN_BY_PHASE, SIGMA_MAX_BY_PHASE
 from .state import MatchState, SimulationResult
 from .sampler import NextBallSampler
 from .evaluator import TerminalStateEvaluator, apply_temperature, load_league_temperature
+
+# Avoid circular import
+if TYPE_CHECKING:
+    from ..inference.predictor import Predictor
 
 logger = structlog.get_logger()
 
@@ -23,6 +28,7 @@ def simulate(
     n_simulations: int = 1000,
     apply_temp: bool = True,
     model_dir: str = "models/t20_male_v1",
+    predictor: "Predictor" = None,
 ) -> SimulationResult:
     """
     Run Monte Carlo simulation from current state.
@@ -33,17 +39,22 @@ def simulate(
         n_simulations: Number of Monte Carlo paths
         apply_temp: Whether to apply league temperature calibration
         model_dir: Path to model directory
+        predictor: Optional Predictor instance for ML-based evaluation.
+                  If provided, uses batch ML prediction for terminal states
+                  (more accurate, ~400-800ms for 2000 sims).
         
     Returns:
         SimulationResult with mean, std, percentiles, confidence interval
         
     Examples:
-        >>> # 1-ball simulation
+        >>> # 1-ball simulation (fast, resource_win_prob)
         >>> result = simulate(state, horizon=1, n_simulations=1000)
         >>> print(f"Win prob: {result.mean:.1%} ± {result.std:.1%}")
         
-        >>> # 1-over (6 balls) simulation
-        >>> result = simulate(state, horizon=6, n_simulations=5000)
+        >>> # 1-over (6 balls) simulation with ML model
+        >>> from bbl_pipeline.inference.predictor import Predictor
+        >>> predictor = Predictor.load("models/t20_male_v2", league="bbl")
+        >>> result = simulate(state, horizon=6, n_simulations=5000, predictor=predictor)
         >>> print(f"90% CI: [{result.ci_low:.1%}, {result.ci_high:.1%}]")
     """
     if horizon < 1:
@@ -54,18 +65,22 @@ def simulate(
     start_time = time.time()
     
     sampler = NextBallSampler()
-    evaluator = TerminalStateEvaluator(model_dir=model_dir)
+    evaluator = TerminalStateEvaluator(model_dir=model_dir, predictor=predictor)
     
-    # Get league temperature once for efficiency
+    # If using ML model, don't apply temperature separately (predictor handles calibration)
+    use_ml_model = predictor is not None
+    
+    # Get league temperature once for efficiency (only needed if not using ML model)
     temperature = None
-    if apply_temp:
+    if apply_temp and not use_ml_model:
         temperature = load_league_temperature(
             league=state.league,
             innings=state.innings,
             model_dir=model_dir,
         )
     
-    # Storage for terminal probabilities
+    # Storage for terminal states and probabilities
+    terminal_states = []
     terminal_probs = np.zeros(n_simulations)
     
     # Run simulations
@@ -84,14 +99,22 @@ def simulate(
             # Apply outcome to state
             sim_state = sim_state.apply_outcome(runs=runs, is_wicket=is_wicket)
         
-        # Evaluate terminal state
-        prob = evaluator.evaluate(sim_state, apply_temp=False)
-        
-        # Apply temperature if provided
-        if temperature is not None and temperature != 1.0:
-            prob = apply_temperature(prob, temperature)
-        
-        terminal_probs[i] = prob
+        if use_ml_model:
+            # Collect states for batch evaluation
+            terminal_states.append(sim_state)
+        else:
+            # Evaluate terminal state immediately
+            prob = evaluator.evaluate(sim_state, apply_temp=False)
+            
+            # Apply temperature if provided
+            if temperature is not None and temperature != 1.0:
+                prob = apply_temperature(prob, temperature)
+            
+            terminal_probs[i] = prob
+    
+    # Batch evaluation for ML model
+    if use_ml_model and terminal_states:
+        terminal_probs = evaluator.evaluate_batch_with_model(terminal_states, apply_temp=False)
     
     elapsed = time.time() - start_time
     
@@ -100,7 +123,7 @@ def simulate(
         horizon_balls=horizon,
         time_taken_ms=elapsed * 1000,
         league=state.league,
-        temperature=temperature,
+        temperature=temperature if not use_ml_model else None,
     )
     
     logger.debug(
@@ -110,6 +133,7 @@ def simulate(
         mean=f"{result.mean_prob:.4f}",
         std=f"{result.std_prob:.4f}",
         elapsed_ms=f"{elapsed * 1000:.1f}",
+        use_ml_model=use_ml_model,
     )
     
     return result
@@ -121,12 +145,16 @@ def simulate_vectorized(
     n_simulations: int = 1000,
     apply_temp: bool = True,
     model_dir: str = "models/t20_male_v1",
+    predictor: "Predictor" = None,
 ) -> SimulationResult:
     """
     Run Monte Carlo simulation with vectorized sampling.
     
     More efficient for larger simulation counts by batch-sampling outcomes.
-    Falls back to sequential evaluation for terminal states.
+    
+    When a predictor is provided, uses ML model for terminal state evaluation
+    (more accurate, ~400-800ms). Otherwise falls back to resource_win_prob 
+    heuristic (faster, ~60ms).
     
     Args:
         state: Current match state
@@ -134,6 +162,8 @@ def simulate_vectorized(
         n_simulations: Number of Monte Carlo paths
         apply_temp: Whether to apply league temperature calibration
         model_dir: Path to model directory
+        predictor: Optional Predictor instance for ML-based evaluation.
+                  If provided, uses batch ML prediction for terminal states.
         
     Returns:
         SimulationResult with statistics
@@ -146,11 +176,14 @@ def simulate_vectorized(
     start_time = time.time()
     
     sampler = NextBallSampler()
-    evaluator = TerminalStateEvaluator(model_dir=model_dir)
+    evaluator = TerminalStateEvaluator(model_dir=model_dir, predictor=predictor)
     
-    # Get league temperature once
+    # If using ML model, don't apply temperature separately (predictor handles calibration)
+    use_ml_model = predictor is not None
+    
+    # Get league temperature once (only needed if not using ML model)
     temperature = None
-    if apply_temp:
+    if apply_temp and not use_ml_model:
         temperature = load_league_temperature(
             league=state.league,
             innings=state.innings,
@@ -203,24 +236,45 @@ def simulate_vectorized(
     # Evaluate terminal states
     terminal_probs = np.zeros(n_simulations)
     
-    for i in range(n_simulations):
-        # Create state for evaluation
-        eval_state = MatchState(
-            innings=state.innings,
-            score=int(scores[i]),
-            wickets_lost=int(wickets[i]),
-            balls_remaining=int(balls_remaining[i]),
-            target_runs=state.target_runs,
-            batting_team=state.batting_team,
-            bowling_team=state.bowling_team,
-            venue=state.venue,
-            league=state.league,
-        )
+    if use_ml_model:
+        # Use batch ML model evaluation for all terminal states
+        terminal_states = []
+        for i in range(n_simulations):
+            eval_state = MatchState(
+                innings=state.innings,
+                score=int(scores[i]),
+                wickets_lost=int(wickets[i]),
+                balls_remaining=int(balls_remaining[i]),
+                target_runs=state.target_runs,
+                batting_team=state.batting_team,
+                bowling_team=state.bowling_team,
+                venue=state.venue,
+                league=state.league,
+            )
+            terminal_states.append(eval_state)
         
-        terminal_probs[i] = evaluator.evaluate(eval_state, apply_temp=False)
+        # Batch prediction (ML model with calibration)
+        terminal_probs = evaluator.evaluate_batch_with_model(terminal_states, apply_temp=False)
+    else:
+        # Use resource_win_prob heuristic (faster)
+        for i in range(n_simulations):
+            # Create state for evaluation
+            eval_state = MatchState(
+                innings=state.innings,
+                score=int(scores[i]),
+                wickets_lost=int(wickets[i]),
+                balls_remaining=int(balls_remaining[i]),
+                target_runs=state.target_runs,
+                batting_team=state.batting_team,
+                bowling_team=state.bowling_team,
+                venue=state.venue,
+                league=state.league,
+            )
+            
+            terminal_probs[i] = evaluator.evaluate(eval_state, apply_temp=False)
     
-    # Apply temperature calibration
-    if temperature is not None and temperature != 1.0:
+    # Apply temperature calibration (only if not using ML model)
+    if not use_ml_model and temperature is not None and temperature != 1.0:
         from .evaluator import apply_temperature_vectorized
         terminal_probs = apply_temperature_vectorized(terminal_probs, temperature)
     
@@ -231,7 +285,7 @@ def simulate_vectorized(
         horizon_balls=horizon,
         time_taken_ms=elapsed * 1000,
         league=state.league,
-        temperature=temperature,
+        temperature=temperature if not use_ml_model else None,
     )
     
     logger.debug(
@@ -241,6 +295,7 @@ def simulate_vectorized(
         mean=f"{result.mean_prob:.4f}",
         std=f"{result.std_prob:.4f}",
         elapsed_ms=f"{elapsed * 1000:.1f}",
+        use_ml_model=use_ml_model,
     )
     
     return result
@@ -251,6 +306,7 @@ def simulate_single_ball(
     n_simulations: int = 1000,
     apply_temp: bool = True,
     model_dir: str = "models/t20_male_v1",
+    predictor: "Predictor" = None,
 ) -> SimulationResult:
     """
     Convenience function for 1-ball simulation.
@@ -262,6 +318,8 @@ def simulate_single_ball(
         n_simulations: Number of simulations
         apply_temp: Whether to apply temperature
         model_dir: Path to model directory
+        predictor: Optional Predictor instance for ML-based evaluation.
+                  If provided, uses batch ML prediction for terminal states.
         
     Returns:
         SimulationResult
@@ -272,6 +330,7 @@ def simulate_single_ball(
         n_simulations=n_simulations,
         apply_temp=apply_temp,
         model_dir=model_dir,
+        predictor=predictor,
     )
 
 
@@ -280,6 +339,7 @@ def simulate_one_over(
     n_simulations: int = 5000,
     apply_temp: bool = True,
     model_dir: str = "models/t20_male_v1",
+    predictor: "Predictor" = None,
 ) -> SimulationResult:
     """
     Convenience function for 6-ball (one over) simulation.
@@ -291,6 +351,8 @@ def simulate_one_over(
         n_simulations: Number of simulations
         apply_temp: Whether to apply temperature
         model_dir: Path to model directory
+        predictor: Optional Predictor instance for ML-based evaluation.
+                  If provided, uses batch ML prediction for terminal states.
         
     Returns:
         SimulationResult
@@ -301,6 +363,7 @@ def simulate_one_over(
         n_simulations=n_simulations,
         apply_temp=apply_temp,
         model_dir=model_dir,
+        predictor=predictor,
     )
 
 

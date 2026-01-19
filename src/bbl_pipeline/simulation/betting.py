@@ -197,18 +197,31 @@ def evaluate_bet(
     market_odds: float,
     balls_remaining: int,
     thresholds: Optional[BettingThresholds] = None,
+    model_prob: Optional[float] = None,
 ) -> BettingDecision:
     """
     Evaluate whether to bet based on simulation result and market odds.
     
     Args:
-        simulation_result: Result from Monte Carlo simulation
+        simulation_result: Result from Monte Carlo simulation (provides uncertainty σ)
         market_odds: Decimal odds offered by market
         balls_remaining: Balls remaining in match (for phase detection)
         thresholds: Betting thresholds (uses defaults if None)
+        model_prob: If provided, use this league-calibrated model probability for
+                   edge calculation instead of simulation_result.mean_prob.
+                   This is RECOMMENDED for betting decisions as it uses the 
+                   trained ML model with league-specific calibration.
+                   Monte Carlo mean_prob uses resource_win_prob heuristic.
         
     Returns:
         BettingDecision with full rationale
+        
+    Note:
+        For betting, you should pass the league-calibrated model probability:
+        
+        >>> model_prob = predictor.predict(match_state)  # League-calibrated
+        >>> sim_result = simulate(state, horizon=6)  # For uncertainty (σ)
+        >>> decision = evaluate_bet(sim_result, odds, balls, model_prob=model_prob)
     """
     if thresholds is None:
         thresholds = BettingThresholds()
@@ -221,14 +234,17 @@ def evaluate_bet(
     sigma_max = thresholds.get_sigma_max(phase)
     
     # Extract values
-    model_prob = simulation_result.mean_prob
-    sigma = simulation_result.std_prob
+    # Use provided model_prob (league-calibrated) if given, otherwise fall back to simulation mean
+    # For betting, model_prob should be the league-calibrated ML model output
+    # simulation_result.mean_prob uses resource_win_prob heuristic which is less accurate
+    prob_for_edge = model_prob if model_prob is not None else simulation_result.mean_prob
+    sigma = simulation_result.std_prob  # Always use Monte Carlo for uncertainty estimation
     
     # Calculate market implied probability
     implied_prob = odds_to_implied_prob(market_odds)
     
-    # Calculate edge
-    edge = calculate_edge(model_prob, implied_prob)
+    # Calculate edge using league-calibrated probability
+    edge = calculate_edge(prob_for_edge, implied_prob)
     
     # Calculate confidence
     confidence = max(0.0, 1.0 - sigma / sigma_max)
@@ -256,13 +272,13 @@ def evaluate_bet(
     else:
         decision = BetDecision.BET
         kelly_stake = calculate_kelly_stake(
-            model_prob=model_prob,
+            model_prob=prob_for_edge,
             odds=market_odds,
             fraction=thresholds.kelly_fraction,
         )
         rationale = (
             f"Value bet found: edge {edge:.2%} >= {edge_min:.0%} ({phase}). "
-            f"Model: {model_prob:.1%}, Market: {implied_prob:.1%}. "
+            f"Model: {prob_for_edge:.1%}, Market: {implied_prob:.1%}. "
             f"Kelly stake: {kelly_stake:.2%}"
         )
     
@@ -273,7 +289,7 @@ def evaluate_bet(
         confidence=confidence,
         phase=phase,
         rationale=rationale,
-        model_prob=model_prob,
+        model_prob=prob_for_edge,
         market_odds=market_odds,
         implied_prob=implied_prob,
         sigma=sigma,

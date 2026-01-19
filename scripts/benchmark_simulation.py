@@ -149,6 +149,82 @@ def benchmark_one_over(
     }
 
 
+def benchmark_ml_model_batch(
+    n_runs: int = 5,
+    n_simulations: int = 2000,
+    model_dir: str = "models/t20_male_v1",
+    feature_store_dir: str = "data/t20_male_feature_store_v2",
+    league: str = "bbl",
+) -> Dict[str, Any]:
+    """
+    Benchmark ML model-based batch evaluation.
+    
+    This tests the performance of using the ML model for terminal state
+    evaluation instead of resource_win_prob heuristic.
+    
+    Target: < 1000ms for 2000 simulations
+    """
+    from pathlib import Path
+    
+    # Check if model exists
+    if not Path(model_dir).exists():
+        return {
+            "name": f"ML batch ({n_simulations} sims)",
+            "target_ms": 1000,
+            "mean_ms": float('nan'),
+            "std_ms": float('nan'),
+            "min_ms": float('nan'),
+            "max_ms": float('nan'),
+            "p95_ms": float('nan'),
+            "passed": False,
+            "error": f"Model not found: {model_dir}",
+        }
+    
+    try:
+        from bbl_pipeline.inference.predictor import Predictor
+        
+        # Load predictor once
+        print(f"  Loading predictor from {model_dir}...")
+        predictor = Predictor.load(model_dir, feature_store_dir, league=league)
+        
+        state = create_test_state()
+        times = []
+        
+        for _ in range(n_runs):
+            start = time.perf_counter()
+            result = simulate_vectorized(
+                state, 
+                horizon=6, 
+                n_simulations=n_simulations,
+                predictor=predictor,  # Use ML model
+            )
+            elapsed = (time.perf_counter() - start) * 1000  # ms
+            times.append(elapsed)
+        
+        return {
+            "name": f"ML batch ({n_simulations} sims)",
+            "target_ms": 1000,
+            "mean_ms": np.mean(times),
+            "std_ms": np.std(times),
+            "min_ms": np.min(times),
+            "max_ms": np.max(times),
+            "p95_ms": np.percentile(times, 95),
+            "passed": np.mean(times) < 1000,
+        }
+    except Exception as e:
+        return {
+            "name": f"ML batch ({n_simulations} sims)",
+            "target_ms": 1000,
+            "mean_ms": float('nan'),
+            "std_ms": float('nan'),
+            "min_ms": float('nan'),
+            "max_ms": float('nan'),
+            "p95_ms": float('nan'),
+            "passed": False,
+            "error": str(e),
+        }
+
+
 def print_results(results: List[Dict[str, Any]]) -> None:
     """Print benchmark results as a table."""
     print("\n" + "=" * 80)
@@ -182,6 +258,10 @@ def main():
     parser = argparse.ArgumentParser(description="Benchmark Monte Carlo simulation")
     parser.add_argument("--runs", type=int, default=10, help="Number of benchmark runs")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--ml-model", action="store_true", help="Include ML model batch benchmark (slower)")
+    parser.add_argument("--model-dir", type=str, default="models/t20_male_v2", help="Model directory for ML benchmark")
+    parser.add_argument("--feature-store-dir", type=str, default="data/t20_male_feature_store_v2", help="Feature store directory")
+    parser.add_argument("--league", type=str, default="bbl", help="League for ML benchmark")
     args = parser.parse_args()
     
     print("Running benchmarks...")
@@ -192,6 +272,17 @@ def main():
         benchmark_six_ball_vectorized(n_runs=args.runs),
         benchmark_one_over(n_runs=args.runs),
     ]
+    
+    # Optionally include ML model benchmark
+    if args.ml_model:
+        print("\nRunning ML model batch benchmark (may take longer)...")
+        ml_result = benchmark_ml_model_batch(
+            n_runs=min(args.runs, 5),  # Limit runs for slower ML benchmark
+            model_dir=args.model_dir,
+            feature_store_dir=args.feature_store_dir,
+            league=args.league,
+        )
+        results.append(ml_result)
     
     if args.json:
         print(json.dumps(results, indent=2))

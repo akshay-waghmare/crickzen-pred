@@ -696,3 +696,417 @@ class Predictor:
                 target_runs=state.target_runs
             )
             return resource_features['resource_win_prob']
+
+    def predict_batch(self, states: list, league: str = None) -> np.ndarray:
+        """
+        Predict win probabilities for multiple MatchState objects in a single batch.
+        
+        This is optimized for Monte Carlo terminal state evaluation where we need
+        to evaluate thousands of states efficiently. Uses fully vectorized feature
+        generation and model prediction.
+        
+        Supports both inference.schema.MatchState (with over/ball/current_score) and
+        simulation.state.MatchState (with balls_remaining/score).
+        
+        Args:
+            states: List of MatchState objects to evaluate
+            league: Optional league code for league-specific calibration
+            
+        Returns:
+            np.ndarray of win probabilities (one per state)
+            
+        Performance:
+            ~50-100ms for 2000 states (fully vectorized)
+        """
+        if not states:
+            return np.array([])
+        
+        n = len(states)
+        probs = np.zeros(n)
+        
+        # Extract state info into numpy arrays for vectorized processing
+        scores = np.zeros(n, dtype=np.float64)
+        wickets = np.zeros(n, dtype=np.int32)
+        balls_remaining = np.zeros(n, dtype=np.int32)
+        innings_arr = np.zeros(n, dtype=np.int32)
+        targets = np.zeros(n, dtype=np.float64)
+        overs = np.zeros(n, dtype=np.int32)
+        balls = np.zeros(n, dtype=np.int32)
+        
+        for i, state in enumerate(states):
+            innings_arr[i] = state.innings
+            wickets[i] = state.wickets_lost
+            targets[i] = state.target_runs if state.target_runs else 0
+            
+            if hasattr(state, 'current_score'):
+                # Inference MatchState
+                scores[i] = state.current_score
+                overs[i] = state.over
+                balls[i] = state.ball
+                balls_remaining[i] = (20 - state.over) * 6 - state.ball
+            else:
+                # Simulation MatchState
+                scores[i] = state.score
+                balls_remaining[i] = state.balls_remaining
+                balls_bowled = 120 - state.balls_remaining
+                overs[i] = balls_bowled // 6
+                balls[i] = balls_bowled % 6
+                if balls[i] == 0 and overs[i] > 0:
+                    balls[i] = 6
+                    overs[i] -= 1
+                elif balls[i] == 0:
+                    balls[i] = 1
+        
+        # Identify terminal states (vectorized)
+        is_inn2 = innings_arr == 2
+        runs_needed = targets - scores
+        
+        # Terminal conditions for innings 2
+        already_won = is_inn2 & (runs_needed <= 0)
+        no_resources = (balls_remaining <= 0) | (wickets >= 10)
+        impossible = is_inn2 & (runs_needed > balls_remaining * 6)
+        
+        probs[already_won] = 1.0
+        probs[is_inn2 & no_resources & (runs_needed > 0)] = 0.0
+        probs[impossible] = 0.0
+        
+        # Terminal conditions for innings 1
+        is_inn1 = innings_arr == 1
+        inn1_terminal = is_inn1 & no_resources
+        
+        # For first innings terminal, use resource calculator (rare case)
+        inn1_terminal_indices = np.where(inn1_terminal)[0]
+        for i in inn1_terminal_indices:
+            resource_features = self.resource_calculator.calculate_all_features(
+                innings=int(innings_arr[i]),
+                over=int(overs[i]),
+                ball=int(balls[i]),
+                current_score=int(scores[i]),
+                wickets_lost=int(wickets[i]),
+                target_runs=int(targets[i]) if targets[i] > 0 else None
+            )
+            probs[i] = resource_features['resource_win_prob']
+        
+        # Non-terminal states mask
+        terminal_mask = already_won | (is_inn2 & no_resources) | impossible | inn1_terminal
+        non_terminal_mask = ~terminal_mask
+        non_terminal_indices = np.where(non_terminal_mask)[0]
+        
+        if len(non_terminal_indices) == 0:
+            return probs
+        
+        # =========================================================================
+        # VECTORIZED FEATURE GENERATION
+        # =========================================================================
+        # Extract arrays for non-terminal states only
+        nt_scores = scores[non_terminal_mask]
+        nt_wickets = wickets[non_terminal_mask]
+        nt_balls_remaining = balls_remaining[non_terminal_mask]
+        nt_innings = innings_arr[non_terminal_mask]
+        nt_targets = targets[non_terminal_mask]
+        nt_overs = overs[non_terminal_mask]
+        nt_balls = balls[non_terminal_mask]
+        
+        num_states = len(nt_scores)
+        
+        # Basic derived features (vectorized)
+        overs_bowled = nt_overs + (nt_balls / 6.0)
+        overs_remaining = 20 - overs_bowled
+        wickets_remaining = 10 - nt_wickets
+        
+        # Run rates (vectorized)
+        current_run_rate = np.where(overs_bowled > 0, nt_scores / overs_bowled, 0.0)
+        runs_required = np.where(nt_innings == 2, nt_targets - nt_scores, 0.0)
+        required_run_rate = np.where(
+            (nt_innings == 2) & (overs_remaining > 0),
+            runs_required / overs_remaining,
+            0.0
+        )
+        run_rate_diff = current_run_rate - required_run_rate
+        
+        # Phase detection (vectorized)
+        current_over_1based = nt_overs + 1
+        is_powerplay = (current_over_1based <= 6).astype(float)
+        is_middle_overs = ((current_over_1based > 6) & (current_over_1based <= 15)).astype(float)
+        is_death_overs = (current_over_1based > 15).astype(float)
+        
+        # Resource percentage (vectorized approximation using DLS formula)
+        # Simplified: resource_pct ≈ (overs_remaining/20) * (1 - 0.08*wickets)
+        resource_pct = np.clip(
+            (overs_remaining / 20.0) * 100.0 * (1 - 0.08 * nt_wickets),
+            0.0, 100.0
+        )
+        
+        # Expected final score projection (first innings style)
+        projected_multiplier = np.where(overs_bowled > 0, 20.0 / overs_bowled, 1.0)
+        expected_final_score = nt_scores * np.clip(projected_multiplier, 1.0, 5.0)
+        projected_score = expected_final_score  # alias
+        
+        # Venue stats (use defaults for speed - actual lookups are expensive)
+        venue_avg_score = 165.0
+        venue_avg_wickets = 6.5
+        venue_bat_first_win_rate = 0.45
+        
+        # Score vs par (vectorized)
+        resources_used = 100 - resource_pct
+        par_at_point_inn2 = np.where(nt_targets > 0, nt_targets * (resources_used / 100.0), 0.0)
+        score_vs_par_inn2 = nt_scores - par_at_point_inn2
+        score_vs_par_inn1 = nt_scores - (venue_avg_score * (1 - resource_pct/100.0))
+        score_vs_par = np.where(nt_innings == 2, score_vs_par_inn2, score_vs_par_inn1)
+        
+        projected_vs_venue_avg = projected_score - venue_avg_score
+        score_per_wicket = nt_scores / (nt_wickets + 1)
+        wickets_times_balls = nt_wickets * (120 - nt_balls_remaining)
+        rrr_times_wickets = required_run_rate * nt_wickets
+        
+        chase_difficulty = np.where(
+            (nt_innings == 2) & (current_run_rate > 0.1),
+            required_run_rate / (current_run_rate + 0.1),
+            0.0
+        )
+        
+        # Pressure index (simplified DLS-style)
+        pressure_index = np.where(
+            nt_innings == 2,
+            np.clip((required_run_rate - 8.0) / 4.0 + (nt_wickets / 10.0), -1.0, 2.0),
+            np.clip((nt_wickets - 3) / 7.0, -0.5, 1.0)
+        )
+        dls_pressure_index = pressure_index  # alias
+        
+        # Resource win prob (simplified, vectorized)
+        # For 2nd innings: based on RRR
+        rrr_factor = np.clip(1.0 - (required_run_rate - 8.0) / 10.0, 0.0, 1.0)
+        wicket_factor = 1.0 - 0.08 * nt_wickets
+        resource_win_prob_inn2 = np.clip(rrr_factor * wicket_factor, 0.001, 0.999)
+        
+        # For 1st innings: based on expected score
+        score_factor = 1.0 / (1.0 + np.exp(-0.04 * (expected_final_score - 165)))
+        resource_win_prob_inn1 = np.clip(score_factor * wicket_factor, 0.001, 0.999)
+        
+        resource_win_prob = np.where(nt_innings == 2, resource_win_prob_inn2, resource_win_prob_inn1)
+        
+        # Team/player stats - use reasonable defaults for Monte Carlo speed
+        # (actual player lookups are expensive and don't change between simulations)
+        batting_team_win_rate = 0.50
+        bowling_team_win_rate = 0.50
+        team_strength_diff = 0.0
+        batting_team_situation_wr = 0.50
+        bowling_team_situation_wr = 0.50
+        situation_advantage = 0.0
+        
+        # Player rolling stats (defaults)
+        batsman_rolling_avg = 25.0
+        batsman_rolling_sr = 130.0
+        bowler_rolling_econ = 8.0
+        bowler_rolling_sr = 20.0
+        
+        # Player venue/vs-team stats (defaults)
+        batsman_venue_avg = 38.0
+        batsman_venue_sr = 61.0
+        batsman_vs_team_avg = 31.5
+        bowler_venue_econ = 4.2
+        bowler_venue_sr = 516.0
+        bowler_vs_team_econ = 5.7
+        batting_pair_strength = 50.0
+        
+        # Recent form (defaults for Monte Carlo)
+        runs_last_12 = 12.0
+        runs_last_18 = 18.0
+        wickets_last_12 = 0.5
+        boundary_pct_last_18 = 0.15
+        wickets_last_30 = 1.0
+        acceleration_potential = 15.0
+        crr_times_res = current_run_rate * resource_pct / 100.0
+        resources_remaining = resource_pct / 100.0
+        
+        # Build feature DataFrame (vectorized)
+        feature_dict = {
+            'expected_final_score': expected_final_score,
+            'resource_win_prob': resource_win_prob,
+            'score_vs_par': score_vs_par,
+            'dls_pressure_index': dls_pressure_index,
+            'projected_vs_venue_avg': projected_vs_venue_avg,
+            'projected_score': projected_score,
+            'is_powerplay': is_powerplay,
+            'score_per_wicket': score_per_wicket,
+            'run_rate_diff': run_rate_diff,
+            'required_run_rate': required_run_rate,
+            'chase_difficulty': chase_difficulty,
+            'wickets_times_balls': wickets_times_balls,
+            'pressure_index': pressure_index,
+            'team_strength_diff': np.full(num_states, team_strength_diff),
+            'rrr_times_wickets': rrr_times_wickets,
+            'overs_remaining': overs_remaining,
+            'batting_team_win_rate': np.full(num_states, batting_team_win_rate),
+            'bowling_team_win_rate': np.full(num_states, bowling_team_win_rate),
+            'batting_team_situation_wr': np.full(num_states, batting_team_situation_wr),
+            'situation_advantage': np.full(num_states, situation_advantage),
+            'boundary_pct_last_18': np.full(num_states, boundary_pct_last_18),
+            'bowling_team_situation_wr': np.full(num_states, bowling_team_situation_wr),
+            'runs_last_12': np.full(num_states, runs_last_12),
+            'runs_last_18': np.full(num_states, runs_last_18),
+            'wickets_last_12': np.full(num_states, wickets_last_12),
+            'batsman_venue_avg': np.full(num_states, batsman_venue_avg),
+            'batsman_venue_sr': np.full(num_states, batsman_venue_sr),
+            'batsman_vs_team_avg': np.full(num_states, batsman_vs_team_avg),
+            'bowler_venue_econ': np.full(num_states, bowler_venue_econ),
+            'bowler_venue_sr': np.full(num_states, bowler_venue_sr),
+            'bowler_vs_team_econ': np.full(num_states, bowler_vs_team_econ),
+            'batting_pair_strength': np.full(num_states, batting_pair_strength),
+            'acceleration_potential': np.full(num_states, acceleration_potential),
+            'wickets_last_30': np.full(num_states, wickets_last_30),
+            'crr_times_res': crr_times_res,
+            'resources_remaining': resources_remaining,
+            'innings': nt_innings.astype(float),
+            'over': nt_overs.astype(float),
+            'ball': nt_balls.astype(float),
+            'current_score': nt_scores,
+            'wickets_lost': nt_wickets.astype(float),
+            'batsman_rolling_avg': np.full(num_states, batsman_rolling_avg),
+            'batsman_rolling_sr': np.full(num_states, batsman_rolling_sr),
+            'bowler_rolling_econ': np.full(num_states, bowler_rolling_econ),
+            'bowler_rolling_sr': np.full(num_states, bowler_rolling_sr),
+            'venue_avg_score': np.full(num_states, venue_avg_score),
+            'venue_avg_wickets': np.full(num_states, venue_avg_wickets),
+            'venue_bat_first_win_rate': np.full(num_states, venue_bat_first_win_rate),
+            'balls_remaining': nt_balls_remaining.astype(float),
+            'wickets_remaining': wickets_remaining.astype(float),
+            'resource_pct': resource_pct,
+            'current_run_rate': current_run_rate,
+            'runs_required': runs_required,
+            'is_middle_overs': is_middle_overs,
+            'is_death_overs': is_death_overs,
+        }
+        
+        X = pd.DataFrame(feature_dict)
+        
+        # Get expected features from model
+        expected_features = None
+        if hasattr(self.model, 'feature_names_in_'):
+            expected_features = list(self.model.feature_names_in_)
+        elif hasattr(self.model, 'selected_features_'):
+            expected_features = self.model.selected_features_
+        elif hasattr(self.model, 'get_booster'):
+            try:
+                expected_features = self.model.get_booster().feature_names
+            except:
+                pass
+        
+        # Align features
+        if expected_features:
+            for feat in expected_features:
+                if feat not in X.columns:
+                    if 'rate' in feat.lower() or 'avg' in feat.lower():
+                        X[feat] = 0.0
+                    elif 'is_' in feat:
+                        X[feat] = 0
+                    elif 'pct' in feat or 'prob' in feat:
+                        X[feat] = 0.5
+                    else:
+                        X[feat] = 0.0
+            X = X[expected_features]
+        
+        # =========================================================================
+        # BATCH MODEL PREDICTION
+        # =========================================================================
+        raw_probs = self.model.predict_proba(X)[:, 1]
+        
+        # =========================================================================
+        # VECTORIZED CALIBRATION
+        # =========================================================================
+        calibrated_probs = self._apply_calibration_batch(
+            raw_probs, nt_innings, nt_overs, league
+        )
+        
+        # Assign results
+        probs[non_terminal_mask] = calibrated_probs
+        
+        return probs
+    
+    def _apply_calibration_batch(
+        self, 
+        raw_probs: np.ndarray, 
+        innings_arr: np.ndarray, 
+        overs_arr: np.ndarray,
+        league: str = None
+    ) -> np.ndarray:
+        """
+        Apply calibration to batch of predictions (vectorized where possible).
+        
+        Args:
+            raw_probs: Raw model probabilities
+            innings_arr: Innings for each prediction
+            overs_arr: Over number for each prediction (0-indexed)
+            league: Optional league for league-specific calibration
+            
+        Returns:
+            Calibrated probabilities
+        """
+        n = len(raw_probs)
+        calibrated = raw_probs.copy()
+        
+        # Determine phase for each prediction
+        current_over_1based = overs_arr + 1
+        
+        # Group by calibrator key for efficient batch processing
+        if self.per_over_calibrators:
+            # Per-over calibration (most granular)
+            for over in range(1, 21):
+                for inn in [1, 2]:
+                    key = f'inn{inn}_over{over}'
+                    if key in self.per_over_calibrators:
+                        mask = (innings_arr == inn) & (current_over_1based == over)
+                        if np.any(mask):
+                            calibrator = self.per_over_calibrators[key]
+                            calibrated[mask] = calibrator.predict(raw_probs[mask])
+        elif self.phase_calibrators:
+            # Phase calibration
+            for inn in [1, 2]:
+                for phase, over_range in [('powerplay', (1, 6)), ('middle', (7, 15)), ('death', (16, 20))]:
+                    key = f'inn{inn}_{phase}'
+                    if key in self.phase_calibrators:
+                        mask = (innings_arr == inn) & (current_over_1based >= over_range[0]) & (current_over_1based <= over_range[1])
+                        if np.any(mask):
+                            calibrator = self.phase_calibrators[key]
+                            calibrated[mask] = calibrator.predict(raw_probs[mask])
+        elif self.calibrator_inn1 is not None or self.calibrator_inn2 is not None:
+            # Innings-specific calibration
+            if self.calibrator_inn1 is not None:
+                mask = innings_arr == 1
+                if np.any(mask):
+                    calibrated[mask] = self.calibrator_inn1.predict(raw_probs[mask])
+            if self.calibrator_inn2 is not None:
+                mask = innings_arr == 2
+                if np.any(mask):
+                    calibrated[mask] = self.calibrator_inn2.predict(raw_probs[mask])
+        elif self.calibrator is not None:
+            # Single calibrator
+            calibrated = self.calibrator.predict(raw_probs)
+        
+        # Apply league calibration if available
+        if self.league_calibrator:
+            method = self.league_calibrator.get('method', 'temperature')
+            calibrators = self.league_calibrator.get('calibrators', {})
+            
+            for inn in [1, 2]:
+                mask = innings_arr == inn
+                if not np.any(mask):
+                    continue
+                    
+                innings_key = f'innings_{inn}'
+                
+                if calibrators and innings_key in calibrators:
+                    scaler = calibrators[innings_key]
+                    if hasattr(scaler, 'predict'):
+                        calibrated[mask] = scaler.predict(calibrated[mask].reshape(-1, 1)).flatten()
+                elif method == 'temperature':
+                    T = self.league_calibrator.get(f'T{inn}', 1.0)
+                    if T and T != 1.0:
+                        # Vectorized temperature scaling
+                        p = calibrated[mask]
+                        # Avoid log(0) and log(inf)
+                        p = np.clip(p, 0.001, 0.999)
+                        logit = np.log(p / (1 - p))
+                        calibrated[mask] = 1.0 / (1.0 + np.exp(-logit / T))
+        
+        return calibrated

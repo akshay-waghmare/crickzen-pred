@@ -100,12 +100,14 @@ class CrexLivePredictor:
     
     def __init__(self, match_url: str, model_dir: str, headless: bool = True,
                  feature_store_dir: str = None, output_json: str = None,
-                 live_match_json: str = None, venue: str = None, league: str = None):
+                 live_match_json: str = None, venue: str = None, league: str = None,
+                 use_ml_model: bool = False):
         self.match_url = match_url
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
         self.league = league  # League code for league-specific calibration
+        self.use_ml_model = use_ml_model  # Use ML model for Monte Carlo terminal evaluation
         self.output_json = output_json  # Path for JSON output (for Streamlit)
         self.venue_override = venue
         # Optional richer debug output (defaults to sibling livematch.json if output_json is set)
@@ -189,9 +191,17 @@ class CrexLivePredictor:
         except Exception as e:
             logger.warning(f"Could not save history: {e}")
     
-    def _run_monte_carlo_simulation(self) -> Optional[Dict[str, Any]]:
+    def _run_monte_carlo_simulation(self, model_prob: Optional[float] = None, use_ml_model: bool = False) -> Optional[Dict[str, Any]]:
         """
         Run Monte Carlo simulation for uncertainty quantification.
+        
+        Args:
+            model_prob: League-calibrated model probability from predictor.predict().
+                       If provided, this is used for edge calculation in betting decisions
+                       (more accurate than simulation mean which uses resource_win_prob).
+            use_ml_model: If True, use ML model for terminal state evaluation (slower but
+                         more accurate ~400-800ms). If False, use resource_win_prob heuristic
+                         (faster ~60ms but less accurate).
         
         Returns dict with simulation results or None if unavailable.
         """
@@ -231,13 +241,17 @@ class CrexLivePredictor:
                 venue=state.venue,
             )
             
+            # Choose predictor for ML model mode
+            predictor = self.predictor if use_ml_model else None
+            
             # Run 1-ball simulation (fast)
-            result_1ball = simulate(sim_state, horizon=1, n_simulations=1000)
+            result_1ball = simulate(sim_state, horizon=1, n_simulations=1000, predictor=predictor)
             
             # Run 6-ball (1 over) simulation
-            result_6ball = simulate_one_over(sim_state, n_simulations=2000)
+            result_6ball = simulate_one_over(sim_state, n_simulations=2000, predictor=predictor)
             
             # Evaluate betting decision if market odds available
+            # Uses league-calibrated model_prob for edge calculation (more accurate than simulation mean)
             betting_decision = None
             if state.market_back_odds:
                 try:
@@ -247,6 +261,7 @@ class CrexLivePredictor:
                             simulation_result=result_6ball,
                             market_odds=odds,
                             balls_remaining=balls_remaining,
+                            model_prob=model_prob,  # League-calibrated probability for edge
                         )
                         betting_decision = {
                             "decision": decision.decision.value,
@@ -255,6 +270,8 @@ class CrexLivePredictor:
                             "confidence": decision.confidence,
                             "phase": decision.phase,
                             "rationale": decision.rationale,
+                            "model_prob": decision.model_prob,  # Include in output
+                            "simulation_mean": result_6ball.mean_prob,  # Also include simulation mean for comparison
                         }
                 except (ValueError, TypeError):
                     pass
@@ -263,6 +280,7 @@ class CrexLivePredictor:
                 "available": True,
                 "league": league,
                 "balls_remaining": balls_remaining,
+                "use_ml_model": use_ml_model,  # Indicates whether ML model was used for terminal evaluation
                 "simulation_1ball": {
                     "mean_prob": result_1ball.mean_prob,
                     "std_prob": result_1ball.std_prob,
@@ -1362,8 +1380,8 @@ class CrexLivePredictor:
                 "market_back_odds": state.market_back_odds,
                 "market_lay_odds": state.market_lay_odds,
                 "market_fav_prob": state.market_fav_prob,
-                # Monte Carlo simulation results
-                "monte_carlo": self._run_monte_carlo_simulation()
+                # Monte Carlo simulation results (uses league-calibrated win_prob for betting edge)
+                "monte_carlo": self._run_monte_carlo_simulation(model_prob=win_prob, use_ml_model=self.use_ml_model)
             }
             
             # Write atomically
@@ -1465,6 +1483,12 @@ async def main():
         default=None,
         help="League code for league-specific calibration (e.g., 'ssm', 'bbl', 'sa20')",
     )
+    parser.add_argument(
+        "--use-ml-model",
+        action="store_true",
+        default=False,
+        help="Use ML model for Monte Carlo terminal state evaluation (more accurate, ~50ms for 2000 sims)",
+    )
     
     args = parser.parse_args()
     
@@ -1477,6 +1501,7 @@ async def main():
         live_match_json=args.live_match_json,
         venue=args.venue,
         league=args.league,
+        use_ml_model=args.use_ml_model,
     )
     
     await predictor.run(poll_interval=args.poll_interval)
