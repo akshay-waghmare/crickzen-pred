@@ -74,7 +74,8 @@
 - [X] T018 [US2] Extend `simulate()` to support `horizon_balls` parameter in `src/bbl_pipeline/simulation/engine.py`
 - [X] T019 [US2] Implement vectorized simulation across N simulations in `src/bbl_pipeline/simulation/engine.py` using NumPy
 - [X] T020 [US2] Vectorize state updates (score/wickets/balls arrays) in `src/bbl_pipeline/simulation/engine.py`
-- [ ] T021 [US2] Batch terminal state evaluation (call evaluator once with 2000 states) in `src/bbl_pipeline/simulation/engine.py`
+- [X] T021 [US2] Batch terminal state evaluation (call evaluator once with 2000 states) in `src/bbl_pipeline/simulation/engine.py`
+  - **COMPLETED**: Superseded by T055-T061 which implemented `evaluate_batch_with_model()` for full batch ML evaluation
 - [X] T022 [US2] Calculate percentiles (p5, p95) in SimulationResult in `src/bbl_pipeline/simulation/engine.py`
 - [X] T023 [P] [US2] Create unit test for 6-ball simulation in `tests/test_simulation.py`
 - [X] T024 [US2] Verify 6-ball simulation completes in <500ms (optimized) in `scripts/benchmark_simulation.py` (~60ms actual)
@@ -130,11 +131,16 @@
 - [X] T032 [US4] Create BettingThresholds dataclass in `src/bbl_pipeline/simulation/betting.py` with EDGE_MIN_BY_PHASE, SIGMA_MAX_BY_PHASE
 - [X] T033 [US4] Create BettingDecision dataclass in `src/bbl_pipeline/simulation/betting.py` with action, edge, reasons
 - [X] T034 [US4] Implement `evaluate_bet()` function in `src/bbl_pipeline/simulation/betting.py` with decision logic
-- [ ] T035 [US4] Implement 1-ball/6-ball agreement check in `src/bbl_pipeline/simulation/betting.py`
+- [X] T035 [US4] Implement 1-ball/6-ball agreement check in `src/bbl_pipeline/simulation/betting.py`
+  - Added `check_simulation_agreement()` function for detecting disagreement
+  - Added `evaluate_bet_with_agreement()` for integrated betting decisions
+  - Added `AgreementResult` dataclass for structured output
 - [X] T036 [US4] Add configurable threshold overrides to `evaluate_bet()` in `src/bbl_pipeline/simulation/betting.py`
 - [X] T037 [P] [US4] Create unit test for betting decision logic in `tests/test_simulation.py`
 - [X] T038 [US4] Test phase-aware thresholds (inn2_death=15%, inn1_middle=30%) in `tests/test_simulation.py`
-- [ ] T039 [US4] Test 1-ball/6-ball disagreement detection in `tests/test_simulation.py`
+- [X] T039 [US4] Test 1-ball/6-ball disagreement detection in `tests/test_simulation.py`
+  - Added `TestSimulationAgreement` test class with 5 test cases
+  - Tests: agreement, mean disagreement, volatility disagreement, normal betting, downgrade, Kelly reduction
 - [X] T052 [US4] Add `model_prob` parameter to `evaluate_bet()` in `src/bbl_pipeline/simulation/betting.py` to use league-calibrated probability for edge calculation (instead of simulation mean)
 - [X] T053 [US4] Update `crex_live_predictor.py` to pass league-calibrated model probability to `evaluate_bet()`
 - [X] T054 [P] [US4] Create unit test for `evaluate_bet()` with explicit `model_prob` override in `tests/test_simulation.py`
@@ -151,12 +157,25 @@
 
 ### Implementation for User Story 5
 
-- [ ] T040 [US5] Create script to extract run distributions from ball-by-ball parquet files in `scripts/analysis/extract_phase_distributions.py`
-- [ ] T041 [US5] Generate league-specific phase tables (BBL, SA20, etc.) in `scripts/analysis/extract_phase_distributions.py`
-- [ ] T042 [US5] Implement league-specific distribution loading in `src/bbl_pipeline/simulation/sampler.py`
-- [ ] T043 [US5] Add wicket multiplier by wickets down (lower-order effect) in `src/bbl_pipeline/simulation/sampler.py`
-- [ ] T044 [P] [US5] Create validation script comparing simulated vs actual distributions in `scripts/validation/validate_phase_distributions.py`
-- [ ] T045 [US5] Test that simulated death over boundary rate matches historical ±10% in validation script
+- [X] T040 [US5] Create script to extract run distributions from ball-by-ball parquet files in `scripts/analysis/extract_phase_distributions.py`
+  - Supports JSON and Python output formats
+  - Extracts run distributions, wicket probabilities, boundary rates
+- [X] T041 [US5] Generate league-specific phase tables (BBL, SA20, etc.) in `scripts/analysis/extract_phase_distributions.py`
+  - Uses `--league` flag for league-specific extraction
+  - Generates config files compatible with sampler.py
+- [X] T042 [US5] Implement league-specific distribution loading in `src/bbl_pipeline/simulation/sampler.py`
+  - Added `load_league_distributions()` function
+  - Sampler accepts `league` parameter for league-specific sampling
+  - Falls back to global distributions if league data not available
+- [X] T043 [US5] Add wicket multiplier by wickets down (lower-order effect) in `src/bbl_pipeline/simulation/sampler.py`
+  - Already implemented via WICKET_MULTIPLIER config
+  - Now uses league-specific wicket probabilities when available
+- [X] T044 [P] [US5] Create validation script comparing simulated vs actual distributions in `scripts/validation/validate_phase_distributions.py`
+  - Validates run distributions, boundary rates, wicket rates by phase
+  - Generates summary report with PASS/FAIL for each metric
+- [X] T045 [US5] Test that simulated death over boundary rate matches historical ±10% in validation script
+  - T045 validation function implemented and tested
+  - Death boundary rate: 17.35% simulated vs 17.36% historical (0.0% diff) ✓
 
 **Checkpoint**: User Story 5 complete - data-driven distributions validated
 
@@ -170,7 +189,12 @@
 - [X] T047 [P] Add type hints and docstrings to all public functions
 - [X] T048 [P] Update `src/bbl_pipeline/__init__.py` to expose simulation module
 - [X] T049 [P] Add performance benchmark script in `scripts/benchmark_simulation.py`
-- [ ] T050 Run quickstart.md validation - verify all examples work
+- [X] T050 Run quickstart.md validation - verify all examples work
+  - Updated all API parameters: `horizon_balls` → `horizon`, `n_sims` → `n_simulations`
+  - Updated `evaluate_bet()` to use `simulation_result`, `balls_remaining` instead of `innings`, `phase`
+  - Added new examples for `check_simulation_agreement()` and `evaluate_bet_with_agreement()`
+  - Added ML model batch evaluation example (Section 6)
+  - Updated BettingThresholds to use flat threshold parameters
 - [X] T051 [P] Add structured logging for simulation stats (n_sims, time_taken_ms)
 
 ---

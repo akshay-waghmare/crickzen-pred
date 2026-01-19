@@ -53,11 +53,14 @@ from .betting import (
     BetDecision,
     BettingThresholds,
     BettingDecision,
+    AgreementResult,
     evaluate_bet,
     calculate_kelly_stake,
     calculate_edge,
     odds_to_implied_prob,
     implied_prob_to_odds,
+    check_simulation_agreement,
+    evaluate_bet_with_agreement,
 )
 
 __all__ = [
@@ -90,9 +93,12 @@ __all__ = [
     "BetDecision",
     "BettingThresholds",
     "BettingDecision",
+    "AgreementResult",
     "evaluate_bet",
     "calculate_kelly_stake",
     "calculate_edge",
     "odds_to_implied_prob",
     "implied_prob_to_odds",
+    "check_simulation_agreement",
+    "evaluate_bet_with_agreement",
 ]

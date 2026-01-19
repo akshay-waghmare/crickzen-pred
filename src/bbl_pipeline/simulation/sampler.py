@@ -3,10 +3,13 @@ NextBallSampler for Monte Carlo Simulation Engine.
 
 Samples ball outcomes (runs, wickets) based on phase and pressure.
 Uses pre-computed CDFs for efficient numpy-based sampling.
+Supports league-specific distributions when available.
 """
 
 import numpy as np
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict
+from pathlib import Path
+import json
 
 from .config import (
     RUN_DIST,
@@ -17,6 +20,59 @@ from .config import (
 )
 from .state import MatchState
 
+# Cache for league-specific distributions
+_LEAGUE_DIST_CACHE: Dict[str, Dict] = {}
+
+
+def _build_cdf_from_dist(dist: Dict[int, float]) -> Tuple[np.ndarray, np.ndarray]:
+    """Build CDF arrays for np.searchsorted() sampling from a distribution."""
+    runs = np.array(sorted(dist.keys()))
+    probs = np.array([dist[r] for r in runs])
+    cdf = np.cumsum(probs)
+    return runs, cdf
+
+
+def load_league_distributions(league: str, data_dir: str = "data") -> Optional[Dict]:
+    """
+    Load league-specific phase distributions from JSON file.
+    
+    Args:
+        league: League code (e.g., 'bbl', 'sa20')
+        data_dir: Directory containing distribution files
+        
+    Returns:
+        Dictionary with run_dist, wicket_prob, etc. or None if not found
+    """
+    cache_key = f"{data_dir}/{league}"
+    
+    if cache_key in _LEAGUE_DIST_CACHE:
+        return _LEAGUE_DIST_CACHE[cache_key]
+    
+    dist_path = Path(data_dir) / f"phase_distributions_{league}.json"
+    
+    if not dist_path.exists():
+        _LEAGUE_DIST_CACHE[cache_key] = None
+        return None
+    
+    try:
+        with open(dist_path) as f:
+            data = json.load(f)
+        
+        # Build CDFs for run distributions
+        run_cdfs = {}
+        for phase, dist in data.get('run_dist', {}).items():
+            # Convert string keys to int
+            dist_int = {int(k): v for k, v in dist.items()}
+            run_cdfs[phase] = _build_cdf_from_dist(dist_int)
+        
+        data['run_cdf'] = run_cdfs
+        _LEAGUE_DIST_CACHE[cache_key] = data
+        return data
+    
+    except Exception:
+        _LEAGUE_DIST_CACHE[cache_key] = None
+        return None
+
 
 class NextBallSampler:
     """
@@ -25,27 +81,49 @@ class NextBallSampler:
     Uses phase-based run distributions and wicket probabilities derived
     from 1.89M global T20 balls (research.md).
     
+    Supports league-specific distributions when available:
+        sampler = NextBallSampler(seed=42, league="bbl")
+    
     Example:
         sampler = NextBallSampler(seed=42)
         runs, is_wicket = sampler.sample(state)
     """
     
-    def __init__(self, seed: Optional[int] = None):
+    def __init__(self, seed: Optional[int] = None, league: Optional[str] = None):
         """
-        Initialize sampler with optional random seed.
+        Initialize sampler with optional random seed and league.
         
         Args:
             seed: Random seed for reproducibility
+            league: Optional league code for league-specific distributions
         """
         self.rng = np.random.default_rng(seed)
+        self.league = league
+        
+        # Try to load league-specific distributions
+        self._league_data = None
+        if league:
+            self._league_data = load_league_distributions(league)
         
         # Pre-compute CDF arrays for each phase
-        self._run_values = {
-            phase: cdf[0] for phase, cdf in RUN_CDF.items()
-        }
-        self._run_cdfs = {
-            phase: cdf[1] for phase, cdf in RUN_CDF.items()
-        }
+        if self._league_data and 'run_cdf' in self._league_data:
+            # Use league-specific CDFs
+            self._run_values = {
+                phase: cdf[0] for phase, cdf in self._league_data['run_cdf'].items()
+            }
+            self._run_cdfs = {
+                phase: cdf[1] for phase, cdf in self._league_data['run_cdf'].items()
+            }
+            self._wicket_prob = self._league_data.get('wicket_prob', WICKET_PROB)
+        else:
+            # Use global distributions
+            self._run_values = {
+                phase: cdf[0] for phase, cdf in RUN_CDF.items()
+            }
+            self._run_cdfs = {
+                phase: cdf[1] for phase, cdf in RUN_CDF.items()
+            }
+            self._wicket_prob = WICKET_PROB
     
     def sample(self, state: MatchState) -> Tuple[int, bool]:
         """
@@ -78,7 +156,7 @@ class NextBallSampler:
     
     def _sample_wicket(self, phase: str, wickets_lost: int) -> bool:
         """Sample wicket with lower-order multiplier."""
-        base_prob = WICKET_PROB[phase]
+        base_prob = self._wicket_prob.get(phase, WICKET_PROB[phase])
         multiplier = WICKET_MULTIPLIER.get(wickets_lost, 1.5)
         effective_prob = min(base_prob * multiplier, 0.25)  # Cap at 25%
         return self.rng.random() < effective_prob
@@ -123,7 +201,7 @@ class NextBallSampler:
             runs[mask] = run_values[phase_idx]
             
             # Sample wickets for this phase
-            base_prob = WICKET_PROB[phase]
+            base_prob = self._wicket_prob.get(phase, WICKET_PROB[phase])
             phase_wickets = wickets[mask]
             multipliers = np.array([WICKET_MULTIPLIER.get(w, 1.5) for w in phase_wickets])
             effective_probs = np.minimum(base_prob * multipliers, 0.25)
@@ -160,7 +238,7 @@ class NextBallSampler:
         runs = run_values[idx]
         
         # Sample wickets
-        base_prob = WICKET_PROB[phase]
+        base_prob = self._wicket_prob.get(phase, WICKET_PROB[phase])
         multiplier = WICKET_MULTIPLIER.get(wickets, 1.5)
         effective_prob = min(base_prob * multiplier, 0.25)
         u_wickets = self.rng.random(n_sims)
@@ -170,11 +248,17 @@ class NextBallSampler:
     
     def get_expected_runs(self, phase: str) -> float:
         """Get expected runs per ball for a phase."""
-        dist = RUN_DIST[phase]
+        # Use league-specific distribution if available
+        if self._league_data and 'run_dist' in self._league_data:
+            dist = self._league_data['run_dist'].get(phase, RUN_DIST[phase])
+            # Convert string keys to int
+            dist = {int(k): v for k, v in dist.items()}
+        else:
+            dist = RUN_DIST[phase]
         return sum(runs * prob for runs, prob in dist.items())
     
     def get_wicket_prob(self, phase: str, wickets_lost: int) -> float:
         """Get effective wicket probability for state."""
-        base_prob = WICKET_PROB[phase]
+        base_prob = self._wicket_prob.get(phase, WICKET_PROB[phase])
         multiplier = WICKET_MULTIPLIER.get(wickets_lost, 1.5)
         return min(base_prob * multiplier, 0.25)

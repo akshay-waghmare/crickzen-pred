@@ -31,7 +31,7 @@ state = MatchState(
 )
 
 # Simulate 1 ball forward, 2000 times
-result = simulate(state, horizon_balls=1, n_sims=2000, league="bbl")
+result = simulate(state, horizon=1, n_simulations=2000)
 
 print(f"1-ball lookahead: {result.mean_prob:.3f} ± {result.std_prob:.3f}")
 print(f"90% CI: [{result.p5:.3f}, {result.p95:.3f}]")
@@ -40,9 +40,9 @@ print(f"Time: {result.time_taken_ms:.1f}ms")
 
 **Expected Output**:
 ```
-1-ball lookahead: 0.623 ± 0.042
-90% CI: [0.558, 0.689]
-Time: 85.3ms
+1-ball lookahead: 0.881 ± 0.021
+90% CI: [0.862, 0.922]
+Time: 117.2ms
 ```
 
 ### 2. Six Ball Simulation (Betting Decisions)
@@ -51,55 +51,60 @@ Time: 85.3ms
 from bbl_pipeline.simulation import simulate, evaluate_bet
 
 # Same state as above
-result_6 = simulate(state, horizon_balls=6, n_sims=2000, league="bbl")
+result_6 = simulate(state, horizon=6, n_simulations=2000)
 
 print(f"6-ball lookahead: {result_6.mean_prob:.3f} ± {result_6.std_prob:.3f}")
 print(f"90% CI: [{result_6.p5:.3f}, {result_6.p95:.3f}]")
 
 # Evaluate betting decision
 decision = evaluate_bet(
-    sim_result=result_6,
+    simulation_result=result_6,
     market_odds=1.60,  # Market has team at 62.5% implied
-    innings=2,
-    phase="middle"
+    balls_remaining=48,
 )
 
-print(f"\nAction: {decision.action}")
+print(f"\nAction: {decision.decision.value}")
 print(f"Edge: {decision.edge:.1%}")
-print(f"Reasons: {decision.reasons}")
+print(f"Rationale: {decision.rationale}")
 ```
 
 **Expected Output**:
 ```
-6-ball lookahead: 0.618 ± 0.068
-90% CI: [0.512, 0.724]
+6-ball lookahead: 0.868 ± 0.068
+90% CI: [0.756, 0.964]
 
-Action: PASS
-Edge: -0.7%
-Reasons: ['Edge -0.7% below threshold (18% required for inn2 middle)']
+Action: SKIP
+Edge: 24.3%
+Rationale: Uncertainty too high: σ=0.0684 > max 0.05 for middle. Wait for more stable conditions.
 ```
 
 ### 3. With 1-Ball/6-Ball Agreement Check
 
 ```python
-from bbl_pipeline.simulation import simulate, evaluate_bet
+from bbl_pipeline.simulation import simulate, check_simulation_agreement, evaluate_bet_with_agreement
 
 # Run both simulations
-result_1 = simulate(state, horizon_balls=1, n_sims=2000, league="bbl")
-result_6 = simulate(state, horizon_balls=6, n_sims=2000, league="bbl")
+result_1 = simulate(state, horizon=1, n_simulations=1000)
+result_6 = simulate(state, horizon=6, n_simulations=2000)
 
-# Evaluate with agreement check
-decision = evaluate_bet(
-    sim_result=result_6,
+# Check if simulations agree
+agreement = check_simulation_agreement(result_1, result_6)
+print(f"Agreement: {agreement.agree}")
+print(f"Mean diff: {agreement.diff:.2%}")
+print(f"Volatility ratio: {agreement.ratio:.2f}x")
+print(f"Recommendation: {agreement.recommendation}")
+
+# Evaluate with agreement check (auto-downgrades on disagreement)
+decision, agreement = evaluate_bet_with_agreement(
+    result_1ball=result_1,
+    result_6ball=result_6,
     market_odds=1.50,  # Market has team at 66.7% implied
-    innings=2,
-    phase="middle",
-    sim_result_1ball=result_1
+    balls_remaining=48,
+    model_prob=0.85,  # Optional: use league-calibrated model prob for edge
 )
 
 print(f"μ₁ = {result_1.mean_prob:.3f}, μ₆ = {result_6.mean_prob:.3f}")
-print(f"Action: {decision.action}")
-print(f"Reasons: {decision.reasons}")
+print(f"Action: {decision.decision.value}")
 ```
 
 ### 4. Death Overs Example (High Stakes)
@@ -117,19 +122,18 @@ state_death = MatchState(
     bowling_team="MI Cape Town"
 )
 
-result = simulate(state_death, horizon_balls=6, n_sims=2000, league="sa20")
+result = simulate(state_death, horizon=6, n_simulations=2000)
 
 print(f"Death over: {result.mean_prob:.3f} ± {result.std_prob:.3f}")
-print(f"Temperature applied: {result.temperature:.3f}")
+print(f"Temperature applied: {result.temperature}")
 
 # Lower threshold in death overs (15% edge required)
 decision = evaluate_bet(
-    sim_result=result,
+    simulation_result=result,
     market_odds=1.80,  # 55.6% implied
-    innings=2,
-    phase="death"
+    balls_remaining=12,
 )
-print(f"Action: {decision.action}")
+print(f"Action: {decision.decision.value}")
 ```
 
 ### 5. First Innings Example
@@ -147,10 +151,35 @@ state_inn1 = MatchState(
     bowling_team="Brisbane Heat"
 )
 
-result = simulate(state_inn1, horizon_balls=6, n_sims=2000, league="bbl")
+result = simulate(state_inn1, horizon=6, n_simulations=2000)
 
 print(f"Inn1 middle: {result.mean_prob:.3f} ± {result.std_prob:.3f}")
 # Note: Higher edge threshold (30%) for first innings middle
+```
+
+### 6. Using ML Model for Monte Carlo (More Accurate)
+
+```python
+from bbl_pipeline.inference.predictor import Predictor
+from bbl_pipeline.simulation import simulate
+
+# Load predictor with league calibration
+predictor = Predictor.load(
+    "models/t20_male_v2",
+    "data/t20_male_feature_store_v2",
+    league="bbl"
+)
+
+# Simulate with ML model terminal state evaluation
+result = simulate(
+    state, 
+    horizon=6, 
+    n_simulations=2000,
+    predictor=predictor  # Uses ML model instead of resource_win_prob
+)
+
+print(f"ML model result: {result.mean_prob:.3f} ± {result.std_prob:.3f}")
+print(f"Time: {result.time_taken_ms:.1f}ms")  # ~50ms for 2000 sims
 ```
 
 ## Configuration
@@ -162,25 +191,35 @@ from bbl_pipeline.simulation import BettingThresholds, evaluate_bet
 
 # More conservative thresholds
 thresholds = BettingThresholds(
-    EDGE_MIN_BY_PHASE={
-        'inn1': {'powerplay': 0.35, 'middle': 0.35, 'death': 0.30},
-        'inn2': {'powerplay': 0.25, 'middle': 0.20, 'death': 0.18},
-    },
-    SIGMA_MAX_BY_PHASE={
-        'inn1': {'powerplay': 0.08, 'middle': 0.08, 'death': 0.08},
-        'inn2': {'powerplay': 0.08, 'middle': 0.08, 'death': 0.10},
-    }
+    edge_min_powerplay=0.05,
+    edge_min_middle=0.04,
+    edge_min_death=0.07,
+    sigma_max_powerplay=0.08,
+    sigma_max_middle=0.06,
+    sigma_max_death=0.10,
 )
 
-decision = evaluate_bet(result, market_odds=1.60, innings=2, phase="death", thresholds=thresholds)
+decision = evaluate_bet(
+    simulation_result=result,
+    market_odds=1.60,
+    balls_remaining=48,
+    thresholds=thresholds
+)
 ```
 
 ### Reproducibility (Seeded RNG)
 
 ```python
-# Same seed → same results
-result_a = simulate(state, horizon_balls=6, n_sims=2000, league="bbl", seed=42)
-result_b = simulate(state, horizon_balls=6, n_sims=2000, league="bbl", seed=42)
+from bbl_pipeline.simulation import simulate, NextBallSampler
+
+# Create seeded sampler
+sampler = NextBallSampler(seed=42)
+
+# Same seed → same results  
+result_a = simulate(state, horizon=6, n_simulations=2000, sampler=sampler)
+
+sampler_b = NextBallSampler(seed=42)
+result_b = simulate(state, horizon=6, n_simulations=2000, sampler=sampler_b)
 
 assert result_a.mean_prob == result_b.mean_prob  # True
 ```

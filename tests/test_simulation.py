@@ -783,5 +783,226 @@ class TestMLModelBatchEvaluation:
         assert all(0 <= p <= 1 for p in probs)
 
 
+class TestSimulationAgreement:
+    """Tests for 1-ball/6-ball simulation agreement check (T035, T039)."""
+    
+    def test_check_simulation_agreement_agree(self):
+        """Test agreement when simulations are close."""
+        from bbl_pipeline.simulation import check_simulation_agreement
+        
+        result_1ball = SimulationResult(
+            mean_prob=0.55,
+            std_prob=0.03,
+            p5=0.50,
+            p95=0.60,
+            n_sims=1000,
+            horizon_balls=1,
+            time_taken_ms=20.0,
+            league="bbl",
+        )
+        result_6ball = SimulationResult(
+            mean_prob=0.54,  # Very close to 1-ball
+            std_prob=0.04,
+            p5=0.48,
+            p95=0.60,
+            n_sims=2000,
+            horizon_balls=6,
+            time_taken_ms=50.0,
+            league="bbl",
+        )
+        
+        agreement = check_simulation_agreement(result_1ball, result_6ball)
+        
+        assert agreement.agree is True
+        assert agreement.diff < 0.05  # Within threshold
+        assert "agree" in agreement.recommendation.lower()
+    
+    def test_check_simulation_agreement_disagree_mean(self):
+        """Test disagreement when means differ significantly."""
+        from bbl_pipeline.simulation import check_simulation_agreement
+        
+        result_1ball = SimulationResult(
+            mean_prob=0.55,
+            std_prob=0.03,
+            p5=0.50,
+            p95=0.60,
+            n_sims=1000,
+            horizon_balls=1,
+            time_taken_ms=20.0,
+            league="bbl",
+        )
+        result_6ball = SimulationResult(
+            mean_prob=0.42,  # 13% different - significant
+            std_prob=0.04,
+            p5=0.36,
+            p95=0.48,
+            n_sims=2000,
+            horizon_balls=6,
+            time_taken_ms=50.0,
+            league="bbl",
+        )
+        
+        agreement = check_simulation_agreement(result_1ball, result_6ball)
+        
+        assert agreement.agree is False
+        assert agreement.diff > 0.10  # Large difference
+        assert agreement.mean_1ball == 0.55
+        assert agreement.mean_6ball == 0.42
+    
+    def test_check_simulation_agreement_high_volatility(self):
+        """Test disagreement due to high volatility ratio."""
+        from bbl_pipeline.simulation import check_simulation_agreement
+        
+        result_1ball = SimulationResult(
+            mean_prob=0.55,
+            std_prob=0.02,  # Low volatility for 1-ball
+            p5=0.52,
+            p95=0.58,
+            n_sims=1000,
+            horizon_balls=1,
+            time_taken_ms=20.0,
+            league="bbl",
+        )
+        result_6ball = SimulationResult(
+            mean_prob=0.54,  # Close means
+            std_prob=0.08,  # High volatility (4x higher)
+            p5=0.42,
+            p95=0.66,
+            n_sims=2000,
+            horizon_balls=6,
+            time_taken_ms=50.0,
+            league="bbl",
+        )
+        
+        agreement = check_simulation_agreement(result_1ball, result_6ball)
+        
+        assert agreement.agree is False
+        assert agreement.ratio > 2.0  # High volatility
+        assert "volatility" in agreement.recommendation.lower()
+    
+    def test_evaluate_bet_with_agreement_normal(self):
+        """Test betting decision with agreement check - normal case."""
+        from bbl_pipeline.simulation import evaluate_bet_with_agreement
+        
+        result_1ball = SimulationResult(
+            mean_prob=0.65,
+            std_prob=0.03,
+            p5=0.60,
+            p95=0.70,
+            n_sims=1000,
+            horizon_balls=1,
+            time_taken_ms=20.0,
+            league="bbl",
+        )
+        result_6ball = SimulationResult(
+            mean_prob=0.64,
+            std_prob=0.04,
+            p5=0.58,
+            p95=0.70,
+            n_sims=2000,
+            horizon_balls=6,
+            time_taken_ms=50.0,
+            league="bbl",
+        )
+        
+        decision, agreement = evaluate_bet_with_agreement(
+            result_1ball=result_1ball,
+            result_6ball=result_6ball,
+            market_odds=2.0,  # Implied 50%
+            balls_remaining=60,
+            model_prob=0.65,
+        )
+        
+        assert agreement.agree is True
+        assert decision.decision == BetDecision.BET  # Good edge
+        assert decision.edge > 0.10
+    
+    def test_evaluate_bet_with_agreement_downgrade(self):
+        """Test betting decision downgraded when simulations disagree."""
+        from bbl_pipeline.simulation import evaluate_bet_with_agreement
+        
+        result_1ball = SimulationResult(
+            mean_prob=0.70,
+            std_prob=0.03,
+            p5=0.65,
+            p95=0.75,
+            n_sims=1000,
+            horizon_balls=1,
+            time_taken_ms=20.0,
+            league="bbl",
+        )
+        result_6ball = SimulationResult(
+            mean_prob=0.55,  # 15% different - strong disagreement
+            std_prob=0.04,  # Keep sigma low enough to not trigger SKIP for uncertainty
+            p5=0.48,
+            p95=0.62,
+            n_sims=2000,
+            horizon_balls=6,
+            time_taken_ms=50.0,
+            league="bbl",
+        )
+        
+        decision, agreement = evaluate_bet_with_agreement(
+            result_1ball=result_1ball,
+            result_6ball=result_6ball,
+            market_odds=2.0,
+            balls_remaining=60,
+            model_prob=0.65,
+        )
+        
+        assert agreement.agree is False
+        assert agreement.diff > 0.10  # Large disagreement
+        # Decision should be SKIP due to large disagreement (>10%)
+        assert decision.decision == BetDecision.SKIP
+        # Rationale should mention the disagreement
+        assert "⚠️" in decision.rationale or "disagreement" in decision.rationale.lower()
+    
+    def test_evaluate_bet_with_agreement_reduces_kelly(self):
+        """Test Kelly stake reduced when simulations disagree moderately."""
+        from bbl_pipeline.simulation import evaluate_bet_with_agreement
+        
+        result_1ball = SimulationResult(
+            mean_prob=0.65,
+            std_prob=0.03,
+            p5=0.60,
+            p95=0.70,
+            n_sims=1000,
+            horizon_balls=1,
+            time_taken_ms=20.0,
+            league="bbl",
+        )
+        result_6ball = SimulationResult(
+            mean_prob=0.58,  # 7% different - moderate disagreement
+            std_prob=0.04,
+            p5=0.52,
+            p95=0.64,
+            n_sims=2000,
+            horizon_balls=6,
+            time_taken_ms=50.0,
+            league="bbl",
+        )
+        
+        # Get decision without agreement check
+        decision_no_check = evaluate_bet(
+            simulation_result=result_6ball,
+            market_odds=2.0,
+            balls_remaining=60,
+            model_prob=0.65,
+        )
+        
+        # Get decision with agreement check
+        decision_with_check, agreement = evaluate_bet_with_agreement(
+            result_1ball=result_1ball,
+            result_6ball=result_6ball,
+            market_odds=2.0,
+            balls_remaining=60,
+            model_prob=0.65,
+        )
+        
+        assert agreement.agree is False  # Moderate disagreement
+        # Kelly stake should be reduced
+        assert decision_with_check.kelly_stake < decision_no_check.kelly_stake
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
