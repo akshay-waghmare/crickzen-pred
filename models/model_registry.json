@@ -280,58 +280,32 @@
       }
     },
     "T20_FEMALE": {
-      "path": "models/t20_female_v1",
-      "version": "v1",
-      "description": "Unified T20 Female Model - XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1510, ECE: 0.0000)",
+      "path": "models/t20_female_v2",
+      "version": "v2",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1510, ECE: 0.0000)",
       "training": {
         "samples": 17062,
-        "matches": 74,
-        "leagues": 1,
         "date": "2026-01-19",
-        "brier_score": 0.1929
+        "brier_score": 0.1510153948788112
       },
       "calibrator": {
-        "path": "models/t20_female_v1/isotonic_calibrator.pkl",
-        "type": "innings_phase_specific",
-        "generated_date": "2026-01-19T01:04:36",
+        "path": "models/t20_female_v2/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2026-01-19T16:32:31.939192",
         "oof_metrics": {
-          "brier_raw": 0.1729,
-          "brier_calibrated": 0.151,
-          "ece_raw": 0.0436,
-          "ece_calibrated": 0.0
+          "brier_raw": 0.17411349756974104,
+          "brier_calibrated": 0.1710451243473449,
+          "ece_raw": 0.03065496642055112,
+          "ece_calibrated": 0.00048724978016863275
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
-        "path": "data/t20_female_feature_store_v1",
-        "version": "v1",
+        "path": "data/t20_female_feature_store_v2",
+        "version": "v2",
         "generated_date": "2026-01-19",
-        "training_data_samples": 17062,
-        "statistics": {
-          "teams": 6,
-          "leagues": [
-            "wpl"
-          ],
-          "team_columns": [
-            "team",
-            "win_rate",
-            "matches",
-            "bat_first_wr",
-            "bowl_first_wr"
-          ],
-          "player_columns": [
-            "batsman_rolling_avg",
-            "batsman_rolling_sr",
-            "bowler_rolling_econ",
-            "bowler_rolling_sr"
-          ]
-        },
-        "recent_changes": {
-          "date": "2026-01-19",
-          "description": "Unified T20 Female Model trained on WPL (74 matches). Additional leagues (WBBL, WCPL) to be added when Cricsheet provides separate downloads.",
-          "impact": "+12.7% improvement vs resource_win_prob baseline. Per-over brier-optimized calibration achieves perfect ECE."
-        }
+        "training_data_samples": 17062
       }
     },
     "SA20": {
@@ -607,6 +581,55 @@
           "impact": "Aligns SMA inference with BBL-style flow (raw model + external OOF calibrator)"
         }
       }
+    }
+  },
+  "T20_FEMALE": {
+    "model_path": "models/t20_female_v2",
+    "feature_store_path": "data/t20_female_feature_store_v2",
+    "version": "v2",
+    "brier_score": 0.1653,
+    "calibration": "brier_optimized",
+    "samples": 57999,
+    "leagues": [
+      "wpl",
+      "ssm"
+    ],
+    "league_calibrators": {
+      "wpl": "models/t20_female_v2/league_calibrators/wpl",
+      "ssm": "models/t20_female_v2/league_calibrators/ssm"
+    }
+  },
+  "models": {
+    "t20_female_v3": {
+      "version": "v3",
+      "type": "unified_female",
+      "created": "2026-01-19T17:27:51.080260",
+      "training_samples": 283026,
+      "matches": 1217,
+      "leagues": [
+        "wbbl",
+        "ssm",
+        "wpl",
+        "cec",
+        "wcsl",
+        "wt20blast",
+        "fairbreak",
+        "wcpl",
+        "wt20challenge",
+        "icc_wt20wc",
+        "cpl"
+      ],
+      "metrics": {
+        "raw_brier": 0.1638,
+        "calibrated_brier": 0.161,
+        "ece": 0.0,
+        "logloss": 0.4787
+      },
+      "calibration": "brier_optimized (per-over)",
+      "feature_store": "data/t20_female_feature_store_v3",
+      "features_dir": "data/t20_female_features_v3",
+      "teams": 65,
+      "notes": "Expanded from v2 (260 matches) to v3 (1217 matches) - 368% increase"
     }
   }
 }

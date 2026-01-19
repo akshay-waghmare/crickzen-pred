@@ -32,10 +32,16 @@ MALE_LEAGUES = [
 ]
 
 FEMALE_LEAGUES = [
-    "wbbl",                     # Women's Big Bash League (519 matches)
-    "wpl",                      # Women's Premier League (74 matches)
-    "super_smash",              # Super Smash (female portion - 186 matches)
-    "wcpl",                     # Women's Caribbean Premier League (25 matches)
+    "wbb",                      # Women's Big Bash League (519 matches) - slug is "wbb" not "wbbl"
+    "wpl",                      # Women's Premier League (77 matches)
+    "super_smash",              # Super Smash (female portion - 188 matches)
+    "wcl",                      # Women's Caribbean Premier League (25 matches) - slug is "wcl" not "wcpl"
+    "cec",                      # Charlotte Edwards Cup (124 matches)
+    "wsl",                      # Women's Cricket Super League (95 matches) - slug is "wsl" not "wcsl"
+    "wtb",                      # Women's T20 Blast (56 matches) - slug is "wtb" not "wt20blast"
+    "frb",                      # FairBreak Invitational (39 matches) - slug is "frb"
+    "wtc",                      # Women's T20 Challenge (13 matches) - slug is "wtc"
+    "icc_womens_t20_world_cup", # ICC Women's T20 World Cup (135 matches)
 ]
 
 def download_and_extract(slug: str, gender: str):
