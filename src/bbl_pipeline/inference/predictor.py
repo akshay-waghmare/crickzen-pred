@@ -831,15 +831,36 @@ class Predictor:
         is_death_overs = (current_over_1based > 15).astype(float)
         
         # Resource percentage (vectorized approximation using DLS formula)
-        # Simplified: resource_pct ≈ (overs_remaining/20) * (1 - 0.08*wickets)
+        # More accurate: resource_pct = exp(-0.045 * overs_remaining * (10/(10+wickets_lost)))
+        resource_remaining_pct = np.clip(
+            np.exp(-0.045 * (20 - overs_remaining) * (10.0 / (10.0 + nt_wickets))) * 100.0,
+            0.0, 100.0
+        )
+        # Also compute simpler version for consistency with some features
         resource_pct = np.clip(
             (overs_remaining / 20.0) * 100.0 * (1 - 0.08 * nt_wickets),
             0.0, 100.0
         )
         
-        # Expected final score projection (first innings style)
-        projected_multiplier = np.where(overs_bowled > 0, 20.0 / overs_bowled, 1.0)
-        expected_final_score = nt_scores * np.clip(projected_multiplier, 1.0, 5.0)
+        # Expected final score projection with regression toward mean (matches calculator.py)
+        # 1. Calculate resource used and remaining
+        resource_at_start = 100.0
+        resource_used = resource_at_start - resource_pct
+        resource_used = np.clip(resource_used, 0.001, 100.0)  # Avoid div by zero
+        
+        # 2. Raw projection based on runs per resource
+        runs_per_resource = nt_scores / resource_used
+        raw_projection = nt_scores + (runs_per_resource * resource_pct)
+        
+        # 3. Regression toward par score (160) based on overs bowled
+        # Early overs: trust ~20% trajectory, 80% par
+        # Late overs: trust ~95% trajectory, 5% par
+        PAR_SCORE = 160.0
+        trajectory_weight = np.clip(overs_bowled / 20.0, 0.0, 0.95)
+        
+        # 4. Regressed projection
+        expected_final_score = trajectory_weight * raw_projection + (1 - trajectory_weight) * PAR_SCORE
+        expected_final_score = np.clip(expected_final_score, 100.0, 280.0)
         projected_score = expected_final_score  # alias
         
         # Venue stats (use defaults for speed - actual lookups are expensive)
@@ -879,9 +900,13 @@ class Predictor:
         wicket_factor = 1.0 - 0.08 * nt_wickets
         resource_win_prob_inn2 = np.clip(rrr_factor * wicket_factor, 0.001, 0.999)
         
-        # For 1st innings: based on expected score
-        score_factor = 1.0 / (1.0 + np.exp(-0.04 * (expected_final_score - 165)))
-        resource_win_prob_inn1 = np.clip(score_factor * wicket_factor, 0.001, 0.999)
+        # For 1st innings: based on expected score vs par (160)
+        # Use sigmoid centered on par score, with gentle slope
+        # expected_final_score of 160 -> 0.5, 180 -> ~0.6, 140 -> ~0.4
+        score_factor = 1.0 / (1.0 + np.exp(-0.03 * (expected_final_score - PAR_SCORE)))
+        # Adjust for wickets, but less harshly in first innings since more uncertainty
+        wicket_factor_inn1 = 1.0 - 0.04 * nt_wickets  # Gentler than 2nd innings
+        resource_win_prob_inn1 = np.clip(score_factor * wicket_factor_inn1, 0.001, 0.999)
         
         resource_win_prob = np.where(nt_innings == 2, resource_win_prob_inn2, resource_win_prob_inn1)
         

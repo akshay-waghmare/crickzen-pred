@@ -219,14 +219,19 @@ class CrexLivePredictor:
             if balls_remaining <= 0:
                 return None
             
-            # Detect league from model_dir
-            league = "bbl"  # Default
-            if "sa20" in self.model_dir.lower():
-                league = "sa20"
-            elif "ilt20" in self.model_dir.lower() or "ilt" in self.model_dir.lower():
-                league = "ilt20"
-            elif "wpl" in self.model_dir.lower():
-                league = "wpl"
+            # Use self.league if provided, otherwise detect from model_dir
+            league = self.league  # Prefer explicitly set league
+            if not league:
+                # Fallback: detect from model_dir
+                league = "bbl"  # Default
+                if "sa20" in self.model_dir.lower():
+                    league = "sa20"
+                elif "ilt20" in self.model_dir.lower() or "ilt" in self.model_dir.lower():
+                    league = "ilt20"
+                elif "wpl" in self.model_dir.lower():
+                    league = "wpl"
+                elif "female" in self.model_dir.lower():
+                    league = None  # Global female model - no specific league calibration
             
             # Create simulation state
             sim_state = SimMatchState(
