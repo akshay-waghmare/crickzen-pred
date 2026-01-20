@@ -25,6 +25,7 @@ try:
         MatchState as SimMatchState,
         simulate,
         simulate_one_over,
+        simulate_two_overs,
         evaluate_bet,
         BettingThresholds,
     )
@@ -255,6 +256,9 @@ class CrexLivePredictor:
             # Run 6-ball (1 over) simulation
             result_6ball = simulate_one_over(sim_state, n_simulations=2000, predictor=predictor)
             
+            # Run 12-ball (2 over) simulation
+            result_12ball = simulate_two_overs(sim_state, n_simulations=2000, predictor=predictor)
+            
             # Evaluate betting decision if market odds available
             # Uses league-calibrated model_prob for edge calculation (more accurate than simulation mean)
             betting_decision = None
@@ -301,6 +305,14 @@ class CrexLivePredictor:
                     "p95": result_6ball.p95,
                     "n_sims": result_6ball.n_sims,
                     "time_ms": result_6ball.time_taken_ms,
+                },
+                "simulation_12ball": {
+                    "mean_prob": result_12ball.mean_prob,
+                    "std_prob": result_12ball.std_prob,
+                    "p5": result_12ball.p5,
+                    "p95": result_12ball.p95,
+                    "n_sims": result_12ball.n_sims,
+                    "time_ms": result_12ball.time_taken_ms,
                 },
                 "betting_decision": betting_decision,
             }

@@ -367,6 +367,39 @@ def simulate_one_over(
     )
 
 
+def simulate_two_overs(
+    state: MatchState,
+    n_simulations: int = 5000,
+    apply_temp: bool = True,
+    model_dir: str = "models/t20_male_v1",
+    predictor: "Predictor" = None,
+) -> SimulationResult:
+    """
+    Convenience function for 12-ball (two over) simulation.
+    
+    Uses higher default simulation count for more stable estimates.
+    
+    Args:
+        state: Current match state
+        n_simulations: Number of simulations
+        apply_temp: Whether to apply temperature
+        model_dir: Path to model directory
+        predictor: Optional Predictor instance for ML-based evaluation.
+                  If provided, uses batch ML prediction for terminal states.
+        
+    Returns:
+        SimulationResult
+    """
+    return simulate_vectorized(
+        state=state,
+        horizon=12,
+        n_simulations=n_simulations,
+        apply_temp=apply_temp,
+        model_dir=model_dir,
+        predictor=predictor,
+    )
+
+
 def calculate_simulation_uncertainty(
     result: SimulationResult,
     phase: str,

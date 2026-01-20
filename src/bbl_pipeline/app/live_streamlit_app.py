@@ -3870,13 +3870,14 @@ def main():
             
             sim_1ball = mc_data.get("simulation_1ball", {})
             sim_6ball = mc_data.get("simulation_6ball", {})
+            sim_12ball = mc_data.get("simulation_12ball", {})
             betting = mc_data.get("betting_decision", {})
             
-            # 1-Ball and 6-Ball simulation results side by side
-            sim_col1, sim_col2 = st.columns(2)
+            # 1-Ball, 6-Ball and 12-Ball simulation results side by side
+            sim_col1, sim_col2, sim_col3 = st.columns(3)
             
             with sim_col1:
-                st.markdown("#### 🎯 Next Ball Simulation")
+                st.markdown("#### 🎯 Next Ball")
                 if sim_1ball:
                     mean_1 = sim_1ball.get("mean_prob", sim_1ball.get("mean", 0)) * 100
                     std_1 = sim_1ball.get("std_prob", sim_1ball.get("std", 0)) * 100
@@ -3897,7 +3898,7 @@ def main():
                     st.info("1-ball simulation not available")
             
             with sim_col2:
-                st.markdown("#### 🎲 Next Over Simulation")
+                st.markdown("#### 🎲 1 Over (6 balls)")
                 if sim_6ball:
                     mean_6 = sim_6ball.get("mean_prob", sim_6ball.get("mean", 0)) * 100
                     std_6 = sim_6ball.get("std_prob", sim_6ball.get("std", 0)) * 100
@@ -3916,6 +3917,27 @@ def main():
                     st.progress(mean_6 / 100, text=f"Batting Team: {mean_6:.1f}%")
                 else:
                     st.info("6-ball simulation not available")
+            
+            with sim_col3:
+                st.markdown("#### 🎲 2 Overs (12 balls)")
+                if sim_12ball:
+                    mean_12 = sim_12ball.get("mean_prob", sim_12ball.get("mean", 0)) * 100
+                    std_12 = sim_12ball.get("std_prob", sim_12ball.get("std", 0)) * 100
+                    p5_12 = sim_12ball.get("p5", 0) * 100
+                    p95_12 = sim_12ball.get("p95", 0) * 100
+                    n_sims_12 = sim_12ball.get("n_sims", sim_12ball.get("n_simulations", 0))
+                    
+                    st.metric(
+                        f"Mean Win Prob (n={n_sims_12:,})",
+                        f"{mean_12:.1f}%",
+                        f"±{std_12:.1f}% (1σ)"
+                    )
+                    st.caption(f"90% CI: [{p5_12:.1f}% — {p95_12:.1f}%]")
+                    
+                    # Visual confidence bar
+                    st.progress(mean_12 / 100, text=f"Batting Team: {mean_12:.1f}%")
+                else:
+                    st.info("12-ball simulation not available")
             
             # Betting Decision Support
             st.markdown("---")
@@ -3958,7 +3980,8 @@ def main():
             st.markdown("""
             **How Monte Carlo Simulation Works:**
             - **1-Ball**: Simulates all possible outcomes of the next delivery (dot, 1-6 runs, wicket)
-            - **6-Ball**: Simulates the next over with temperature-scaled probabilities for variance
+            - **1-Over (6-Ball)**: Simulates the next over with temperature-scaled probabilities for variance
+            - **2-Over (12-Ball)**: Simulates the next 2 overs for longer-term uncertainty quantification
             - **Confidence Interval**: 90% of simulated outcomes fall within the p5-p95 range
             - **Kelly Criterion**: Optimal bet sizing based on edge and phase-specific thresholds
             """)
