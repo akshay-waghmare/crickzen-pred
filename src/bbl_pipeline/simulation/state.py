@@ -26,6 +26,10 @@ class MatchState:
         batting_team: Canonical batting team name
         bowling_team: Canonical bowling team name
         venue: Venue name (optional)
+        batting_team_win_rate: Win rate of batting team (0-1, default 0.5)
+        bowling_team_win_rate: Win rate of bowling team (0-1, default 0.5)
+        batting_team_situation_wr: Situational win rate for batting team
+        bowling_team_situation_wr: Situational win rate for bowling team
     """
     innings: int
     score: int
@@ -36,6 +40,10 @@ class MatchState:
     bowling_team: str
     target_runs: Optional[int] = None
     venue: Optional[str] = None
+    batting_team_win_rate: float = 0.5
+    bowling_team_win_rate: float = 0.5
+    batting_team_situation_wr: float = 0.5
+    bowling_team_situation_wr: float = 0.5
     
     def __post_init__(self) -> None:
         """Validate state after initialization."""

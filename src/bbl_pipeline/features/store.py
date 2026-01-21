@@ -169,6 +169,50 @@ VENUE_ALIASES = {
     'Kotambi Stadium': 'Kotambi Stadium, Vadodara',
     'Kotambi Stadium, Vadodara': 'Kotambi Stadium, Vadodara',
     'Vadodara Stadium': 'Kotambi Stadium, Vadodara',
+    
+    # T20 International Venues (India)
+    'Wankhede Stadium': 'Wankhede Stadium, Mumbai',
+    'Wankhede Stadium, Mumbai': 'Wankhede Stadium, Mumbai',
+    'Eden Gardens': 'Eden Gardens, Kolkata',
+    'Eden Gardens, Kolkata': 'Eden Gardens, Kolkata',
+    'MA Chidambaram Stadium': 'MA Chidambaram Stadium, Chepauk, Chennai',
+    'MA Chidambaram Stadium, Chepauk, Chennai': 'MA Chidambaram Stadium, Chepauk, Chennai',
+    'Chepauk': 'MA Chidambaram Stadium, Chepauk, Chennai',
+    'Punjab Cricket Association IS Bindra Stadium': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'Punjab Cricket Association IS Bindra Stadium, Mohali': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'Mohali Stadium': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'PCA Stadium': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'Rajiv Gandhi International Stadium': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Rajiv Gandhi International Stadium, Uppal, Hyderabad': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Rajiv Gandhi International Stadium, Hyderabad': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Uppal Stadium': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Narendra Modi Stadium': 'Narendra Modi Stadium, Ahmedabad',
+    'Narendra Modi Stadium, Ahmedabad': 'Narendra Modi Stadium, Ahmedabad',
+    'Motera Stadium': 'Narendra Modi Stadium, Ahmedabad',
+    'Sardar Patel Stadium': 'Narendra Modi Stadium, Ahmedabad',
+    'Sawai Mansingh Stadium': 'Sawai Mansingh Stadium, Jaipur',
+    'Sawai Mansingh Stadium, Jaipur': 'Sawai Mansingh Stadium, Jaipur',
+    'Jaipur Stadium': 'Sawai Mansingh Stadium, Jaipur',
+    'Maharashtra Cricket Association Stadium': 'Maharashtra Cricket Association Stadium, Pune',
+    'Maharashtra Cricket Association Stadium, Pune': 'Maharashtra Cricket Association Stadium, Pune',
+    'MCA Stadium': 'Maharashtra Cricket Association Stadium, Pune',
+    'Pune Stadium': 'Maharashtra Cricket Association Stadium, Pune',
+    'Himachal Pradesh Cricket Association Stadium': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+    'Himachal Pradesh Cricket Association Stadium, Dharamsala': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+    'HPCA Stadium': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+    'Dharamsala Stadium': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+    'Holkar Cricket Stadium': 'Holkar Cricket Stadium, Indore',
+    'Holkar Cricket Stadium, Indore': 'Holkar Cricket Stadium, Indore',
+    'Indore Stadium': 'Holkar Cricket Stadium, Indore',
+    'Vidarbha Cricket Association Stadium': 'Vidarbha Cricket Association Stadium, Jamtha, Nagpur',
+    'Vidarbha Cricket Association Stadium, Jamtha, Nagpur': 'Vidarbha Cricket Association Stadium, Jamtha, Nagpur',
+    'VCA Stadium': 'Vidarbha Cricket Association Stadium, Jamtha, Nagpur',
+    'Nagpur Stadium': 'Vidarbha Cricket Association Stadium, Jamtha, Nagpur',
+    'Saurashtra Cricket Association Stadium': 'Saurashtra Cricket Association Stadium, Rajkot',
+    'Saurashtra Cricket Association Stadium, Rajkot': 'Saurashtra Cricket Association Stadium, Rajkot',
+    'SCA Stadium': 'Saurashtra Cricket Association Stadium, Rajkot',
+    'Rajkot Stadium': 'Saurashtra Cricket Association Stadium, Rajkot',
 }
 
 class FeatureStore(Protocol):
@@ -392,6 +436,15 @@ class InMemoryFeatureStore:
         'SSS': 'Sylhet Super Stars',
         'SR': 'Sylhet Royals',
         'SyS': 'Sylhet Sunrisers',  # was SYS - conflicts with Sydney Sixers
+        
+        # T20 International Teams
+        'IND': 'India', 'AUS': 'Australia', 'ENG': 'England', 'NZ': 'New Zealand',
+        'NZL': 'New Zealand', 'SA': 'South Africa', 'PAK': 'Pakistan', 'WI': 'West Indies',
+        'SL': 'Sri Lanka', 'BAN': 'Bangladesh', 'AFG': 'Afghanistan', 'IRE': 'Ireland',
+        'SCO': 'Scotland', 'ZIM': 'Zimbabwe', 'UAE': 'United Arab Emirates', 'NED': 'Netherlands',
+        'NAM': 'Namibia', 'NEP': 'Nepal', 'OMA': 'Oman', 'PNG': 'Papua New Guinea',
+        'HK': 'Hong Kong', 'KEN': 'Kenya', 'UGA': 'Uganda', 'GER': 'Germany',
+        'JER': 'Jersey', 'USA': 'United States of America', 'CAN': 'Canada',
     }
 
     # Team aliases for mapping new/renamed teams to historical equivalents

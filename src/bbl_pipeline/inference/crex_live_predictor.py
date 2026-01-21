@@ -225,16 +225,47 @@ class CrexLivePredictor:
             if not league:
                 # Fallback: detect from model_dir
                 league = "bbl"  # Default
-                if "sa20" in self.model_dir.lower():
+                model_dir_lower = self.model_dir.lower()
+                if "t20_international" in model_dir_lower or "t20i" in model_dir_lower:
+                    league = "t20i"
+                elif "sa20" in model_dir_lower or "sat_" in model_dir_lower:
                     league = "sa20"
-                elif "ilt20" in self.model_dir.lower() or "ilt" in self.model_dir.lower():
+                elif "ilt20" in model_dir_lower or "ilt_" in model_dir_lower:
                     league = "ilt20"
-                elif "wpl" in self.model_dir.lower():
+                elif "wpl" in model_dir_lower:
                     league = "wpl"
-                elif "female" in self.model_dir.lower():
+                elif "ssm" in model_dir_lower:
+                    league = "ssm"
+                elif "bpl" in model_dir_lower:
+                    league = "bpl"
+                elif "female" in model_dir_lower:
                     league = None  # Global female model - no specific league calibration
             
             # Create simulation state
+            # Get team stats from feature store for accurate Monte Carlo
+            batting_team_wr = 0.5
+            bowling_team_wr = 0.5
+            batting_team_sit_wr = 0.5
+            bowling_team_sit_wr = 0.5
+            
+            if self.predictor and hasattr(self.predictor, 'feature_store'):
+                fs = self.predictor.feature_store
+                bat_stats = fs.get_team_stats(state.batting_team)
+                bowl_stats = fs.get_team_stats(state.bowling_team)
+                if bat_stats:
+                    batting_team_wr = bat_stats.get('win_rate', 0.5)
+                    # Use appropriate situation rate based on innings
+                    if state.is_second_innings:
+                        batting_team_sit_wr = bat_stats.get('bowl_first_wr', batting_team_wr)  # They batted 2nd
+                    else:
+                        batting_team_sit_wr = bat_stats.get('bat_first_wr', batting_team_wr)
+                if bowl_stats:
+                    bowling_team_wr = bowl_stats.get('win_rate', 0.5)
+                    if state.is_second_innings:
+                        bowling_team_sit_wr = bowl_stats.get('bat_first_wr', bowling_team_wr)  # They batted 1st
+                    else:
+                        bowling_team_sit_wr = bowl_stats.get('bowl_first_wr', bowling_team_wr)
+            
             sim_state = SimMatchState(
                 innings=2 if state.is_second_innings else 1,
                 score=state.total_runs,
@@ -245,6 +276,10 @@ class CrexLivePredictor:
                 bowling_team=state.bowling_team,
                 league=league,
                 venue=state.venue,
+                batting_team_win_rate=batting_team_wr,
+                bowling_team_win_rate=bowling_team_wr,
+                batting_team_situation_wr=batting_team_sit_wr,
+                bowling_team_situation_wr=bowling_team_sit_wr,
             )
             
             # Choose predictor for ML model mode
@@ -331,16 +366,31 @@ class CrexLivePredictor:
         
         Example text pattern:
         Team Comparison (Last 10 matches)
-        RW vs all teams NE vs all teams
-        10 Matches Played 2
-        60% Win 0%
-        148 Avg Score 126
+        IND vs all teams NZ vs all teams
+        10 Matches Played 8
+        80% Win 60%
+        165 Avg Score 148
+        
+        Note: The order of teams in the comparison table may differ from the match title!
+        We need to extract team abbreviations from "XXX vs all teams" to match correctly.
         """
         try:
             import re
             
-            # Look for team comparison section
-            # Pattern: "X Matches Played Y" where X and Y are numbers
+            # First, extract the team abbreviations from the comparison headers
+            # Pattern: "XXX vs all teams YYY vs all teams"
+            team_headers_pattern = r'([A-Z0-9\-]+)\s+vs\s+all\s+teams\s+([A-Z0-9\-]+)\s+vs\s+all\s+teams'
+            team_headers_match = re.search(team_headers_pattern, page_text, re.IGNORECASE)
+            
+            if not team_headers_match:
+                logger.warning("Could not find team comparison headers")
+                return
+                
+            # These are the teams in the order they appear in the comparison table
+            left_team = team_headers_match.group(1)
+            right_team = team_headers_match.group(2)
+            
+            # Now extract the stats (these correspond to left and right columns)
             matches_pattern = r'(\d+)\s*Matches\s*Played\s*(\d+)'
             win_pattern = r'(\d+)%\s*Win\s*(\d+)%'
             avg_score_pattern = r'(\d+)\s*Avg\s*Score\s*(\d+)'
@@ -350,21 +400,21 @@ class CrexLivePredictor:
             avg_score_match = re.search(avg_score_pattern, page_text, re.IGNORECASE)
             
             if matches_match and win_match:
-                team1_matches = int(matches_match.group(1))
-                team2_matches = int(matches_match.group(2))
-                team1_win_pct = int(win_match.group(1)) / 100
-                team2_win_pct = int(win_match.group(2)) / 100
-                team1_avg_score = int(avg_score_match.group(1)) if avg_score_match else 150
-                team2_avg_score = int(avg_score_match.group(2)) if avg_score_match else 150
+                left_matches = int(matches_match.group(1))
+                right_matches = int(matches_match.group(2))
+                left_win_pct = int(win_match.group(1)) / 100
+                right_win_pct = int(win_match.group(2)) / 100
+                left_avg_score = int(avg_score_match.group(1)) if avg_score_match else 150
+                right_avg_score = int(avg_score_match.group(2)) if avg_score_match else 150
                 
                 # Only use if at least 2 matches played
-                if team1_matches >= 2:
-                    print(f"📊 Extracted season stats for {team1}: {team1_matches} matches, {team1_win_pct*100:.0f}% win rate")
-                    self._inject_season_stats(team1, team1_matches, team1_win_pct, team1_avg_score)
+                if left_matches >= 2:
+                    print(f"📊 Extracted season stats for {left_team}: {left_matches} matches, {left_win_pct*100:.0f}% win rate")
+                    self._inject_season_stats(left_team, left_matches, left_win_pct, left_avg_score)
                 
-                if team2_matches >= 2:
-                    print(f"📊 Extracted season stats for {team2}: {team2_matches} matches, {team2_win_pct*100:.0f}% win rate")
-                    self._inject_season_stats(team2, team2_matches, team2_win_pct, team2_avg_score)
+                if right_matches >= 2:
+                    print(f"📊 Extracted season stats for {right_team}: {right_matches} matches, {right_win_pct*100:.0f}% win rate")
+                    self._inject_season_stats(right_team, right_matches, right_win_pct, right_avg_score)
                     
         except Exception as e:
             logger.warning(f"Could not extract team comparison: {e}")

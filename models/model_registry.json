@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-19",
+  "last_updated": "2026-01-21",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -191,6 +191,79 @@
           "date": "2025-12-17",
           "description": "Initial T20I International model trained on 2,940 matches (2004-2025); includes innings-specific calibrators",
           "impact": "Covers all T20I matches with 106 international teams; broader coverage than league models"
+        }
+      }
+    },
+    "T20_INTERNATIONAL_MALE": {
+      "path": "models/t20_international_male_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1583, ECE: 0.0000)",
+      "training": {
+        "samples": 686832,
+        "date": "2026-01-21",
+        "brier_score": 0.1605
+      },
+      "calibrator": {
+        "path": "models/t20_international_male_v1/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2026-01-21T13:00:29",
+        "oof_metrics": {
+          "brier_raw": 0.1599,
+          "brier_calibrated": 0.1583,
+          "ece_raw": 0.0041,
+          "ece_calibrated": 0.0000
+        },
+        "innings_specific": {
+          "innings1": {
+            "samples": 366089,
+            "brier_raw": 0.1980,
+            "brier_calibrated": 0.1976,
+            "ece_raw": 0.0100,
+            "ece_calibrated": 0.0001
+          },
+          "innings2": {
+            "samples": 320743,
+            "brier_raw": 0.1165,
+            "brier_calibrated": 0.1162,
+            "ece_raw": 0.0090,
+            "ece_calibrated": 0.0014
+          }
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
+      "feature_store": {
+        "path": "data/t20_international_male_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-01-21",
+        "training_data_samples": 686832,
+        "statistics": {
+          "teams": 107,
+          "players": 4238,
+          "venues": 323,
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ],
+          "player_columns": [
+            "batsman_rolling_avg",
+            "batsman_rolling_sr",
+            "bowler_rolling_econ",
+            "bowler_rolling_sr"
+          ],
+          "venue_columns": [
+            "venue_avg_score",
+            "venue_avg_wickets",
+            "venue_bat_first_win_rate"
+          ]
+        },
+        "recent_changes": {
+          "date": "2026-01-21",
+          "description": "Initial T20 International Male model trained on 686,832 samples; includes per-over brier-optimized calibrators (38 calibrators) and innings×phase calibrators (6 calibrators)",
+          "impact": "Best overall OOF performance: Brier 0.1583 (best), ECE 0.0000 (perfect), LogLoss 0.4719. Per-over calibration outperforms all other methods."
         }
       }
     },

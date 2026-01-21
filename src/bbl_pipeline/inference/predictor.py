@@ -910,14 +910,22 @@ class Predictor:
         
         resource_win_prob = np.where(nt_innings == 2, resource_win_prob_inn2, resource_win_prob_inn1)
         
-        # Team/player stats - use reasonable defaults for Monte Carlo speed
-        # (actual player lookups are expensive and don't change between simulations)
-        batting_team_win_rate = 0.50
-        bowling_team_win_rate = 0.50
-        team_strength_diff = 0.0
-        batting_team_situation_wr = 0.50
-        bowling_team_situation_wr = 0.50
-        situation_advantage = 0.0
+        # Team/player stats - extract from states if available, otherwise use defaults
+        # This is critical for Monte Carlo to use actual team strengths!
+        batting_team_win_rates = np.zeros(num_states)
+        bowling_team_win_rates = np.zeros(num_states)
+        batting_team_situation_wrs = np.zeros(num_states)
+        bowling_team_situation_wrs = np.zeros(num_states)
+        
+        for i, idx in enumerate(non_terminal_indices):
+            state = states[idx]
+            batting_team_win_rates[i] = getattr(state, 'batting_team_win_rate', 0.5)
+            bowling_team_win_rates[i] = getattr(state, 'bowling_team_win_rate', 0.5)
+            batting_team_situation_wrs[i] = getattr(state, 'batting_team_situation_wr', batting_team_win_rates[i])
+            bowling_team_situation_wrs[i] = getattr(state, 'bowling_team_situation_wr', bowling_team_win_rates[i])
+        
+        team_strength_diff = batting_team_win_rates - bowling_team_win_rates
+        situation_advantage = batting_team_situation_wrs - bowling_team_situation_wrs
         
         # Player rolling stats (defaults)
         batsman_rolling_avg = 25.0
@@ -959,15 +967,15 @@ class Predictor:
             'chase_difficulty': chase_difficulty,
             'wickets_times_balls': wickets_times_balls,
             'pressure_index': pressure_index,
-            'team_strength_diff': np.full(num_states, team_strength_diff),
+            'team_strength_diff': team_strength_diff,
             'rrr_times_wickets': rrr_times_wickets,
             'overs_remaining': overs_remaining,
-            'batting_team_win_rate': np.full(num_states, batting_team_win_rate),
-            'bowling_team_win_rate': np.full(num_states, bowling_team_win_rate),
-            'batting_team_situation_wr': np.full(num_states, batting_team_situation_wr),
-            'situation_advantage': np.full(num_states, situation_advantage),
+            'batting_team_win_rate': batting_team_win_rates,
+            'bowling_team_win_rate': bowling_team_win_rates,
+            'batting_team_situation_wr': batting_team_situation_wrs,
+            'situation_advantage': situation_advantage,
             'boundary_pct_last_18': np.full(num_states, boundary_pct_last_18),
-            'bowling_team_situation_wr': np.full(num_states, bowling_team_situation_wr),
+            'bowling_team_situation_wr': bowling_team_situation_wrs,
             'runs_last_12': np.full(num_states, runs_last_12),
             'runs_last_18': np.full(num_states, runs_last_18),
             'wickets_last_12': np.full(num_states, wickets_last_12),
@@ -1043,6 +1051,45 @@ class Predictor:
             raw_probs, nt_innings, nt_overs, league
         )
         
+        # =========================================================================
+        # CONSTRAINT LAYER (Second Innings) - Match main predict() constraints
+        # =========================================================================
+        # Skip constraint layer for T20 International - use raw model output
+        # The simplified batch features don't match main predictor's resource_win_prob
+        is_t20i = league and league.lower() in ['t20i', 't20_international', 't20international']
+        
+        if not is_t20i:
+            # Apply the same caps as main predictor to ensure consistent behavior
+            # Only apply downward caps, never boost probabilities
+            
+            # Calculate runs per ball needed for each 2nd innings state
+            is_inn2_nt = nt_innings == 2
+            runs_needed_nt = nt_targets - nt_scores
+            
+            # Near-impossible: Need >5 runs per ball on average
+            near_impossible = is_inn2_nt & (runs_needed_nt > nt_balls_remaining * 5)
+            calibrated_probs[near_impossible] = np.minimum(calibrated_probs[near_impossible], 0.02)
+            
+            # Very difficult: Need >4 runs per ball on average
+            very_difficult = is_inn2_nt & (runs_needed_nt > nt_balls_remaining * 4) & (~near_impossible)
+            calibrated_probs[very_difficult] = np.minimum(calibrated_probs[very_difficult], 0.05)
+            
+            # Loss guardrails - cap optimism in high RRR situations
+            # Use a more aggressive cap based on runs per ball needed
+            runs_per_ball = np.where(nt_balls_remaining > 0, runs_needed_nt / nt_balls_remaining, 0)
+            
+            # RRR > 2 (need >12 per over): Apply significant cap
+            high_rrr = is_inn2_nt & (runs_per_ball > 2.0) & (~near_impossible) & (~very_difficult)
+            if np.any(high_rrr):
+                # Cap at approximately what resource_win_prob would give
+                # Formula: base_cap = max(0.02, 0.5 * (1 - (rrr - 6) / 10) * (1 - wickets/10))
+                rpb = runs_per_ball[high_rrr]
+                wkts = nt_wickets[high_rrr]
+                rrr_factor = np.clip(1.0 - (rpb * 6 - 8.0) / 10.0, 0.0, 1.0)
+                wicket_factor = 1.0 - 0.08 * wkts
+                max_cap = np.clip(rrr_factor * wicket_factor * 0.2, 0.01, 0.15)  # Conservative cap
+                calibrated_probs[high_rrr] = np.minimum(calibrated_probs[high_rrr], max_cap)
+        
         # Assign results
         probs[non_terminal_mask] = calibrated_probs
         
@@ -1070,20 +1117,44 @@ class Predictor:
         n = len(raw_probs)
         calibrated = raw_probs.copy()
         
+        # T20 International: Skip calibration, use raw model output
+        # The raw model is better calibrated for diverse international conditions
+        if league and league.lower() in ['t20i', 't20_international', 't20international']:
+            return calibrated
+        
         # Determine phase for each prediction
         current_over_1based = overs_arr + 1
         
         # Group by calibrator key for efficient batch processing
         if self.per_over_calibrators:
-            # Per-over calibration (most granular)
+            # Per-over calibration (most granular), with phase fallback
+            # Track which predictions haven't been calibrated yet for phase fallback
+            calibrated_mask = np.zeros(n, dtype=bool)
+            
             for over in range(1, 21):
                 for inn in [1, 2]:
                     key = f'inn{inn}_over{over}'
+                    mask = (innings_arr == inn) & (current_over_1based == over)
                     if key in self.per_over_calibrators:
-                        mask = (innings_arr == inn) & (current_over_1based == over)
                         if np.any(mask):
                             calibrator = self.per_over_calibrators[key]
                             calibrated[mask] = calibrator.predict(raw_probs[mask])
+                            calibrated_mask[mask] = True
+                    elif self.phase_calibrators:
+                        # Fallback to phase calibrator for missing per-over calibrators
+                        if np.any(mask):
+                            # Determine phase for this over
+                            if over <= 6:
+                                phase = 'powerplay'
+                            elif over <= 15:
+                                phase = 'middle'
+                            else:
+                                phase = 'death'
+                            phase_key = f'inn{inn}_{phase}'
+                            if phase_key in self.phase_calibrators:
+                                phase_calibrator = self.phase_calibrators[phase_key]
+                                calibrated[mask] = phase_calibrator.predict(raw_probs[mask])
+                                calibrated_mask[mask] = True
         elif self.phase_calibrators:
             # Phase calibration
             for inn in [1, 2]:
