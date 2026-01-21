@@ -320,35 +320,56 @@ class CrexLivePredictor:
                 except (ValueError, TypeError):
                     pass
             
+            # Anchor MC results to ML model baseline if provided
+            # This preserves the relative uncertainty (spread) while using the ML model's
+            # more accurate mean (from full feature pipeline + league calibration)
+            def anchor_simulation_result(sim_result, ml_baseline: float):
+                """
+                Shift MC distribution to be centered on ML model baseline.
+                
+                The MC uses simplified features and produces different absolute values,
+                but the spread/uncertainty is still meaningful. By anchoring to the ML
+                baseline, we get:
+                - Mean = ML model's calibrated probability (accurate)
+                - Spread = MC's uncertainty estimate (useful for betting decisions)
+                """
+                if ml_baseline is None:
+                    return {
+                        "mean_prob": sim_result.mean_prob,
+                        "std_prob": sim_result.std_prob,
+                        "p5": sim_result.p5,
+                        "p95": sim_result.p95,
+                        "n_sims": sim_result.n_sims,
+                        "time_ms": sim_result.time_taken_ms,
+                        "raw_mean": sim_result.mean_prob,
+                    }
+                
+                # Calculate shift to anchor on ML baseline
+                shift = ml_baseline - sim_result.mean_prob
+                
+                # Apply shift and clamp to [0, 1]
+                anchored_p5 = max(0.0, min(1.0, sim_result.p5 + shift))
+                anchored_p95 = max(0.0, min(1.0, sim_result.p95 + shift))
+                
+                return {
+                    "mean_prob": ml_baseline,  # Use ML model's calibrated value
+                    "std_prob": sim_result.std_prob,  # Keep uncertainty from MC
+                    "p5": anchored_p5,
+                    "p95": anchored_p95,
+                    "n_sims": sim_result.n_sims,
+                    "time_ms": sim_result.time_taken_ms,
+                    "raw_mean": sim_result.mean_prob,  # Original MC mean for debugging
+                }
+            
             return {
                 "available": True,
                 "league": league,
                 "balls_remaining": balls_remaining,
                 "use_ml_model": use_ml_model,  # Indicates whether ML model was used for terminal evaluation
-                "simulation_1ball": {
-                    "mean_prob": result_1ball.mean_prob,
-                    "std_prob": result_1ball.std_prob,
-                    "p5": result_1ball.p5,
-                    "p95": result_1ball.p95,
-                    "n_sims": result_1ball.n_sims,
-                    "time_ms": result_1ball.time_taken_ms,
-                },
-                "simulation_6ball": {
-                    "mean_prob": result_6ball.mean_prob,
-                    "std_prob": result_6ball.std_prob,
-                    "p5": result_6ball.p5,
-                    "p95": result_6ball.p95,
-                    "n_sims": result_6ball.n_sims,
-                    "time_ms": result_6ball.time_taken_ms,
-                },
-                "simulation_12ball": {
-                    "mean_prob": result_12ball.mean_prob,
-                    "std_prob": result_12ball.std_prob,
-                    "p5": result_12ball.p5,
-                    "p95": result_12ball.p95,
-                    "n_sims": result_12ball.n_sims,
-                    "time_ms": result_12ball.time_taken_ms,
-                },
+                "ml_baseline": model_prob,  # The fully calibrated ML model probability
+                "simulation_1ball": anchor_simulation_result(result_1ball, model_prob),
+                "simulation_6ball": anchor_simulation_result(result_6ball, model_prob),
+                "simulation_12ball": anchor_simulation_result(result_12ball, model_prob),
                 "betting_decision": betting_decision,
             }
             
