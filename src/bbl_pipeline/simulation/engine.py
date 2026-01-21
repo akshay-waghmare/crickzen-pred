@@ -27,7 +27,7 @@ def simulate(
     horizon: int = 1,
     n_simulations: int = 1000,
     apply_temp: bool = True,
-    model_dir: str = "models/t20_male_v1",
+    model_dir: str = "models/t20_male_v2",
     predictor: "Predictor" = None,
 ) -> SimulationResult:
     """
@@ -69,6 +69,15 @@ def simulate(
     
     # If using ML model, don't apply temperature separately (predictor handles calibration)
     use_ml_model = predictor is not None
+    
+    # Log which model is being used for simulation
+    if use_ml_model:
+        predictor_source = getattr(predictor, 'model_dir', 'unknown')
+        logger.debug(
+            "Using ML model for Monte Carlo evaluation",
+            predictor_model_dir=predictor_source,
+            fallback_model_dir=model_dir,
+        )
     
     # Get league temperature once for efficiency (only needed if not using ML model)
     temperature = None
@@ -126,6 +135,12 @@ def simulate(
         temperature=temperature if not use_ml_model else None,
     )
     
+    # Get model source info for logging
+    predictor_model_dir = None
+    if use_ml_model and predictor is not None:
+        # Try to get model_dir from predictor if available
+        predictor_model_dir = getattr(predictor, 'model_dir', None)
+    
     logger.debug(
         "Simulation complete",
         horizon=horizon,
@@ -134,6 +149,7 @@ def simulate(
         std=f"{result.std_prob:.4f}",
         elapsed_ms=f"{elapsed * 1000:.1f}",
         use_ml_model=use_ml_model,
+        ml_model_source=predictor_model_dir if use_ml_model else None,
     )
     
     return result
@@ -144,7 +160,7 @@ def simulate_vectorized(
     horizon: int = 1,
     n_simulations: int = 1000,
     apply_temp: bool = True,
-    model_dir: str = "models/t20_male_v1",
+    model_dir: str = "models/t20_male_v2",
     predictor: "Predictor" = None,
 ) -> SimulationResult:
     """
@@ -288,6 +304,11 @@ def simulate_vectorized(
         temperature=temperature if not use_ml_model else None,
     )
     
+    # Get model source info for logging
+    predictor_model_dir = None
+    if use_ml_model and predictor is not None:
+        predictor_model_dir = getattr(predictor, 'model_dir', None)
+    
     logger.debug(
         "Vectorized simulation complete",
         horizon=horizon,
@@ -296,6 +317,7 @@ def simulate_vectorized(
         std=f"{result.std_prob:.4f}",
         elapsed_ms=f"{elapsed * 1000:.1f}",
         use_ml_model=use_ml_model,
+        ml_model_source=predictor_model_dir if use_ml_model else None,
     )
     
     return result
@@ -305,7 +327,7 @@ def simulate_single_ball(
     state: MatchState,
     n_simulations: int = 1000,
     apply_temp: bool = True,
-    model_dir: str = "models/t20_male_v1",
+    model_dir: str = "models/t20_male_v2",
     predictor: "Predictor" = None,
 ) -> SimulationResult:
     """
@@ -338,7 +360,7 @@ def simulate_one_over(
     state: MatchState,
     n_simulations: int = 5000,
     apply_temp: bool = True,
-    model_dir: str = "models/t20_male_v1",
+    model_dir: str = "models/t20_male_v2",
     predictor: "Predictor" = None,
 ) -> SimulationResult:
     """
@@ -371,7 +393,7 @@ def simulate_two_overs(
     state: MatchState,
     n_simulations: int = 5000,
     apply_temp: bool = True,
-    model_dir: str = "models/t20_male_v1",
+    model_dir: str = "models/t20_male_v2",
     predictor: "Predictor" = None,
 ) -> SimulationResult:
     """

@@ -541,12 +541,12 @@ class InMemoryFeatureStore:
             # Log what we're using
             bat_wr = season_stats.get('bat_first_wr', season_stats['win_rate'])
             bowl_wr = season_stats.get('bowl_first_wr', season_stats['win_rate'])
-            logger.info(f"📊 Using SEASON stats for '{full_name}': {season_stats['matches']} matches, {season_stats['win_rate']*100:.0f}% win rate (bat_first={bat_wr:.0%}, bowl_first={bowl_wr:.0%})")
+            logger.info(f"Using SEASON stats for '{full_name}': {season_stats['matches']} matches, {season_stats['win_rate']*100:.0f}% win rate (bat_first={bat_wr:.0%}, bowl_first={bowl_wr:.0%})")
             return season_stats
         
         # 0.2 Check if this is a new team that should use default stats
         if full_name in self.NEW_TEAMS:
-            logger.warning(f"⚠️ Using DEFAULT stats for new team '{full_name}' (no historical data)")
+            logger.warning(f"Using DEFAULT stats for new team '{full_name}' (no historical data)")
             return self.DEFAULT_TEAM_STATS.copy()
             
         # 0.3 Try to resolve through alias chain

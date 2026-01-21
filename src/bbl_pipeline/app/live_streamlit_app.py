@@ -865,11 +865,18 @@ def main():
     league = d.get("league", None)  # League code if specified
     
     # Detect if this is SA20 and recalculate calibrated probabilities client-side
+    # BUT skip if CLI already applied league calibration (league field is set)
     batting_team = d.get("batting_team", "")
     sa20_teams = {'DSG', 'MICT', 'PR', 'JSK', 'PC', 'SEC'}
     is_sa20_match = batting_team in sa20_teams
     
-    if is_sa20_match and SA20_CALIBRATORS is not None:
+    # Only do client-side recalibration if:
+    # 1. SA20 match detected by team name
+    # 2. SA20_CALIBRATORS loaded
+    # 3. CLI did NOT apply league calibration (league is None or different from sa20)
+    cli_applied_league_calibration = league is not None and league_calibrated_prob is not None
+    
+    if is_sa20_match and SA20_CALIBRATORS is not None and not cli_applied_league_calibration:
         # Recalculate all calibrated probabilities using SA20 calibrators
         import math
         overs_float = d.get("overs", 0.0)

@@ -72,12 +72,13 @@ class Predictor:
     """
     def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], 
                  calibrator=None, calibrator_inn1=None, calibrator_inn2=None, phase_calibrators=None, 
-                 per_over_calibrators=None, calibrator_type='none', league_calibrator=None):
+                 per_over_calibrators=None, calibrator_type='none', league_calibrator=None, model_dir: str = None):
         # Wrap ensemble model dict if needed
         if isinstance(model, dict) and 'xgb_model' in model:
             self.model = EnsembleModelWrapper(model)
         else:
             self.model = model
+        self.model_dir = model_dir  # Store model directory for reference
         self.feature_store = feature_store
         self.global_stats = global_stats
         self.calibrator = calibrator  # Single calibrator (legacy/backward compatible)
@@ -102,6 +103,7 @@ class Predictor:
             league: Optional league code (e.g., 'ssm', 'bbl') to load league-specific calibrator
         """
         path = Path(model_dir)
+        logger.info(f"Loading model from: {model_dir}")
         
         # Load model
         model_path = path / "champion_model.joblib"
@@ -269,7 +271,7 @@ class Predictor:
                             calibrator_type = 'none'
                         else:
                             logger.info(
-                                "✓ Calibrator validated",
+                                "Calibrator validated",
                                 type=calibrator_type,
                                 feature_hash=cal_feature_hash,
                                 n_features=len(cal_features),
@@ -314,7 +316,7 @@ class Predictor:
             else:
                 logger.warning(f"League calibrator not found at {league_cal_path}")
         
-        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type, league_calibrator)
+        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type, league_calibrator, model_dir=str(path))
 
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
@@ -455,7 +457,7 @@ class Predictor:
             
             if debug:
                 print("\n" + "="*70)
-                print("🔍 DEBUG: Features fed to model")
+                print("DEBUG: Features fed to model")
                 print("="*70)
                 print(f"Input MatchState:")
                 print(f"  innings={state.innings}, over={state.over}, ball={state.ball}")
@@ -569,20 +571,20 @@ class Predictor:
                 if debug:
                     cal_label = f"Inn{state.innings}" if self.calibrator_type in ['innings_specific', 'innings_phase_specific'] else "Single"
                     if per_over_calibrator is not None:
-                        print(f"📊 Raw: {raw_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%} | PerOver ({over_key}): {self.last_calibrated_per_over:.1%}")
+                        print(f"[CAL] Raw: {raw_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%} | PerOver ({over_key}): {self.last_calibrated_per_over:.1%}")
                     elif phase_calibrator is not None:
-                        print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Inn-Specific: {calibrated_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%}")
+                        print(f"[CAL] Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Inn-Specific: {calibrated_prob:.1%} | Phase ({phase_key}): {self.last_calibrated_phase:.1%}")
                     elif self.calibrator_type in ['innings_specific', 'innings_phase_specific'] and combined_calibrator is not None:
-                        print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Combined: {calibrated_combined:.1%} | Inn-Specific ({cal_label}): {calibrated_prob:.1%}")
+                        print(f"[CAL] Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Combined: {calibrated_combined:.1%} | Inn-Specific ({cal_label}): {calibrated_prob:.1%}")
                     else:
-                        print(f"📊 Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Calibrated ({cal_label}): {calibrated_prob:.1%}")
+                        print(f"[CAL] Raw: {raw_prob:.1%} | Smoothed: {smoothed_prob:.1%} | Calibrated ({cal_label}): {calibrated_prob:.1%}")
             else:
                 # Still calculate per-over if available even without other calibrators
                 if per_over_calibrator is not None:
                     calibrated_per_over = float(per_over_calibrator.predict([raw_prob])[0])
                     self.last_calibrated_per_over = calibrated_per_over
                 if debug:
-                    print(f"📊 Model probability: {model_prob:.1%}")
+                    print(f"[CAL] Model probability: {model_prob:.1%}")
             
             # Get resource-based probability for constraint layer
             resource_prob = X['resource_win_prob'].iloc[0] if 'resource_win_prob' in X.columns else 0.5
@@ -662,7 +664,7 @@ class Predictor:
                         import numpy as np
                         prob = float(scaler.predict(np.array([[prob]]))[0])
                         if debug:
-                            print(f"🌍 League ({league_name}): {pre_league_prob:.1%} → {prob:.1%}")
+                            print(f"[LEAGUE] League ({league_name}): {pre_league_prob:.1%} -> {prob:.1%}")
                 elif method == 'temperature':
                     # Legacy format: T1/T2 keys
                     T = self.league_calibrator.get('T1' if state.innings == 1 else 'T2', 1.0)
@@ -671,7 +673,7 @@ class Predictor:
                         logit = np.log(prob / (1 - prob))
                         prob = 1 / (1 + np.exp(-logit / T))
                         if debug:
-                            print(f"🌍 League ({league_name}, T={T:.2f}): {pre_league_prob:.1%} → {prob:.1%}")
+                            print(f"[LEAGUE] League ({league_name}, T={T:.2f}): {pre_league_prob:.1%} -> {prob:.1%}")
                 elif method == 'platt':
                     # Legacy format: a1/b1/a2/b2 keys
                     a = self.league_calibrator.get('a1' if state.innings == 1 else 'a2', 1.0)
@@ -681,7 +683,7 @@ class Predictor:
                         logit = np.log(prob / (1 - prob))
                         prob = 1 / (1 + np.exp(-(a * logit + b)))
                         if debug:
-                            print(f"🌍 League ({league_name}, Platt): {pre_league_prob:.1%} → {prob:.1%}")
+                            print(f"[LEAGUE] League ({league_name}, Platt): {pre_league_prob:.1%} -> {prob:.1%}")
             
             return float(prob)
         except Exception as e:

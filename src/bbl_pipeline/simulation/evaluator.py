@@ -80,7 +80,7 @@ def apply_temperature_vectorized(probs: np.ndarray, temperature: float) -> np.nd
 def load_league_temperature(
     league: str,
     innings: int,
-    model_dir: str = "models/t20_male_v1",
+    model_dir: str = "models/t20_male_v2",
 ) -> Optional[float]:
     """
     Load temperature for a specific league and innings.
@@ -137,7 +137,7 @@ class TerminalStateEvaluator:
     Applies league-specific temperature calibration.
     """
     
-    def __init__(self, model_dir: str = "models/t20_male_v1", predictor: Optional["Predictor"] = None):
+    def __init__(self, model_dir: str = "models/t20_male_v2", predictor: Optional["Predictor"] = None):
         """
         Initialize evaluator.
         
@@ -331,10 +331,37 @@ class TerminalStateEvaluator:
         # Use predictor if available
         if self.predictor is not None:
             # Use the batch prediction method
+            predictor_model = getattr(self.predictor, 'model_dir', 'unknown')
+            
+            # Determine calibration type being used
+            calibration_type = "raw"
+            if hasattr(self.predictor, 'per_over_calibrators') and self.predictor.per_over_calibrators:
+                calibration_type = f"per_over_brier_optimized ({len(self.predictor.per_over_calibrators)} calibrators)"
+            elif hasattr(self.predictor, 'phase_calibrators') and self.predictor.phase_calibrators:
+                calibration_type = f"phase_isotonic ({len(self.predictor.phase_calibrators)} calibrators)"
+            elif hasattr(self.predictor, 'calibrator_inn1') and self.predictor.calibrator_inn1:
+                calibration_type = "innings_specific (2 calibrators)"
+            elif hasattr(self.predictor, 'calibrator') and self.predictor.calibrator:
+                calibration_type = "combined (1 calibrator)"
+            
+            has_league = hasattr(self.predictor, 'league_calibrator') and self.predictor.league_calibrator
+            
+            logger.debug(
+                "MC terminal eval using ML predictor",
+                predictor_model_dir=predictor_model,
+                n_states=len(states),
+                calibration=calibration_type,
+                league_calibration=has_league,
+            )
             league = states[0].league if states and hasattr(states[0], 'league') else None
             return self.predictor.predict_batch(states, league=league)
         
         # Fallback to resource_win_prob evaluation (loop)
+        logger.warning(
+            "MC terminal eval using RESOURCE FALLBACK (no predictor)",
+            n_states=len(states),
+            method="resource_win_prob",
+        )
         n = len(states)
         probs = np.zeros(n)
         
@@ -348,7 +375,7 @@ class TerminalStateEvaluator:
 def evaluate_terminal_state(
     state: MatchState,
     apply_temp: bool = True,
-    model_dir: str = "models/t20_male_v1",
+    model_dir: str = "models/t20_male_v2",
 ) -> float:
     """
     Evaluate win probability for a terminal simulation state.

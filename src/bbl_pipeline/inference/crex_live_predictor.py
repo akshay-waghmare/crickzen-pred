@@ -144,13 +144,13 @@ class CrexLivePredictor:
             from bbl_pipeline.inference.predictor import Predictor
             self.predictor = Predictor.load(self.model_dir, self.feature_store_dir, league=self.league)
             self.model = self.predictor.model
-            print(f"✅ Model loaded from {self.model_dir}")
+            print(f"[OK] Model loaded from {self.model_dir}")
             if self.feature_store_dir:
-                print(f"📊 Feature store: {self.feature_store_dir}")
+                print(f"[INFO] Feature store: {self.feature_store_dir}")
             if self.league:
-                print(f"🏏 League calibrator: {self.league}")
+                print(f"[INFO] League calibrator: {self.league}")
         except Exception as e:
-            print(f"⚠️ Could not load model: {e}")
+            print(f"[WARN] Could not load model: {e}")
             print("   Will run in scraper-only mode (no predictions)")
             self.predictor = None
     
@@ -166,12 +166,12 @@ class CrexLivePredictor:
                     # Check if history belongs to current match
                     saved_url = data.get("match_url")
                     if saved_url and saved_url != self.match_url:
-                        print(f"🔄 New match detected (URL mismatch). Clearing history.")
+                        print(f"[NEW] New match detected (URL mismatch). Clearing history.")
                         self._prediction_history = []
                         return
                         
                     self._prediction_history = data.get("history", [])
-                    print(f"📈 Loaded {len(self._prediction_history)} history points from {self._history_file}")
+                    print(f"[HIST] Loaded {len(self._prediction_history)} history points from {self._history_file}")
         except Exception as e:
             logger.warning(f"Could not load history: {e}")
             self._prediction_history = []
@@ -409,11 +409,11 @@ class CrexLivePredictor:
                 
                 # Only use if at least 2 matches played
                 if left_matches >= 2:
-                    print(f"📊 Extracted season stats for {left_team}: {left_matches} matches, {left_win_pct*100:.0f}% win rate")
+                    print(f"[STATS] Extracted season stats for {left_team}: {left_matches} matches, {left_win_pct*100:.0f}% win rate")
                     self._inject_season_stats(left_team, left_matches, left_win_pct, left_avg_score)
                 
                 if right_matches >= 2:
-                    print(f"📊 Extracted season stats for {right_team}: {right_matches} matches, {right_win_pct*100:.0f}% win rate")
+                    print(f"[STATS] Extracted season stats for {right_team}: {right_matches} matches, {right_win_pct*100:.0f}% win rate")
                     self._inject_season_stats(right_team, right_matches, right_win_pct, right_avg_score)
                     
         except Exception as e:
@@ -533,7 +533,7 @@ class CrexLivePredictor:
                     'avg_1st_inns': avg_1st_inns,
                     'avg_2nd_inns': avg_2nd_inns,
                 }
-                print(f"🏟️ Extracted venue stats: {num_matches} matches, bat first WR {bat_first_wr*100:.0f}%, bowl first WR {bowl_first_wr*100:.0f}%")
+                print(f"[VENUE] Extracted venue stats: {num_matches} matches, bat first WR {bat_first_wr*100:.0f}%, bowl first WR {bowl_first_wr*100:.0f}%")
                 print(f"   Avg 1st innings: {avg_1st_inns}, Avg 2nd innings: {avg_2nd_inns}")
                 logger.info(f"Injected venue situation stats: bat_first={bat_first_wr:.0%}, bowl_first={bowl_first_wr:.0%}, avg_1st={avg_1st_inns}, avg_2nd={avg_2nd_inns}")
                 
@@ -544,7 +544,7 @@ class CrexLivePredictor:
         """Fetch additional match info from the info page (toss, venue, etc)."""
         try:
             info_url = self._get_info_url()
-            print(f"📋 Fetching match info from: {info_url}")
+            print(f"[FETCH] Fetching match info from: {info_url}")
             
             # Navigate to info page briefly
             await self.page.goto(info_url, timeout=30000)
@@ -559,13 +559,13 @@ class CrexLivePredictor:
             if toss_match:
                 self.match_state.toss_winner = toss_match.group(1)
                 self.match_state.toss_decision = toss_match.group(2).lower()
-                print(f"🪙 Toss: {self.match_state.toss_winner} won, elected to {self.match_state.toss_decision}")
+                print(f"[TOSS] Toss: {self.match_state.toss_winner} won, elected to {self.match_state.toss_decision}")
             
             # Extract venue - look for known cricket venue patterns
             # Be specific to avoid capturing random text
             if self.venue_override:
                 self.match_state.venue = self.venue_override
-                print(f"🏟️ Venue (Override): {self.match_state.venue}")
+                print(f"[VENUE] Venue (Override): {self.match_state.venue}")
             else:
                 # First, try to extract venue from the weather section (appears at top of info page)
                 # Pattern: "International Sports Stadium, Coffs Harbour weather International Sports Stadium"
@@ -577,7 +577,7 @@ class CrexLivePredictor:
                     if len(venue) > 5 and len(venue) < 60:
                         self.match_state.venue = venue
                         logger.info(f"Extracted venue from weather section: '{venue}'")
-                        print(f"🏟️ Venue: {self.match_state.venue}")
+                        print(f"[VENUE] Venue: {self.match_state.venue}")
                 
                 # If weather pattern didn't work, try specific venue patterns
                 if not self.match_state.venue:
@@ -649,7 +649,7 @@ class CrexLivePredictor:
                             if len(venue) > 5 and len(venue) < 60:  # Reasonable venue name length
                                 self.match_state.venue = venue
                                 logger.info(f"Extracted venue from page: '{venue}'")
-                                print(f"🏟️ Venue: {self.match_state.venue}")
+                                print(f"[VENUE] Venue: {self.match_state.venue}")
                                 break
             
             # Extract teams from info page - store both teams, we'll figure out batting/bowling from title
@@ -659,7 +659,7 @@ class CrexLivePredictor:
                 # Store as team1 and team2 initially - batting will be set from title later
                 self._team1 = team1
                 self._team2 = team2
-                print(f"📍 Teams: {team1} vs {team2}")
+                print(f"[TEAMS] Teams: {team1} vs {team2}")
                 
                 # Extract venue stats FIRST (bat/bowl first win rates)
                 await self._extract_venue_stats(page_text)
@@ -673,7 +673,7 @@ class CrexLivePredictor:
             await asyncio.sleep(3)
             
         except Exception as e:
-            print(f"⚠️ Could not fetch info page: {e}")
+            print(f"[WARN] Could not fetch info page: {e}")
             # Still try to go to live page
             try:
                 await self.page.goto(self.match_url, timeout=30000)
@@ -683,7 +683,7 @@ class CrexLivePredictor:
     
     async def start(self):
         """Start the browser and navigate to match."""
-        print(f"🏏 Starting Crex Live Predictor")
+        print(f"[START] Starting Crex Live Predictor")
         print(f"   Match URL: {self.match_url}")
         
         playwright = await async_playwright().start()
@@ -701,7 +701,7 @@ class CrexLivePredictor:
         self.page.on("response", self._handle_response)
         
         # First fetch info page for toss, venue, etc.
-        print(f"🌐 Opening info page first...")
+        print(f"[WEB] Opening info page first...")
         await self._fetch_match_info_page()
         
         # Wait for page title to include score (retry up to 10 times)
@@ -711,7 +711,7 @@ class CrexLivePredictor:
                 break
             await asyncio.sleep(1)
         
-        print(f"✅ Page loaded: {title}")
+        print(f"[OK] Page loaded: {title}")
         
         # Extract localStorage for team/player code resolution
         try:
@@ -719,9 +719,9 @@ class CrexLivePredictor:
                 "() => Object.fromEntries(Object.entries(localStorage).map(([k, v]) => [k, v]))"
             )
             team_entries = sum(1 for k in self.local_storage if k.startswith('t_'))
-            print(f"📦 Loaded localStorage: {len(self.local_storage)} entries ({team_entries} teams)")
+            print(f"[STORE] Loaded localStorage: {len(self.local_storage)} entries ({team_entries} teams)")
         except Exception as e:
-            print(f"⚠️ Could not extract localStorage: {e}")
+            print(f"[WARN] Could not extract localStorage: {e}")
             self.local_storage = {}
         
         # Extract initial match info from live page
@@ -839,7 +839,7 @@ class CrexLivePredictor:
                         pass
                         
         except Exception as e:
-            print(f"⚠️ Error processing API data: {e}")
+            print(f"[WARN] Error processing API data: {e}")
     
     async def _extract_match_info(self):
         """Extract match information from DOM using Crex selectors."""
@@ -1013,7 +1013,7 @@ class CrexLivePredictor:
                     self.match_state.bowler1_name = bowler_match.group(1).strip()
                         
         except Exception as e:
-            print(f"⚠️ Error extracting match info: {e}")
+            print(f"[WARN] Error extracting match info: {e}")
     
     async def poll_and_predict(self) -> Optional[float]:
         """Poll for updates and run prediction."""
@@ -1032,7 +1032,7 @@ class CrexLivePredictor:
             return None
             
         except Exception as e:
-            print(f"⚠️ Error in poll_and_predict: {e}")
+            print(f"[WARN] Error in poll_and_predict: {e}")
             return None
     
     def _check_match_result(self) -> Optional[float]:
@@ -1129,7 +1129,7 @@ class CrexLivePredictor:
             return float(win_prob)
             
         except Exception as e:
-            print(f"⚠️ Prediction error: {e}")
+            print(f"[WARN] Prediction error: {e}")
             import traceback
             traceback.print_exc()
             return None
@@ -1268,7 +1268,7 @@ class CrexLivePredictor:
             return features
             
         except Exception as e:
-            print(f"⚠️ Error building features: {e}")
+            print(f"[WARN] Error building features: {e}")
             return None
     
     async def run(self, poll_interval: float = 2.0):
@@ -1277,17 +1277,17 @@ class CrexLivePredictor:
         
         started = await self.start()
         if not started:
-            print("❌ Failed to start predictor")
+            print("[ERROR] Failed to start predictor")
             return
         
         print("\n" + "="*60)
-        print("🏏 LIVE MATCH PREDICTION")
+        print("LIVE MATCH PREDICTION")
         print("="*60)
         print(f"   {self.match_state.batting_team} vs {self.match_state.bowling_team}")
         if self.match_state.venue:
-            print(f"   📍 {self.match_state.venue}")
+            print(f"   Venue: {self.match_state.venue}")
         print("="*60)
-        print("\n⏳ Monitoring match... Press Ctrl+C to stop\n")
+        print("\n[...] Monitoring match... Press Ctrl+C to stop\n")
         
         try:
             while self._running:
@@ -1300,9 +1300,9 @@ class CrexLivePredictor:
                 await asyncio.sleep(poll_interval)
                 
         except asyncio.CancelledError:
-            print("\n✋ Predictor stopped")
+            print("\n[STOP] Predictor stopped")
         except KeyboardInterrupt:
-            print("\n✋ Stopped by user")
+            print("\n[STOP] Stopped by user")
         finally:
             await self.stop()
     
@@ -1311,7 +1311,7 @@ class CrexLivePredictor:
         state = self.match_state
         
         # Build display line
-        display = f"\r📊 {state.batting_team}: {state.total_runs}/{state.wickets} ({state.overs} ov)"
+        display = f"\r{state.batting_team}: {state.total_runs}/{state.wickets} ({state.overs} ov)"
         
         if state.is_second_innings and state.target:
             runs_needed = state.target - state.total_runs
@@ -1322,7 +1322,7 @@ class CrexLivePredictor:
         if win_prob is not None:
             bar_len = 20
             filled = int(win_prob * bar_len)
-            bar = "█" * filled + "░" * (bar_len - filled)
+            bar = "#" * filled + "-" * (bar_len - filled)
             # Show both teams' probabilities
             bowling_prob = 1 - win_prob
             display += f" | {state.batting_team}: {win_prob*100:.1f}% [{bar}] {state.bowling_team}: {bowling_prob*100:.1f}%"
@@ -1440,6 +1440,8 @@ class CrexLivePredictor:
                 "calibrated_win_prob": getattr(self, 'last_calibrated_prob', win_prob),
                 "calibrated_phase_prob": getattr(self, 'last_calibrated_phase', win_prob),
                 "calibrated_per_over_prob": getattr(self, 'last_calibrated_per_over', win_prob),
+                "league": self.league,  # League code if --league was specified
+                "league_calibrated_prob": win_prob if self.league else None,  # Final league-calibrated prob
                 "features": features,
                 "history": self._prediction_history[-50:],  # Last 50 data points
                 # Market odds from CREX
@@ -1521,9 +1523,9 @@ class CrexLivePredictor:
         if self.browser:
             try:
                 await self.browser.close()
-                print("\n🛑 Browser closed")
+                print("\n[STOP] Browser closed")
             except Exception as e:
-                print(f"\n⚠️ Browser close failed (ignored): {e}")
+                print(f"\n[WARN] Browser close failed (ignored): {e}")
             finally:
                 self.browser = None
 
