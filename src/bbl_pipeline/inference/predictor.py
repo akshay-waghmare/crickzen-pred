@@ -4,8 +4,11 @@ import pickle
 from pathlib import Path
 import pandas as pd
 import numpy as np
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, TYPE_CHECKING
 import structlog
+
+if TYPE_CHECKING:
+    from ..simulation.feature_context import FeatureContext
 
 from .schema import MatchState
 from .realtime_mapper import RealTimeFeatureMapper
@@ -389,6 +392,138 @@ class Predictor:
         
         return pd.DataFrame([features])
 
+    def build_feature_context(
+        self,
+        batting_team: str,
+        bowling_team: str,
+        venue: str,
+        league: str,
+        innings: int,
+        # Optional season stats overrides (from Crex live scraper)
+        batting_team_wr: float | None = None,
+        bowling_team_wr: float | None = None,
+        batting_situation_wr: float | None = None,
+        bowling_situation_wr: float | None = None,
+    ) -> "FeatureContext":
+        """
+        Build FeatureContext from InMemoryFeatureStore for MC terminal state evaluation.
+        
+        This method is called ONCE per Monte Carlo simulation to cache venue/team stats.
+        The returned FeatureContext is then passed to predict_batch() for all 2000+
+        terminal states, amortizing the feature store lookup cost.
+        
+        Hybrid Stats Approach (Option 3):
+            If season stats are provided (batting_team_wr != 0.5), they override
+            the historical stats from the feature store. This ensures MC predictions
+            use the same stats as the baseline ML prediction.
+        
+        Args:
+            batting_team: Canonical team name (e.g., "Perth Scorchers")
+            bowling_team: Canonical team name (e.g., "Sydney Sixers")
+            venue: Venue name (e.g., "Perth Stadium")
+            league: League code (e.g., "bbl", "sa20")
+            innings: 1 or 2 (affects situation-specific win rates)
+            batting_team_wr: Optional season win rate for batting team (from Crex)
+            bowling_team_wr: Optional season win rate for bowling team (from Crex)
+            batting_situation_wr: Optional situation-specific WR for batting team
+            bowling_situation_wr: Optional situation-specific WR for bowling team
+            
+        Returns:
+            FeatureContext with venue/team stats (season if provided, else feature store)
+            
+        Raises:
+            KeyError: If team/venue not found in feature store
+            ValueError: If innings not in {1, 2}
+            
+        Performance:
+            ~10ms for 5 feature store lookups (amortized across 2000 states)
+        """
+        from ..simulation.feature_context import FeatureContext
+        
+        if innings not in (1, 2):
+            raise ValueError(f"innings must be 1 or 2, got {innings}")
+        
+        # Lookup venue stats
+        venue_stats = self.feature_store.get_venue_stats(venue)
+        if venue_stats:
+            venue_avg_score = venue_stats.get('avg_score', 165.0)
+            venue_bat_first_wr = venue_stats.get('bat_first_wr', 0.45)
+        else:
+            # Venue not found, use defaults
+            venue_avg_score = 165.0
+            venue_bat_first_wr = 0.45
+        
+        # Lookup team stats from feature store (historical)
+        team_a_stats = self.feature_store.get_team_stats(batting_team)
+        team_b_stats = self.feature_store.get_team_stats(bowling_team)
+        
+        # Use season stats if provided, else historical from feature store
+        # Season stats come from Crex live scraper with current season win rates
+        # Detect Crex data: if ANY of the 4 stats differs from 0.5 default, use season stats
+        # (It's extremely unlikely Crex would report exactly 50% for all 4 values)
+        has_season_stats = any([
+            batting_team_wr is not None and batting_team_wr != 0.5,
+            bowling_team_wr is not None and bowling_team_wr != 0.5,
+            batting_situation_wr is not None and batting_situation_wr != 0.5,
+            bowling_situation_wr is not None and bowling_situation_wr != 0.5,
+        ])
+        use_season_stats = has_season_stats
+        
+        if use_season_stats:
+            # Use Crex season stats (same as baseline ML prediction)
+            team_a_wr = batting_team_wr
+            team_b_wr = bowling_team_wr if bowling_team_wr is not None else 0.5
+            final_batting_situation_wr = batting_situation_wr if batting_situation_wr is not None else team_a_wr
+            final_bowling_situation_wr = bowling_situation_wr if bowling_situation_wr is not None else team_b_wr
+            logger.debug(
+                "Using season stats from Crex",
+                team_a_wr=team_a_wr,
+                team_b_wr=team_b_wr,
+                source="season"
+            )
+        else:
+            # Use historical stats from feature store
+            team_a_wr = team_a_stats.get('win_rate', 0.5)
+            team_b_wr = team_b_stats.get('win_rate', 0.5)
+            
+            # Determine situation-specific win rates based on innings
+            if innings == 1:
+                # Batting first, bowling first
+                final_batting_situation_wr = team_a_stats.get('bat_first_wr', team_a_wr)
+                final_bowling_situation_wr = team_b_stats.get('bowl_first_wr', team_b_wr)
+            else:
+                # Chasing (team A bats second), defending (team B bowled first)
+                final_batting_situation_wr = team_a_stats.get('bowl_first_wr', team_a_wr)
+                final_bowling_situation_wr = team_b_stats.get('bat_first_wr', team_b_wr)
+            logger.debug(
+                "Using historical stats from feature store",
+                team_a_wr=team_a_wr,
+                team_b_wr=team_b_wr,
+                source="feature_store"
+            )
+        
+        logger.debug(
+            "Built FeatureContext",
+            batting_team=batting_team,
+            bowling_team=bowling_team,
+            venue=venue,
+            venue_avg_score=venue_avg_score,
+            team_a_wr=team_a_wr,
+            team_b_wr=team_b_wr,
+            innings=innings,
+            stats_source="season" if use_season_stats else "feature_store"
+        )
+        
+        return FeatureContext(
+            venue_avg_score=venue_avg_score,
+            venue_bat_first_wr=venue_bat_first_wr,
+            team_a_wr=team_a_wr,
+            team_b_wr=team_b_wr,
+            batting_situation_wr=final_batting_situation_wr,
+            bowling_situation_wr=final_bowling_situation_wr,
+            league=league
+        )
+
     def predict(self, state: MatchState, debug: bool = False, ball_history: list = None) -> float:
         """
         Returns the win probability for the batting team.
@@ -699,7 +834,12 @@ class Predictor:
             )
             return resource_features['resource_win_prob']
 
-    def predict_batch(self, states: list, league: str = None) -> np.ndarray:
+    def predict_batch(
+        self, 
+        states: list, 
+        feature_context: Optional["FeatureContext"] = None,
+        league: str = None
+    ) -> np.ndarray:
         """
         Predict win probabilities for multiple MatchState objects in a single batch.
         
@@ -707,21 +847,44 @@ class Predictor:
         to evaluate thousands of states efficiently. Uses fully vectorized feature
         generation and model prediction.
         
+        CRITICAL: predict_batch() MUST NOT access FeatureStore directly; only via
+        FeatureContext parameter. This prevents accidental re-introduction of slow
+        per-state lookups.
+        
         Supports both inference.schema.MatchState (with over/ball/current_score) and
         simulation.state.MatchState (with balls_remaining/score).
         
         Args:
             states: List of MatchState objects to evaluate
+            feature_context: Optional FeatureContext with cached venue/team stats.
+                If provided, uses real feature store values. If None, falls back to
+                hardcoded defaults (simplified mode).
             league: Optional league code for league-specific calibration
             
         Returns:
             np.ndarray of win probabilities (one per state)
             
         Performance:
-            ~50-100ms for 2000 states (fully vectorized)
+            ~100-170ms for 2000 states with FeatureContext (fully vectorized)
+            ~50-100ms for 2000 states without FeatureContext (simplified mode)
         """
         if not states:
             return np.array([])
+        
+        # Determine feature mode for logging
+        if feature_context:
+            feature_mode = "full"
+            logger.debug(
+                "predict_batch using full features from FeatureContext",
+                venue_avg_score=feature_context.venue_avg_score,
+                team_a_wr=feature_context.team_a_wr,
+                team_b_wr=feature_context.team_b_wr
+            )
+        else:
+            feature_mode = "simplified"
+            logger.warning(
+                "predict_batch using simplified features (no FeatureContext provided)"
+            )
         
         n = len(states)
         probs = np.zeros(n)
@@ -798,8 +961,16 @@ class Predictor:
             return probs
         
         # =========================================================================
-        # VECTORIZED FEATURE GENERATION
+        # FEATURE GENERATION USING ResourceFeatureCalculator
         # =========================================================================
+        # CRITICAL: Use the same ResourceFeatureCalculator as predict() to ensure
+        # feature consistency. This is slower than vectorized approximations but
+        # guarantees identical features between predict() and predict_batch().
+        #
+        # The ~11pp gap was caused by simplified vectorized formulas that differed
+        # from the calibrated DLS-based calculations in ResourceFeatureCalculator.
+        # =========================================================================
+        
         # Extract arrays for non-terminal states only
         nt_scores = scores[non_terminal_mask]
         nt_wickets = wickets[non_terminal_mask]
@@ -811,72 +982,63 @@ class Predictor:
         
         num_states = len(nt_scores)
         
-        # Basic derived features (vectorized)
-        overs_bowled = nt_overs + (nt_balls / 6.0)
-        overs_remaining = 20 - overs_bowled
-        wickets_remaining = 10 - nt_wickets
+        # Pre-allocate arrays for resource-based features (from ResourceFeatureCalculator)
+        resource_win_prob = np.zeros(num_states)
+        expected_final_score = np.zeros(num_states)
+        resource_pct = np.zeros(num_states)
+        pressure_index = np.zeros(num_states)
+        is_powerplay = np.zeros(num_states)
+        is_middle_overs = np.zeros(num_states)
+        is_death_overs = np.zeros(num_states)
+        current_run_rate = np.zeros(num_states)
+        required_run_rate = np.zeros(num_states)
+        overs_remaining = np.zeros(num_states)
+        runs_required = np.zeros(num_states)
         
-        # Run rates (vectorized)
-        current_run_rate = np.where(overs_bowled > 0, nt_scores / overs_bowled, 0.0)
-        runs_required = np.where(nt_innings == 2, nt_targets - nt_scores, 0.0)
-        required_run_rate = np.where(
-            (nt_innings == 2) & (overs_remaining > 0),
-            runs_required / overs_remaining,
-            0.0
-        )
-        run_rate_diff = current_run_rate - required_run_rate
+        # Calculate resource features using the same calculator as predict()
+        for i in range(num_states):
+            resource_features = self.resource_calculator.calculate_all_features(
+                innings=int(nt_innings[i]),
+                over=int(nt_overs[i]),
+                ball=int(nt_balls[i]),
+                current_score=int(nt_scores[i]),
+                wickets_lost=int(nt_wickets[i]),
+                target_runs=int(nt_targets[i]) if nt_targets[i] > 0 else None
+            )
+            
+            # Extract all resource features to ensure consistency with predict()
+            resource_win_prob[i] = resource_features['resource_win_prob']
+            expected_final_score[i] = resource_features['expected_final_score']
+            resource_pct[i] = resource_features['resource_pct']
+            pressure_index[i] = resource_features['pressure_index']
+            is_powerplay[i] = resource_features['is_powerplay']
+            is_middle_overs[i] = resource_features['is_middle_overs']
+            is_death_overs[i] = resource_features['is_death_overs']
+            current_run_rate[i] = resource_features['current_run_rate']
+            required_run_rate[i] = resource_features['required_run_rate']
+            overs_remaining[i] = resource_features['overs_remaining']
+            runs_required[i] = resource_features.get('runs_required', 0)
         
-        # Phase detection (vectorized)
-        current_over_1based = nt_overs + 1
-        is_powerplay = (current_over_1based <= 6).astype(float)
-        is_middle_overs = ((current_over_1based > 6) & (current_over_1based <= 15)).astype(float)
-        is_death_overs = (current_over_1based > 15).astype(float)
-        
-        # Resource percentage (vectorized approximation using DLS formula)
-        # More accurate: resource_pct = exp(-0.045 * overs_remaining * (10/(10+wickets_lost)))
-        resource_remaining_pct = np.clip(
-            np.exp(-0.045 * (20 - overs_remaining) * (10.0 / (10.0 + nt_wickets))) * 100.0,
-            0.0, 100.0
-        )
-        # Also compute simpler version for consistency with some features
-        resource_pct = np.clip(
-            (overs_remaining / 20.0) * 100.0 * (1 - 0.08 * nt_wickets),
-            0.0, 100.0
-        )
-        
-        # Expected final score projection with regression toward mean (matches calculator.py)
-        # 1. Calculate resource used and remaining
-        resource_at_start = 100.0
-        resource_used = resource_at_start - resource_pct
-        resource_used = np.clip(resource_used, 0.001, 100.0)  # Avoid div by zero
-        
-        # 2. Raw projection based on runs per resource
-        runs_per_resource = nt_scores / resource_used
-        raw_projection = nt_scores + (runs_per_resource * resource_pct)
-        
-        # 3. Regression toward par score (160) based on overs bowled
-        # Early overs: trust ~20% trajectory, 80% par
-        # Late overs: trust ~95% trajectory, 5% par
-        PAR_SCORE = 160.0
-        trajectory_weight = np.clip(overs_bowled / 20.0, 0.0, 0.95)
-        
-        # 4. Regressed projection
-        expected_final_score = trajectory_weight * raw_projection + (1 - trajectory_weight) * PAR_SCORE
-        expected_final_score = np.clip(expected_final_score, 100.0, 280.0)
+        # Derived features (can be vectorized since they use the calculator outputs)
         projected_score = expected_final_score  # alias
+        wickets_remaining = 10 - nt_wickets
+        dls_pressure_index = pressure_index  # alias
         
-        # Venue stats (use defaults for speed - actual lookups are expensive)
-        venue_avg_score = 165.0
+        # Run rate diff (vectorized from calculated run rates)
+        # In innings 1, run_rate_diff = 0 (no target to compare to)
+        run_rate_diff = np.where(nt_innings == 2, current_run_rate - required_run_rate, 0.0)
+        # =========================================================================
+        # VENUE STATS - Use FeatureContext if provided, else defaults
+        # =========================================================================
+        if feature_context:
+            venue_avg_score = feature_context.venue_avg_score
+            venue_bat_first_win_rate = feature_context.venue_bat_first_wr
+        else:
+            venue_avg_score = 165.0
+            venue_bat_first_win_rate = 0.45
         venue_avg_wickets = 6.5
-        venue_bat_first_win_rate = 0.45
         
-        # Score vs par (vectorized)
-        resources_used = 100 - resource_pct
-        par_at_point_inn2 = np.where(nt_targets > 0, nt_targets * (resources_used / 100.0), 0.0)
-        score_vs_par_inn2 = nt_scores - par_at_point_inn2
-        score_vs_par_inn1 = nt_scores - (venue_avg_score * (1 - resource_pct/100.0))
-        score_vs_par = np.where(nt_innings == 2, score_vs_par_inn2, score_vs_par_inn1)
-        
+        # Derived features (vectorized from calculator outputs)
         projected_vs_venue_avg = projected_score - venue_avg_score
         score_per_wicket = nt_scores / (nt_wickets + 1)
         wickets_times_balls = nt_wickets * (120 - nt_balls_remaining)
@@ -888,43 +1050,41 @@ class Predictor:
             0.0
         )
         
-        # Pressure index (simplified DLS-style)
-        pressure_index = np.where(
-            nt_innings == 2,
-            np.clip((required_run_rate - 8.0) / 4.0 + (nt_wickets / 10.0), -1.0, 2.0),
-            np.clip((nt_wickets - 3) / 7.0, -0.5, 1.0)
-        )
-        dls_pressure_index = pressure_index  # alias
+        # Score vs par - use calculator-derived resource_pct for consistency
+        resources_used = 100 - resource_pct
+        par_at_point_inn2 = np.where(nt_targets > 0, nt_targets * (resources_used / 100.0), 0.0)
+        score_vs_par_inn2 = nt_scores - par_at_point_inn2
+        score_vs_par_inn1 = nt_scores - (venue_avg_score * (1 - resource_pct/100.0))
+        score_vs_par = np.where(nt_innings == 2, score_vs_par_inn2, score_vs_par_inn1)
         
-        # Resource win prob (simplified, vectorized)
-        # For 2nd innings: based on RRR
-        rrr_factor = np.clip(1.0 - (required_run_rate - 8.0) / 10.0, 0.0, 1.0)
-        wicket_factor = 1.0 - 0.08 * nt_wickets
-        resource_win_prob_inn2 = np.clip(rrr_factor * wicket_factor, 0.001, 0.999)
+        # Computed resources
+        crr_times_res = current_run_rate * resource_pct / 100.0
+        resources_remaining = resource_pct / 100.0
         
-        # For 1st innings: based on expected score vs par (160)
-        # Use sigmoid centered on par score, with gentle slope
-        # expected_final_score of 160 -> 0.5, 180 -> ~0.6, 140 -> ~0.4
-        score_factor = 1.0 / (1.0 + np.exp(-0.03 * (expected_final_score - PAR_SCORE)))
-        # Adjust for wickets, but less harshly in first innings since more uncertainty
-        wicket_factor_inn1 = 1.0 - 0.04 * nt_wickets  # Gentler than 2nd innings
-        resource_win_prob_inn1 = np.clip(score_factor * wicket_factor_inn1, 0.001, 0.999)
-        
-        resource_win_prob = np.where(nt_innings == 2, resource_win_prob_inn2, resource_win_prob_inn1)
-        
-        # Team/player stats - extract from states if available, otherwise use defaults
-        # This is critical for Monte Carlo to use actual team strengths!
+        # =========================================================================
+        # TEAM STATS - Use FeatureContext if provided, else fall back to state attrs/defaults
+        # CRITICAL: predict_batch() MUST NOT access FeatureStore directly;
+        # only via FeatureContext parameter.
+        # =========================================================================
         batting_team_win_rates = np.zeros(num_states)
         bowling_team_win_rates = np.zeros(num_states)
         batting_team_situation_wrs = np.zeros(num_states)
         bowling_team_situation_wrs = np.zeros(num_states)
         
-        for i, idx in enumerate(non_terminal_indices):
-            state = states[idx]
-            batting_team_win_rates[i] = getattr(state, 'batting_team_win_rate', 0.5)
-            bowling_team_win_rates[i] = getattr(state, 'bowling_team_win_rate', 0.5)
-            batting_team_situation_wrs[i] = getattr(state, 'batting_team_situation_wr', batting_team_win_rates[i])
-            bowling_team_situation_wrs[i] = getattr(state, 'bowling_team_situation_wr', bowling_team_win_rates[i])
+        if feature_context:
+            # All states in batch have same teams (same MC call) - vectorized assignment
+            batting_team_win_rates[:] = feature_context.team_a_wr
+            bowling_team_win_rates[:] = feature_context.team_b_wr
+            batting_team_situation_wrs[:] = feature_context.batting_situation_wr
+            bowling_team_situation_wrs[:] = feature_context.bowling_situation_wr
+        else:
+            # Fallback to state attributes or defaults (simplified mode)
+            for i, idx in enumerate(non_terminal_indices):
+                state = states[idx]
+                batting_team_win_rates[i] = getattr(state, 'batting_team_win_rate', 0.5)
+                bowling_team_win_rates[i] = getattr(state, 'bowling_team_win_rate', 0.5)
+                batting_team_situation_wrs[i] = getattr(state, 'batting_team_situation_wr', batting_team_win_rates[i])
+                bowling_team_situation_wrs[i] = getattr(state, 'bowling_team_situation_wr', bowling_team_win_rates[i])
         
         team_strength_diff = batting_team_win_rates - bowling_team_win_rates
         situation_advantage = batting_team_situation_wrs - bowling_team_situation_wrs

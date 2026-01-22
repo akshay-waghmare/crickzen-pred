@@ -14,6 +14,7 @@ from .config import get_phase, EDGE_MIN_BY_PHASE, SIGMA_MAX_BY_PHASE
 from .state import MatchState, SimulationResult
 from .sampler import NextBallSampler
 from .evaluator import TerminalStateEvaluator, apply_temperature, load_league_temperature
+from .feature_context import FeatureContext
 
 # Avoid circular import
 if TYPE_CHECKING:
@@ -123,9 +124,48 @@ def simulate(
     
     # Batch evaluation for ML model
     if use_ml_model and terminal_states:
-        terminal_probs = evaluator.evaluate_batch_with_model(terminal_states, apply_temp=False)
+        # Build FeatureContext once for all terminal states (amortizes feature store lookups)
+        feature_context = None
+        try:
+            feature_context = predictor.build_feature_context(
+                batting_team=state.batting_team,
+                bowling_team=state.bowling_team,
+                venue=state.venue,
+                league=state.league,
+                innings=state.innings
+            )
+            logger.debug(
+                "Built FeatureContext for MC terminal evaluation",
+                feature_mode="full",
+                venue_avg_score=feature_context.venue_avg_score,
+                team_a_wr=feature_context.team_a_wr,
+            )
+        except (KeyError, AttributeError) as e:
+            logger.warning(
+                "FeatureContext build failed, using simplified features",
+                error=str(e),
+                venue=state.venue,
+                batting_team=state.batting_team,
+                bowling_team=state.bowling_team,
+                feature_mode="simplified",
+            )
+            feature_context = None
+        
+        terminal_probs = evaluator.evaluate_batch_with_model(
+            terminal_states, 
+            feature_context=feature_context,
+            apply_temp=False
+        )
+        # Track feature mode for result
+        _feature_mode = "full" if feature_context else "simplified"
     
     elapsed = time.time() - start_time
+    
+    # Determine feature mode for result
+    if use_ml_model:
+        sim_feature_mode = _feature_mode
+    else:
+        sim_feature_mode = None  # Not applicable for resource_win_prob
     
     result = SimulationResult.from_probs(
         probs=terminal_probs,
@@ -133,6 +173,7 @@ def simulate(
         time_taken_ms=elapsed * 1000,
         league=state.league,
         temperature=temperature if not use_ml_model else None,
+        feature_mode=sim_feature_mode,
     )
     
     # Get model source info for logging
@@ -269,10 +310,44 @@ def simulate_vectorized(
             )
             terminal_states.append(eval_state)
         
-        # Batch prediction (ML model with calibration)
-        terminal_probs = evaluator.evaluate_batch_with_model(terminal_states, apply_temp=False)
+        # Build FeatureContext once for all terminal states (amortizes feature store lookups)
+        feature_context = None
+        try:
+            feature_context = predictor.build_feature_context(
+                batting_team=state.batting_team,
+                bowling_team=state.bowling_team,
+                venue=state.venue,
+                league=state.league,
+                innings=state.innings
+            )
+            logger.debug(
+                "Built FeatureContext for MC vectorized evaluation",
+                feature_mode="full",
+                venue_avg_score=feature_context.venue_avg_score,
+                team_a_wr=feature_context.team_a_wr,
+            )
+        except (KeyError, AttributeError) as e:
+            logger.warning(
+                "FeatureContext build failed, using simplified features",
+                error=str(e),
+                venue=state.venue,
+                batting_team=state.batting_team,
+                bowling_team=state.bowling_team,
+                feature_mode="simplified",
+            )
+            feature_context = None
+        
+        # Batch prediction (ML model with calibration + FeatureContext)
+        terminal_probs = evaluator.evaluate_batch_with_model(
+            terminal_states, 
+            feature_context=feature_context,
+            apply_temp=False
+        )
+        # Track feature mode for result
+        vec_feature_mode = "full" if feature_context else "simplified"
     else:
         # Use resource_win_prob heuristic (faster)
+        vec_feature_mode = None  # Not applicable for resource_win_prob
         for i in range(n_simulations):
             # Create state for evaluation
             eval_state = MatchState(
@@ -302,6 +377,7 @@ def simulate_vectorized(
         time_taken_ms=elapsed * 1000,
         league=state.league,
         temperature=temperature if not use_ml_model else None,
+        feature_mode=vec_feature_mode,
     )
     
     # Get model source info for logging

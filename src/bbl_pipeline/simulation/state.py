@@ -148,6 +148,7 @@ class SimulationResult:
         time_taken_ms: Execution time in milliseconds
         league: League used for temperature calibration
         temperature: Temperature applied (if any)
+        feature_mode: "full" (FeatureContext) or "simplified" (defaults)
         all_probs: Raw probability array (optional, for debugging)
     """
     mean_prob: float
@@ -159,6 +160,7 @@ class SimulationResult:
     time_taken_ms: float
     league: str
     temperature: Optional[float] = None
+    feature_mode: Optional[str] = None  # "full" or "simplified"
     all_probs: Optional[np.ndarray] = field(default=None, repr=False)
     
     def __post_init__(self) -> None:
@@ -178,6 +180,7 @@ class SimulationResult:
         time_taken_ms: float,
         league: str,
         temperature: Optional[float] = None,
+        feature_mode: Optional[str] = None,
     ) -> "SimulationResult":
         """
         Create SimulationResult from array of probabilities.
@@ -188,6 +191,7 @@ class SimulationResult:
             time_taken_ms: Execution time in milliseconds
             league: League code
             temperature: Temperature applied (if any)
+            feature_mode: "full" (FeatureContext used) or "simplified" (defaults)
             
         Returns:
             SimulationResult with computed statistics
@@ -202,6 +206,7 @@ class SimulationResult:
             time_taken_ms=time_taken_ms,
             league=league,
             temperature=temperature,
+            feature_mode=feature_mode,
             all_probs=probs,
         )
     
@@ -217,4 +222,5 @@ class SimulationResult:
             "time_taken_ms": self.time_taken_ms,
             "league": self.league,
             "temperature": self.temperature,
+            "feature_mode": self.feature_mode,
         }

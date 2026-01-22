@@ -15,9 +15,10 @@ import structlog
 from ..features.calculator import ResourceFeatureCalculator
 from .state import MatchState
 
-# Avoid circular import - only import Predictor for type hints
+# Avoid circular import - only import Predictor and FeatureContext for type hints
 if TYPE_CHECKING:
     from ..inference.predictor import Predictor
+    from .feature_context import FeatureContext
 
 logger = structlog.get_logger()
 
@@ -304,6 +305,7 @@ class TerminalStateEvaluator:
     def evaluate_batch_with_model(
         self,
         states: List[MatchState],
+        feature_context: Optional["FeatureContext"] = None,
         apply_temp: bool = False,
     ) -> np.ndarray:
         """
@@ -315,6 +317,9 @@ class TerminalStateEvaluator:
         
         Args:
             states: List of MatchState objects to evaluate
+            feature_context: Optional FeatureContext with cached venue/team stats.
+                If provided, uses real feature store values for terminal state
+                evaluation (full mode). If None, falls back to simplified defaults.
             apply_temp: Whether to apply temperature (usually False since
                        predictor handles its own calibration)
             
@@ -322,7 +327,8 @@ class TerminalStateEvaluator:
             Array of win probabilities (n,)
             
         Performance:
-            ~400-800ms for 2000 states with ML model
+            ~100-170ms for 2000 states with ML model + FeatureContext (full)
+            ~50-100ms for 2000 states with ML model + defaults (simplified)
             ~60ms for 2000 states with resource_win_prob fallback
         """
         if not states:
@@ -345,6 +351,7 @@ class TerminalStateEvaluator:
                 calibration_type = "combined (1 calibrator)"
             
             has_league = hasattr(self.predictor, 'league_calibrator') and self.predictor.league_calibrator
+            feature_mode = "full" if feature_context else "simplified"
             
             logger.debug(
                 "MC terminal eval using ML predictor",
@@ -352,9 +359,10 @@ class TerminalStateEvaluator:
                 n_states=len(states),
                 calibration=calibration_type,
                 league_calibration=has_league,
+                feature_mode=feature_mode,
             )
             league = states[0].league if states and hasattr(states[0], 'league') else None
-            return self.predictor.predict_batch(states, league=league)
+            return self.predictor.predict_batch(states, feature_context=feature_context, league=league)
         
         # Fallback to resource_win_prob evaluation (loop)
         logger.warning(
