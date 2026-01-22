@@ -3875,18 +3875,6 @@ def main():
         with st.expander("🎲 Monte Carlo Simulation (Uncertainty Quantification)", expanded=True):
             st.markdown("### Forward-Looking Win Probability with Confidence Intervals")
             
-            # Show ML Model baseline for reference
-            ml_baseline = mc_data.get("ml_baseline") or d.get("bat_win_prob", 0.5)
-            league = d.get("league")
-            use_ml_model = mc_data.get("use_ml_model", False)
-            
-            st.success(f"""
-**ML Model Baseline**: {ml_baseline*100:.1f}% (fully calibrated{' with ' + league.upper() + ' league adjustment' if league else ''})
-
-Monte Carlo simulates {mc_data.get('balls_remaining', '?')} possible outcomes. Results are **anchored to the ML baseline** 
-— mean equals the ML model, spread (σ) shows uncertainty from simulation variance.
-""")
-            
             sim_1ball = mc_data.get("simulation_1ball", {})
             sim_6ball = mc_data.get("simulation_6ball", {})
             sim_12ball = mc_data.get("simulation_12ball", {})
