@@ -346,9 +346,25 @@
           ]
         },
         "recent_changes": {
-          "date": "2026-01-19",
-          "description": "V2: Pure franchise leagues only (excludes T10, The Hundred, T20I). 11 leagues: BBL, BPL, CPL, ILT20, IPL, LPL, MLC, NTB (Blast), PSL, SA20, SSM.",
-          "impact": "Brier: 0.1788, ECE: 0.0000. Cleaner model for T20 franchise cricket."
+          "date": "2026-01-23",
+          "description": "V2: Pure franchise leagues only (excludes T10, The Hundred, T20I). 11 leagues: BBL, BPL, CPL, ILT20, IPL, LPL, MLC, NTB (Blast), PSL, SA20, SSM. SSM league calibrator regenerated with 55,470 samples.",
+          "impact": "Brier: 0.1788, ECE: 0.0000. Cleaner model for T20 franchise cricket. SSM calibrator: Brier 0.1656→0.1647 (+0.5%), LogLoss 0.4941→0.4899 (+0.9%)."
+        }
+      },
+      "league_calibrators": {
+        "ssm": "models/t20_male_v2/league_calibrators/ssm"
+      },
+      "league_calibrator_details": {
+        "ssm": {
+          "method": "temperature",
+          "fitted_date": "2026-01-23",
+          "samples": 55470,
+          "brier_improvement": 0.5,
+          "logloss_improvement": 0.9,
+          "temperatures": {
+            "innings_1": 0.7832,
+            "innings_2": 0.8215
+          }
         }
       }
     },
@@ -665,11 +681,11 @@
     "samples": 57999,
     "leagues": [
       "wpl",
-      "ssm"
+      "wssm"
     ],
     "league_calibrators": {
       "wpl": "models/t20_female_v2/league_calibrators/wpl",
-      "ssm": "models/t20_female_v2/league_calibrators/ssm"
+      "wssm": "models/t20_female_v2/league_calibrators/wssm"
     }
   },
   "models": {
@@ -681,7 +697,7 @@
       "matches": 1217,
       "leagues": [
         "wbbl",
-        "ssm",
+        "wssm",
         "wpl",
         "cec",
         "wcsl",
@@ -702,7 +718,11 @@
       "feature_store": "data/t20_female_feature_store_v3",
       "features_dir": "data/t20_female_features_v3",
       "teams": 65,
-      "notes": "Expanded from v2 (260 matches) to v3 (1217 matches) - 368% increase"
+      "notes": "Expanded from v2 (260 matches) to v3 (1217 matches) - 368% increase",
+      "league_calibrators": {
+        "wssm": "models/t20_female_v3/league_calibrators/wssm",
+        "wpl": "models/t20_female_v3/league_calibrators/wpl"
+      }
     }
   }
 }

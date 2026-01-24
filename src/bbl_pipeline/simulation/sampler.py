@@ -10,15 +10,18 @@ import numpy as np
 from typing import Tuple, Optional, Dict
 from pathlib import Path
 import json
+import structlog
 
 from .config import (
-    RUN_DIST,
+    RUN_DIST, 
     RUN_CDF,
     WICKET_PROB,
     WICKET_MULTIPLIER,
     get_phase,
 )
 from .state import MatchState
+
+logger = structlog.get_logger(__name__)
 
 # Cache for league-specific distributions
 _LEAGUE_DIST_CACHE: Dict[str, Dict] = {}
@@ -115,6 +118,12 @@ class NextBallSampler:
                 phase: cdf[1] for phase, cdf in self._league_data['run_cdf'].items()
             }
             self._wicket_prob = self._league_data.get('wicket_prob', WICKET_PROB)
+            logger.info(
+                "Sampler using league-specific distributions",
+                league=league,
+                phases=list(self._run_values.keys()),
+                distribution_source=f"data/phase_distributions_{league}.json"
+            )
         else:
             # Use global distributions
             self._run_values = {
@@ -124,6 +133,14 @@ class NextBallSampler:
                 phase: cdf[1] for phase, cdf in RUN_CDF.items()
             }
             self._wicket_prob = WICKET_PROB
+            if league:
+                logger.warning(
+                    "League-specific distributions not found, using global T20 distributions",
+                    league=league,
+                    expected_file=f"data/phase_distributions_{league}.json"
+                )
+            else:
+                logger.debug("Sampler using global T20 distributions")
     
     def sample(self, state: MatchState) -> Tuple[int, bool]:
         """
