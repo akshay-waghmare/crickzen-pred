@@ -48,6 +48,7 @@ from .engine import (
     simulate_single_ball,
     simulate_one_over,
     simulate_two_overs,
+    simulate_five_overs,
     get_required_simulations,
 )
 from .betting import (
@@ -90,6 +91,7 @@ __all__ = [
     "simulate_single_ball",
     "simulate_one_over",
     "simulate_two_overs",
+    "simulate_five_overs",
     "get_required_simulations",
     # Betting
     "BetDecision",

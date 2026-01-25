@@ -3878,10 +3878,11 @@ def main():
             sim_1ball = mc_data.get("simulation_1ball", {})
             sim_6ball = mc_data.get("simulation_6ball", {})
             sim_12ball = mc_data.get("simulation_12ball", {})
+            sim_30ball = mc_data.get("simulation_30ball", {})
             betting = mc_data.get("betting_decision", {})
             
-            # 1-Ball, 6-Ball and 12-Ball simulation results side by side
-            sim_col1, sim_col2, sim_col3 = st.columns(3)
+            # 1-Ball, 6-Ball, 12-Ball and 30-Ball simulation results side by side
+            sim_col1, sim_col2, sim_col3, sim_col4 = st.columns(4)
             
             with sim_col1:
                 st.markdown("#### 🎯 Next Ball")
@@ -3946,6 +3947,27 @@ def main():
                 else:
                     st.info("12-ball simulation not available")
             
+            with sim_col4:
+                st.markdown("#### 🎲 5 Overs (30 balls)")
+                if sim_30ball:
+                    mean_30 = sim_30ball.get("mean_prob", sim_30ball.get("mean", 0)) * 100
+                    std_30 = sim_30ball.get("std_prob", sim_30ball.get("std", 0)) * 100
+                    p5_30 = sim_30ball.get("p5", 0) * 100
+                    p95_30 = sim_30ball.get("p95", 0) * 100
+                    n_sims_30 = sim_30ball.get("n_sims", sim_30ball.get("n_simulations", 0))
+                    
+                    st.metric(
+                        f"Mean Win Prob (n={n_sims_30:,})",
+                        f"{mean_30:.1f}%",
+                        f"±{std_30:.1f}% (1σ)"
+                    )
+                    st.caption(f"90% CI: [{p5_30:.1f}% — {p95_30:.1f}%]")
+                    
+                    # Visual confidence bar
+                    st.progress(mean_30 / 100, text=f"Batting Team: {mean_30:.1f}%")
+                else:
+                    st.info("30-ball simulation not available")
+            
             # Betting Decision Support
             st.markdown("---")
             st.markdown("#### 💰 Betting Decision Support")
@@ -3988,7 +4010,8 @@ def main():
             **How Monte Carlo Simulation Works:**
             - **1-Ball**: Simulates all possible outcomes of the next delivery (dot, 1-6 runs, wicket)
             - **1-Over (6-Ball)**: Simulates the next over with temperature-scaled probabilities for variance
-            - **2-Over (12-Ball)**: Simulates the next 2 overs for longer-term uncertainty quantification
+            - **2-Over (12-Ball)**: Simulates the next 2 overs for medium-term uncertainty quantification
+            - **5-Over (30-Ball)**: Simulates the next 5 overs - useful for first innings where predictions are less stable
             - **Confidence Interval**: 90% of simulated outcomes fall within the p5-p95 range
             - **Kelly Criterion**: Optimal bet sizing based on edge and phase-specific thresholds
             """)

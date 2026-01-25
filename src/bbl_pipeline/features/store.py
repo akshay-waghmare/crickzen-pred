@@ -606,7 +606,22 @@ class InMemoryFeatureStore:
         if not self._loaded:
             self.load()
             
+        # Handle empty venue name - still return CREX-overridden defaults if available
         if not venue_name:
+            # Return defaults with CREX override if available
+            base_stats = {
+                'venue_avg_score': 160.0,
+                'venue_avg_wickets': 6.0,
+                'venue_bat_first_win_rate': 0.5,
+            }
+            # Override with live VENUE_SITUATION_STATS from CREX if available
+            if self.VENUE_SITUATION_STATS:
+                if 'avg_1st_inns' in self.VENUE_SITUATION_STATS:
+                    base_stats['venue_avg_score'] = float(self.VENUE_SITUATION_STATS['avg_1st_inns'])
+                    logger.info(f"Using CREX venue stats for empty venue: avg_score={base_stats['venue_avg_score']}")
+                if 'bat_first_wr' in self.VENUE_SITUATION_STATS:
+                    base_stats['venue_bat_first_win_rate'] = float(self.VENUE_SITUATION_STATS['bat_first_wr'])
+                return base_stats
             return None
 
         # 0. Check venue alias mapping first
@@ -639,7 +654,11 @@ class InMemoryFeatureStore:
         
         # 4. If no historical data found, create default stats
         if base_stats is None:
-            logger.warning(f"No venue stats found for '{venue_name}', using defaults")
+            # Only log warning if venue name is meaningful (not generic placeholder)
+            if venue_name and venue_name not in ['Unknown', 'International Cricket Stadium']:
+                logger.warning(f"No venue stats found for '{venue_name}', using defaults")
+            else:
+                logger.info(f"Using default venue stats (venue not identified from match page)")
             base_stats = {
                 'venue_avg_score': 160.0,
                 'venue_avg_wickets': 6.0,

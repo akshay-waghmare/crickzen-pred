@@ -446,8 +446,8 @@ class Predictor:
         # Lookup venue stats
         venue_stats = self.feature_store.get_venue_stats(venue)
         if venue_stats:
-            venue_avg_score = venue_stats.get('avg_score', 165.0)
-            venue_bat_first_wr = venue_stats.get('bat_first_wr', 0.45)
+            venue_avg_score = venue_stats.get('venue_avg_score', 165.0)
+            venue_bat_first_wr = venue_stats.get('venue_bat_first_win_rate', 0.45)
         else:
             # Venue not found, use defaults
             venue_avg_score = 165.0
@@ -1282,6 +1282,12 @@ class Predictor:
         # T20 International: Skip calibration, use raw model output
         # The raw model is better calibrated for diverse international conditions
         if league and league.lower() in ['t20i', 't20_international', 't20international']:
+            logger.debug(
+                "Skipping calibration for T20 International",
+                league=league,
+                n_predictions=n,
+                raw_mean=np.mean(raw_probs)
+            )
             return calibrated
         
         # Determine phase for each prediction

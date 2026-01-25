@@ -353,6 +353,7 @@ class TerminalStateEvaluator:
             has_league = hasattr(self.predictor, 'league_calibrator') and self.predictor.league_calibrator
             feature_mode = "full" if feature_context else "simplified"
             
+            league = states[0].league if states and hasattr(states[0], 'league') else None
             logger.debug(
                 "MC terminal eval using ML predictor",
                 predictor_model_dir=predictor_model,
@@ -360,8 +361,8 @@ class TerminalStateEvaluator:
                 calibration=calibration_type,
                 league_calibration=has_league,
                 feature_mode=feature_mode,
+                league_param=league,
             )
-            league = states[0].league if states and hasattr(states[0], 'league') else None
             return self.predictor.predict_batch(states, feature_context=feature_context, league=league)
         
         # Fallback to resource_win_prob evaluation (loop)

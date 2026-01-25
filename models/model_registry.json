@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-21",
+  "last_updated": "2026-01-25",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -352,7 +352,9 @@
         }
       },
       "league_calibrators": {
-        "ssm": "models/t20_male_v2/league_calibrators/ssm"
+        "ssm": "models/t20_male_v2/league_calibrators/ssm",
+        "sa20": "models/t20_male_v2/league_calibrators/sa20",
+        "bbl": "models/t20_male_v2/league_calibrators/bbl"
       },
       "league_calibrator_details": {
         "ssm": {
@@ -365,6 +367,46 @@
             "innings_1": 0.7832,
             "innings_2": 0.8215
           }
+        },
+        "sa20": {
+          "method": "temperature",
+          "fitted_date": "2026-01-19",
+          "samples": 26121,
+          "brier_improvement": 0.7,
+          "logloss_improvement": 1.4,
+          "temperatures": {
+            "innings_1": 0.9981,
+            "innings_2": 0.9523
+          }
+        }
+      },
+      "league_distributions": {
+        "ssm": {
+          "path": "data/phase_distributions_ssm.json",
+          "generated_date": "2026-01-23",
+          "balls": 55235,
+          "matches": 263,
+          "powerplay_wicket_prob": 0.0385,
+          "middle_wicket_prob": 0.0476,
+          "death_wicket_prob": 0.0824
+        },
+        "sa20": {
+          "path": "data/phase_distributions_sa20.json",
+          "generated_date": "2026-01-19",
+          "balls": 25858,
+          "matches": 121,
+          "powerplay_wicket_prob": 0.047,
+          "middle_wicket_prob": 0.0504,
+          "death_wicket_prob": 0.0883
+        },
+        "bbl": {
+          "path": "data/phase_distributions_bbl.json",
+          "generated_date": "2026-01-17",
+          "balls": 140889,
+          "matches": 630,
+          "powerplay_wicket_prob": 0.0419,
+          "middle_wicket_prob": 0.0488,
+          "death_wicket_prob": 0.0881
         }
       }
     },
@@ -722,6 +764,30 @@
       "league_calibrators": {
         "wssm": "models/t20_female_v3/league_calibrators/wssm",
         "wpl": "models/t20_female_v3/league_calibrators/wpl"
+      },
+      "league_calibrator_details": {
+        "wpl": {
+          "method": "temperature",
+          "fitted_date": "2026-01-24",
+          "samples": 17062,
+          "brier_improvement": 0.0,
+          "logloss_improvement": 0.4,
+          "temperatures": {
+            "innings_1": 0.8295,
+            "innings_2": 0.9793
+          }
+        }
+      },
+      "league_distributions": {
+        "wpl": {
+          "path": "data/phase_distributions_wpl.json",
+          "generated_date": "2026-01-24",
+          "balls": 16781,
+          "matches": 74,
+          "powerplay_wicket_prob": 0.0406,
+          "middle_wicket_prob": 0.0454,
+          "death_wicket_prob": 0.0909
+        }
       }
     }
   }

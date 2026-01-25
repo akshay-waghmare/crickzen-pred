@@ -26,6 +26,7 @@ try:
         simulate,
         simulate_one_over,
         simulate_two_overs,
+        simulate_five_overs,
         evaluate_bet,
         BettingThresholds,
     )
@@ -294,6 +295,9 @@ class CrexLivePredictor:
             # Run 12-ball (2 over) simulation
             result_12ball = simulate_two_overs(sim_state, n_simulations=2000, predictor=predictor)
             
+            # Run 30-ball (5 over) simulation - useful for first innings uncertainty
+            result_30ball = simulate_five_overs(sim_state, n_simulations=2000, predictor=predictor)
+            
             # Evaluate betting decision if market odds available
             # Uses league-calibrated model_prob for edge calculation (more accurate than simulation mean)
             betting_decision = None
@@ -348,6 +352,14 @@ class CrexLivePredictor:
                     "p95": result_12ball.p95,
                     "n_sims": result_12ball.n_sims,
                     "time_ms": result_12ball.time_taken_ms,
+                },
+                "simulation_30ball": {
+                    "mean_prob": result_30ball.mean_prob,
+                    "std_prob": result_30ball.std_prob,
+                    "p5": result_30ball.p5,
+                    "p95": result_30ball.p95,
+                    "n_sims": result_30ball.n_sims,
+                    "time_ms": result_30ball.time_taken_ms,
                 },
                 "betting_decision": betting_decision,
             }
@@ -1084,9 +1096,16 @@ class CrexLivePredictor:
                 ball = 0
             
             # Build MatchState for predictor using its schema
+            # Use generic venue name if not extracted from page (avoids "Unknown" warning)
+            venue_name = self.match_state.venue
+            if not venue_name or venue_name.strip() == "":
+                # Use a generic but valid venue name that won't trigger warnings
+                # The predictor will use default venue stats + CREX live venue stats override
+                venue_name = "International Cricket Stadium"
+                
             pred_state = PredictorMatchState(
                 match_id="live_match",  # Required field
-                venue=self.match_state.venue or "Unknown",
+                venue=venue_name,
                 batting_team=self.match_state.batting_team,
                 bowling_team=self.match_state.bowling_team,
                 innings=2 if self.match_state.is_second_innings else 1,
