@@ -80,7 +80,7 @@ After the match concludes, the user wants to post the final result and document 
 
 **Pre-Match Prediction Requirements**
 
-- **FR-007**: Pre-Match Prediction modal MUST capture: Match ID (string), League (string), Team A (string), Team B (string), Selection (enum: BACK or LAY), Model Win Probability (percentage), Market Odds (decimal), Model Edge (percentage)
+- **FR-007**: Pre-Match Prediction modal MUST capture: Match ID (string), League (string), Team A (string), Team B (string), Selection (enum: BACK or LAY), Model Win Probability (percentage), Market Odds (decimal), Model Edge (percentage, calculated as: `(model_probability/100 - 1/market_odds) × 100`)
 - **FR-008**: System MUST format pre-match predictions using the exact template structure: Match ID, League, Match (teams), Model Probability, Market Odds, Position (BACK/LAY + team), Model Edge, Status (Pre-Match Prediction)
 - **FR-009**: Pre-match prediction messages MUST include "Pre-Match Prediction" as the status label
 

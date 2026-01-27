@@ -47,3 +47,11 @@ output/
 
 # Logs
 *.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Telegram predictions storage
+data/telegram_predictions.jsonl

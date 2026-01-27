@@ -20,12 +20,12 @@ Tasks are organized by user story priority (P1, P2, P3) to enable independent, i
 
 ### Setup Tasks
 
-- [ ] T001 Add dependencies to pyproject.toml (python-telegram-bot>=20.0, python-decouple>=3.8)
-- [ ] T002 Create src/bbl_pipeline/telegram/ module directory structure
-- [ ] T003 Create config/.env.example with Telegram configuration template
-- [ ] T004 Update .gitignore to ensure .env is excluded
-- [ ] T005 Create data/ directory for telegram_predictions.jsonl storage
-- [ ] T006 Create tests/telegram/ directory for test modules
+- [X] T001 Add dependencies to pyproject.toml (python-telegram-bot>=20.0, python-decouple>=3.8)
+- [X] T002 Create src/bbl_pipeline/telegram/ module directory structure
+- [X] T003 Create config/.env.example with Telegram configuration template
+- [X] T004 Update .gitignore to ensure .env is excluded
+- [X] T005 Create data/ directory for telegram_predictions.jsonl storage
+- [X] T006 Create tests/telegram/ directory for test modules
 
 **Test**: Run `pip install -e .` successfully, import telegram module without errors
 
@@ -37,12 +37,12 @@ Tasks are organized by user story priority (P1, P2, P3) to enable independent, i
 
 ### Configuration & Bot Client
 
-- [ ] T007 [P] Implement config.py in src/bbl_pipeline/telegram/config.py (load env vars, validate token format)
-- [ ] T008 [P] Implement BotClient class in src/bbl_pipeline/telegram/bot_client.py (send_message method, error handling)
-- [ ] T009 [P] Implement append-only storage in src/bbl_pipeline/telegram/storage.py (append_record, read_records methods)
-- [ ] T010 Write unit tests for config.py in tests/telegram/test_config.py
-- [ ] T011 Write unit tests for bot_client.py in tests/telegram/test_bot_client.py (mock Telegram API)
-- [ ] T012 Write unit tests for storage.py in tests/telegram/test_storage.py
+- [X] T007 [P] Implement config.py in src/bbl_pipeline/telegram/config.py (load env vars, validate token format)
+- [X] T008 [P] Implement BotClient class in src/bbl_pipeline/telegram/bot_client.py (send_message method, error handling)
+- [X] T009 [P] Implement append-only storage in src/bbl_pipeline/telegram/storage.py (append_record, read_records methods)
+- [X] T010 Write unit tests for config.py in tests/telegram/test_config.py
+- [X] T011 Write unit tests for bot_client.py in tests/telegram/test_bot_client.py (mock Telegram API)
+- [X] T012 Write unit tests for storage.py in tests/telegram/test_storage.py
 
 **Test**: Unit tests pass; can load config, send test message to Telegram, write/read storage file
 
@@ -58,15 +58,15 @@ Tasks are organized by user story priority (P1, P2, P3) to enable independent, i
 
 ### Implementation Tasks
 
-- [ ] T013 [US1] Implement PreMatchPrediction dataclass in src/bbl_pipeline/telegram/models.py
-- [ ] T014 [US1] Implement format_prematch_prediction function in src/bbl_pipeline/telegram/message_formatter.py
-- [ ] T015 [US1] Write unit tests for format_prematch_prediction in tests/telegram/test_message_formatter.py
-- [ ] T016 [US1] Create telegram_ledger_app.py skeleton in src/bbl_pipeline/app/telegram_ledger_app.py
-- [ ] T017 [US1] Implement pre-match prediction modal UI with @st.dialog in telegram_ledger_app.py
-- [ ] T018 [US1] Implement form validation for pre-match prediction modal (all required fields)
-- [ ] T019 [US1] Implement post_prematch_prediction function integrating bot_client + formatter + storage
-- [ ] T020 [US1] Add success/error feedback UI (st.success, st.error messages)
-- [ ] T021 [US1] Add edge calculation helper (model_edge = (1/odds - 1/(prob/100)) * 100)
+- [X] T013 [US1] Implement PreMatchPrediction dataclass in src/bbl_pipeline/telegram/models.py (SKIPPED - using dicts)
+- [X] T014 [US1] Implement format_prematch_prediction function in src/bbl_pipeline/telegram/message_formatter.py
+- [X] T015 [US1] Write unit tests for format_prematch_prediction in tests/telegram/test_message_formatter.py
+- [X] T016 [US1] Create telegram_ledger_app.py skeleton in src/bbl_pipeline/app/telegram_ledger_app.py
+- [X] T017 [US1] Implement pre-match prediction modal UI with @st.dialog in telegram_ledger_app.py
+- [X] T018 [US1] Implement form validation for pre-match prediction modal (all required fields)
+- [X] T019 [US1] Implement post_prematch_prediction function integrating bot_client + formatter + storage
+- [X] T020 [US1] Add success/error feedback UI (st.success, st.error messages)
+- [X] T021 [US1] Add edge calculation helper (model_edge = (1/odds - 1/(prob/100)) * 100)
 
 **Integration Test**: Complete flow from button click → modal → Telegram post → storage write
 
@@ -92,13 +92,13 @@ Tasks are organized by user story priority (P1, P2, P3) to enable independent, i
 
 ### Implementation Tasks
 
-- [ ] T027 [P] [US2] Implement MatchStartRecord dataclass in src/bbl_pipeline/telegram/models.py
-- [ ] T028 [P] [US2] Implement format_match_start function in src/bbl_pipeline/telegram/message_formatter.py
-- [ ] T029 [US2] Write unit tests for format_match_start in tests/telegram/test_message_formatter.py
-- [ ] T030 [US2] Implement match start modal UI with @st.dialog in telegram_ledger_app.py
-- [ ] T031 [US2] Implement form validation for match start modal (required fields, toss decision enum)
-- [ ] T032 [US2] Implement post_match_start function integrating bot_client + formatter + storage
-- [ ] T033 [US2] Add success/error feedback UI for match start posting
+- [X] T027 [P] [US2] Implement MatchStartRecord dataclass in src/bbl_pipeline/telegram/models.py (SKIPPED - using dicts)
+- [X] T028 [P] [US2] Implement format_match_start function in src/bbl_pipeline/telegram/message_formatter.py
+- [X] T029 [US2] Write unit tests for format_match_start in tests/telegram/test_message_formatter.py
+- [X] T030 [US2] Implement match start modal UI with @st.dialog in telegram_ledger_app.py
+- [X] T031 [US2] Implement form validation for match start modal (required fields, toss decision enum)
+- [X] T032 [US2] Implement post_match_start function integrating bot_client + formatter + storage
+- [X] T033 [US2] Add success/error feedback UI for match start posting
 
 **Integration Test**: Complete flow from "Post Match Start Info" button → modal → Telegram post → storage write
 
@@ -123,14 +123,14 @@ Tasks are organized by user story priority (P1, P2, P3) to enable independent, i
 
 ### Implementation Tasks
 
-- [ ] T038 [P] [US3] Implement ResultRecord dataclass in src/bbl_pipeline/telegram/models.py
-- [ ] T039 [P] [US3] Implement format_match_result function in src/bbl_pipeline/telegram/message_formatter.py
-- [ ] T040 [US3] Write unit tests for format_match_result in tests/telegram/test_message_formatter.py
-- [ ] T041 [US3] Implement match result modal UI with @st.dialog in telegram_ledger_app.py
-- [ ] T042 [US3] Implement lookup_original_prediction helper to find pre-match prediction by match_id
-- [ ] T043 [US3] Implement calculate_correctness logic (BACK: winner==selected, LAY: winner!=selected)
-- [ ] T044 [US3] Implement post_match_result function integrating lookup + bot_client + formatter + storage
-- [ ] T045 [US3] Add success/error feedback UI for result posting
+- [X] T038 [P] [US3] Implement ResultRecord dataclass in src/bbl_pipeline/telegram/models.py (SKIPPED - using dicts)
+- [X] T039 [P] [US3] Implement format_match_result function in src/bbl_pipeline/telegram/message_formatter.py
+- [X] T040 [US3] Write unit tests for format_match_result in tests/telegram/test_message_formatter.py
+- [X] T041 [US3] Implement match result modal UI with @st.dialog in telegram_ledger_app.py
+- [X] T042 [US3] Implement lookup_original_prediction helper to find pre-match prediction by match_id
+- [X] T043 [US3] Implement calculate_correctness logic (BACK: winner==selected, LAY: winner!=selected)
+- [X] T044 [US3] Implement post_match_result function integrating lookup + bot_client + formatter + storage
+- [X] T045 [US3] Add success/error feedback UI for result posting
 
 **Integration Test**: Complete flow from "Post Match Result" → lookup prediction → calculate correctness → post to Telegram
 
@@ -152,23 +152,23 @@ Tasks are organized by user story priority (P1, P2, P3) to enable independent, i
 
 ### UX Enhancements
 
-- [ ] T051 Add spinner with st.spinner("Posting to Telegram...") during API calls
-- [ ] T052 Add confirmation preview before posting (show formatted message in modal before submit)
-- [ ] T053 Add league selector dropdown with all supported leagues (BBL, SA20, ILT20, WPL, SSM, T20I, etc.)
-- [ ] T054 Add input placeholders and help text for all form fields
-- [ ] T055 Implement HTML escaping for user input in message formatter (prevent injection)
+- [X] T051 Add spinner with st.spinner("Posting to Telegram...") during API calls
+- [X] T052 Add confirmation preview before posting (show formatted message in modal before submit)
+- [X] T053 Add league selector dropdown with all supported leagues (BBL, SA20, ILT20, WPL, SSM, T20I, etc.)
+- [X] T054 Add input placeholders and help text for all form fields
+- [X] T055 Implement HTML escaping for user input in message formatter (prevent injection)
 
 ### Error Handling & Logging
 
 - [ ] T056 Add structured logging with structlog for all Telegram API calls
 - [ ] T057 Add retry button for failed posts (show "Retry" button on error)
-- [ ] T058 Implement specific error messages for all Telegram error types (NetworkError, Unauthorized, BadRequest)
+- [X] T058 Implement specific error messages for all Telegram error types (NetworkError, Unauthorized, BadRequest)
 - [ ] T059 Add startup validation check (verify bot token format, test Telegram connection)
 
 ### Documentation & Setup
 
-- [ ] T060 Create comprehensive docstrings for all public functions and classes
-- [ ] T061 Add type hints to all function signatures
+- [X] T060 Create comprehensive docstrings for all public functions and classes
+- [X] T061 Add type hints to all function signatures
 - [ ] T062 Update project README.md with Telegram Ledger feature section
 - [ ] T063 Create video/GIF walkthrough of posting workflow for documentation
 
