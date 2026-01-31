@@ -41,6 +41,9 @@ def view_first_innings_chart(wickets: int, data_dir: str = "data/win_prob_tables
     
     df = pd.read_csv(filepath, index_col=0)
     
+    # Convert columns to int for proper lookup
+    df.columns = df.columns.astype(int)
+    
     print("\n" + "="*100)
     print(f"📊 FIRST INNINGS WIN PROBABILITY CHART - {wickets} WICKETS DOWN")
     print("="*100)
@@ -61,7 +64,7 @@ def view_first_innings_chart(wickets: int, data_dir: str = "data/win_prob_tables
     # Print header
     print("Overs | ", end="")
     for score in display_scores:
-        print(f"{score:>7}", end="")
+        print(f"{score:>8}", end="")
     print("\n" + "-"*100)
     
     # Print data rows
@@ -69,7 +72,7 @@ def view_first_innings_chart(wickets: int, data_dir: str = "data/win_prob_tables
         print(f"{over:5.0f} | ", end="")
         for score in display_scores:
             prob = display_df.loc[over, score]
-            print(f"{format_prob(prob)}", end="")
+            print(f"{format_prob(prob):>8}", end="")
         print()
     
     print("\n" + "="*100)
@@ -88,6 +91,9 @@ def view_second_innings_chart(wickets: int, data_dir: str = "data/win_prob_table
     
     df = pd.read_csv(filepath, index_col=0)
     
+    # Convert columns to int for proper lookup
+    df.columns = df.columns.astype(int)
+    
     print("\n" + "="*100)
     print(f"📊 SECOND INNINGS WIN PROBABILITY CHART - {wickets} WICKETS DOWN")
     print("="*100)
@@ -104,7 +110,7 @@ def view_second_innings_chart(wickets: int, data_dir: str = "data/win_prob_table
     # Print header
     print("Balls | ", end="")
     for runs in display_runs:
-        print(f"{runs:>7}", end="")
+        print(f"{runs:>8}", end="")
     print("\n" + "-"*100)
     
     # Print data rows
@@ -115,7 +121,7 @@ def view_second_innings_chart(wickets: int, data_dir: str = "data/win_prob_table
         print(f"{overs:2.0f}.{balls_in_over:1.0f} | ", end="")
         for runs in display_runs:
             prob = df.loc[balls, runs]
-            print(f"{format_prob(prob)}", end="")
+            print(f"{format_prob(prob):>8}", end="")
         print()
     
     print("\n" + "="*100)
