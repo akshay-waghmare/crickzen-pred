@@ -276,6 +276,14 @@ python src/run_integrated_prediction.py \
     --poll-interval 1.5
 ```
 
+## 🎲 Fun Features
+
+Looking for something delightful? Check out our experimental tools:
+
+- **[Bookmaker-Style Lookup Charts](docs/FUN_FEATURES.md)** - Pre-computed win probability tables (like old paper cricket charts!) with instant lookup. Generate 10,439 probabilities, view in terminal with color coding, or open in Excel. 100-500x faster than real-time calculation. Just for fun - but production ready! 🏏
+
+See [docs/FUN_FEATURES.md](docs/FUN_FEATURES.md) for more experimental and educational tools.
+
 ## License
 
 [Your License]
