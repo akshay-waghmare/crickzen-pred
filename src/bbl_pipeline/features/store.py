@@ -463,7 +463,11 @@ class InMemoryFeatureStore:
     # =====================================================================
     # CONFIGURATION - Toggle between historical data and season overrides
     # =====================================================================
-    USE_SEASON_OVERRIDES = True  # Set to False to use historical feature store data only
+    # DISABLED: CREX "Last 10 matches" stats cause train/inference mismatch.
+    # Model trained on historical win rates (~0.55), but CREX can show 0.90 vs 0.30
+    # which creates team_strength_diff=0.60 (6x larger than training distribution).
+    # Use historical feature store data only for consistency.
+    USE_SEASON_OVERRIDES = False
     
     # =====================================================================
     # VENUE SITUATION STATS - Bat/Bowl first win rates from current venue

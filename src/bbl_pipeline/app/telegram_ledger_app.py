@@ -115,10 +115,16 @@ def show_prematch_prediction_modal():
                 horizontal=True,
                 help="BACK = team wins, LAY = team loses"
             )
+            # Build team options dynamically
+            team_options = []
+            if team_a and team_b:
+                team_options = [team_a, team_b]
+            
             selected_team = st.selectbox(
                 "Selected Team *",
-                options=["(Select team)", team_a, team_b] if team_a and team_b else ["(Enter teams first)"],
-                help="Team you are backing or laying"
+                options=team_options if team_options else ["(Enter teams first)"],
+                help="Team you are backing or laying",
+                disabled=not team_options
             )
             model_probability = st.number_input(
                 "Model Win Probability (%) *",
@@ -150,7 +156,7 @@ def show_prematch_prediction_modal():
         
         # Preview
         st.markdown("**Message Preview:**")
-        if match_id and team_a and team_b and selected_team not in ["(Select team)", "(Enter teams first)"]:
+        if match_id and team_a and team_b and selected_team and selected_team != "(Enter teams first)":
             preview = format_prematch_prediction(
                 match_id=match_id,
                 league=league,
@@ -181,7 +187,7 @@ def show_prematch_prediction_modal():
                 errors.append("Team A is required")
             if not team_b:
                 errors.append("Team B is required")
-            if selected_team in ["(Select team)", "(Enter teams first)"]:
+            if not selected_team or selected_team == "(Enter teams first)":
                 errors.append("Selected Team is required")
             
             if errors:
@@ -259,10 +265,16 @@ def show_match_start_modal():
             team_b = st.text_input("Team B *", placeholder="e.g., Melbourne Stars")
         
         with col2:
+            # Build team options dynamically
+            team_options_toss = []
+            if team_a and team_b:
+                team_options_toss = [team_a, team_b]
+            
             toss_winner = st.selectbox(
                 "Toss Winner *",
-                options=["(Select team)", team_a, team_b] if team_a and team_b else ["(Enter teams first)"],
-                help="Team that won the toss"
+                options=team_options_toss if team_options_toss else ["(Enter teams first)"],
+                help="Team that won the toss",
+                disabled=not team_options_toss
             )
             toss_decision = st.radio(
                 "Toss Decision *",
@@ -283,7 +295,7 @@ def show_match_start_modal():
         
         # Preview
         st.markdown("**Message Preview:**")
-        if match_id and team_a and team_b and toss_winner not in ["(Select team)", "(Enter teams first)"]:
+        if match_id and team_a and team_b and toss_winner and toss_winner != "(Enter teams first)":
             preview = format_match_start(
                 match_id=match_id,
                 team_a=team_a,
@@ -308,7 +320,7 @@ def show_match_start_modal():
                 errors.append("Team A is required")
             if not team_b:
                 errors.append("Team B is required")
-            if toss_winner in ["(Select team)", "(Enter teams first)"]:
+            if not toss_winner or toss_winner == "(Enter teams first)":
                 errors.append("Toss Winner is required")
             
             if errors:

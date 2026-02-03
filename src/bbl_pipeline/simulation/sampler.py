@@ -35,25 +35,44 @@ def _build_cdf_from_dist(dist: Dict[int, float]) -> Tuple[np.ndarray, np.ndarray
     return runs, cdf
 
 
-def load_league_distributions(league: str, data_dir: str = "data") -> Optional[Dict]:
+def load_league_distributions(league: str, data_dir: str = "data", model_dir: Optional[str] = None) -> Optional[Dict]:
     """
     Load league-specific phase distributions from JSON file.
     
+    Lookup order:
+    1. model_dir/phase_distributions_{league}.json (if model_dir provided)
+    2. data_dir/phase_distributions_{league}.json
+    
     Args:
         league: League code (e.g., 'bbl', 'sa20')
-        data_dir: Directory containing distribution files
+        data_dir: Directory containing distribution files (fallback)
+        model_dir: Model directory to check first (optional)
         
     Returns:
         Dictionary with run_dist, wicket_prob, etc. or None if not found
     """
-    cache_key = f"{data_dir}/{league}"
+    cache_key = f"{model_dir or data_dir}/{league}"
     
     if cache_key in _LEAGUE_DIST_CACHE:
         return _LEAGUE_DIST_CACHE[cache_key]
     
-    dist_path = Path(data_dir) / f"phase_distributions_{league}.json"
+    # Try model directory first
+    dist_path = None
+    source = None
+    if model_dir:
+        model_path = Path(model_dir) / f"phase_distributions_{league}.json"
+        if model_path.exists():
+            dist_path = model_path
+            source = "model_dir"
     
-    if not dist_path.exists():
+    # Fallback to data directory
+    if dist_path is None:
+        data_path = Path(data_dir) / f"phase_distributions_{league}.json"
+        if data_path.exists():
+            dist_path = data_path
+            source = "data_dir"
+    
+    if dist_path is None:
         _LEAGUE_DIST_CACHE[cache_key] = None
         return None
     
@@ -69,6 +88,7 @@ def load_league_distributions(league: str, data_dir: str = "data") -> Optional[D
             run_cdfs[phase] = _build_cdf_from_dist(dist_int)
         
         data['run_cdf'] = run_cdfs
+        data['_source'] = source  # Track where it was loaded from
         _LEAGUE_DIST_CACHE[cache_key] = data
         return data
     
@@ -92,13 +112,14 @@ class NextBallSampler:
         runs, is_wicket = sampler.sample(state)
     """
     
-    def __init__(self, seed: Optional[int] = None, league: Optional[str] = None):
+    def __init__(self, seed: Optional[int] = None, league: Optional[str] = None, model_dir: Optional[str] = None):
         """
         Initialize sampler with optional random seed and league.
         
         Args:
             seed: Random seed for reproducibility
             league: Optional league code for league-specific distributions
+            model_dir: Optional model directory to look for phase distributions
         """
         self.rng = np.random.default_rng(seed)
         self.league = league
@@ -106,7 +127,7 @@ class NextBallSampler:
         # Try to load league-specific distributions
         self._league_data = None
         if league:
-            self._league_data = load_league_distributions(league)
+            self._league_data = load_league_distributions(league, model_dir=model_dir)
         
         # Pre-compute CDF arrays for each phase
         if self._league_data and 'run_cdf' in self._league_data:
@@ -118,11 +139,13 @@ class NextBallSampler:
                 phase: cdf[1] for phase, cdf in self._league_data['run_cdf'].items()
             }
             self._wicket_prob = self._league_data.get('wicket_prob', WICKET_PROB)
+            source = self._league_data.get('_source', 'unknown')
             logger.info(
                 "Sampler using league-specific distributions",
                 league=league,
                 phases=list(self._run_values.keys()),
-                distribution_source=f"data/phase_distributions_{league}.json"
+                distribution_source=source,
+                model_dir=model_dir
             )
         else:
             # Use global distributions

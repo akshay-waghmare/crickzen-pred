@@ -67,7 +67,7 @@ def simulate(
     
     # Pass league to sampler for league-specific distributions
     league = state.league if hasattr(state, 'league') else None
-    sampler = NextBallSampler(league=league)
+    sampler = NextBallSampler(league=league, model_dir=model_dir)
     evaluator = TerminalStateEvaluator(model_dir=model_dir, predictor=predictor)
     
     # If using ML model, don't apply temperature separately (predictor handles calibration)
@@ -236,7 +236,7 @@ def simulate_vectorized(
     
     # Pass league to sampler for league-specific distributions
     league = state.league if hasattr(state, 'league') else None
-    sampler = NextBallSampler(league=league)
+    sampler = NextBallSampler(league=league, model_dir=model_dir)
     evaluator = TerminalStateEvaluator(model_dir=model_dir, predictor=predictor)
     
     # If using ML model, don't apply temperature separately (predictor handles calibration)
