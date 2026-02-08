@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-01-25",
+  "last_updated": "2026-02-05",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -211,21 +211,21 @@
           "brier_raw": 0.1599,
           "brier_calibrated": 0.1583,
           "ece_raw": 0.0041,
-          "ece_calibrated": 0.0000
+          "ece_calibrated": 0.0
         },
         "innings_specific": {
           "innings1": {
             "samples": 366089,
-            "brier_raw": 0.1980,
+            "brier_raw": 0.198,
             "brier_calibrated": 0.1976,
-            "ece_raw": 0.0100,
+            "ece_raw": 0.01,
             "ece_calibrated": 0.0001
           },
           "innings2": {
             "samples": 320743,
             "brier_raw": 0.1165,
             "brier_calibrated": 0.1162,
-            "ece_raw": 0.0090,
+            "ece_raw": 0.009,
             "ece_calibrated": 0.0014
           }
         },
@@ -262,7 +262,7 @@
         },
         "recent_changes": {
           "date": "2026-01-21",
-          "description": "Initial T20 International Male model trained on 686,832 samples; includes per-over brier-optimized calibrators (38 calibrators) and innings×phase calibrators (6 calibrators)",
+          "description": "Initial T20 International Male model trained on 686,832 samples; includes per-over brier-optimized calibrators (38 calibrators) and innings\u00c3\u2014phase calibrators (6 calibrators)",
           "impact": "Best overall OOF performance: Brier 0.1583 (best), ECE 0.0000 (perfect), LogLoss 0.4719. Per-over calibration outperforms all other methods."
         }
       }
@@ -348,7 +348,7 @@
         "recent_changes": {
           "date": "2026-01-23",
           "description": "V2: Pure franchise leagues only (excludes T10, The Hundred, T20I). 11 leagues: BBL, BPL, CPL, ILT20, IPL, LPL, MLC, NTB (Blast), PSL, SA20, SSM. SSM league calibrator regenerated with 55,470 samples.",
-          "impact": "Brier: 0.1788, ECE: 0.0000. Cleaner model for T20 franchise cricket. SSM calibrator: Brier 0.1656→0.1647 (+0.5%), LogLoss 0.4941→0.4899 (+0.9%)."
+          "impact": "Brier: 0.1788, ECE: 0.0000. Cleaner model for T20 franchise cricket. SSM calibrator: Brier 0.1656\u00e2\u2020\u20190.1647 (+0.5%), LogLoss 0.4941\u00e2\u2020\u20190.4899 (+0.9%)."
         }
       },
       "league_calibrators": {
@@ -411,32 +411,81 @@
       }
     },
     "T20_FEMALE": {
-      "path": "models/t20_female_v2",
-      "version": "v2",
-      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1510, ECE: 0.0000)",
+      "path": "models/t20_female_v4",
+      "version": "v4",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1603, ECE: 0.0000)",
       "training": {
-        "samples": 17062,
-        "date": "2026-01-19",
-        "brier_score": 0.1510153948788112
+        "samples": 328855,
+        "date": "2026-02-05",
+        "brier_score": 0.1603090936594209,
+        "leagues": [
+          "WBBL",
+          "WSSM",
+          "WPL",
+          "ICC_WT20WC",
+          "CEC",
+          "WCPL",
+          "WCSL",
+          "FAIRBREAK",
+          "BLZ",
+          "WT20_BLAST",
+          "WT20_CHALLENGE",
+          "T20I_FEMALE",
+          "SA20_FEMALE",
+          "BPL_FEMALE",
+          "LOTUS_CUP"
+        ]
       },
       "calibrator": {
-        "path": "models/t20_female_v2/isotonic_calibrator.pkl",
-        "type": "isotonic_regression",
-        "generated_date": "2026-01-19T16:32:31.939192",
+        "path": "models/t20_female_v4/isotonic_calibrator.pkl",
+        "type": "innings_phase_specific",
+        "generated_date": "2026-02-05",
         "oof_metrics": {
-          "brier_raw": 0.17411349756974104,
-          "brier_calibrated": 0.1710451243473449,
-          "ece_raw": 0.03065496642055112,
-          "ece_calibrated": 0.00048724978016863275
+          "brier_raw": 0.1629,
+          "brier_calibrated": 0.1603,
+          "ece_raw": 0.0111,
+          "ece_calibrated": 0.0000
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
-        "path": "data/t20_female_feature_store_v2",
-        "version": "v2",
-        "generated_date": "2026-01-19",
-        "training_data_samples": 17062
+        "path": "data/t20_female_feature_store_v4",
+        "version": "v4",
+        "generated_date": "2026-02-05",
+        "training_data_samples": 328855,
+        "statistics": {
+          "teams": 96,
+          "leagues": 15,
+          "team_columns": [
+            "team",
+            "win_rate",
+            "matches",
+            "bat_first_wr",
+            "bowl_first_wr"
+          ]
+        },
+        "recent_changes": {
+          "date": "2026-02-05",
+          "description": "V4: Combined 15 female T20 leagues (1,467 matches). Added new leagues: SA20 Female, BPL Female, Lotus Cup, T20I Female tours. Updated with 185 new T20 matches from recently_played.",
+          "impact": "Samples: 283,026 → 328,855 (+16%). Teams: 65 → 96. Brier: 0.1603 (brier_optimized). Perfect calibration (ECE: 0.0000)."
+        }
+      },
+      "league_calibrators": {
+        "wpl": "models/t20_female_v4/league_calibrators/wpl"
+      },
+      "league_calibrator_details": {
+        "wpl": {
+          "method": "temperature",
+          "fitted_date": "2026-02-05",
+          "samples": 20145,
+          "brier_improvement": 0.2,
+          "logloss_improvement": 0.8,
+          "temperatures": {
+            "innings_1": 0.7791,
+            "innings_2": 0.9320
+          }
+        }
       }
     },
     "SA20": {

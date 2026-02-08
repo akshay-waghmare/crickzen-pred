@@ -1251,7 +1251,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'model_prefix': 't20_male',
         },
         't20_female': {
-            'json_dir': 'wpl_female_json',  # Currently only WPL for female
+            'json_dir': 'data/t20_female_json',  # Combined 15 female leagues
             'raw_dir': 'data/t20_female_raw',
             'features_dir': 'data/t20_female_features',
             'feature_store_dir': 'data/t20_female_feature_store',

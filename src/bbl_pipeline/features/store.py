@@ -234,6 +234,7 @@ class InMemoryFeatureStore:
         self._player_names_lower: Dict[str, str] = {}
         self._venue_names_lower: Dict[str, str] = {}
         self._team_names_lower: Dict[str, str] = {}
+        self.league_context: Optional[str] = None
         
         # Player-venue and player-vs-team lookup tables
         self._player_venue_batting: Dict[tuple, Dict[str, Any]] = {}
@@ -447,6 +448,26 @@ class InMemoryFeatureStore:
         'JER': 'Jersey', 'USA': 'United States of America', 'CAN': 'Canada',
     }
 
+    TEAM_ABBREVIATIONS_T20I = {
+        'IND': 'India', 'AUS': 'Australia', 'ENG': 'England', 'NZ': 'New Zealand',
+        'NZL': 'New Zealand', 'SA': 'South Africa', 'PAK': 'Pakistan', 'WI': 'West Indies',
+        'SL': 'Sri Lanka', 'BAN': 'Bangladesh', 'AFG': 'Afghanistan', 'IRE': 'Ireland',
+        'SCO': 'Scotland', 'ZIM': 'Zimbabwe', 'UAE': 'United Arab Emirates', 'NED': 'Netherlands',
+        'NAM': 'Namibia', 'NEP': 'Nepal', 'OMA': 'Oman', 'PNG': 'Papua New Guinea',
+        'HK': 'Hong Kong', 'KEN': 'Kenya', 'UGA': 'Uganda', 'GER': 'Germany',
+        'JER': 'Jersey', 'USA': 'United States of America', 'CAN': 'Canada',
+    }
+
+    def _resolve_team_abbrev(self, team_name: str) -> str:
+        code = team_name.upper()
+        league_context = (self.league_context or '').lower()
+        if league_context in ('t20i', 't20_international') or 't20_international' in league_context:
+            if code in self.TEAM_ABBREVIATIONS_T20I:
+                return self.TEAM_ABBREVIATIONS_T20I[code]
+        if code in self.TEAM_ABBREVIATIONS:
+            return self.TEAM_ABBREVIATIONS[code]
+        return team_name
+
     # Team aliases for mapping new/renamed teams to historical equivalents
     TEAM_ALIASES = {
         # Rajshahi lineage: Duronto Rajshahi (2012-13) → Rajshahi Kings (2016-19) → Rajshahi Royals (2019-20) → Durbar Rajshahi (2024) → Rajshahi Warriors (2025)
@@ -535,9 +556,7 @@ class InMemoryFeatureStore:
             return None
         
         # 0. Check abbreviation map first and resolve full name
-        full_name = team_name
-        if team_name.upper() in self.TEAM_ABBREVIATIONS:
-            full_name = self.TEAM_ABBREVIATIONS[team_name.upper()]
+        full_name = self._resolve_team_abbrev(team_name)
         
         # 0.1 CHECK SEASON OVERRIDES FIRST (if enabled)
         if self.USE_SEASON_OVERRIDES and full_name in self.SEASON_OVERRIDES:

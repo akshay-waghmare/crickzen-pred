@@ -443,7 +443,10 @@ class CrexLivePredictor:
             
             # Resolve full team name from abbreviation
             full_name = team_abbrev
-            if team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS:
+            feature_store = getattr(self.predictor, 'feature_store', None) if hasattr(self, 'predictor') else None
+            if feature_store and hasattr(feature_store, '_resolve_team_abbrev'):
+                full_name = feature_store._resolve_team_abbrev(team_abbrev)
+            elif team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS:
                 full_name = InMemoryFeatureStore.TEAM_ABBREVIATIONS[team_abbrev.upper()]
             
             # Always use team's historical situation rates scaled by current season win rate
@@ -452,7 +455,6 @@ class CrexLivePredictor:
             bowl_first_wr = None
             
             # Get feature store from predictor
-            feature_store = getattr(self.predictor, 'feature_store', None) if hasattr(self, 'predictor') else None
             if feature_store and hasattr(feature_store, '_team_stats'):
                 # Ensure feature store is loaded
                 if not feature_store._loaded:

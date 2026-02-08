@@ -148,6 +148,12 @@ class Predictor:
         if player_stats_path.exists() and venue_stats_path.exists():
             try:
                 feature_store = InMemoryFeatureStore(player_stats_path, venue_stats_path)
+                league_context = league
+                if not league_context:
+                    model_dir_lower = str(model_dir).lower()
+                    if 't20_international' in model_dir_lower or 't20i' in model_dir_lower:
+                        league_context = 't20_international'
+                feature_store.league_context = league_context
                 feature_store.load()
                 logger.info(f"Feature store loaded successfully. Type: {type(feature_store)}")
                 logger.info(f"Has get_team_stats: {hasattr(feature_store, 'get_team_stats')}")

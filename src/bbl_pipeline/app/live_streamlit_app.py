@@ -110,6 +110,31 @@ TEAM_COLORS = {
     "Hong Kong": "#DE2910", "HK": "#DE2910",
     "Uganda": "#FCDC04", "UGA": "#FCDC04",
 }
+T20I_TEAM_COLORS = {
+    "Australia": "#FFD700", "AUS": "#FFD700",
+    "India": "#0033A0", "IND": "#0033A0",
+    "England": "#001840", "ENG": "#001840",
+    "New Zealand": "#000000", "NZ": "#000000",
+    "South Africa": "#006B3F", "SA": "#006B3F",
+    "Pakistan": "#006400", "PAK": "#006400",
+    "West Indies": "#800020", "WI": "#800020",
+    "Sri Lanka": "#0000FF", "SL": "#0000FF",
+    "Bangladesh": "#006A4E", "BAN": "#006A4E",
+    "Afghanistan": "#0066B3", "AFG": "#0066B3",
+    "Zimbabwe": "#FFD700", "ZIM": "#FFD700",
+    "Ireland": "#169B62", "IRE": "#169B62",
+    "Scotland": "#005EB8", "SCO": "#005EB8",
+    "Netherlands": "#FF6600", "NED": "#FF6600",
+    "Namibia": "#003580", "NAM": "#003580",
+    "United States of America": "#B22234", "USA": "#B22234",
+    "Canada": "#FF0000", "CAN": "#FF0000",
+    "Oman": "#EF3340", "OMA": "#EF3340",
+    "Nepal": "#DC143C", "NEP": "#DC143C",
+    "United Arab Emirates": "#00732F", "UAE": "#00732F",
+    "Papua New Guinea": "#FF0000", "PNG": "#FF0000",
+    "Hong Kong": "#DE2910", "HK": "#DE2910",
+    "Uganda": "#FCDC04", "UGA": "#FCDC04",
+}
 TEAM_NAMES = {
     # WBBL
     "SYS-W": "Sydney Sixers", "PRS-W": "Perth Scorchers", "ADL-W": "Adelaide Strikers",
@@ -174,7 +199,34 @@ TEAM_NAMES = {
     "Uganda": "Uganda", "UGA": "Uganda",
 }
 
+T20I_TEAM_NAMES = {
+    "Australia": "Australia", "AUS": "Australia",
+    "India": "India", "IND": "India",
+    "England": "England", "ENG": "England",
+    "New Zealand": "New Zealand", "NZ": "New Zealand",
+    "South Africa": "South Africa", "SA": "South Africa",
+    "Pakistan": "Pakistan", "PAK": "Pakistan",
+    "West Indies": "West Indies", "WI": "West Indies",
+    "Sri Lanka": "Sri Lanka", "SL": "Sri Lanka",
+    "Bangladesh": "Bangladesh", "BAN": "Bangladesh",
+    "Afghanistan": "Afghanistan", "AFG": "Afghanistan",
+    "Zimbabwe": "Zimbabwe", "ZIM": "Zimbabwe",
+    "Ireland": "Ireland", "IRE": "Ireland",
+    "Scotland": "Scotland", "SCO": "Scotland",
+    "Netherlands": "Netherlands", "NED": "Netherlands",
+    "Namibia": "Namibia", "NAM": "Namibia",
+    "United States of America": "USA", "USA": "USA",
+    "Canada": "Canada", "CAN": "Canada",
+    "Oman": "Oman", "OMA": "Oman",
+    "Nepal": "Nepal", "NEP": "Nepal",
+    "United Arab Emirates": "UAE", "UAE": "UAE",
+    "Papua New Guinea": "PNG", "PNG": "PNG",
+    "Hong Kong": "Hong Kong", "HK": "Hong Kong",
+    "Uganda": "Uganda", "UGA": "Uganda",
+}
+
 DEFAULT_JSON = "data/live_state.json"
+_league_context = None
 
 # Load per-over calibrators for ECE-optimized predictions (smoother than phase calibrators)
 # NOTE: SA20 and WPL use phase calibrators instead of per-over due to small datasets
@@ -384,8 +436,26 @@ def load_sa20_full_calibrators():
 
 SA20_CALIBRATORS = load_sa20_full_calibrators()
 
-def get_color(team): return TEAM_COLORS.get(team, "#607d8b")
-def get_name(team): return TEAM_NAMES.get(team, team)
+def infer_league_context(state: dict) -> str:
+    if not state:
+        return ""
+    league = (state.get("league") or "").lower()
+    if league:
+        return league
+    model_dir = (state.get("model_dir") or "").lower()
+    if "t20_international" in model_dir or "t20i" in model_dir:
+        return "t20i"
+    return ""
+
+def get_color(team):
+    if _league_context == "t20i":
+        return T20I_TEAM_COLORS.get(team, TEAM_COLORS.get(team, "#607d8b"))
+    return TEAM_COLORS.get(team, "#607d8b")
+
+def get_name(team):
+    if _league_context == "t20i":
+        return T20I_TEAM_NAMES.get(team, TEAM_NAMES.get(team, team))
+    return TEAM_NAMES.get(team, team)
 def prob_to_odds(prob): 
     """Convert probability to decimal odds."""
     if prob <= 0: return 999.99
@@ -773,6 +843,9 @@ def main():
             st.rerun()
         return
     
+    global _league_context
+    _league_context = infer_league_context(state)
+
     # Parse timestamp
     try:
         ts = datetime.fromisoformat(state["timestamp"])
