@@ -480,6 +480,13 @@ class InMemoryFeatureStore:
         # Map new teams to lowest performing historical team
         'Noakhali Express': 'Durdanto Dhaka',  # New team -> worst performer (8.3% win rate)
     }
+
+    # T20 International-only aliases (applied only when league_context is t20i/t20_international)
+    # Afghanistan excluded from source data provider - use Scotland as proxy
+    # Afghanistan T20I WR ~55-60%, Scotland ~49% is the closest available mid-tier team
+    TEAM_ALIASES_T20I = {
+        'Afghanistan': 'Scotland',
+    }
     
     # =====================================================================
     # CONFIGURATION - Toggle between historical data and season overrides
@@ -525,9 +532,19 @@ class InMemoryFeatureStore:
     NEW_TEAMS = set()
 
     def _resolve_team_alias(self, team_name: str, max_depth: int = 5) -> Optional[str]:
-        """Follow alias chain to find a team that exists in the feature store."""
+        """Follow alias chain to find a team that exists in the feature store.
+        
+        Checks both global TEAM_ALIASES and league-specific aliases
+        (e.g. TEAM_ALIASES_T20I) based on the current league_context.
+        """
         current = team_name
         chain = [team_name]
+        
+        # Build combined alias dict: global + league-specific
+        aliases = dict(self.TEAM_ALIASES)
+        league = (self.league_context or '').lower()
+        if league in ('t20i', 't20_international') or 't20_international' in league:
+            aliases.update(self.TEAM_ALIASES_T20I)
         
         for _ in range(max_depth):
             if current in self._team_stats:
@@ -535,8 +552,8 @@ class InMemoryFeatureStore:
                     logger.info(f"Resolved team chain: {' → '.join(chain)}")
                 return current
             
-            if current in self.TEAM_ALIASES:
-                current = self.TEAM_ALIASES[current]
+            if current in aliases:
+                current = aliases[current]
                 chain.append(current)
             else:
                 break
