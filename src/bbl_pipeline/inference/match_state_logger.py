@@ -1,0 +1,567 @@
+"""
+Match state logger for recording live prediction data to Parquet.
+
+This module implements the MatchStateLogger class which captures complete match state
+(raw state, computed features, calibration chain, market odds) at every ball during
+live predictions and persists to per-match Parquet files.
+
+Key features:
+- Error isolation: all public methods wrapped in try/except (FR-009)
+- Buffered writes: flushes at innings break, match end, or every 30 records
+- Deviation computation: model-market gap with bucket/direction classification
+- Team tier classification: top/mid/bottom based on feature store win rates
+- Schema validation: uses PyArrow schemas for type safety
+
+Primary class: MatchStateLogger
+"""
+
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+import structlog
+
+from bbl_pipeline.inference.match_state_schema import (
+    BALL_STATE_SCHEMA,
+    MATCH_METADATA_SCHEMA,
+    get_deviation_bucket,
+    get_deviation_direction,
+)
+
+logger = structlog.get_logger(__name__)
+
+
+class MatchStateLogger:
+    """
+    Records match state data to Parquet during live predictions.
+    
+    Captures complete prediction context including:
+    - Raw match state (runs, wickets, overs, batsmen, bowler, venue)
+    - 50+ computed features (resource %, pressure, team strength, rolling stats)
+    - Full calibration chain (raw → combined → innings → phase → per-over → league)
+    - CREX market odds (back/lay, implied probabilities)
+    - Deviation metrics (size, direction, bucket)
+    - Team strength tiers
+    - Model and feature store versions
+    
+    All writes are error-isolated to prevent disruption of live predictions (FR-009).
+    """
+    
+    def __init__(
+        self,
+        match_id: str,
+        league: str,
+        states_dir: Path,
+        model_version: str,
+        feature_store_version: str,
+    ):
+        """
+        Initialize match state logger.
+        
+        Args:
+            match_id: Unique match identifier (typically from URL)
+            league: League code (bbl, sa20, ilt20, etc.)
+            states_dir: Root directory for match states (e.g., data/match_states/<league>/)
+            model_version: Model directory basename (e.g., "t20_male_v2")
+            feature_store_version: Feature store directory basename
+        """
+        self.match_id = match_id
+        self.league = league
+        self.states_dir = Path(states_dir)
+        self.model_version = model_version
+        self.feature_store_version = feature_store_version
+        
+        # Create output directory
+        self.states_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Initialize buffer
+        self.buffer: List[Dict[str, Any]] = []
+        self.recording_start = datetime.now()
+        self.current_innings = 1
+        self.previous_ball_state: Optional[Dict[str, Any]] = None
+        
+        # Logging
+        self.log = logger.bind(match_id=match_id, league=league)
+        self.log.info("match_state_logger_initialized", states_dir=str(states_dir))
+    
+    def _compute_match_phase(self, over_number: int) -> str:
+        """
+        Classify over number into match phase.
+        
+        Args:
+            over_number: Over number (1-20)
+            
+        Returns:
+            "powerplay" (1-6), "middle" (7-15), or "death" (16-20)
+        """
+        if over_number <= 6:
+            return "powerplay"
+        elif over_number <= 15:
+            return "middle"
+        else:
+            return "death"
+    
+    def _compute_team_tier(self, win_rate: float) -> str:
+        """
+        Classify team win rate into strength tier.
+        
+        Uses a simple threshold approach:
+        - Top: win_rate >= 0.60
+        - Mid: 0.40 <= win_rate < 0.60
+        - Bottom: win_rate < 0.40
+        
+        Args:
+            win_rate: Team win rate from feature store (0.0-1.0)
+            
+        Returns:
+            "top", "mid", or "bottom"
+        """
+        if win_rate >= 0.60:
+            return "top"
+        elif win_rate >= 0.40:
+            return "mid"
+        else:
+            return "bottom"
+    
+    def _map_market_probs(
+        self,
+        market_fav_team: str,
+        market_fav_prob: float,
+        batting_team: str,
+        bowling_team: str,
+    ) -> tuple[Optional[float], Optional[float]]:
+        """
+        Map market favorite probability to batting/bowling team probabilities.
+        
+        Args:
+            market_fav_team: Which team is market favorite
+            market_fav_prob: Implied probability for favorite team
+            batting_team: Batting team name
+            bowling_team: Bowling team name
+            
+        Returns:
+            (batting_team_prob, bowling_team_prob)
+        """
+        if market_fav_team == batting_team:
+            return (market_fav_prob, 1.0 - market_fav_prob)
+        elif market_fav_team == bowling_team:
+            return (1.0 - market_fav_prob, market_fav_prob)
+        else:
+            # Market favorite doesn't match either team (shouldn't happen)
+            self.log.warning(
+                "market_fav_team_mismatch",
+                market_fav=market_fav_team,
+                batting=batting_team,
+                bowling=bowling_team,
+            )
+            return (None, None)
+    
+    def _compute_deviation(
+        self,
+        model_prob: float,
+        market_batting_team_prob: Optional[float],
+    ) -> tuple[Optional[float], Optional[float], Optional[str], Optional[str]]:
+        """
+        Compute deviation metrics between model and market.
+        
+        Args:
+            model_prob: Model final probability for batting team
+            market_batting_team_prob: Market implied probability for batting team (nullable)
+            
+        Returns:
+            (deviation, deviation_abs, deviation_bucket, deviation_direction)
+            All None if market_batting_team_prob is None
+        """
+        if market_batting_team_prob is None:
+            return (None, None, None, None)
+        
+        deviation = model_prob - market_batting_team_prob
+        deviation_abs = abs(deviation)
+        deviation_bucket = get_deviation_bucket(deviation_abs)
+        deviation_direction = get_deviation_direction(deviation)
+        
+        return (deviation, deviation_abs, deviation_bucket, deviation_direction)
+    
+    def record_ball(
+        self,
+        match_state: Any,  # MatchState dataclass from crex_live_predictor
+        features_dict: Dict[str, Any],
+        predictor: Any,  # Predictor instance with calibration attributes
+        market_odds: Dict[str, Any],
+    ) -> None:
+        """
+        Record one ball state to buffer.
+        
+        Assembles complete BallStateRecord dict from:
+        - match_state: raw state (runs, wickets, overs, batsmen, venue, etc.)
+        - features_dict: all computed features from RealTimeFeatureMapper
+        - predictor: calibration chain attributes (last_raw_prob, last_calibrated_*, etc.)
+        - market_odds: CREX odds dict (market_fav_team, back_odds, fav_prob, etc.)
+        
+        Computes:
+        - model_prob_delta and market_prob_delta from previous ball
+        - Deviation metrics (size, bucket, direction)
+        - Team strength tiers
+        - Match phase
+        
+        Auto-flushes at 30 records. Entire method wrapped in try/except (FR-009).
+        
+        Args:
+            match_state: MatchState dataclass from predictor
+            features_dict: Feature values dict
+            predictor: Predictor instance
+            market_odds: Market odds dict from CREX
+        """
+        try:
+            # Deduplicate: skip if match state hasn't changed since last record
+            overs_val = getattr(match_state, 'overs', 0.0) or 0.0
+            runs_val = getattr(match_state, 'total_runs', 0)
+            wkts_val = getattr(match_state, 'wickets', 0)
+            inn_val = 2 if getattr(match_state, 'is_second_innings', False) else 1
+            state_key = (inn_val, overs_val, runs_val, wkts_val)
+            if hasattr(self, '_last_state_key') and self._last_state_key == state_key:
+                self.log.debug("duplicate_state_skipped", overs=overs_val, runs=runs_val)
+                return
+            self._last_state_key = state_key
+
+            # Derive over_number, ball_in_over, innings from MatchState
+            # MatchState.overs is a float like 5.3 meaning over 5, ball 3
+            overs_float = overs_val
+            over_int = int(overs_float)
+            ball_in_over = int(round((overs_float - over_int) * 10))
+            if ball_in_over >= 6:
+                ball_in_over = 0
+            over_number = over_int + 1  # over 5.3 means ball 3 of over 6 (1-indexed)
+            if ball_in_over == 0 and over_int > 0:
+                over_number = over_int  # 5.0 means over 5 complete
+            
+            # Innings already derived above as inn_val
+            innings = inn_val
+            
+            # Extract market odds (handle missing gracefully)
+            # market_back_odds and market_lay_odds may be strings from MatchState
+            market_fav_team = market_odds.get("market_fav_team") or None
+            raw_back = market_odds.get("market_back_odds")
+            raw_lay = market_odds.get("market_lay_odds")
+            try:
+                market_back_odds = float(raw_back) if raw_back else None
+            except (ValueError, TypeError):
+                market_back_odds = None
+            try:
+                market_lay_odds = float(raw_lay) if raw_lay else None
+            except (ValueError, TypeError):
+                market_lay_odds = None
+            raw_fav_prob = market_odds.get("market_fav_prob")
+            try:
+                market_fav_prob = float(raw_fav_prob) if raw_fav_prob else None
+            except (ValueError, TypeError):
+                market_fav_prob = None
+            
+            # Map market probs to batting/bowling teams
+            if market_fav_team and market_fav_prob is not None:
+                market_batting_prob, market_bowling_prob = self._map_market_probs(
+                    market_fav_team, market_fav_prob, match_state.batting_team, match_state.bowling_team
+                )
+            else:
+                market_batting_prob, market_bowling_prob = None, None
+            
+            # Get calibration chain from predictor
+            model_raw_prob = getattr(predictor, 'last_raw_prob', None)
+            model_smoothed_prob = getattr(predictor, 'last_smoothed_prob', None)
+            model_calibrated_combined = getattr(predictor, 'last_calibrated_combined', None)
+            model_calibrated_innings = getattr(predictor, 'last_calibrated_innings', None)
+            model_calibrated_phase = getattr(predictor, 'last_calibrated_phase', None)
+            model_calibrated_per_over = getattr(predictor, 'last_calibrated_per_over', None)
+            model_league_calibrated = getattr(predictor, 'last_league_calibrated', None)
+            
+            # Final probability (what predictor returns)
+            model_final_prob = predictor.last_prediction if hasattr(predictor, 'last_prediction') else model_calibrated_per_over
+            
+            # Compute deviation
+            deviation, deviation_abs, deviation_bucket, deviation_direction = self._compute_deviation(
+                model_final_prob, market_batting_prob
+            )
+            
+            # Compute probability deltas from previous ball
+            model_prob_delta = None
+            market_prob_delta = None
+            if self.previous_ball_state:
+                prev_model_prob = self.previous_ball_state.get('model_final_prob')
+                prev_market_prob = self.previous_ball_state.get('market_batting_team_prob')
+                if prev_model_prob is not None:
+                    model_prob_delta = model_final_prob - prev_model_prob
+                if prev_market_prob is not None and market_batting_prob is not None:
+                    market_prob_delta = market_batting_prob - prev_market_prob
+            
+            # Compute team tiers
+            batting_team_wr = features_dict.get('batting_team_win_rate', 0.5)
+            bowling_team_wr = features_dict.get('bowling_team_win_rate', 0.5)
+            batting_team_tier = self._compute_team_tier(batting_team_wr)
+            bowling_team_tier = self._compute_team_tier(bowling_team_wr)
+            
+            # Compute match phase
+            match_phase = self._compute_match_phase(over_number)
+            
+            # Assemble complete record
+            record = {
+                # Identity
+                'match_id': self.match_id,
+                'league': self.league,
+                'timestamp': datetime.now(),
+                'innings': innings,
+                'over_number': over_number,
+                'ball_in_over': ball_in_over,
+                'match_phase': match_phase,
+                
+                # Raw match state
+                'batting_team': match_state.batting_team,
+                'bowling_team': match_state.bowling_team,
+                'total_runs': getattr(match_state, 'total_runs', 0),
+                'wickets': getattr(match_state, 'wickets', 0),
+                'overs': overs_float,
+                'current_run_rate': getattr(match_state, 'current_run_rate', 0.0),
+                'required_run_rate': getattr(match_state, 'required_run_rate', 0.0),
+                'target': getattr(match_state, 'target', None),
+                'batsman1_name': getattr(match_state, 'batsman1_name', ""),
+                'batsman1_runs': getattr(match_state, 'batsman1_runs', 0),
+                'batsman1_balls': getattr(match_state, 'batsman1_balls', 0),
+                'batsman2_name': getattr(match_state, 'batsman2_name', ""),
+                'batsman2_runs': getattr(match_state, 'batsman2_runs', 0),
+                'batsman2_balls': getattr(match_state, 'batsman2_balls', 0),
+                'bowler_name': getattr(match_state, 'bowler1_name', ""),
+                'venue': match_state.venue,
+                'toss_winner': match_state.toss_winner if hasattr(match_state, 'toss_winner') else "",
+                'toss_decision': match_state.toss_decision if hasattr(match_state, 'toss_decision') else "",
+                
+                # Computed features (all from features_dict)
+                **{k: features_dict.get(k) for k in [
+                    'resource_pct', 'resource_win_prob', 'expected_final_score', 'projected_score',
+                    'projected_vs_venue_avg', 'score_vs_par', 'pressure_index', 'dls_pressure_index',
+                    'team_strength_diff', 'batting_team_win_rate', 'bowling_team_win_rate',
+                    'batting_team_situation_wr', 'bowling_team_situation_wr', 'situation_advantage',
+                    'runs_last_12', 'runs_last_18', 'wickets_last_12', 'wickets_last_30',
+                    'boundary_pct_last_18', 'chase_difficulty', 'score_per_wicket',
+                    'wickets_times_balls', 'rrr_times_wickets', 'batting_pair_strength',
+                    'acceleration_potential', 'crr_times_res', 'resources_remaining',
+                    'run_rate_diff', 'is_powerplay', 'is_death', 'venue_avg_score',
+                    'venue_avg_wickets', 'venue_bat_first_wr', 'batsman_venue_avg',
+                    'batsman_venue_sr', 'batsman_vs_team_avg', 'bowler_venue_econ',
+                    'bowler_venue_sr', 'bowler_vs_team_econ',
+                ]},
+                
+                # Calibration chain
+                'model_raw_prob': model_raw_prob,
+                'model_smoothed_prob': model_smoothed_prob,
+                'model_calibrated_combined': model_calibrated_combined,
+                'model_calibrated_innings': model_calibrated_innings,
+                'model_calibrated_phase': model_calibrated_phase,
+                'model_calibrated_per_over': model_calibrated_per_over,
+                'model_league_calibrated': model_league_calibrated,
+                'model_final_prob': model_final_prob,
+                
+                # Market odds
+                'market_fav_team': market_fav_team,
+                'market_back_odds': market_back_odds,
+                'market_lay_odds': market_lay_odds,
+                'market_fav_prob': market_fav_prob,
+                'market_batting_team_prob': market_batting_prob,
+                'market_bowling_team_prob': market_bowling_prob,
+                
+                # Deviation metrics
+                'deviation': deviation,
+                'deviation_abs': deviation_abs,
+                'deviation_bucket': deviation_bucket,
+                'deviation_direction': deviation_direction,
+                'model_prob_delta': model_prob_delta,
+                'market_prob_delta': market_prob_delta,
+                
+                # Team strength tier
+                'batting_team_tier': batting_team_tier,
+                'bowling_team_tier': bowling_team_tier,
+                
+                # Versioning
+                'model_version': self.model_version,
+                'feature_store_version': self.feature_store_version,
+            }
+            
+            # Append to buffer
+            self.buffer.append(record)
+            self.previous_ball_state = record
+            
+            # Check for innings change
+            if innings != self.current_innings:
+                self.log.info("innings_break_detected", innings=innings)
+                self.flush()
+                self.current_innings = innings
+            
+            # Auto-flush at 30 records
+            if len(self.buffer) >= 30:
+                self.log.info("auto_flush_triggered", buffer_size=len(self.buffer))
+                self.flush()
+            
+            self.log.debug("ball_recorded", buffer_size=len(self.buffer))
+            
+        except Exception as e:
+            self.log.error("record_ball_failed", error=str(e), exc_info=True)
+            # Error is logged but not raised (FR-009)
+    
+    def flush(self) -> None:
+        """
+        Flush buffered records to Parquet file.
+        
+        Writes buffer to <match_id>.parquet using BALL_STATE_SCHEMA.
+        If file already exists, appends new records.
+        Clears buffer after successful write.
+        
+        Wrapped in try/except (FR-009).
+        """
+        try:
+            if not self.buffer:
+                self.log.debug("flush_skipped_empty_buffer")
+                return
+            
+            # Convert buffer to DataFrame
+            df = pd.DataFrame(self.buffer)
+            
+            # Convert to PyArrow Table with schema
+            try:
+                table = pa.Table.from_pandas(df, schema=BALL_STATE_SCHEMA)
+            except Exception as schema_error:
+                self.log.warning("schema_validation_failed_using_inferred", error=str(schema_error))
+                table = pa.Table.from_pandas(df)
+            
+            # Write to Parquet
+            match_file = self.states_dir / f"{self.match_id}.parquet"
+            
+            if match_file.exists():
+                # Append to existing file
+                existing_table = pq.read_table(match_file)
+                combined_table = pa.concat_tables([existing_table, table])
+                pq.write_table(combined_table, match_file)
+                self.log.info("buffer_appended_to_existing_file", rows=len(df), file=str(match_file))
+            else:
+                # Write new file
+                pq.write_table(table, match_file)
+                self.log.info("buffer_flushed_to_new_file", rows=len(df), file=str(match_file))
+            
+            # Clear buffer
+            self.buffer = []
+            
+        except Exception as e:
+            self.log.error("flush_failed", error=str(e), buffer_size=len(self.buffer), exc_info=True)
+            # Error is logged but not raised (FR-009)
+    
+    def finalize(
+        self,
+        winner: Optional[str] = None,
+        team_a_score: Optional[str] = None,
+        team_b_score: Optional[str] = None,
+        result_type: str = "in_progress",
+    ) -> None:
+        """
+        Finalize match recording and write metadata.
+        
+        Flushes any remaining buffer, then writes/appends match metadata row
+        to match_metadata.parquet.
+        
+        Wrapped in try/except (FR-009).
+        
+        Args:
+            winner: Match winner team name (None if no result)
+            team_a_score: Team A score string (e.g., "185/4")
+            team_b_score: Team B score string
+            result_type: "completed", "no_result", or "in_progress"
+        """
+        try:
+            # Flush remaining buffer
+            self.flush()
+            
+            # Prepare metadata record
+            recording_end = datetime.now()
+            
+            # Extract teams from first recorded ball (if buffer was flushed, read from file)
+            team_a = None
+            team_b = None
+            team_a_tier = None
+            team_b_tier = None
+            venue = None
+            toss_winner = None
+            toss_decision = None
+            
+            match_file = self.states_dir / f"{self.match_id}.parquet"
+            if match_file.exists():
+                df = pd.read_parquet(match_file)
+                if not df.empty:
+                    first_row = df.iloc[0]
+                    # Team A = team batting first (innings 1)
+                    innings_1_rows = df[df['innings'] == 1]
+                    if not innings_1_rows.empty:
+                        team_a = innings_1_rows.iloc[0]['batting_team']
+                        team_a_tier = innings_1_rows.iloc[0]['batting_team_tier']
+                    innings_2_rows = df[df['innings'] == 2]
+                    if not innings_2_rows.empty:
+                        team_b = innings_2_rows.iloc[0]['batting_team']
+                        team_b_tier = innings_2_rows.iloc[0]['batting_team_tier']
+                    venue = first_row.get('venue')
+                    toss_winner = first_row.get('toss_winner')
+                    toss_decision = first_row.get('toss_decision')
+                    total_balls = len(df)
+            else:
+                total_balls = 0
+            
+            metadata_record = {
+                'match_id': self.match_id,
+                'match_url': "",  # Populated by caller if available
+                'league': self.league,
+                'date': self.recording_start,
+                'venue': venue or "",
+                'team_a': team_a or "",
+                'team_b': team_b or "",
+                'team_a_tier': team_a_tier or "mid",
+                'team_b_tier': team_b_tier or "mid",
+                'toss_winner': toss_winner or "",
+                'toss_decision': toss_decision or "",
+                'winner': winner,
+                'team_a_score': team_a_score,
+                'team_b_score': team_b_score,
+                'result_type': result_type,
+                'model_version': self.model_version,
+                'feature_store_version': self.feature_store_version,
+                'total_balls_recorded': total_balls,
+                'recording_start': self.recording_start,
+                'recording_end': recording_end,
+            }
+            
+            # Write/append to metadata file
+            metadata_file = self.states_dir / "match_metadata.parquet"
+            metadata_df = pd.DataFrame([metadata_record])
+            
+            try:
+                metadata_table = pa.Table.from_pandas(metadata_df, schema=MATCH_METADATA_SCHEMA)
+            except Exception as schema_error:
+                self.log.warning("metadata_schema_validation_failed", error=str(schema_error))
+                metadata_table = pa.Table.from_pandas(metadata_df)
+            
+            if metadata_file.exists():
+                existing_metadata = pq.read_table(metadata_file)
+                combined_metadata = pa.concat_tables([existing_metadata, metadata_table])
+                pq.write_table(combined_metadata, metadata_file)
+                self.log.info("metadata_appended", file=str(metadata_file))
+            else:
+                pq.write_table(metadata_table, metadata_file)
+                self.log.info("metadata_created", file=str(metadata_file))
+            
+            self.log.info(
+                "match_recording_finalized",
+                winner=winner,
+                balls_recorded=total_balls,
+                duration_seconds=(recording_end - self.recording_start).total_seconds(),
+            )
+            
+        except Exception as e:
+            self.log.error("finalize_failed", error=str(e), exc_info=True)
+            # Error is logged but not raised (FR-009)

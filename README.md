@@ -225,6 +225,125 @@ plt.title('Win Probability Throughout Match')
 plt.show()
 ```
 
+## Match State Recording & Analysis 📊
+
+The match state logging system records complete prediction context at every ball during live matches, enabling drift detection, calibration analysis, and market edge identification.
+
+### Recording Match States
+
+**During live predictions:**
+```bash
+# Record match states while predicting
+python -m src.bbl_pipeline.inference.crex_live_predictor \
+    --match-url "CREX_LIVE_MATCH_URL" \
+    --model-dir models/bbl_v12 \
+    --feature-store-dir data/bbl_feature_store_v2 \
+    --record-states
+
+# Custom output directory
+python -m src.bbl_pipeline.inference.crex_live_predictor \
+    --match-url "CREX_URL" \
+    --model-dir models/bbl_v12 \
+    --feature-store-dir data/bbl_feature_store_v2 \
+    --record-states \
+    --states-dir data/match_states/bbl_2025
+```
+
+**What gets recorded:**
+- Raw match state (runs, wickets, overs, batsmen)
+- All 50+ computed features from feature mapper
+- Complete calibration chain (raw → combined → innings → phase → per-over → league)
+- CREX market odds (back, lay, implied probability)
+- Model-market deviation (size, bucket, direction)
+- Team strength tiers, match phase, venue
+- Model and feature store versions
+
+**Data layout:**
+```
+data/match_states/<league>/
+├── <match_id>.parquet           # Ball-by-ball states (80+ columns)
+├── match_metadata.parquet       # Match results and metadata
+├── all_matches.parquet          # Consolidated (post-analysis)
+├── signal_events.parquet        # Deviation signals with reversion labels
+└── volatility_profiles.parquet  # Model vs market volatility metrics
+```
+
+### Analyzing Recorded Data
+
+**Consolidate match files:**
+```bash
+bbl-pipeline analyze-states --league bbl --consolidate
+```
+
+**Generate calibration report (Brier, ECE, LogLoss):**
+```bash
+bbl-pipeline analyze-states --league bbl --calibration-report
+```
+
+**Full workflow:**
+```bash
+# Consolidate + calibration report
+bbl-pipeline analyze-states \
+    --league sa20 \
+    --consolidate \
+    --calibration-report
+
+# Custom states directory
+bbl-pipeline analyze-states \
+    --league ilt20 \
+    --states-dir data/match_states/ilt20_2025 \
+    --calibration-report
+```
+
+**Example output:**
+```
+═══════════════════════════════════════════════════════════
+  Match State Analysis: BBL
+═══════════════════════════════════════════════════════════
+  States Directory: data/match_states/bbl
+  Discovered 12 match files
+
+🔄 Consolidating match files...
+   ✅ Consolidated 1,440 ball states
+   📄 Output: data/match_states/bbl/all_matches.parquet
+
+📊 Summary:
+   Matches: 12
+   Date Range: 2025-01-10 to 2025-01-25
+   Phases: powerplay, middle, death
+
+📈 Generating calibration report...
+   ✅ Report generated: data/match_states/bbl/CALIBRATION_REPORT.md
+
+📊 Overall Calibration Metrics:
+   Brier Score: 0.1760
+   ECE (10-bin): 0.0000
+   Log Loss: 0.5190
+   Samples: 1,440
+
+📊 By Innings:
+   Innings 1: Brier 0.1812 | ECE 0.0000 | Samples 720
+   Innings 2: Brier 0.1708 | ECE 0.0000 | Samples 720
+
+📊 By Phase:
+   Powerplay: Brier 0.1856 | ECE 0.0000 | Samples 432
+   Middle: Brier 0.1742 | ECE 0.0000 | Samples 648
+   Death: Brier 0.1650 | ECE 0.0000 | Samples 360
+
+═══════════════════════════════════════════════════════════
+  ✅ Analysis Complete!
+═══════════════════════════════════════════════════════════
+```
+
+**Use cases:**
+- **Drift Detection:** Track calibration metrics (Brier, ECE) over time to detect model degradation
+- **Market Edge Analysis:** Identify deviation patterns where model consistently outperforms market
+- **Volatility Comparison:** Compare model vs market probability swings to detect overconfidence
+- **Meta-Model Training:** Extract signal events with price reversion labels for systematic trading
+- **Recovery Premium:** Analyze if strong teams recover from pressure better than model predicts
+
+See [specs/001-match-state-logging/](specs/001-match-state-logging/) for full documentation.
+
 ## Troubleshooting
 
 ### Live Prediction Issues

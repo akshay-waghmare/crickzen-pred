@@ -1173,7 +1173,7 @@ def update_matches(ctx, source_dir, league, dry_run):
 
 
 @main.command()
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 't20_male', 't20_female']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 't20_male', 't20_female', 't20i_female']), required=True,
               help='League to retrain model for')
 @click.option('--version', type=str, required=True,
               help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
@@ -1256,6 +1256,13 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/t20_female_features',
             'feature_store_dir': 'data/t20_female_feature_store',
             'model_prefix': 't20_female',
+        },
+        't20i_female': {
+            'json_dir': 't20i_female_json',
+            'raw_dir': 'data/t20i_female_raw',
+            'features_dir': 'data/t20i_female_features',
+            'feature_store_dir': 'data/t20i_female_feature_store',
+            'model_prefix': 't20i_female',
         },
     }
     
@@ -1380,6 +1387,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
         'wpl': 'WPL',
         't20_male': 'T20_MALE',
         't20_female': 'T20_FEMALE',
+        't20i_female': 'T20I_FEMALE',
     }
     
     registry_path = Path('models/model_registry.json')
@@ -1634,5 +1642,115 @@ def calibrate_league(ctx, global_model, input_file, league, output_dir, method):
     click.echo(f"   calibrated = calibrator.predict(df, raw_probs)")
 
 
+@main.command(name='analyze-states')
+@click.option('--league', type=str, required=True, help='League identifier (e.g., bbl, sa20, ilt20)')
+@click.option('--states-dir', type=click.Path(exists=True), help='Directory containing match state Parquet files')
+@click.option('--consolidate', is_flag=True, help='Consolidate all match files into all_matches.parquet')
+@click.option('--calibration-report', is_flag=True, help='Generate calibration report with Brier/ECE/LogLoss')
+@click.option('--deviation-threshold', type=float, default=0.10, help='Minimum deviation threshold for signal extraction (default: 0.10)')
+@click.pass_context
+def analyze_states(ctx, league, states_dir, consolidate, calibration_report, deviation_threshold):
+    """
+    Analyze recorded match state data.
+    
+    Consolidates match Parquet files, computes calibration metrics (Brier, ECE, LogLoss),
+    and generates reports for drift detection and deviation analysis.
+    
+    Examples:
+        # Consolidate all match files for BBL
+        bbl-pipeline analyze-states --league bbl --consolidate
+        
+        # Generate calibration report for SA20
+        bbl-pipeline analyze-states --league sa20 --calibration-report
+        
+        # Both consolidation and report
+        bbl-pipeline analyze-states --league ilt20 --consolidate --calibration-report
+    """
+    from bbl_pipeline.analysis.state_analyzer import StateAnalyzer
+    
+    # Determine states directory
+    if states_dir:
+        states_path = Path(states_dir)
+    else:
+        states_path = Path(f"data/match_states/{league}")
+    
+    if not states_path.exists():
+        click.echo(f"❌ States directory not found: {states_path}")
+        click.echo(f"   Run predictor with --record-states to collect data first.")
+        return
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  Match State Analysis: {league.upper()}")
+    click.echo(f"{'='*60}")
+    click.echo(f"  States Directory: {states_path}")
+    
+    # Initialize analyzer
+    analyzer = StateAnalyzer(league=league, states_dir=states_path)
+    
+    click.echo(f"  Discovered {len(analyzer.match_files)} match files")
+    
+    if not consolidate and not calibration_report:
+        click.echo(f"\n⚠️  No action specified. Use --consolidate or --calibration-report")
+        return
+    
+    # Consolidate matches
+    if consolidate:
+        click.echo(f"\n🔄 Consolidating match files...")
+        df = analyzer.consolidate()
+        
+        if len(df) > 0:
+            click.echo(f"   ✅ Consolidated {len(df):,} ball states")
+            click.echo(f"   📄 Output: {analyzer.consolidated_file}")
+            
+            # Show summary stats
+            click.echo(f"\n📊 Summary:")
+            click.echo(f"   Matches: {df['match_id'].nunique()}")
+            click.echo(f"   Date Range: {df['timestamp'].min()} to {df['timestamp'].max()}")
+            click.echo(f"   Phases: {', '.join(df['match_phase'].unique())}")
+        else:
+            click.echo(f"   ❌ No match data found")
+            return
+    
+    # Generate calibration report
+    if calibration_report:
+        click.echo(f"\n📈 Generating calibration report...")
+        
+        results = analyzer.calibration_report()
+        
+        if len(results) == 0:
+            click.echo(f"   ❌ No completed matches with outcomes found")
+            return
+        
+        click.echo(f"   ✅ Report generated: {states_path / 'CALIBRATION_REPORT.md'}")
+        
+        # Display overall metrics
+        if "overall" in results:
+            overall = results["overall"]
+            click.echo(f"\n📊 Overall Calibration Metrics:")
+            click.echo(f"   Brier Score: {overall['brier']:.4f}")
+            click.echo(f"   ECE (10-bin): {overall['ece']:.4f}")
+            click.echo(f"   Log Loss: {overall['log_loss']:.4f}")
+            click.echo(f"   Samples: {overall['sample_count']:,}")
+        
+        # Show by innings
+        click.echo(f"\n📊 By Innings:")
+        for key in sorted([k for k in results.keys() if k.startswith("innings_")]):
+            metrics = results[key]
+            click.echo(f"   {metrics['segment']}: Brier {metrics['brier']:.4f} | ECE {metrics['ece']:.4f} | Samples {metrics['sample_count']:,}")
+        
+        # Show by phase highlights
+        click.echo(f"\n📊 By Phase:")
+        for phase in ["powerplay", "middle", "death"]:
+            key = f"phase_{phase}"
+            if key in results:
+                metrics = results[key]
+                click.echo(f"   {metrics['segment']}: Brier {metrics['brier']:.4f} | ECE {metrics['ece']:.4f} | Samples {metrics['sample_count']:,}")
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  ✅ Analysis Complete!")
+    click.echo(f"{'='*60}\n")
+
+
 if __name__ == '__main__':
     main()
+

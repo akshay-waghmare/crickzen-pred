@@ -103,13 +103,15 @@ class CrexLivePredictor:
     def __init__(self, match_url: str, model_dir: str, headless: bool = True,
                  feature_store_dir: str = None, output_json: str = None,
                  live_match_json: str = None, venue: str = None, league: str = None,
-                 use_ml_model: bool = False):
+                 use_ml_model: bool = False, record_states: bool = False, states_dir: str = None):
         self.match_url = match_url
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
         self.league = league  # League code for league-specific calibration
         self.use_ml_model = use_ml_model  # Use ML model for Monte Carlo terminal evaluation
+        self.record_states = record_states  # Enable match state recording
+        self.states_dir = states_dir  # Custom states directory
         self.output_json = output_json  # Path for JSON output (for Streamlit)
         self.venue_override = venue
         # Optional richer debug output (defaults to sibling livematch.json if output_json is set)
@@ -138,6 +140,45 @@ class CrexLivePredictor:
         # Try to load the prediction model
         self.model = None
         self._load_model()
+        
+        # Initialize match state logger if recording enabled
+        self.match_state_logger = None
+        if self.record_states:
+            self._init_match_state_logger()
+    
+    def _init_match_state_logger(self):
+        """Initialize match state logger if recording is enabled."""
+        try:
+            from pathlib import Path
+            from bbl_pipeline.inference.match_state_logger import MatchStateLogger
+            
+            # Extract match ID from URL (use last path segment)
+            match_id = self.match_url.split("/")[-2] if "/" in self.match_url else "unknown_match"
+            
+            # Determine states directory
+            if self.states_dir:
+                states_dir = Path(self.states_dir)
+            elif self.league:
+                states_dir = Path(f"data/match_states/{self.league}")
+            else:
+                states_dir = Path("data/match_states/unknown")
+            
+            # Extract version strings
+            model_version = Path(self.model_dir).name if self.model_dir else "unknown_model"
+            feature_store_version = Path(self.feature_store_dir).name if self.feature_store_dir else "unknown_store"
+            
+            # Create logger
+            self.match_state_logger = MatchStateLogger(
+                match_id=match_id,
+                league=self.league or "unknown",
+                states_dir=states_dir,
+                model_version=model_version,
+                feature_store_version=feature_store_version,
+            )
+            print(f"[RECORD] Match state recording enabled -> {states_dir}/{match_id}.parquet")
+        except Exception as e:
+            print(f"[WARN] Could not initialize match state logger: {e}")
+            self.match_state_logger = None
     
     def _load_model(self):
         """Load the trained prediction model."""
@@ -869,14 +910,21 @@ class CrexLivePredictor:
                 self.match_state.wickets = int(title_match.group(3))
                 self.match_state.overs = float(title_match.group(4))
                 
+                # Helper to normalize team names for comparison (e.g. "IND-W" vs "INDW")
+                def _norm_team(name: str) -> str:
+                    return name.replace('-', '').replace(' ', '').upper()
+                
                 # If batting team changed, update bowling team accordingly
-                if self.match_state.batting_team and self.match_state.batting_team != current_batting_team:
+                if self.match_state.batting_team and _norm_team(self.match_state.batting_team) != _norm_team(current_batting_team):
                     # The current batting was the previous bowling
                     self.match_state.bowling_team = self.match_state.batting_team
                 elif not self.match_state.bowling_team:
                     # First time setting teams - use info page teams if available
                     if hasattr(self, '_team1') and hasattr(self, '_team2'):
-                        self.match_state.bowling_team = self._team2 if current_batting_team == self._team1 else self._team1
+                        if _norm_team(current_batting_team) == _norm_team(self._team1):
+                            self.match_state.bowling_team = self._team2
+                        else:
+                            self.match_state.bowling_team = self._team1
                 
                 self.match_state.batting_team = current_batting_team
             else:
@@ -1325,6 +1373,13 @@ class CrexLivePredictor:
         except KeyboardInterrupt:
             print("\n[STOP] Stopped by user")
         finally:
+            # Finalize match state recording if enabled
+            if self.match_state_logger:
+                try:
+                    self.match_state_logger.finalize(result_type="in_progress")
+                    print("[RECORD] Match state recording finalized")
+                except Exception as e:
+                    print(f"[WARN] Logger finalize failed: {e}")
             await self.stop()
     
     def _display_state(self, win_prob: Optional[float]):
@@ -1367,6 +1422,54 @@ class CrexLivePredictor:
             # Write to JSON if output file specified
             if self.output_json:
                 self._write_json_state(win_prob)
+            
+            # Record ball state if logger is enabled
+            if self.match_state_logger and self.predictor:
+                try:
+                    # Compute features for logger (same logic as _write_json_state)
+                    over = int(state.overs)
+                    ball = int(round((state.overs - over) * 10))
+                    if ball >= 6:
+                        ball = 0
+                    
+                    scraped_data = {
+                        'innings_num': 2 if state.is_second_innings else 1,
+                        'over_number': over,
+                        'ball_number': ball,
+                        'total_score': state.total_runs,
+                        'total_wickets': state.wickets,
+                        'current_batsman': state.batsman1_name,
+                        'non_striker': state.batsman2_name,
+                        'batting_team': state.batting_team,
+                        'bowling_team': state.bowling_team,
+                        'venue': state.venue,
+                        'target_score': state.target,
+                        'runs_needed': (state.target - state.total_runs) if state.target else 0
+                    }
+                    
+                    feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
+                    features = {
+                        k: (float(v) if isinstance(v, (int, float)) else str(v))
+                        for k, v in feat_df.iloc[0].to_dict().items()
+                    }
+                    
+                    # Assemble market odds dict
+                    market_odds = {
+                        "market_fav_team": state.market_fav_team,
+                        "market_back_odds": state.market_back_odds,
+                        "market_lay_odds": state.market_lay_odds,
+                        "market_fav_prob": state.market_fav_prob,
+                    }
+                    
+                    # Record ball
+                    self.match_state_logger.record_ball(
+                        match_state=state,
+                        features_dict=features,
+                        predictor=self.predictor,
+                        market_odds=market_odds,
+                    )
+                except Exception as e:
+                    pass  # Logging errors are already handled in logger
         
         # Pad and print
         print(display.ljust(120), end="", flush=True)
@@ -1579,6 +1682,17 @@ async def main():
         default=False,
         help="Use ML model for Monte Carlo terminal state evaluation (more accurate, ~50ms for 2000 sims)",
     )
+    parser.add_argument(
+        "--record-states",
+        action="store_true",
+        default=False,
+        help="Enable match state recording to Parquet files for analysis",
+    )
+    parser.add_argument(
+        "--states-dir",
+        default=None,
+        help="Directory for recorded match states (default: data/match_states/<league>/)",
+    )
     
     args = parser.parse_args()
     
@@ -1592,6 +1706,8 @@ async def main():
         venue=args.venue,
         league=args.league,
         use_ml_model=args.use_ml_model,
+        record_states=args.record_states,
+        states_dir=args.states_dir,
     )
     
     await predictor.run(poll_interval=args.poll_interval)

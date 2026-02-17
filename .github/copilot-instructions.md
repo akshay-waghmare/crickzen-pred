@@ -194,6 +194,59 @@ See `docs/FEATURE_STORE.md` for detailed schema documentation.
     --output-json data/live_state.json
   ```
 
+- **Match State Recording (CLI):** Record complete match states during live predictions:
+  ```bash
+  # Record match states alongside live predictions
+  python -m src.bbl_pipeline.inference.crex_live_predictor \
+    --match-url "CREX_MATCH_URL" \
+    --model-dir models/bbl_v12 \
+    --feature-store-dir data/bbl_feature_store_v2 \
+    --record-states
+  
+  # Custom output directory
+  python -m src.bbl_pipeline.inference.crex_live_predictor \
+    --match-url "CREX_URL" \
+    --model-dir models/sa20_v2 \
+    --feature-store-dir data/sa20_feature_store_v2 \
+    --record-states \
+    --states-dir data/match_states/sa20_2025
+  
+  # Records 80+ columns per ball:
+  #   - Raw match state (runs, wickets, overs, batsmen)
+  #   - All 50+ computed features
+  #   - Complete calibration chain (raw → league)
+  #   - CREX market odds + deviation metrics
+  #   - Team tiers, match phase, model/feature store versions
+  
+  # Output: data/match_states/<league>/<match_id>.parquet
+  ```
+
+- **Analyze Recorded Matches:** Generate calibration reports and consolidate data:
+  ```bash
+  # Consolidate all match files
+  bbl-pipeline analyze-states --league bbl --consolidate
+  
+  # Generate calibration report (Brier, ECE, LogLoss)
+  bbl-pipeline analyze-states --league sa20 --calibration-report
+  
+  # Full workflow: consolidate + calibration
+  bbl-pipeline analyze-states \
+    --league ilt20 \
+    --consolidate \
+    --calibration-report
+  
+  # Output files:
+  #   - all_matches.parquet (consolidated ball states)
+  #   - CALIBRATION_REPORT.md (metrics by innings/phase/tier)
+  #   - signal_events.parquet (deviation signals with reversion labels)
+  #   - volatility_profiles.parquet (model vs market volatility)
+  ```
+
+- **Key Classes for Match State Logging:**
+  - `MatchStateLogger` (`src/bbl_pipeline/inference/match_state_logger.py`): Records ball states to Parquet with buffering, error isolation
+  - `StateAnalyzer` (`src/bbl_pipeline/analysis/state_analyzer.py`): Consolidates matches, computes calibration metrics, extracts signals
+  - **Schemas:** `src/bbl_pipeline/inference/match_state_schema.py` (PyArrow schemas for BALL_STATE, MATCH_METADATA, SIGNAL_EVENT, VOLATILITY_PROFILE)
+
 - **Live Visualization:** Run `streamlit run src/bbl_pipeline/app/live_streamlit_app.py`
 - **Calibration Analysis:** See `docs/BBL_V12_MODEL.md` for detailed Brier/ECE breakdown.
 - **Comprehensive OOF Calibration Analysis:** 
