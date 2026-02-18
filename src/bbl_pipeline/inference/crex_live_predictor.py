@@ -1066,13 +1066,25 @@ class CrexLivePredictor:
                         self.match_state.bowler1_wickets = int(wickets_text)
                     except:
                         pass
+            # Note: If bowler_row is None, fallback regex patterns below will attempt extraction
             
             # Fallback: Try to extract bowler from page text patterns
             if not self.match_state.bowler1_name or self.match_state.bowler1_name == "Unknown":
-                # Look for bowling figure pattern: "Player Name 1-0-8-0" (overs-maidens-runs-wickets)
-                bowler_match = re.search(r'([A-Za-z\s]+)\s+(\d+)-(\d+)-(\d+)-(\d+)', page_text)
+                # Pattern 1: Bowling figures "Player Name 1-0-8-0" or "Name 2.3-0-15-1"
+                bowler_match = re.search(r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+([\d.]+)-\d+-\d+-\d+', page_text)
                 if bowler_match:
                     self.match_state.bowler1_name = bowler_match.group(1).strip()
+                else:
+                    # Pattern 2: "Bowler: Name" or "Bowling: Name"
+                    bowler_match = re.search(r'Bowl(?:er|ing)\s*[:]\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', page_text, re.IGNORECASE)
+                    if bowler_match:
+                        self.match_state.bowler1_name = bowler_match.group(1).strip()
+                    else:
+                        # Pattern 3: Extract from page title if bowler is mentioned after "vs" pattern
+                        # Some CREX pages show "Team1 vs Team2 (Batsman1 X(Y), Batsman2 X(Y)) - Bowler A-B-C-D"
+                        title_bowler = re.search(r'-\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+[\d.]+-\d+-\d+-\d+', title)
+                        if title_bowler:
+                            self.match_state.bowler1_name = title_bowler.group(1).strip()
                         
         except Exception as e:
             print(f"[WARN] Error extracting match info: {e}")
