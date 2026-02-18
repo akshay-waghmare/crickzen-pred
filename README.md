@@ -258,6 +258,36 @@ python -m src.bbl_pipeline.inference.crex_live_predictor \
 - Team strength tiers, match phase, venue
 - Model and feature store versions
 
+### Data Quality & Resume Behavior
+
+- **Resume-safe recording:** restarting the predictor for the same match now resumes cleanly and skips already persisted ball states (no full-file replay append).
+- **Bowler capture improvements:** logger now uses current CREX layout fallbacks (`.batsmen-score.bowler` / active player card text), plus regex fallback, to populate `bowler_name` more reliably.
+- **`ball_in_over` normalization:** analysis output now uses only `1..6` (never `0`).
+    - `overs = X.0` is stored as `over_number=X, ball_in_over=6`
+    - `overs = 0.0` snapshot is stored as `over_number=1, ball_in_over=1`
+
+**Backfill old files with legacy `ball_in_over=0`:**
+```bash
+python - <<'PY'
+import pandas as pd
+from pathlib import Path
+
+p = Path('data/match_states/<league>/<match_id>.parquet')
+df = pd.read_parquet(p)
+
+mask_start = (df['ball_in_over'] == 0) & (df['overs'].fillna(0).round(3) == 0)
+df.loc[mask_start, ['over_number', 'ball_in_over']] = [1, 1]
+
+is_integer_over = (df['overs'].fillna(-1) > 0) & ((df['overs'] - df['overs'].fillna(0).astype(int)).abs() < 1e-6)
+mask_completed = (df['ball_in_over'] == 0) & is_integer_over
+df.loc[mask_completed, 'over_number'] = df.loc[mask_completed, 'overs'].astype(int).astype(df['over_number'].dtype)
+df.loc[mask_completed, 'ball_in_over'] = 6
+
+df.to_parquet(p, index=False)
+print('Backfill complete')
+PY
+```
+
 **Data layout:**
 ```
 data/match_states/<league>/

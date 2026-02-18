@@ -1039,40 +1039,83 @@ class CrexLivePredictor:
                             self.match_state.batsman2_balls = int(balls) if balls.isdigit() else 0
             
             # Extract bowler data from DOM
-            bowler_row = await self.page.query_selector(".bowler-row, .bowl-row")
-            if bowler_row:
-                name_el = await bowler_row.query_selector(".player-name, .name")
-                overs_el = await bowler_row.query_selector(".overs, .over")
-                runs_el = await bowler_row.query_selector(".runs, .score")
-                wickets_el = await bowler_row.query_selector(".wickets, .wkt")
-                
-                if name_el:
-                    self.match_state.bowler1_name = (await name_el.inner_text()).strip()
-                if overs_el:
-                    overs_text = await overs_el.inner_text()
+            # CREX current layout commonly exposes bowler as: <span class="batsmen-score bowler">D Parashar 0-1 (0.4)</span>
+            bowler_text_el = await self.page.query_selector(".batsmen-score.bowler")
+            if bowler_text_el:
+                bowler_text = (await bowler_text_el.inner_text()).strip()
+                bowler_match = re.search(r'([A-Za-z.\-]+(?:\s+[A-Za-z.\-]+)*)\s+(\d+)-(\d+)\s*\(([\d.]+)\)', bowler_text)
+                if bowler_match:
+                    self.match_state.bowler1_name = bowler_match.group(1).strip()
                     try:
-                        self.match_state.bowler1_overs = float(overs_text)
+                        self.match_state.bowler1_wickets = int(bowler_match.group(2))
+                        self.match_state.bowler1_runs = int(bowler_match.group(3))
+                        self.match_state.bowler1_overs = float(bowler_match.group(4))
                     except:
                         pass
-                if runs_el:
-                    runs_text = await runs_el.inner_text()
-                    try:
-                        self.match_state.bowler1_runs = int(runs_text)
-                    except:
-                        pass
-                if wickets_el:
-                    wickets_text = await wickets_el.inner_text()
-                    try:
-                        self.match_state.bowler1_wickets = int(wickets_text)
-                    except:
-                        pass
-            # Note: If bowler_row is None, fallback regex patterns below will attempt extraction
+
+            # Fallback DOM selectors (legacy layouts)
+            if not self.match_state.bowler1_name:
+                bowler_row = await self.page.query_selector(".bowler-row, .bowl-row")
+                if bowler_row:
+                    name_el = await bowler_row.query_selector(".player-name, .name")
+                    overs_el = await bowler_row.query_selector(".overs, .over")
+                    runs_el = await bowler_row.query_selector(".runs, .score")
+                    wickets_el = await bowler_row.query_selector(".wickets, .wkt")
+                    
+                    if name_el:
+                        self.match_state.bowler1_name = (await name_el.inner_text()).strip()
+                    if overs_el:
+                        overs_text = await overs_el.inner_text()
+                        try:
+                            self.match_state.bowler1_overs = float(overs_text)
+                        except:
+                            pass
+                    if runs_el:
+                        runs_text = await runs_el.inner_text()
+                        try:
+                            self.match_state.bowler1_runs = int(runs_text)
+                        except:
+                            pass
+                    if wickets_el:
+                        wickets_text = await wickets_el.inner_text()
+                        try:
+                            self.match_state.bowler1_wickets = int(wickets_text)
+                        except:
+                            pass
+
+            # Fallback from active player card text (current CREX layout)
+            if not self.match_state.bowler1_name:
+                active_card = await self.page.query_selector(".player-active, .player-card, .player-profile")
+                if active_card:
+                    active_text = (await active_card.inner_text()).replace("\n", " ")
+                    # Example: "A Markram 1 (1) + Q de Kock 0 (5) D Parashar 0-1 (0.4)"
+                    card_match = re.search(r'([A-Za-z.\-]+(?:\s+[A-Za-z.\-]+)*)\s+(\d+)-(\d+)\s*\(([\d.]+)\)', active_text)
+                    if card_match:
+                        self.match_state.bowler1_name = card_match.group(1).strip()
+                        try:
+                            self.match_state.bowler1_wickets = int(card_match.group(2))
+                            self.match_state.bowler1_runs = int(card_match.group(3))
+                            self.match_state.bowler1_overs = float(card_match.group(4))
+                        except:
+                            pass
+            # Note: If DOM selectors fail, fallback regex patterns below will attempt extraction
             
             # Fallback: Try to extract bowler from page text patterns
             if not self.match_state.bowler1_name or self.match_state.bowler1_name == "Unknown":
+                # Pattern 0: Current CREX figure format "Name 0-1 (0.4)"
+                bowler_match = re.search(r'([A-Za-z.\-]+(?:\s+[A-Za-z.\-]+)*)\s+(\d+)-(\d+)\s*\(([\d.]+)\)', page_text)
+                if bowler_match:
+                    self.match_state.bowler1_name = bowler_match.group(1).strip()
+                    try:
+                        self.match_state.bowler1_wickets = int(bowler_match.group(2))
+                        self.match_state.bowler1_runs = int(bowler_match.group(3))
+                        self.match_state.bowler1_overs = float(bowler_match.group(4))
+                    except:
+                        pass
+
                 # Pattern 1: Bowling figures "Player Name 1-0-8-0" or "Name 2.3-0-15-1"
                 bowler_match = re.search(r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+([\d.]+)-\d+-\d+-\d+', page_text)
-                if bowler_match:
+                if bowler_match and (not self.match_state.bowler1_name or self.match_state.bowler1_name == "Unknown"):
                     self.match_state.bowler1_name = bowler_match.group(1).strip()
                 else:
                     # Pattern 2: "Bowler: Name" or "Bowling: Name"

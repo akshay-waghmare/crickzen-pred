@@ -83,10 +83,40 @@ class MatchStateLogger:
         self.recording_start = datetime.now()
         self.current_innings = 1
         self.previous_ball_state: Optional[Dict[str, Any]] = None
+        self._seen_record_keys: set[tuple[int, int, int, int, int]] = set()
+        self.match_file = self.states_dir / f"{self.match_id}.parquet"
         
         # Logging
         self.log = logger.bind(match_id=match_id, league=league)
+
+        # Resume support: load previously recorded keys to avoid rewriting after restart
+        self._load_existing_record_keys()
         self.log.info("match_state_logger_initialized", states_dir=str(states_dir))
+
+    def _record_key(self, innings: int, over_number: int, ball_in_over: int, total_runs: int, wickets: int) -> tuple[int, int, int, int, int]:
+        """Build stable key for one recorded ball state."""
+        return (innings, over_number, ball_in_over, total_runs, wickets)
+
+    def _load_existing_record_keys(self) -> None:
+        """Load existing match parquet keys so recording can resume without duplicates."""
+        try:
+            if not self.match_file.exists():
+                return
+
+            existing_df = pd.read_parquet(self.match_file, columns=["innings", "over_number", "ball_in_over", "total_runs", "wickets"])
+            for row in existing_df.itertuples(index=False):
+                key = self._record_key(
+                    int(getattr(row, "innings", 0)),
+                    int(getattr(row, "over_number", 0)),
+                    int(getattr(row, "ball_in_over", 0)),
+                    int(getattr(row, "total_runs", 0)),
+                    int(getattr(row, "wickets", 0)),
+                )
+                self._seen_record_keys.add(key)
+
+            self.log.info("loaded_existing_record_keys", existing_keys=len(self._seen_record_keys), file=str(self.match_file))
+        except Exception as e:
+            self.log.warning("load_existing_record_keys_failed", error=str(e), file=str(self.match_file))
     
     def _compute_match_phase(self, over_number: int) -> str:
         """
@@ -237,10 +267,29 @@ class MatchStateLogger:
                 ball_in_over = 0
             over_number = over_int + 1  # over 5.3 means ball 3 of over 6 (1-indexed)
             if ball_in_over == 0 and over_int > 0:
-                over_number = over_int  # 5.0 means over 5 complete
+                # 5.0 means over 5 completed; represent as ball 6 of over 5 for analysis
+                over_number = over_int
+                ball_in_over = 6
+            elif ball_in_over == 0 and over_int == 0:
+                # Start-of-innings snapshot (0.0) -> represent as ball 1 (avoid 0 in analysis keys)
+                over_number = 1
+                ball_in_over = 1
             
             # Innings already derived above as inn_val
             innings = inn_val
+
+            # Cross-session dedup: skip if this ball state was already persisted in previous runs
+            record_key = self._record_key(innings, over_number, ball_in_over, int(runs_val), int(wkts_val))
+            if record_key in self._seen_record_keys:
+                self.log.debug(
+                    "already_recorded_state_skipped",
+                    innings=innings,
+                    over=over_number,
+                    ball=ball_in_over,
+                    runs=runs_val,
+                    wickets=wkts_val,
+                )
+                return
             
             # Extract market odds (handle missing gracefully)
             # market_back_odds and market_lay_odds may be strings from MatchState
@@ -305,6 +354,14 @@ class MatchStateLogger:
             
             # Compute match phase
             match_phase = self._compute_match_phase(over_number)
+
+            # Bowler fallback: carry forward previous non-empty bowler in same innings
+            bowler_name = (getattr(match_state, 'bowler1_name', '') or '').strip()
+            if not bowler_name and self.previous_ball_state:
+                prev_innings = self.previous_ball_state.get('innings')
+                prev_bowler_name = (self.previous_ball_state.get('bowler_name') or '').strip()
+                if prev_innings == innings and prev_bowler_name:
+                    bowler_name = prev_bowler_name
             
             # Assemble complete record
             record = {
@@ -332,7 +389,7 @@ class MatchStateLogger:
                 'batsman2_name': getattr(match_state, 'batsman2_name', ""),
                 'batsman2_runs': getattr(match_state, 'batsman2_runs', 0),
                 'batsman2_balls': getattr(match_state, 'batsman2_balls', 0),
-                'bowler_name': getattr(match_state, 'bowler1_name', ""),
+                'bowler_name': bowler_name,
                 'venue': match_state.venue,
                 'toss_winner': match_state.toss_winner if hasattr(match_state, 'toss_winner') else "",
                 'toss_decision': match_state.toss_decision if hasattr(match_state, 'toss_decision') else "",
@@ -390,6 +447,7 @@ class MatchStateLogger:
             
             # Append to buffer
             self.buffer.append(record)
+            self._seen_record_keys.add(record_key)
             self.previous_ball_state = record
             
             # Check for innings change
@@ -435,8 +493,8 @@ class MatchStateLogger:
                 table = pa.Table.from_pandas(df)
             
             # Write to Parquet
-            match_file = self.states_dir / f"{self.match_id}.parquet"
-            
+            match_file = self.match_file
+
             if match_file.exists():
                 # Append to existing file
                 existing_table = pq.read_table(match_file)
