@@ -461,9 +461,25 @@ class InMemoryFeatureStore:
     def _resolve_team_abbrev(self, team_name: str) -> str:
         code = team_name.upper()
         league_context = (self.league_context or '').lower()
-        if league_context in ('t20i', 't20_international') or 't20_international' in league_context:
+        
+        # Handle women's team suffixes: IND-W, INDW, AUS-W, AUSW → IND, AUS
+        # Strip -W or W suffix for international women's teams
+        base_code = code
+        if code.endswith('-W'):
+            base_code = code[:-2]
+        elif code.endswith('W') and len(code) >= 3:
+            # Only strip trailing W if the base code (without W) is a known abbreviation
+            candidate = code[:-1]
+            if candidate in self.TEAM_ABBREVIATIONS or candidate in self.TEAM_ABBREVIATIONS_T20I:
+                base_code = candidate
+        
+        if league_context in ('t20i', 't20_international') or 't20_international' in league_context or 't20i_female' in league_context:
+            if base_code in self.TEAM_ABBREVIATIONS_T20I:
+                return self.TEAM_ABBREVIATIONS_T20I[base_code]
             if code in self.TEAM_ABBREVIATIONS_T20I:
                 return self.TEAM_ABBREVIATIONS_T20I[code]
+        if base_code in self.TEAM_ABBREVIATIONS:
+            return self.TEAM_ABBREVIATIONS[base_code]
         if code in self.TEAM_ABBREVIATIONS:
             return self.TEAM_ABBREVIATIONS[code]
         return team_name
@@ -505,6 +521,45 @@ class InMemoryFeatureStore:
         # Auto-populated: {'bat_first_wr': 0.45, 'bowl_first_wr': 0.53, 'matches': 66}
     }
     
+    # =====================================================================
+    # FULL MEMBER OVERRIDES - Win rates filtered to ICC Full Member opponents
+    # Fixes inflated WRs for associate teams (e.g. UAE 56% all → 33% vs FM)
+    # Toggle USE_FM_OVERRIDES=True to use these during T20I inference
+    # =====================================================================
+    USE_FM_OVERRIDES = True
+    FM_OVERRIDES = {
+        # T20I teams: win rates computed ONLY vs ICC Full Member opponents
+        # Source: t20_international_male_raw matches, filtered Feb 2026
+        # Fixes inflated WRs for associates (e.g. UAE 56% all → 33% vs FM)
+        #
+        # Full Members (12)
+        'India':                {'win_rate': 0.6853, 'matches': 232, 'bat_first_wr': 0.6489, 'bowl_first_wr': 0.7327},
+        'Australia':            {'win_rate': 0.5700, 'matches': 200, 'bat_first_wr': 0.5244, 'bowl_first_wr': 0.6017},
+        'Pakistan':             {'win_rate': 0.5691, 'matches': 246, 'bat_first_wr': 0.5591, 'bowl_first_wr': 0.5798},
+        'England':              {'win_rate': 0.5464, 'matches': 194, 'bat_first_wr': 0.5783, 'bowl_first_wr': 0.5225},
+        'New Zealand':          {'win_rate': 0.5359, 'matches': 209, 'bat_first_wr': 0.5965, 'bowl_first_wr': 0.4632},
+        'South Africa':         {'win_rate': 0.5276, 'matches': 199, 'bat_first_wr': 0.5514, 'bowl_first_wr': 0.5000},
+        'West Indies':          {'win_rate': 0.4327, 'matches': 208, 'bat_first_wr': 0.4500, 'bowl_first_wr': 0.4167},
+        'Afghanistan':          {'win_rate': 0.4249, 'matches': 193, 'bat_first_wr': 0.3905, 'bowl_first_wr': 0.4659},
+        'Sri Lanka':            {'win_rate': 0.4249, 'matches': 193, 'bat_first_wr': 0.3905, 'bowl_first_wr': 0.4659},
+        'Bangladesh':           {'win_rate': 0.3416, 'matches': 161, 'bat_first_wr': 0.3521, 'bowl_first_wr': 0.3333},
+        'Ireland':              {'win_rate': 0.2656, 'matches':  64, 'bat_first_wr': 0.2222, 'bowl_first_wr': 0.2973},
+        'Zimbabwe':             {'win_rate': 0.2500, 'matches': 108, 'bat_first_wr': 0.2667, 'bowl_first_wr': 0.2292},
+        #
+        # Associates (T20 WC contenders)
+        'Namibia':              {'win_rate': 0.4074, 'matches':  27, 'bat_first_wr': 0.3077, 'bowl_first_wr': 0.5000},
+        'United Arab Emirates': {'win_rate': 0.3333, 'matches':  30, 'bat_first_wr': 0.3636, 'bowl_first_wr': 0.3158},
+        'Netherlands':          {'win_rate': 0.3250, 'matches':  40, 'bat_first_wr': 0.3000, 'bowl_first_wr': 0.3500},
+        'United States of America': {'win_rate': 0.3000, 'matches': 10, 'bat_first_wr': 0.3333, 'bowl_first_wr': 0.2500},
+        'Papua New Guinea':     {'win_rate': 0.2857, 'matches':   7, 'bat_first_wr': 0.3333, 'bowl_first_wr': 0.2500},
+        'Canada':               {'win_rate': 0.1667, 'matches':   5, 'bat_first_wr': 0.30,   'bowl_first_wr': 0.25},  # small sample, adjusted to mid-tier Associate level
+        'Uganda':               {'win_rate': 0.2500, 'matches':   4, 'bat_first_wr': 0.40,   'bowl_first_wr': 0.40},  # too few matches, dampened
+        'Scotland':             {'win_rate': 0.1935, 'matches':  31, 'bat_first_wr': 0.2857, 'bowl_first_wr': 0.1176},
+        'Oman':                 {'win_rate': 0.1667, 'matches':  12, 'bat_first_wr': 0.3333, 'bowl_first_wr': 0.1111},
+        'Nepal':                {'win_rate': 0.1667, 'matches':  12, 'bat_first_wr': 0.3333, 'bowl_first_wr': 0.40},  # 0/7 bowl_first too extreme, dampened
+    }
+    # =====================================================================
+
     # =====================================================================
     # SEASON OVERRIDES - Current season stats (takes precedence over historical)
     # This is auto-populated by crex_live_predictor from the match info page
@@ -575,6 +630,15 @@ class InMemoryFeatureStore:
         # 0. Check abbreviation map first and resolve full name
         full_name = self._resolve_team_abbrev(team_name)
         
+        # 0.05 CHECK FM OVERRIDES (Full Member filtered win rates for T20I)
+        if self.USE_FM_OVERRIDES and full_name in self.FM_OVERRIDES:
+            fm_stats = self.FM_OVERRIDES[full_name].copy()
+            bat_wr = fm_stats.get('bat_first_wr', fm_stats['win_rate'])
+            bowl_wr = fm_stats.get('bowl_first_wr', fm_stats['win_rate'])
+            logger.info(f"Using FM-FILTERED stats for '{full_name}': {fm_stats['matches']} matches, "
+                        f"{fm_stats['win_rate']*100:.1f}% win rate (bat_first={bat_wr:.1%}, bowl_first={bowl_wr:.1%})")
+            return fm_stats
+
         # 0.1 CHECK SEASON OVERRIDES FIRST (if enabled)
         if self.USE_SEASON_OVERRIDES and full_name in self.SEASON_OVERRIDES:
             season_stats = self.SEASON_OVERRIDES[full_name].copy()

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-02-05",
+  "last_updated": "2026-02-15",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -444,7 +444,7 @@
           "brier_raw": 0.1629,
           "brier_calibrated": 0.1603,
           "ece_raw": 0.0111,
-          "ece_calibrated": 0.0000
+          "ece_calibrated": 0.0
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
@@ -468,7 +468,7 @@
         "recent_changes": {
           "date": "2026-02-05",
           "description": "V4: Combined 15 female T20 leagues (1,467 matches). Added new leagues: SA20 Female, BPL Female, Lotus Cup, T20I Female tours. Updated with 185 new T20 matches from recently_played.",
-          "impact": "Samples: 283,026 → 328,855 (+16%). Teams: 65 → 96. Brier: 0.1603 (brier_optimized). Perfect calibration (ECE: 0.0000)."
+          "impact": "Samples: 283,026 \u00e2\u2020\u2019 328,855 (+16%). Teams: 65 \u00e2\u2020\u2019 96. Brier: 0.1603 (brier_optimized). Perfect calibration (ECE: 0.0000)."
         }
       },
       "league_calibrators": {
@@ -483,7 +483,7 @@
           "logloss_improvement": 0.8,
           "temperatures": {
             "innings_1": 0.7791,
-            "innings_2": 0.9320
+            "innings_2": 0.932
           }
         }
       }
@@ -706,6 +706,23 @@
           "description": "SSM v1 trained on 263 Super Smash matches with Per-Over calibration",
           "impact": "Per-Over Cal reduces ECE from 0.1050 to 0.0343 (67% improvement); Inn-Cal should NOT be used"
         }
+      }
+    },
+    "T20I_FEMALE": {
+      "path": "models/t20i_female_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1358, ECE: 0.0000)",
+      "training": {
+        "samples": 414237,
+        "date": "2026-02-15",
+        "brier_score": 0.1357778506933286
+      },
+      "calibrator": {},
+      "feature_store": {
+        "path": "data/t20i_female_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-02-15",
+        "training_data_samples": 414237
       }
     }
   },
