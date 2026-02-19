@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface-900 text-gray-100 font-sans antialiased;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar (Webkit) */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+}
+
+@layer components {
+  /* --- Cards --- */
+  .card {
+    @apply bg-surface-800 rounded-xl border border-surface-700 p-4 shadow-lg
+           transition-all duration-300;
+  }
+  .card-hover {
+    @apply card hover:border-surface-600 hover:shadow-xl;
+  }
+
+  /* --- Buttons --- */
+  .btn-primary {
+    @apply bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-6 rounded-lg
+           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400
+           focus:ring-offset-2 focus:ring-offset-surface-900 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply text-gray-400 hover:text-gray-200 text-sm font-medium
+           transition-colors duration-200 px-3 py-1.5 rounded-lg
+           hover:bg-surface-700;
+  }
+
+  /* --- Inputs --- */
+  .input-field {
+    @apply w-full bg-surface-700 border border-surface-600 rounded-lg px-4 py-2.5 text-gray-100
+           placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500
+           focus:border-transparent transition-all duration-200;
+  }
+
+  .select-field {
+    @apply bg-surface-700 border border-surface-600 rounded-lg px-3 py-1.5 text-sm text-gray-200
+           focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none cursor-pointer
+           transition-all duration-200;
+  }
+
+  /* --- Badges --- */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-live {
+    @apply badge bg-red-500/20 text-red-400 border border-red-500/30;
+  }
+
+  .badge-stale {
+    @apply badge bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+  }
+
+  .badge-ended {
+    @apply badge bg-surface-600 text-gray-300 border border-surface-600;
+  }
+
+  .badge-calibration {
+    @apply badge bg-surface-700 text-gray-400 border border-surface-600;
+  }
+
+  /* --- Score display --- */
+  .score-value {
+    @apply text-4xl sm:text-5xl font-extrabold text-white tabular-nums tracking-tight
+           transition-all duration-300;
+  }
+
+  .score-label {
+    @apply text-sm text-gray-400 uppercase tracking-wider;
+  }
+
+  /* --- Team accent classes --- */
+  .team-emerald { color: #10b981; }
+  .team-rose { color: #f43f5e; }
+
+  /* --- Gauge / chart wrappers --- */
+  .chart-container {
+    @apply relative w-full;
+  }
+
+  /* --- Animations --- */
+  .fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Gauge transition pulse */
+  .gauge-update {
+    animation: gaugePulse 0.6s ease-out;
+  }
+
+  @keyframes gaugePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+}

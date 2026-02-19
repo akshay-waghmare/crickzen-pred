@@ -44,6 +44,8 @@ output/
 !src/**/*.json
 !tests/**/*.json
 !data/raw_json/**/*.json
+!dashboard/package.json
+!dashboard/package-lock.json
 
 # Logs
 *.log
@@ -55,3 +57,12 @@ output/
 
 # Telegram predictions storage
 data/telegram_predictions.jsonl
+
+# Dashboard
+dashboard/.env
+dashboard/auth*.db
+dashboard/auth*.db-shm
+dashboard/auth*.db-wal
+dashboard/static/css/app.css
+dashboard/node_modules/
+dashboard/.venv/

@@ -437,6 +437,27 @@ See [docs/FUN_FEATURES.md](docs/FUN_FEATURES.md) for more experimental and educa
 
 [Your License]
 
+## 🖥️ SaaS Dashboard
+
+A commercially-ready, JWT-gated web dashboard for live T20 win probability predictions. Replaces the Streamlit prototype with a polished dark-themed UI.
+
+**Features:** Live win probability gauges, ball-by-ball timeline chart, multi-league support, mobile-responsive design.
+
+**Quick Start (Local Dev):**
+```bash
+cd dashboard
+pip install -r requirements.txt
+cp .env.example .env  # Edit with your settings
+uvicorn app.main:app --reload --port 8000
+```
+
+**Production Deployment:**
+```bash
+docker compose up --build -d
+```
+
+📖 Full setup guide: [specs/001-saas-prediction-dashboard/quickstart.md](specs/001-saas-prediction-dashboard/quickstart.md)
+
 ## Credits
 
 - BBL Data Pipeline: Built for comprehensive cricket analytics

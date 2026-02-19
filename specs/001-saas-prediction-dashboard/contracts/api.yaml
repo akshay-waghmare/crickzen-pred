@@ -1,0 +1,289 @@
+openapi: "3.1.0"
+info:
+  title: CrickenZen Live Dashboard API
+  version: "1.0.0"
+  description: |
+    REST API for the SaaS T20 win-probability dashboard.
+    All routes under /api/ require a valid JWT access token (Authorization: Bearer <token>).
+    Auth routes are public but rate-limited.
+
+servers:
+  - url: https://your.domain.com
+    description: Production VPS
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: subscriber@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: Short-lived JWT (≤60 min). Send in Authorization header.
+        token_type:
+          type: string
+          enum: [bearer]
+        expires_in:
+          type: integer
+          description: Seconds until access_token expires.
+          example: 3600
+
+    HistoryPoint:
+      type: object
+      properties:
+        ball:
+          type: string
+          example: "14.3"
+        over:
+          type: integer
+          example: 14
+        bat_win_prob:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+        is_wicket:
+          type: boolean
+        is_boundary:
+          type: boolean
+        phase:
+          type: string
+          enum: [powerplay, middle, death]
+        innings:
+          type: integer
+          enum: [1, 2]
+
+    MatchState:
+      type: object
+      properties:
+        batting_team:
+          type: string
+          example: SYS
+        bowling_team:
+          type: string
+          example: BRH
+        score:
+          type: integer
+          example: 142
+        wickets:
+          type: integer
+          example: 4
+        overs:
+          type: number
+          format: float
+          example: 14.3
+        target:
+          type: integer
+          nullable: true
+          description: Set only during second innings.
+          example: 187
+        bat_win_prob:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          example: 0.63
+        bowl_win_prob:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          example: 0.37
+        current_run_rate:
+          type: number
+          format: float
+          example: 9.73
+        required_run_rate:
+          type: number
+          format: float
+          nullable: true
+          example: 14.2
+        is_second_innings:
+          type: boolean
+        phase:
+          type: string
+          enum: [powerplay, middle, death]
+        league:
+          type: string
+          example: bbl
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO8601 UTC timestamp written by the prediction backend.
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/HistoryPoint"
+
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+
+paths:
+
+  /auth/login:
+    post:
+      summary: Login with email + password
+      description: |
+        Authenticates a subscriber. On success:
+        - Returns a short-lived JWT access token in the response body.
+        - Sets a long-lived refresh token as an HttpOnly, Secure, SameSite=Strict cookie.
+        Rate-limited to 5 requests per minute per IP.
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful.
+          headers:
+            Set-Cookie:
+              description: refresh_token=<opaque>; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Invalid credentials.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Account deactivated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limit exceeded (5 failed attempts per minute per IP).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/refresh:
+    post:
+      summary: Silently renew access token
+      description: |
+        Uses the refresh_token HttpOnly cookie to issue a new access token and rotate the refresh token.
+        Called automatically by the dashboard client before access token expiry (proactive, ~5 min before expiry).
+        Old refresh token is immediately consumed (deleted). New refresh token set in cookie.
+      tags: [Auth]
+      responses:
+        "200":
+          description: New access token issued.
+          headers:
+            Set-Cookie:
+              description: New refresh_token cookie (old one consumed).
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Missing, expired, or already-consumed refresh token.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      summary: Revoke session
+      description: |
+        Revokes the current refresh token (sets revoked=True in DB).
+        Access token remains valid until its natural expiry (≤60 min) — no server-side access token blocklist.
+        Clears the refresh_token cookie on the client.
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Successfully logged out.
+        "401":
+          description: No valid refresh token cookie present.
+
+  /api/live-state:
+    get:
+      summary: Get current live match state
+      description: |
+        Returns the latest match state written by the prediction backend.
+        Polled by the dashboard client every 3 seconds (POLL_INTERVAL_MS env var, default 3000).
+        If the state file is stale (>60s old) the response includes a `stale: true` flag.
+        If no state file exists, returns 404.
+      tags: [Live]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: If-None-Match
+          schema:
+            type: string
+          description: ETag from previous response. Server returns 304 if state unchanged.
+      responses:
+        "200":
+          description: Current match state.
+          headers:
+            ETag:
+              description: File mtime fingerprint for conditional requests.
+              schema:
+                type: string
+            Cache-Control:
+              description: "no-store"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchState"
+        "304":
+          description: State unchanged since last poll (ETag match).
+        "401":
+          description: Missing or invalid access token.
+        "404":
+          description: No live match state file found. Dashboard shows waiting state.
+
+  /health:
+    get:
+      summary: Health check
+      description: Returns 200 if the service is running. Used by Docker Compose healthcheck and Caddy upstream health probe.
+      tags: [System]
+      responses:
+        "200":
+          description: Service healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok

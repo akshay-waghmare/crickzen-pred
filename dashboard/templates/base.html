@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CrickenZen{% endblock %} — Live Cricket Predictions</title>
+
+    <!-- Tailwind CSS (built at Docker image time) -->
+    <link rel="stylesheet" href="/static/css/app.css">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Fallback inline styles in case Tailwind CSS isn't built yet (dev mode) */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #f1f5f9;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .bg-surface-900 { background: #0f172a; }
+        .bg-surface-800 { background: #1e293b; }
+        .bg-surface-700 { background: #334155; }
+        .text-gray-100 { color: #f1f5f9; }
+        .text-gray-400 { color: #94a3b8; }
+    </style>
+
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="bg-surface-900 text-gray-100 font-sans antialiased min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-surface-800 border-b border-surface-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo / Brand -->
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🏏</span>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
+                        CrickenZen
+                    </h1>
+                </div>
+
+                <!-- Nav items -->
+                <div class="flex items-center gap-4" id="nav-items">
+                    {% block nav_items %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-surface-700 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-500">
+                CrickenZen &copy; {{ "now"|default("2026") }} — Live T20 Win Probability Predictions
+            </p>
+        </div>
+    </footer>
+
+    <!-- Vendor JS: Chart.js first (no defer), Alpine last (defer) -->
+    <script src="/static/js/chart.umd.min.js"></script>
+    {% block scripts %}{% endblock %}
+    <script src="/static/js/alpine.min.js" defer></script>
+</body>
+</html>
