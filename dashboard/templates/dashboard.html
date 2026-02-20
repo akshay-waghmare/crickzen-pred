@@ -10,6 +10,12 @@
             LIVE
         </span>
     </div>
+    <!-- New ball flash badge -->
+    <div x-data x-show="$store.dashboard && $store.dashboard.newBall" x-cloak>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 animate-pulse">
+            ⚡ NEW BALL
+        </span>
+    </div>
     <div x-data x-show="$store.dashboard && $store.dashboard.isStale" x-cloak>
         <span class="badge-stale">⚠ Delayed</span>
     </div>
@@ -87,7 +93,8 @@
             <!-- Score Panel — responsive grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Batting Team Score -->
-                <div class="card text-center">
+                <div class="card text-center transition-all duration-300"
+                     :class="$store.dashboard.newBall ? 'ring-2 ring-yellow-400/60 shadow-[0_0_16px_rgba(250,204,21,0.25)]' : ''">
                     <p class="score-label mb-2" x-text="$store.dashboard.state.batting_team"></p>
                     <p class="score-value">
                         <span x-text="$store.dashboard.state.score"></span>/<span x-text="$store.dashboard.state.wickets"></span>
@@ -95,11 +102,18 @@
                     <p class="text-lg text-gray-400 mt-1">
                         (<span x-text="$store.dashboard.state.overs"></span> ov)
                     </p>
-                    <!-- Phase indicator -->
-                    <div class="mt-3">
+                    <!-- Phase + ball counter row -->
+                    <div class="mt-3 flex items-center justify-center gap-2 flex-wrap">
                         <span class="badge bg-surface-700 text-gray-300 border border-surface-600 capitalize"
                               x-text="$store.dashboard.state.phase"></span>
+                        <span x-show="$store.dashboard.ballCount > 0" x-cloak
+                              class="badge bg-surface-700/60 text-gray-500 border border-surface-600/50 text-xs tabular-nums">
+                            Ball #<span x-text="$store.dashboard.ballCount"></span>
+                        </span>
                     </div>
+                    <!-- Last-ball flash overlay -->
+                    <div x-show="$store.dashboard.newBall" x-cloak
+                         class="mt-2 text-yellow-400 text-xs font-semibold animate-pulse">⚡ Ball updated</div>
                 </div>
 
                 <!-- Win Probability Gauges -->

@@ -58,12 +58,16 @@ document.addEventListener('alpine:init', () => {
     isStale: false,
     error: null,
     selectedLeague: '',
-    pollIntervalMs: (typeof POLL_INTERVAL_MS !== 'undefined') ? POLL_INTERVAL_MS : 3000,
+    pollIntervalMs: 1500,   // fast poll — ETag 304 is nearly free
     etag: null,
+    newBall: false,         // true for 800ms after each new ball
+    lastBallKey: null,      // '<innings>.<over>.<ball>.<score>' to detect changes
+    ballCount: 0,           // total balls received this session
 
     // ── internal handles ──
     _pollTimer: null,
     _refreshTimer: null,
+    _newBallTimer: null,
     _probChart: null,
     _rrChart: null,
     _gaugeHome: null,
@@ -147,6 +151,17 @@ document.addEventListener('alpine:init', () => {
         const data = await resp.json();
         const newEtag = resp.headers.get('ETag');
         if (newEtag) this.etag = newEtag;
+
+        // Detect a new ball (over/ball/score changed)
+        const ballKey = `${data.innings ?? data.is_second_innings ? 2 : 1}.${data.over}.${data.ball}.${data.score}`;
+        const isNewBall = this.lastBallKey !== null && ballKey !== this.lastBallKey;
+        if (isNewBall) {
+          this.ballCount++;
+          this.newBall = true;
+          if (this._newBallTimer) clearTimeout(this._newBallTimer);
+          this._newBallTimer = setTimeout(() => { this.newBall = false; }, 800);
+        }
+        this.lastBallKey = ballKey;
 
         // Update state
         this.state = data;
