@@ -1,0 +1,247 @@
+openapi: 3.0.3
+info:
+  title: Monte Carlo Simulation API
+  description: |
+    Internal Python API for Monte Carlo simulation engine.
+    This is not a REST API - it documents the Python function signatures.
+  version: 1.0.0
+
+paths: {}
+
+components:
+  schemas:
+    MatchState:
+      type: object
+      required:
+        - innings
+        - score
+        - wickets_lost
+        - balls_remaining
+        - league
+        - batting_team
+        - bowling_team
+      properties:
+        innings:
+          type: integer
+          enum: [1, 2]
+          description: Innings number (1=batting first, 2=chasing)
+        score:
+          type: integer
+          minimum: 0
+          description: Current runs scored
+        wickets_lost:
+          type: integer
+          minimum: 0
+          maximum: 10
+          description: Wickets lost
+        balls_remaining:
+          type: integer
+          minimum: 0
+          maximum: 120
+          description: Balls remaining in innings
+        target_runs:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Target to chase (required if innings=2)
+        league:
+          type: string
+          description: League code for temperature calibration
+          example: "bbl"
+        batting_team:
+          type: string
+          description: Canonical batting team name
+        bowling_team:
+          type: string
+          description: Canonical bowling team name
+        venue:
+          type: string
+          nullable: true
+          description: Venue name (optional)
+
+    SimulationResult:
+      type: object
+      required:
+        - mean_prob
+        - std_prob
+        - p5
+        - p95
+        - n_sims
+        - horizon_balls
+        - time_taken_ms
+        - league
+      properties:
+        mean_prob:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: Mean win probability
+        std_prob:
+          type: number
+          format: float
+          minimum: 0.0
+          description: Standard deviation
+        p5:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: 5th percentile
+        p95:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: 95th percentile
+        n_sims:
+          type: integer
+          minimum: 1
+          description: Number of simulations
+        horizon_balls:
+          type: integer
+          minimum: 1
+          description: Balls simulated forward
+        time_taken_ms:
+          type: number
+          format: float
+          description: Execution time in ms
+        league:
+          type: string
+          description: League used for calibration
+        temperature:
+          type: number
+          format: float
+          nullable: true
+          description: Temperature applied
+
+    BettingDecision:
+      type: object
+      required:
+        - action
+        - edge
+        - confidence
+        - reasons
+        - mu_6
+        - sigma_6
+        - market_odds
+        - implied_prob
+      properties:
+        action:
+          type: string
+          enum: [BET, PASS, HEDGE]
+          description: Recommended action
+        edge:
+          type: number
+          format: float
+          description: Calculated edge (model - implied)
+        confidence:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: Confidence level
+        reasons:
+          type: array
+          items:
+            type: string
+          description: Explanation of decision
+        mu_1:
+          type: number
+          format: float
+          nullable: true
+          description: 1-ball simulation mean
+        mu_6:
+          type: number
+          format: float
+          description: 6-ball simulation mean
+        sigma_6:
+          type: number
+          format: float
+          description: 6-ball simulation std
+        market_odds:
+          type: number
+          format: float
+          description: Market decimal odds
+        implied_prob:
+          type: number
+          format: float
+          description: Implied probability (1/odds)
+
+# Python API Signatures (documentation only)
+x-python-api:
+  simulate:
+    signature: |
+      def simulate(
+          state: MatchState,
+          horizon_balls: int = 6,
+          n_sims: int = 2000,
+          league: str = "bbl",
+          seed: Optional[int] = None
+      ) -> SimulationResult
+    description: |
+      Run Monte Carlo simulation from current state.
+      
+      Args:
+          state: Current match state
+          horizon_balls: Number of balls to simulate forward (1, 6, or 30)
+          n_sims: Number of Monte Carlo paths
+          league: League code for temperature calibration
+          seed: Random seed for reproducibility (optional)
+      
+      Returns:
+          SimulationResult with mean, std, percentiles, and timing
+      
+      Performance:
+          - 1 ball, 2000 sims: < 200ms (or < 100ms with vectorization)
+          - 6 balls, 2000 sims: < 500ms (or < 1000ms naive)
+          - 30 balls, 2000 sims: < 2000ms
+
+  evaluate_bet:
+    signature: |
+      def evaluate_bet(
+          sim_result: SimulationResult,
+          market_odds: float,
+          innings: int,
+          phase: str,
+          thresholds: Optional[BettingThresholds] = None,
+          sim_result_1ball: Optional[SimulationResult] = None
+      ) -> BettingDecision
+    description: |
+      Evaluate betting decision based on simulation results.
+      
+      Args:
+          sim_result: 6-ball simulation result
+          market_odds: Market decimal odds (e.g., 1.60)
+          innings: Current innings (1 or 2)
+          phase: Current phase ('powerplay', 'middle', 'death')
+          thresholds: Optional custom thresholds (uses defaults if None)
+          sim_result_1ball: Optional 1-ball simulation for agreement check
+      
+      Returns:
+          BettingDecision with action, edge, and reasons
+      
+      Decision Logic:
+          1. If σ₆ > SIGMA_MAX → PASS (high uncertainty)
+          2. If μ₁ and μ₆ disagree on direction → PASS
+          3. If edge < EDGE_MIN → PASS (insufficient edge)
+          4. Otherwise → BET
+
+  apply_temperature:
+    signature: |
+      def apply_temperature(prob: float, temperature: float) -> float
+    description: |
+      Apply temperature scaling to probability.
+      
+      Formula: sigmoid(logit(prob) / temperature)
+      
+      Args:
+          prob: Uncalibrated probability
+          temperature: Temperature parameter (T < 1 = sharper, T > 1 = softer)
+      
+      Returns:
+          Calibrated probability
+      
+      Example:
+          apply_temperature(0.60, 0.8) → 0.624
+          (logit(0.60) = 0.405, 0.405/0.8 = 0.506, sigmoid(0.506) = 0.624)

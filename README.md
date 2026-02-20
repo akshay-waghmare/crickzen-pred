@@ -2,13 +2,15 @@
 
 A comprehensive system for Big Bash League (BBL) cricket data processing and real-time match win probability prediction.
 
-## 🏆 Latest Model: BBL v3 (Dec 2025)
+## 🏆 Latest Model: BBL v12 (Jan 2026)
 
-Our latest champion model achieves state-of-the-art calibration:
-- **Brier Score:** 0.1514
-- **ECE (Calibration Error):** 0.0087
-- **Method:** XGBoost (WBBL Tuned) + Isotonic Calibration
-- [Read the full documentation](docs/BBL_MODEL_V3.md) - Includes detailed phase-wise, over-wise, and probability zone analysis.
+Our latest champion model achieves state-of-the-art performance:
+- **Brier Score:** 0.1760 (per-over calibrated), 0.1833 (raw model)
+- **ECE (Calibration Error):** 0.0000 (perfect calibration)
+- **Method:** XGBLogRegEnsemble + Per-Over Brier-Optimized Isotonic Calibration
+- **Training Data:** 141,435 ball-by-ball samples
+- **Calibrators:** 38 per-over + 6 phase-specific isotonic calibrators
+- [Read the full documentation](docs/BBL_V12_MODEL.md) - Includes detailed OOF calibration analysis.
 
 ## Features
 
@@ -25,6 +27,14 @@ Our latest champion model achieves state-of-the-art calibration:
 - **DLS Integration**: Resource-based features for accurate predictions
 - **Match Analysis**: Pressure metrics, run rate tracking, and situation assessment
 - **Auto Export**: Save all predictions to CSV for post-match analysis
+
+### Monte Carlo Simulation 🎲 **NEW**
+- **Uncertainty Quantification**: 1-ball and 6-ball forward simulations
+- **Confidence Intervals**: 90% CI (p5-p95) for win probability
+- **Betting Decision Support**: Phase-aware Kelly criterion with risk guardrails
+- **Temperature Calibration**: League-specific probability adjustments (BBL, SA20, ILT20, WPL)
+- **Performance**: <200ms for 1-ball, <500ms for 6-ball simulations
+- [Full Documentation](docs/MONTE_CARLO_SIMULATION.md)
 
 ## Installation
 
@@ -215,6 +225,155 @@ plt.title('Win Probability Throughout Match')
 plt.show()
 ```
 
+## Match State Recording & Analysis 📊
+
+The match state logging system records complete prediction context at every ball during live matches, enabling drift detection, calibration analysis, and market edge identification.
+
+### Recording Match States
+
+**During live predictions:**
+```bash
+# Record match states while predicting
+python -m src.bbl_pipeline.inference.crex_live_predictor \
+    --match-url "CREX_LIVE_MATCH_URL" \
+    --model-dir models/bbl_v12 \
+    --feature-store-dir data/bbl_feature_store_v2 \
+    --record-states
+
+# Custom output directory
+python -m src.bbl_pipeline.inference.crex_live_predictor \
+    --match-url "CREX_URL" \
+    --model-dir models/bbl_v12 \
+    --feature-store-dir data/bbl_feature_store_v2 \
+    --record-states \
+    --states-dir data/match_states/bbl_2025
+```
+
+**What gets recorded:**
+- Raw match state (runs, wickets, overs, batsmen)
+- All 50+ computed features from feature mapper
+- Complete calibration chain (raw → combined → innings → phase → per-over → league)
+- CREX market odds (back, lay, implied probability)
+- Model-market deviation (size, bucket, direction)
+- Team strength tiers, match phase, venue
+- Model and feature store versions
+
+### Data Quality & Resume Behavior
+
+- **Resume-safe recording:** restarting the predictor for the same match now resumes cleanly and skips already persisted ball states (no full-file replay append).
+- **Bowler capture improvements:** logger now uses current CREX layout fallbacks (`.batsmen-score.bowler` / active player card text), plus regex fallback, to populate `bowler_name` more reliably.
+- **`ball_in_over` normalization:** analysis output now uses only `1..6` (never `0`).
+    - `overs = X.0` is stored as `over_number=X, ball_in_over=6`
+    - `overs = 0.0` snapshot is stored as `over_number=1, ball_in_over=1`
+
+**Backfill old files with legacy `ball_in_over=0`:**
+```bash
+python - <<'PY'
+import pandas as pd
+from pathlib import Path
+
+p = Path('data/match_states/<league>/<match_id>.parquet')
+df = pd.read_parquet(p)
+
+mask_start = (df['ball_in_over'] == 0) & (df['overs'].fillna(0).round(3) == 0)
+df.loc[mask_start, ['over_number', 'ball_in_over']] = [1, 1]
+
+is_integer_over = (df['overs'].fillna(-1) > 0) & ((df['overs'] - df['overs'].fillna(0).astype(int)).abs() < 1e-6)
+mask_completed = (df['ball_in_over'] == 0) & is_integer_over
+df.loc[mask_completed, 'over_number'] = df.loc[mask_completed, 'overs'].astype(int).astype(df['over_number'].dtype)
+df.loc[mask_completed, 'ball_in_over'] = 6
+
+df.to_parquet(p, index=False)
+print('Backfill complete')
+PY
+```
+
+**Data layout:**
+```
+data/match_states/<league>/
+├── <match_id>.parquet           # Ball-by-ball states (80+ columns)
+├── match_metadata.parquet       # Match results and metadata
+├── all_matches.parquet          # Consolidated (post-analysis)
+├── signal_events.parquet        # Deviation signals with reversion labels
+└── volatility_profiles.parquet  # Model vs market volatility metrics
+```
+
+### Analyzing Recorded Data
+
+**Consolidate match files:**
+```bash
+bbl-pipeline analyze-states --league bbl --consolidate
+```
+
+**Generate calibration report (Brier, ECE, LogLoss):**
+```bash
+bbl-pipeline analyze-states --league bbl --calibration-report
+```
+
+**Full workflow:**
+```bash
+# Consolidate + calibration report
+bbl-pipeline analyze-states \
+    --league sa20 \
+    --consolidate \
+    --calibration-report
+
+# Custom states directory
+bbl-pipeline analyze-states \
+    --league ilt20 \
+    --states-dir data/match_states/ilt20_2025 \
+    --calibration-report
+```
+
+**Example output:**
+```
+═══════════════════════════════════════════════════════════
+  Match State Analysis: BBL
+═══════════════════════════════════════════════════════════
+  States Directory: data/match_states/bbl
+  Discovered 12 match files
+
+🔄 Consolidating match files...
+   ✅ Consolidated 1,440 ball states
+   📄 Output: data/match_states/bbl/all_matches.parquet
+
+📊 Summary:
+   Matches: 12
+   Date Range: 2025-01-10 to 2025-01-25
+   Phases: powerplay, middle, death
+
+📈 Generating calibration report...
+   ✅ Report generated: data/match_states/bbl/CALIBRATION_REPORT.md
+
+📊 Overall Calibration Metrics:
+   Brier Score: 0.1760
+   ECE (10-bin): 0.0000
+   Log Loss: 0.5190
+   Samples: 1,440
+
+📊 By Innings:
+   Innings 1: Brier 0.1812 | ECE 0.0000 | Samples 720
+   Innings 2: Brier 0.1708 | ECE 0.0000 | Samples 720
+
+📊 By Phase:
+   Powerplay: Brier 0.1856 | ECE 0.0000 | Samples 432
+   Middle: Brier 0.1742 | ECE 0.0000 | Samples 648
+   Death: Brier 0.1650 | ECE 0.0000 | Samples 360
+
+═══════════════════════════════════════════════════════════
+  ✅ Analysis Complete!
+═══════════════════════════════════════════════════════════
+```
+
+**Use cases:**
+- **Drift Detection:** Track calibration metrics (Brier, ECE) over time to detect model degradation
+- **Market Edge Analysis:** Identify deviation patterns where model consistently outperforms market
+- **Volatility Comparison:** Compare model vs market probability swings to detect overconfidence
+- **Meta-Model Training:** Extract signal events with price reversion labels for systematic trading
+- **Recovery Premium:** Analyze if strong teams recover from pressure better than model predicts
+
+See [specs/001-match-state-logging/](specs/001-match-state-logging/) for full documentation.
+
 ## Troubleshooting
 
 ### Live Prediction Issues
@@ -266,9 +425,38 @@ python src/run_integrated_prediction.py \
     --poll-interval 1.5
 ```
 
+## 🎲 Fun Features
+
+Looking for something delightful? Check out our experimental tools:
+
+- **[Bookmaker-Style Lookup Charts](docs/FUN_FEATURES.md)** - Pre-computed win probability tables (like old paper cricket charts!) with instant lookup. Generate 10,439 probabilities, view in terminal with color coding, or open in Excel. 100-500x faster than real-time calculation. Just for fun - but production ready! 🏏
+
+See [docs/FUN_FEATURES.md](docs/FUN_FEATURES.md) for more experimental and educational tools.
+
 ## License
 
 [Your License]
+
+## 🖥️ SaaS Dashboard
+
+A commercially-ready, JWT-gated web dashboard for live T20 win probability predictions. Replaces the Streamlit prototype with a polished dark-themed UI.
+
+**Features:** Live win probability gauges, ball-by-ball timeline chart, multi-league support, mobile-responsive design.
+
+**Quick Start (Local Dev):**
+```bash
+cd dashboard
+pip install -r requirements.txt
+cp .env.example .env  # Edit with your settings
+uvicorn app.main:app --reload --port 8000
+```
+
+**Production Deployment:**
+```bash
+docker compose up --build -d
+```
+
+📖 Full setup guide: [specs/001-saas-prediction-dashboard/quickstart.md](specs/001-saas-prediction-dashboard/quickstart.md)
 
 ## Credits
 

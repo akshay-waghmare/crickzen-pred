@@ -1,0 +1,35 @@
+version: "3.8"
+
+# Development override — run with:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Or for local dev without Docker, just run:
+#   cd dashboard && uvicorn app.main:app --reload --port 8000
+
+services:
+  api:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      - DATABASE_URL=sqlite:///./auth_dev.db
+      - STATE_FILE=data/live_state.json
+      - DOMAIN=localhost
+    volumes:
+      - ./dashboard:/app
+      - ./data:/app/data:ro
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    networks:
+      - dashboard_net
+
+  # No caddy in dev mode — direct access on port 8000
+
+volumes:
+  auth_db:
+
+networks:
+  dashboard_net:
+    driver: bridge

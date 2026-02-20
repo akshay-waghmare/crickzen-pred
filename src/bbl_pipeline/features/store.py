@@ -63,11 +63,156 @@ VENUE_ALIASES = {
     # Traeger Park
     'Traeger Park': 'Traeger Park',
     
+    # International Sports Stadium, Coffs Harbour (BBL regional venue)
+    'International Sports Stadium': 'International Sports Stadium, Coffs Harbour',
+    'International Sports Stadium, Coffs Harbour': 'International Sports Stadium, Coffs Harbour',
+    'C.ex Coffs International Stadium': 'International Sports Stadium, Coffs Harbour',
+    'Coffs Harbour Stadium': 'International Sports Stadium, Coffs Harbour',
+    
     # ILT20 Venues
     'Dubai International Cricket Stadium': 'Dubai International Cricket Stadium',
     'Sheikh Zayed Stadium': 'Zayed Cricket Stadium, Abu Dhabi',
     'Sharjah Cricket Stadium': 'Sharjah Cricket Stadium',
     'Zayed Cricket Stadium': 'Zayed Cricket Stadium, Abu Dhabi',
+
+    # SA20 Venues
+    'Kingsmead': 'Kingsmead, Durban',
+    'Kingsmead, Durban': 'Kingsmead, Durban',
+    'Durban Hollywoodbets Kingsmead Cricket Stadium': 'Kingsmead, Durban',
+    'Hollywoodbets Kingsmead Stadium': 'Kingsmead, Durban',
+    'Hollywoodbets Kingsmead': 'Kingsmead, Durban',
+    'Newlands': 'Newlands, Cape Town',
+    'Newlands, Cape Town': 'Newlands, Cape Town',
+    'Newlands Cricket Ground': 'Newlands, Cape Town',
+    'Boland Park': 'Boland Park, Paarl',
+    'Boland Park, Paarl': 'Boland Park, Paarl',
+    'Boland Park Paarl': 'Boland Park, Paarl',
+    "St George's Park": "St George's Park, Gqeberha",
+    "St George's Park, Gqeberha": "St George's Park, Gqeberha",
+    'St Georges Park': "St George's Park, Gqeberha",
+    'SuperSport Park': 'SuperSport Park, Centurion',
+    'SuperSport Park, Centurion': 'SuperSport Park, Centurion',
+    'SuperSport Park Centurion': 'SuperSport Park, Centurion',
+    'The Wanderers Stadium': 'The Wanderers Stadium, Johannesburg',
+    'The Wanderers Stadium, Johannesburg': 'The Wanderers Stadium, Johannesburg',
+    'Wanderers': 'The Wanderers Stadium, Johannesburg',
+    'Wanderers Stadium': 'The Wanderers Stadium, Johannesburg',
+    'Wanderers, Johannesburg': 'The Wanderers Stadium, Johannesburg',
+    
+    # BPL Venues (Bangladesh Premier League)
+    'Shere Bangla National Stadium': 'Shere Bangla National Stadium, Mirpur',
+    'Shere Bangla National Stadium, Mirpur': 'Shere Bangla National Stadium, Mirpur',
+    'Mirpur Stadium': 'Shere Bangla National Stadium, Mirpur',
+    'Sylhet International Cricket Stadium': 'Sylhet International Cricket Stadium',
+    'Sylhet Stadium': 'Sylhet International Cricket Stadium',
+    'Zahur Ahmed Chowdhury Stadium': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Zahur Ahmed Chowdhury Stadium, Chattogram': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Zahur Ahmed Chowdhury Stadium, Chittagong': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Chittagong Stadium': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Chattogram Stadium': 'Zahur Ahmed Chowdhury Stadium, Chattogram',
+    'Sheikh Abu Naser Stadium': 'Sheikh Abu Naser Stadium, Khulna',
+    'Sheikh Abu Naser Stadium, Khulna': 'Sheikh Abu Naser Stadium, Khulna',
+    'Khulna Stadium': 'Sheikh Abu Naser Stadium, Khulna',
+    'MA Aziz Stadium': 'MA Aziz Stadium, Chittagong',
+    'MA Aziz Stadium, Chittagong': 'MA Aziz Stadium, Chittagong',
+    
+    # New Zealand Venues (Super Smash)
+    'Basin Reserve': 'Basin Reserve, Wellington',
+    'Basin Reserve, Wellington': 'Basin Reserve, Wellington',
+    'Eden Park': 'Eden Park, Auckland',
+    'Eden Park, Auckland': 'Eden Park, Auckland',
+    'Eden Park Outer Oval': 'Eden Park Outer Oval, Auckland',
+    'Eden Park Outer Oval, Auckland': 'Eden Park Outer Oval, Auckland',
+    'Hagley Oval': 'Hagley Oval, Christchurch',
+    'Hagley Oval, Christchurch': 'Hagley Oval, Christchurch',
+    'Seddon Park': 'Seddon Park, Hamilton',
+    'Seddon Park, Hamilton': 'Seddon Park, Hamilton',
+    'Bay Oval': 'Bay Oval, Mount Maunganui',
+    'Bay Oval, Mount Maunganui': 'Bay Oval, Mount Maunganui',
+    'McLean Park': 'McLean Park, Napier',
+    'McLean Park, Napier': 'McLean Park, Napier',
+    'University Oval': 'University Oval, Dunedin',
+    'University Oval, Dunedin': 'University Oval, Dunedin',
+    'University of Otago Oval': 'University Oval, Dunedin',  # Same venue, different name
+    'University of Otago Oval, Dunedin': 'University Oval, Dunedin',  # Same venue, different name
+    'Saxton Oval': 'Saxton Oval, Nelson',
+    'Saxton Oval, Nelson': 'Saxton Oval, Nelson',
+    'Pukekura Park': 'Pukekura Park, New Plymouth',
+    'Pukekura Park, New Plymouth': 'Pukekura Park, New Plymouth',
+    'Molyneux Park': 'Molyneux Park, Alexandra',
+    'Molyneux Park, Alexandra': 'Molyneux Park, Alexandra',
+    'John Davies Oval': 'John Davies Oval, Queenstown',
+    'John Davies Oval, Queenstown': 'John Davies Oval, Queenstown',
+    'Fitzherbert Park': 'Fitzherbert Park, Palmerston North',
+    'Fitzherbert Park, Palmerston North': 'Fitzherbert Park, Palmerston North',
+    'Cobham Oval': 'Cobham Oval (New), Whangarei',
+    'Cobham Oval (New), Whangarei': 'Cobham Oval (New), Whangarei',
+    
+    # WPL (Women's Premier League - India) Venues
+    'Arun Jaitley Stadium': 'Arun Jaitley Stadium, Delhi',
+    'Arun Jaitley Stadium, Delhi': 'Arun Jaitley Stadium, Delhi',
+    'Feroz Shah Kotla': 'Arun Jaitley Stadium, Delhi',
+    'M Chinnaswamy Stadium': 'M Chinnaswamy Stadium, Bengaluru',
+    'M Chinnaswamy Stadium, Bengaluru': 'M Chinnaswamy Stadium, Bengaluru',
+    'Chinnaswamy Stadium': 'M Chinnaswamy Stadium, Bengaluru',
+    'Brabourne Stadium': 'Brabourne Stadium, Mumbai',
+    'Brabourne Stadium, Mumbai': 'Brabourne Stadium, Mumbai',
+    'CCI Brabourne Stadium': 'Brabourne Stadium, Mumbai',
+    'Dr DY Patil Sports Academy': 'Dr DY Patil Sports Academy, Mumbai',
+    'Dr DY Patil Sports Academy, Mumbai': 'Dr DY Patil Sports Academy, Mumbai',
+    'DY Patil Stadium': 'Dr DY Patil Sports Academy, Mumbai',
+    'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Ekana Cricket Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Ekana Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Lucknow Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow',
+    'Kotambi Stadium': 'Kotambi Stadium, Vadodara',
+    'Kotambi Stadium, Vadodara': 'Kotambi Stadium, Vadodara',
+    'Vadodara Stadium': 'Kotambi Stadium, Vadodara',
+    
+    # T20 International Venues (India)
+    'Wankhede Stadium': 'Wankhede Stadium, Mumbai',
+    'Wankhede Stadium, Mumbai': 'Wankhede Stadium, Mumbai',
+    'Eden Gardens': 'Eden Gardens, Kolkata',
+    'Eden Gardens, Kolkata': 'Eden Gardens, Kolkata',
+    'MA Chidambaram Stadium': 'MA Chidambaram Stadium, Chepauk, Chennai',
+    'MA Chidambaram Stadium, Chepauk, Chennai': 'MA Chidambaram Stadium, Chepauk, Chennai',
+    'Chepauk': 'MA Chidambaram Stadium, Chepauk, Chennai',
+    'Punjab Cricket Association IS Bindra Stadium': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'Punjab Cricket Association IS Bindra Stadium, Mohali': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'Mohali Stadium': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'PCA Stadium': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
+    'Rajiv Gandhi International Stadium': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Rajiv Gandhi International Stadium, Uppal, Hyderabad': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Rajiv Gandhi International Stadium, Hyderabad': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Uppal Stadium': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Narendra Modi Stadium': 'Narendra Modi Stadium, Ahmedabad',
+    'Narendra Modi Stadium, Ahmedabad': 'Narendra Modi Stadium, Ahmedabad',
+    'Motera Stadium': 'Narendra Modi Stadium, Ahmedabad',
+    'Sardar Patel Stadium': 'Narendra Modi Stadium, Ahmedabad',
+    'Sawai Mansingh Stadium': 'Sawai Mansingh Stadium, Jaipur',
+    'Sawai Mansingh Stadium, Jaipur': 'Sawai Mansingh Stadium, Jaipur',
+    'Jaipur Stadium': 'Sawai Mansingh Stadium, Jaipur',
+    'Maharashtra Cricket Association Stadium': 'Maharashtra Cricket Association Stadium, Pune',
+    'Maharashtra Cricket Association Stadium, Pune': 'Maharashtra Cricket Association Stadium, Pune',
+    'MCA Stadium': 'Maharashtra Cricket Association Stadium, Pune',
+    'Pune Stadium': 'Maharashtra Cricket Association Stadium, Pune',
+    'Himachal Pradesh Cricket Association Stadium': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+    'Himachal Pradesh Cricket Association Stadium, Dharamsala': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+    'HPCA Stadium': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+    'Dharamsala Stadium': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+    'Holkar Cricket Stadium': 'Holkar Cricket Stadium, Indore',
+    'Holkar Cricket Stadium, Indore': 'Holkar Cricket Stadium, Indore',
+    'Indore Stadium': 'Holkar Cricket Stadium, Indore',
+    'Vidarbha Cricket Association Stadium': 'Vidarbha Cricket Association Stadium, Jamtha, Nagpur',
+    'Vidarbha Cricket Association Stadium, Jamtha, Nagpur': 'Vidarbha Cricket Association Stadium, Jamtha, Nagpur',
+    'VCA Stadium': 'Vidarbha Cricket Association Stadium, Jamtha, Nagpur',
+    'Nagpur Stadium': 'Vidarbha Cricket Association Stadium, Jamtha, Nagpur',
+    'Saurashtra Cricket Association Stadium': 'Saurashtra Cricket Association Stadium, Rajkot',
+    'Saurashtra Cricket Association Stadium, Rajkot': 'Saurashtra Cricket Association Stadium, Rajkot',
+    'SCA Stadium': 'Saurashtra Cricket Association Stadium, Rajkot',
+    'Rajkot Stadium': 'Saurashtra Cricket Association Stadium, Rajkot',
 }
 
 class FeatureStore(Protocol):
@@ -89,6 +234,7 @@ class InMemoryFeatureStore:
         self._player_names_lower: Dict[str, str] = {}
         self._venue_names_lower: Dict[str, str] = {}
         self._team_names_lower: Dict[str, str] = {}
+        self.league_context: Optional[str] = None
         
         # Player-venue and player-vs-team lookup tables
         self._player_venue_batting: Dict[tuple, Dict[str, Any]] = {}
@@ -223,11 +369,256 @@ class InMemoryFeatureStore:
         'HUR': 'Hobart Hurricanes', 'THU': 'Sydney Thunder',
         # ILT20 (International League T20)
         'DUB': 'Dubai Capitals', 'ABD': 'Abu Dhabi Knight Riders', 'SHA': 'Sharjah Warriors',
-        'DSG': 'Desert Vipers', 'GUL': 'Gulf Giants', 'MIC': 'MI Emirates',
+        'DES': 'Desert Vipers', 'GUL': 'Gulf Giants', 'MIC': 'MI Emirates',
         # ILT20 alternate abbreviations (from CREX scraper)
         'DV': 'Desert Vipers', 'GG': 'Gulf Giants', 'MIE': 'MI Emirates',
         'DC': 'Dubai Capitals', 'ADKR': 'Abu Dhabi Knight Riders', 'SW': 'Sharjah Warriors',
+        
+        # SA20 (South Africa T20)
+        'DSG': "Durban's Super Giants",
+        'MICT': 'MI Cape Town',
+        'PR': 'Paarl Royals',
+        'JSK': 'Joburg Super Kings',
+        'PC': 'Pretoria Capitals',
+        'SEC': 'Sunrisers Eastern Cape',
+        'SUNE': 'Sunrisers Eastern Cape',
+        
+        # SSM (Super Smash - New Zealand)
+        'OTG': 'Otago',
+        'NB': 'Northern Districts',
+        'AKL': 'Auckland',
+        'CD': 'Central Districts',
+        'CK': 'Canterbury',
+        'WEL': 'Wellington',
+        'ND': 'Northern Districts',
+        
+        # Women's Super Smash (New Zealand - CREX codes)
+        'AHW': 'Auckland',  # Auckland Hearts Women
+        'OSW': 'Otago',      # Otago Sparks Women
+        'WBW': 'Wellington', # Wellington Blaze Women
+        'CMW': 'Canterbury', # Canterbury Magicians Women
+        'CSW': 'Central Districts',  # Central Hinds Women (alt code)
+        'CHW': 'Central Districts',  # Central Hinds Women
+        'NDW': 'Northern Districts', # Northern Brave Women
+        'NBW': 'Northern Districts', # Northern Brave Women (alt code)
+        
+        # WPL (Women's Premier League - India)
+        'MIW': 'Mumbai Indians',           # Mumbai Indians Women
+        'RCBW': 'Royal Challengers Bengaluru',  # RCB Women (now Bengaluru)
+        'DCW': 'Delhi Capitals',           # Delhi Capitals Women
+        'GGW': 'Gujarat Giants',           # Gujarat Giants Women
+        'UPW': 'UP Warriorz',              # UP Warriorz Women
+        'MI-W': 'Mumbai Indians',          # Alternate format
+        'RCB-W': 'Royal Challengers Bengaluru',
+        'DC-W': 'Delhi Capitals',
+        'GG-W': 'Gujarat Giants',
+        'UP-W': 'UP Warriorz',
+        
+        # BPL (Bangladesh Premier League)
+        'CV': 'Comilla Victorians',
+        'RR': 'Rangpur Riders',
+        'FB': 'Fortune Barishal',
+        'KT': 'Khulna Tigers',
+        'DD': 'Dhaka Dominators',
+        'DCa': 'Dhaka Capitals',  # BPL 2025-26 (was DC - conflicts with Dubai Capitals)
+        'DuD': 'Durdanto Dhaka',
+        'DurD': 'Durbar Rajshahi',
+        'DurR': 'Duronto Rajshahi',
+        'DR': 'Durbar Rajshahi',  # BPL 2025
+        'SS': 'Sylhet Strikers',
+        'CKi': 'Chittagong Kings',  # was CK - conflicts with Canterbury
+        'CC': 'Chattogram Challengers',
+        # BPL 2025-26 new teams
+        'NE': 'Noakhali Express',
+        'RW': 'Rajshahi Warriors',
+        'BB': 'Barisal Bulls',
+        'MGD': 'Minister Group Dhaka',
+        'DG': 'Dhaka Gladiators',
+        'SSS': 'Sylhet Super Stars',
+        'SR': 'Sylhet Royals',
+        'SyS': 'Sylhet Sunrisers',  # was SYS - conflicts with Sydney Sixers
+        
+        # T20 International Teams
+        'IND': 'India', 'AUS': 'Australia', 'ENG': 'England', 'NZ': 'New Zealand',
+        'NZL': 'New Zealand', 'SA': 'South Africa', 'PAK': 'Pakistan', 'WI': 'West Indies',
+        'SL': 'Sri Lanka', 'BAN': 'Bangladesh', 'AFG': 'Afghanistan', 'IRE': 'Ireland',
+        'SCO': 'Scotland', 'ZIM': 'Zimbabwe', 'UAE': 'United Arab Emirates', 'NED': 'Netherlands',
+        'NAM': 'Namibia', 'NEP': 'Nepal', 'OMA': 'Oman', 'PNG': 'Papua New Guinea',
+        'HK': 'Hong Kong', 'KEN': 'Kenya', 'UGA': 'Uganda', 'GER': 'Germany',
+        'JER': 'Jersey', 'USA': 'United States of America', 'CAN': 'Canada',
     }
+
+    TEAM_ABBREVIATIONS_T20I = {
+        'IND': 'India', 'AUS': 'Australia', 'ENG': 'England', 'NZ': 'New Zealand',
+        'NZL': 'New Zealand', 'SA': 'South Africa', 'PAK': 'Pakistan', 'WI': 'West Indies',
+        'SL': 'Sri Lanka', 'BAN': 'Bangladesh', 'AFG': 'Afghanistan', 'IRE': 'Ireland',
+        'SCO': 'Scotland', 'ZIM': 'Zimbabwe', 'UAE': 'United Arab Emirates', 'NED': 'Netherlands',
+        'NAM': 'Namibia', 'NEP': 'Nepal', 'OMA': 'Oman', 'PNG': 'Papua New Guinea',
+        'HK': 'Hong Kong', 'KEN': 'Kenya', 'UGA': 'Uganda', 'GER': 'Germany',
+        'JER': 'Jersey', 'USA': 'United States of America', 'CAN': 'Canada',
+    }
+
+    def _resolve_team_abbrev(self, team_name: str) -> str:
+        code = team_name.upper()
+        league_context = (self.league_context or '').lower()
+        
+        # Handle women's team suffixes: IND-W, INDW, AUS-W, AUSW → IND, AUS
+        # Strip -W or W suffix for international women's teams
+        base_code = code
+        if code.endswith('-W'):
+            base_code = code[:-2]
+        elif code.endswith('W') and len(code) >= 3:
+            # Only strip trailing W if the base code (without W) is a known abbreviation
+            candidate = code[:-1]
+            if candidate in self.TEAM_ABBREVIATIONS or candidate in self.TEAM_ABBREVIATIONS_T20I:
+                base_code = candidate
+        
+        if league_context in ('t20i', 't20_international') or 't20_international' in league_context or 't20i_female' in league_context:
+            if base_code in self.TEAM_ABBREVIATIONS_T20I:
+                return self.TEAM_ABBREVIATIONS_T20I[base_code]
+            if code in self.TEAM_ABBREVIATIONS_T20I:
+                return self.TEAM_ABBREVIATIONS_T20I[code]
+        if base_code in self.TEAM_ABBREVIATIONS:
+            return self.TEAM_ABBREVIATIONS[base_code]
+        if code in self.TEAM_ABBREVIATIONS:
+            return self.TEAM_ABBREVIATIONS[code]
+        return team_name
+
+    # Team aliases for mapping new/renamed teams to historical equivalents
+    TEAM_ALIASES = {
+        # Rajshahi lineage: Duronto Rajshahi (2012-13) → Rajshahi Kings (2016-19) → Rajshahi Royals (2019-20) → Durbar Rajshahi (2024) → Rajshahi Warriors (2025)
+        'Rajshahi Warriors': 'Durbar Rajshahi',  # 2025 successor of Durbar Rajshahi
+        'Durbar Rajshahi': 'Rajshahi Royals',  # 2024 successor of Rajshahi Royals
+        'Rajshahi Royals': 'Rajshahi Kings',  # 2019-20 successor of Rajshahi Kings
+        'Rajshahi Kings': 'Duronto Rajshahi',  # 2016 successor of Duronto Rajshahi
+        # Dhaka lineage
+        'Dhaka Capitals': 'Durdanto Dhaka',  # 2025 Dhaka successor
+        # Map new teams to lowest performing historical team
+        'Noakhali Express': 'Durdanto Dhaka',  # New team -> worst performer (8.3% win rate)
+    }
+
+    # T20 International-only aliases (applied only when league_context is t20i/t20_international)
+    # Afghanistan excluded from source data provider - use Scotland as proxy
+    # Afghanistan T20I WR ~55-60%, Scotland ~49% is the closest available mid-tier team
+    TEAM_ALIASES_T20I = {
+        'Afghanistan': 'Scotland',
+    }
+    
+    # =====================================================================
+    # CONFIGURATION - Toggle between historical data and season overrides
+    # =====================================================================
+    # DISABLED: CREX "Last 10 matches" stats cause train/inference mismatch.
+    # Model trained on historical win rates (~0.55), but CREX can show 0.90 vs 0.30
+    # which creates team_strength_diff=0.60 (6x larger than training distribution).
+    # Use historical feature store data only for consistency.
+    USE_SEASON_OVERRIDES = False
+    
+    # =====================================================================
+    # VENUE SITUATION STATS - Bat/Bowl first win rates from current venue
+    # Auto-populated by crex_live_predictor from match info page
+    # =====================================================================
+    VENUE_SITUATION_STATS = {
+        # Auto-populated: {'bat_first_wr': 0.45, 'bowl_first_wr': 0.53, 'matches': 66}
+    }
+    
+    # =====================================================================
+    # FULL MEMBER OVERRIDES - Win rates filtered to ICC Full Member opponents
+    # Fixes inflated WRs for associate teams (e.g. UAE 56% all → 33% vs FM)
+    # Toggle USE_FM_OVERRIDES=True to use these during T20I inference
+    # =====================================================================
+    USE_FM_OVERRIDES = True
+    FM_OVERRIDES = {
+        # T20I teams: win rates computed ONLY vs ICC Full Member opponents
+        # Source: t20_international_male_raw matches, filtered Feb 2026
+        # Fixes inflated WRs for associates (e.g. UAE 56% all → 33% vs FM)
+        #
+        # Full Members (12)
+        'India':                {'win_rate': 0.6853, 'matches': 232, 'bat_first_wr': 0.6489, 'bowl_first_wr': 0.7327},
+        'Australia':            {'win_rate': 0.5700, 'matches': 200, 'bat_first_wr': 0.5244, 'bowl_first_wr': 0.6017},
+        'Pakistan':             {'win_rate': 0.5691, 'matches': 246, 'bat_first_wr': 0.5591, 'bowl_first_wr': 0.5798},
+        'England':              {'win_rate': 0.5464, 'matches': 194, 'bat_first_wr': 0.5783, 'bowl_first_wr': 0.5225},
+        'New Zealand':          {'win_rate': 0.5359, 'matches': 209, 'bat_first_wr': 0.5965, 'bowl_first_wr': 0.4632},
+        'South Africa':         {'win_rate': 0.5276, 'matches': 199, 'bat_first_wr': 0.5514, 'bowl_first_wr': 0.5000},
+        'West Indies':          {'win_rate': 0.4327, 'matches': 208, 'bat_first_wr': 0.4500, 'bowl_first_wr': 0.4167},
+        'Afghanistan':          {'win_rate': 0.4249, 'matches': 193, 'bat_first_wr': 0.3905, 'bowl_first_wr': 0.4659},
+        'Sri Lanka':            {'win_rate': 0.4249, 'matches': 193, 'bat_first_wr': 0.3905, 'bowl_first_wr': 0.4659},
+        'Bangladesh':           {'win_rate': 0.3416, 'matches': 161, 'bat_first_wr': 0.3521, 'bowl_first_wr': 0.3333},
+        'Ireland':              {'win_rate': 0.2656, 'matches':  64, 'bat_first_wr': 0.2222, 'bowl_first_wr': 0.2973},
+        'Zimbabwe':             {'win_rate': 0.2500, 'matches': 108, 'bat_first_wr': 0.2667, 'bowl_first_wr': 0.2292},
+        #
+        # Associates (T20 WC contenders)
+        'Namibia':              {'win_rate': 0.4074, 'matches':  27, 'bat_first_wr': 0.3077, 'bowl_first_wr': 0.5000},
+        'United Arab Emirates': {'win_rate': 0.3333, 'matches':  30, 'bat_first_wr': 0.3636, 'bowl_first_wr': 0.3158},
+        'Netherlands':          {'win_rate': 0.3250, 'matches':  40, 'bat_first_wr': 0.3000, 'bowl_first_wr': 0.3500},
+        'United States of America': {'win_rate': 0.3000, 'matches': 10, 'bat_first_wr': 0.3333, 'bowl_first_wr': 0.2500},
+        'Papua New Guinea':     {'win_rate': 0.2857, 'matches':   7, 'bat_first_wr': 0.3333, 'bowl_first_wr': 0.2500},
+        'Canada':               {'win_rate': 0.1667, 'matches':   5, 'bat_first_wr': 0.30,   'bowl_first_wr': 0.25},  # small sample, adjusted to mid-tier Associate level
+        'Uganda':               {'win_rate': 0.2500, 'matches':   4, 'bat_first_wr': 0.40,   'bowl_first_wr': 0.40},  # too few matches, dampened
+        'Scotland':             {'win_rate': 0.1935, 'matches':  31, 'bat_first_wr': 0.2857, 'bowl_first_wr': 0.1176},
+        'Oman':                 {'win_rate': 0.1667, 'matches':  12, 'bat_first_wr': 0.3333, 'bowl_first_wr': 0.1111},
+        'Nepal':                {'win_rate': 0.1667, 'matches':  12, 'bat_first_wr': 0.3333, 'bowl_first_wr': 0.40},  # 0/7 bowl_first too extreme, dampened
+    }
+    # =====================================================================
+
+    # =====================================================================
+    # SEASON OVERRIDES - Current season stats (takes precedence over historical)
+    # This is auto-populated by crex_live_predictor from the match info page
+    # Can also be manually updated. Format:
+    # 'Team Name': {'win_rate': X, 'matches': N, 'avg_score': Y, ...}
+    # =====================================================================
+    SEASON_OVERRIDES = {
+        # Auto-populated from CREX match info page during live prediction
+        # Example entry (added automatically):
+        # 'Rajshahi Warriors': {'win_rate': 0.60, 'matches': 10, 'avg_score': 148, ...}
+    }
+    # =====================================================================
+    
+    # Default stats for completely new teams (treat as lower performing)
+    # New teams typically struggle in their first season due to lack of team cohesion,
+    # unfamiliar conditions, and untested squad combinations
+    DEFAULT_TEAM_STATS = {
+        'win_rate': 0.40,  # New teams perform below average historically
+        'matches': 0,
+        'bat_first_wr': 0.40,
+        'bowl_first_wr': 0.40,
+    }
+    
+    # Teams that should use default average stats (none currently - all mapped)
+    NEW_TEAMS = set()
+
+    def _resolve_team_alias(self, team_name: str, max_depth: int = 5) -> Optional[str]:
+        """Follow alias chain to find a team that exists in the feature store.
+        
+        Checks both global TEAM_ALIASES and league-specific aliases
+        (e.g. TEAM_ALIASES_T20I) based on the current league_context.
+        """
+        current = team_name
+        chain = [team_name]
+        
+        # Build combined alias dict: global + league-specific
+        aliases = dict(self.TEAM_ALIASES)
+        league = (self.league_context or '').lower()
+        if league in ('t20i', 't20_international') or 't20_international' in league:
+            aliases.update(self.TEAM_ALIASES_T20I)
+        
+        for _ in range(max_depth):
+            if current in self._team_stats:
+                if len(chain) > 1:
+                    logger.info(f"Resolved team chain: {' → '.join(chain)}")
+                return current
+            
+            if current in aliases:
+                current = aliases[current]
+                chain.append(current)
+            else:
+                break
+        
+        # Final check
+        if current in self._team_stats:
+            logger.info(f"Resolved team chain: {' → '.join(chain)}")
+            return current
+        
+        return None
 
     def get_team_stats(self, team_name: str) -> Optional[Dict[str, Any]]:
         if not self._loaded:
@@ -236,12 +627,41 @@ class InMemoryFeatureStore:
         if not team_name:
             return None
         
-        # 0. Check abbreviation map first
-        if team_name.upper() in self.TEAM_ABBREVIATIONS:
-            full_name = self.TEAM_ABBREVIATIONS[team_name.upper()]
-            if full_name in self._team_stats:
-                logger.info(f"Mapped team abbreviation '{team_name}' to '{full_name}'")
-                return self._team_stats[full_name]
+        # 0. Check abbreviation map first and resolve full name
+        full_name = self._resolve_team_abbrev(team_name)
+        
+        # 0.05 CHECK FM OVERRIDES (Full Member filtered win rates for T20I)
+        if self.USE_FM_OVERRIDES and full_name in self.FM_OVERRIDES:
+            fm_stats = self.FM_OVERRIDES[full_name].copy()
+            bat_wr = fm_stats.get('bat_first_wr', fm_stats['win_rate'])
+            bowl_wr = fm_stats.get('bowl_first_wr', fm_stats['win_rate'])
+            logger.info(f"Using FM-FILTERED stats for '{full_name}': {fm_stats['matches']} matches, "
+                        f"{fm_stats['win_rate']*100:.1f}% win rate (bat_first={bat_wr:.1%}, bowl_first={bowl_wr:.1%})")
+            return fm_stats
+
+        # 0.1 CHECK SEASON OVERRIDES FIRST (if enabled)
+        if self.USE_SEASON_OVERRIDES and full_name in self.SEASON_OVERRIDES:
+            season_stats = self.SEASON_OVERRIDES[full_name].copy()
+            # Log what we're using
+            bat_wr = season_stats.get('bat_first_wr', season_stats['win_rate'])
+            bowl_wr = season_stats.get('bowl_first_wr', season_stats['win_rate'])
+            logger.info(f"Using SEASON stats for '{full_name}': {season_stats['matches']} matches, {season_stats['win_rate']*100:.0f}% win rate (bat_first={bat_wr:.0%}, bowl_first={bowl_wr:.0%})")
+            return season_stats
+        
+        # 0.2 Check if this is a new team that should use default stats
+        if full_name in self.NEW_TEAMS:
+            logger.warning(f"Using DEFAULT stats for new team '{full_name}' (no historical data)")
+            return self.DEFAULT_TEAM_STATS.copy()
+            
+        # 0.3 Try to resolve through alias chain
+        resolved = self._resolve_team_alias(full_name)
+        if resolved:
+            # Warn if using a proxy team (not same as original)
+            if resolved != full_name:
+                logger.warning(f"⚠️ Using PROXY stats: '{full_name}' → '{resolved}' (no direct data for this team)")
+            if team_name != full_name:
+                logger.info(f"Mapped team abbreviation '{team_name}' → '{full_name}' → '{resolved}'")
+            return self._team_stats[resolved]
             
         # 1. Exact match
         if team_name in self._team_stats:
@@ -290,7 +710,22 @@ class InMemoryFeatureStore:
         if not self._loaded:
             self.load()
             
+        # Handle empty venue name - still return CREX-overridden defaults if available
         if not venue_name:
+            # Return defaults with CREX override if available
+            base_stats = {
+                'venue_avg_score': 160.0,
+                'venue_avg_wickets': 6.0,
+                'venue_bat_first_win_rate': 0.5,
+            }
+            # Override with live VENUE_SITUATION_STATS from CREX if available
+            if self.VENUE_SITUATION_STATS:
+                if 'avg_1st_inns' in self.VENUE_SITUATION_STATS:
+                    base_stats['venue_avg_score'] = float(self.VENUE_SITUATION_STATS['avg_1st_inns'])
+                    logger.info(f"Using CREX venue stats for empty venue: avg_score={base_stats['venue_avg_score']}")
+                if 'bat_first_wr' in self.VENUE_SITUATION_STATS:
+                    base_stats['venue_bat_first_win_rate'] = float(self.VENUE_SITUATION_STATS['bat_first_wr'])
+                return base_stats
             return None
 
         # 0. Check venue alias mapping first
@@ -299,26 +734,53 @@ class InMemoryFeatureStore:
             logger.info(f"Resolved venue alias '{venue_name}' to '{canonical_name}'")
             venue_name = canonical_name
 
+        # Start with base stats (either from historical data or defaults)
+        base_stats = None
+        
         # 1. Exact match
         if venue_name in self._venue_stats:
             logger.info(f"Using venue stats for '{venue_name}'")
-            return self._venue_stats[venue_name]
+            base_stats = self._venue_stats[venue_name].copy()
             
         # 2. Case-insensitive match
-        if venue_name.lower() in self._venue_names_lower:
+        elif venue_name.lower() in self._venue_names_lower:
             real_name = self._venue_names_lower[venue_name.lower()]
             logger.info(f"Using venue stats for '{real_name}' (case-insensitive match)")
-            return self._venue_stats[real_name]
+            base_stats = self._venue_stats[real_name].copy()
             
         # 3. Fuzzy match (increased cutoff to 0.8 for stricter matching)
-        matches = difflib.get_close_matches(venue_name, self._venue_stats.keys(), n=1, cutoff=0.8)
-        if matches:
-            match = matches[0]
-            logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
-            return self._venue_stats[match]
+        else:
+            matches = difflib.get_close_matches(venue_name, self._venue_stats.keys(), n=1, cutoff=0.8)
+            if matches:
+                match = matches[0]
+                logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
+                base_stats = self._venue_stats[match].copy()
         
-        logger.warning(f"No venue stats found for '{venue_name}'")
-        return None
+        # 4. If no historical data found, create default stats
+        if base_stats is None:
+            # Only log warning if venue name is meaningful (not generic placeholder)
+            if venue_name and venue_name not in ['Unknown', 'International Cricket Stadium']:
+                logger.warning(f"No venue stats found for '{venue_name}', using defaults")
+            else:
+                logger.info(f"Using default venue stats (venue not identified from match page)")
+            base_stats = {
+                'venue_avg_score': 160.0,
+                'venue_avg_wickets': 6.0,
+                'venue_bat_first_win_rate': 0.5,
+            }
+        
+        # 5. Override with live VENUE_SITUATION_STATS from CREX if available
+        # This ensures we use the actual venue avg from the current match info page
+        # for consistency with what's displayed on CREX
+        if self.VENUE_SITUATION_STATS:
+            if 'avg_1st_inns' in self.VENUE_SITUATION_STATS:
+                # Use avg_1st_inns as venue_avg_score (consistent with training which uses first innings avg)
+                base_stats['venue_avg_score'] = float(self.VENUE_SITUATION_STATS['avg_1st_inns'])
+                logger.info(f"Overrode venue_avg_score with CREX avg_1st_inns: {base_stats['venue_avg_score']}")
+            if 'bat_first_wr' in self.VENUE_SITUATION_STATS:
+                base_stats['venue_bat_first_win_rate'] = float(self.VENUE_SITUATION_STATS['bat_first_wr'])
+        
+        return base_stats
 
     def _fuzzy_match_player(self, player_name: str) -> Optional[str]:
         """Fuzzy match a player name to a known player in the store."""
@@ -436,6 +898,14 @@ class InMemoryFeatureStore:
             'Melbourne Renegades Women': 'Melbourne Renegades',
             'Melbourne Stars Women': 'Melbourne Stars',
             'Adelaide Strikers Women': 'Adelaide Strikers',
+            
+            # SA20
+            'PC': 'Pretoria Capitals',
+            'SEC': 'Sunrisers Eastern Cape',
+            'DSG': "Durban's Super Giants",
+            'JSK': 'Joburg Super Kings',
+            'MICT': 'MI Cape Town',
+            'PR': 'Paarl Royals',
         }
         
         # Check abbreviation map first

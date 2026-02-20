@@ -272,6 +272,7 @@ class RealTimeFeatureMapper:
         if hasattr(self.feature_store, 'get_team_stats'):
              batting_stats = self.feature_store.get_team_stats(batting_team) or {}
              bowling_stats = self.feature_store.get_team_stats(bowling_team) or {}
+
              batting_team_win_rate = batting_stats.get('win_rate', 0.5)
              bowling_team_win_rate = bowling_stats.get('win_rate', 0.5)
              batting_team_bat_first_wr = batting_stats.get('bat_first_wr', 0.5)
@@ -279,6 +280,8 @@ class RealTimeFeatureMapper:
              bowling_team_bat_first_wr = bowling_stats.get('bat_first_wr', 0.5)
              bowling_team_bowl_first_wr = bowling_stats.get('bowl_first_wr', 0.5)
              team_strength_diff = batting_team_win_rate - bowling_team_win_rate
+        else:
+             logger.warning("Feature store does not have get_team_stats method")
 
         # --- Resource-based Features (DLS-style) ---
         target_runs = scraped_data.get('target_score') if innings == 2 else None
@@ -308,13 +311,16 @@ class RealTimeFeatureMapper:
         required_run_rate = scraped_data.get('required_run_rate',
                                              resource_features['required_run_rate'])
         
-        # At the very start of an innings (0 balls bowled), use neutral run_rate_diff
-        # to avoid penalizing teams before they've had a chance to bat
-        if total_balls_in_innings == 0:
-            # Assume they'll score at required rate initially
+        # run_rate_diff only makes sense in innings 2 (chasing)
+        # In innings 1, there's no target, so run_rate_diff should be 0
+        # This matches training data calculation in processor.py
+        if innings == 1:
+            run_rate_diff = 0.0
+        elif total_balls_in_innings == 0:
+            # At the very start of innings 2, use neutral value
             run_rate_diff = 0.0
         else:
-            # Positive = batting team ahead (scoring faster than required)
+            # Innings 2: Positive = batting team ahead (scoring faster than required)
             run_rate_diff = current_run_rate - required_run_rate
         
         # --- Projected/Expected Scores ---

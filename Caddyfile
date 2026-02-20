@@ -1,0 +1,18 @@
+{$DOMAIN} {
+	encode gzip
+
+	# Reverse proxy to FastAPI
+	reverse_proxy api:8000 {
+		health_uri /health
+		health_interval 30s
+		health_timeout 5s
+	}
+
+	# Security headers
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+	}
+}

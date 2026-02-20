@@ -102,11 +102,365 @@ class ResourceFeatureCalculator:
     # 7 wkts: 16% (75% penalty)
     # 8 wkts: 7% (88% penalty)
     # 9 wkts: 0% (95% penalty)
+    # DEPRECATED: Use WICKET_PENALTY_2D for chase situations
     WICKET_PENALTY = {
         0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00,
         4: 0.75, 5: 0.50, 6: 0.35, 7: 0.25,
         8: 0.12, 9: 0.05, 10: 0.01
     }
+    
+    # =========================================================================
+    # DYNAMIC 2D WICKET PENALTY (Jan 2026 - Empirically Calibrated from BBL Data)
+    # =========================================================================
+    # Wicket penalties vary SIGNIFICANTLY based on chase difficulty (CRR/RRR ratio)
+    # 
+    # Chase Ease Classification:
+    #   very_easy:   CRR/RRR >= 3.0  (scoring 3x faster than needed)
+    #   easy:        CRR/RRR >= 1.5  (scoring 1.5-3x faster than needed)
+    #   comfortable: CRR/RRR >= 1.0  (on track to win)
+    #   tough:       CRR/RRR >= 0.7  (slightly behind required rate)
+    #   desperate:   CRR/RRR < 0.7   (way behind, unlikely to win)
+    #
+    # Key Insight: In easy chases, even 5+ wickets down barely affects win rate!
+    #   - Very Easy, 5 wkts down: 83.2% win rate (vs 50% from flat penalty)
+    #   - Easy, 7 wkts down: 88.1% win rate (vs 25% from flat penalty)
+    # =========================================================================
+    
+    # Difficulty thresholds for CRR/RRR ratio
+    CHASE_EASE_THRESHOLDS = {
+        'very_easy': 3.0,    # CRR >= 3x RRR
+        'easy': 1.5,         # CRR >= 1.5x RRR
+        'comfortable': 1.0,  # CRR >= RRR (on track)
+        'tough': 0.7,        # CRR >= 0.7x RRR
+        'desperate': 0.0     # Below 0.7x (base case)
+    }
+    
+    # 2D Wicket Penalty Table: [difficulty][wickets_lost] -> penalty multiplier
+    # Derived from empirical BBL win rates (67,560 2nd innings samples)
+    WICKET_PENALTY_2D = {
+        'very_easy': {
+            0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00,
+            5: 0.88, 6: 0.76, 7: 0.56, 8: 0.24, 9: 0.05, 10: 0.00
+        },
+        'easy': {
+            0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00,
+            5: 1.00, 6: 1.00, 7: 1.00, 8: 0.44, 9: 0.22, 10: 0.00
+        },
+        'comfortable': {
+            0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00,
+            5: 1.00, 6: 1.00, 7: 1.00, 8: 0.62, 9: 0.74, 10: 0.00
+        },
+        'tough': {
+            0: 1.00, 1: 0.93, 2: 0.90, 3: 0.88, 4: 0.76,
+            5: 0.79, 6: 0.71, 7: 0.70, 8: 0.34, 9: 0.05, 10: 0.00
+        },
+        'desperate': {
+            0: 1.00, 1: 0.72, 2: 0.46, 3: 0.35, 4: 0.21,
+            5: 0.21, 6: 0.15, 7: 0.08, 8: 0.05, 9: 0.01, 10: 0.00
+        }
+    }
+    
+    def get_dynamic_wicket_penalty(
+        self, 
+        wickets_lost: int, 
+        current_run_rate: float, 
+        required_run_rate: float
+    ) -> float:
+        """
+        Get wicket penalty with smooth interpolation based on chase difficulty.
+        
+        Uses CRR/RRR ratio to determine chase ease, then interpolates between
+        adjacent difficulty levels for smooth transitions.
+        
+        Args:
+            wickets_lost: Number of wickets fallen (0-10)
+            current_run_rate: Current scoring rate
+            required_run_rate: Required run rate to win
+            
+        Returns:
+            Penalty multiplier (0.0 to 1.0)
+        """
+        wickets_lost = min(max(wickets_lost, 0), 10)
+        
+        # Handle edge cases
+        if required_run_rate <= 0:
+            # Already won or trivial chase - minimal penalty
+            return self.WICKET_PENALTY_2D['very_easy'].get(wickets_lost, 0.01)
+        
+        if current_run_rate <= 0:
+            # Not scoring - maximum penalty
+            return self.WICKET_PENALTY_2D['desperate'].get(wickets_lost, 0.01)
+        
+        # Calculate chase ease ratio
+        ease_ratio = current_run_rate / required_run_rate
+        
+        # Determine which two difficulty levels to interpolate between
+        difficulty_levels = ['desperate', 'tough', 'comfortable', 'easy', 'very_easy']
+        thresholds = [0.0, 0.7, 1.0, 1.5, 3.0]
+        
+        # Find the bracket
+        lower_idx = 0
+        for i, threshold in enumerate(thresholds):
+            if ease_ratio >= threshold:
+                lower_idx = i
+        
+        # Get the lower difficulty level
+        lower_level = difficulty_levels[lower_idx]
+        lower_penalty = self.WICKET_PENALTY_2D[lower_level].get(wickets_lost, 0.01)
+        
+        # If at the highest level or exactly on a boundary, return directly
+        if lower_idx >= len(difficulty_levels) - 1:
+            return lower_penalty
+        
+        # Get the upper difficulty level for interpolation
+        upper_idx = lower_idx + 1
+        upper_level = difficulty_levels[upper_idx]
+        upper_penalty = self.WICKET_PENALTY_2D[upper_level].get(wickets_lost, 0.01)
+        
+        # Calculate interpolation weight (0 = lower, 1 = upper)
+        lower_threshold = thresholds[lower_idx]
+        upper_threshold = thresholds[upper_idx]
+        
+        if upper_threshold == lower_threshold:
+            weight = 0.0
+        else:
+            weight = (ease_ratio - lower_threshold) / (upper_threshold - lower_threshold)
+            weight = min(max(weight, 0.0), 1.0)
+        
+        # Linear interpolation
+        interpolated_penalty = lower_penalty + weight * (upper_penalty - lower_penalty)
+        
+        return float(max(0.01, min(1.0, interpolated_penalty)))
+    
+    # =========================================================================
+    # FIRST INNINGS 3D WICKET PENALTY (Jan 2026 - Empirically Calibrated)
+    # =========================================================================
+    # Wicket penalties vary by PHASE × SCORE POSITION × WICKETS
+    # 
+    # Phase Classification (by overs bowled):
+    #   powerplay: 0-6 overs
+    #   middle:    6-14 overs
+    #   death:     14-18 overs
+    #   final:     18-20 overs
+    #
+    # Score Position (ease = CRR / Expected RR):
+    #   well_ahead: ease >= 1.15
+    #   ahead:      ease >= 1.05
+    #   par:        ease >= 0.95
+    #   behind:     ease >= 0.85
+    #   well_behind: ease < 0.85
+    #
+    # Key Insight: In death/final overs, wickets matter LESS, especially when
+    # scoring above expected rate. The current score is "banked".
+    # =========================================================================
+    
+    # Phase thresholds (overs bowled)
+    FIRST_INNINGS_PHASE_THRESHOLDS = {
+        'powerplay': 6,
+        'middle': 14,
+        'death': 18,
+        'final': 20
+    }
+    
+    # Expected run rate by phase (from BBL historical data)
+    FIRST_INNINGS_EXPECTED_RR = {
+        'powerplay': 7.5,
+        'middle': 7.8,
+        'death': 9.5,
+        'final': 11.0
+    }
+    
+    # Ease ratio thresholds for score position
+    FIRST_INNINGS_EASE_THRESHOLDS = {
+        'well_ahead': 1.15,
+        'ahead': 1.05,
+        'par': 0.95,
+        'behind': 0.85,
+        'well_behind': 0.0
+    }
+    
+    # 3D Penalty Tables: PHASE -> EASE -> WICKETS -> penalty
+    # Derived from BBL empirical win rates (73,875 first innings samples)
+    FIRST_INNINGS_WICKET_PENALTY_3D = {
+        'powerplay': {
+            'well_ahead':  {0: 1.00, 1: 0.97, 2: 0.68, 3: 0.25, 4: 0.18, 5: 0.10, 6: 0.05, 7: 0.02, 8: 0.01, 9: 0.01, 10: 0.01},
+            'ahead':       {0: 1.00, 1: 0.95, 2: 0.61, 3: 0.31, 4: 0.15, 5: 0.08, 6: 0.04, 7: 0.02, 8: 0.01, 9: 0.01, 10: 0.01},
+            'par':         {0: 1.00, 1: 0.98, 2: 0.60, 3: 0.50, 4: 0.30, 5: 0.15, 6: 0.08, 7: 0.04, 8: 0.02, 9: 0.01, 10: 0.01},
+            'behind':      {0: 1.00, 1: 0.91, 2: 0.67, 3: 0.47, 4: 0.11, 5: 0.05, 6: 0.02, 7: 0.01, 8: 0.01, 9: 0.01, 10: 0.01},
+            'well_behind': {0: 1.00, 1: 0.90, 2: 0.56, 3: 0.31, 4: 0.05, 5: 0.01, 6: 0.01, 7: 0.01, 8: 0.01, 9: 0.01, 10: 0.01},
+        },
+        # =====================================================================
+        # MIDDLE PHASE (overs 6-14): Empirically calibrated Jan 2026
+        # Middle overs see less impact from wickets than previously modeled.
+        # Projected scores remain stable even with 5-6 wickets down.
+        # =====================================================================
+        'middle': {
+            'well_ahead':  {0: 1.00, 1: 0.98, 2: 0.96, 3: 0.97, 4: 0.96, 5: 0.91, 6: 0.85, 7: 0.75, 8: 0.60, 9: 0.40, 10: 0.01},
+            'ahead':       {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 0.99, 5: 1.00, 6: 0.95, 7: 0.85, 8: 0.70, 9: 0.50, 10: 0.01},
+            'par':         {0: 1.00, 1: 0.99, 2: 0.99, 3: 0.98, 4: 0.98, 5: 0.97, 6: 0.95, 7: 0.96, 8: 0.90, 9: 0.80, 10: 0.01},
+            'behind':      {0: 1.00, 1: 0.99, 2: 0.99, 3: 0.98, 4: 0.98, 5: 0.97, 6: 0.98, 7: 1.00, 8: 0.96, 9: 0.90, 10: 0.01},
+            'well_behind': {0: 1.00, 1: 1.00, 2: 1.00, 3: 0.97, 4: 0.97, 5: 0.97, 6: 0.89, 7: 0.87, 8: 0.98, 9: 0.95, 10: 0.01},
+        },
+        # =====================================================================
+        # DEATH PHASE (overs 14-18): Empirically calibrated Jan 2026
+        # Key insight: In death overs, wickets have MINIMAL impact on projected
+        # score. The batters are set, and additional runs scale almost linearly
+        # with balls remaining regardless of wickets lost.
+        # =====================================================================
+        'death': {
+            'well_ahead':  {0: 1.00, 1: 1.00, 2: 1.00, 3: 0.95, 4: 0.96, 5: 0.94, 6: 0.92, 7: 0.90, 8: 0.85, 9: 0.80, 10: 0.01},
+            'ahead':       {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 1.00, 7: 0.98, 8: 0.95, 9: 0.90, 10: 0.01},
+            'par':         {0: 1.00, 1: 0.99, 2: 0.99, 3: 0.98, 4: 0.98, 5: 0.97, 6: 0.97, 7: 0.98, 8: 0.94, 9: 0.90, 10: 0.01},
+            'behind':      {0: 1.00, 1: 1.00, 2: 0.99, 3: 0.99, 4: 0.99, 5: 0.98, 6: 0.98, 7: 0.97, 8: 1.00, 9: 0.95, 10: 0.01},
+            'well_behind': {0: 1.00, 1: 1.00, 2: 1.00, 3: 0.95, 4: 0.95, 5: 0.93, 6: 0.88, 7: 0.88, 8: 0.86, 9: 0.81, 10: 0.01},
+        },
+        # =====================================================================
+        # FINAL PHASE (overs 18-20): Empirically calibrated Jan 2026
+        # In the final 2 overs, projected score is almost entirely determined
+        # by banked runs. Additional runs from remaining balls are minimal,
+        # so wickets matter even less than in death phase.
+        # =====================================================================
+        'final': {
+            'well_ahead':  {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 0.99, 7: 0.98, 8: 0.95, 9: 0.90, 10: 0.01},
+            'ahead':       {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 0.99, 7: 0.98, 8: 0.95, 9: 0.90, 10: 0.01},
+            'par':         {0: 1.00, 1: 1.00, 2: 0.97, 3: 0.98, 4: 0.97, 5: 0.98, 6: 0.99, 7: 0.99, 8: 0.98, 9: 0.95, 10: 0.01},
+            'behind':      {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 1.00, 7: 1.00, 8: 1.00, 9: 0.99, 10: 0.01},
+            'well_behind': {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 0.98, 5: 0.96, 6: 0.93, 7: 0.91, 8: 0.88, 9: 0.84, 10: 0.01},
+        },
+    }
+    
+    def get_first_innings_phase(self, overs_bowled: float) -> str:
+        """Get the phase name for first innings based on overs bowled."""
+        if overs_bowled < 6:
+            return 'powerplay'
+        elif overs_bowled < 14:
+            return 'middle'
+        elif overs_bowled < 18:
+            return 'death'
+        else:
+            return 'final'
+    
+    def get_first_innings_ease_bucket(self, current_run_rate: float, phase: str) -> str:
+        """
+        Get the ease bucket based on CRR vs expected RR for the phase.
+        
+        Args:
+            current_run_rate: Current scoring rate
+            phase: Current phase name
+            
+        Returns:
+            Ease bucket name ('well_ahead', 'ahead', 'par', 'behind', 'well_behind')
+        """
+        expected_rr = self.FIRST_INNINGS_EXPECTED_RR.get(phase, 8.0)
+        
+        if expected_rr <= 0:
+            return 'par'
+        
+        ease_ratio = current_run_rate / expected_rr
+        
+        if ease_ratio >= self.FIRST_INNINGS_EASE_THRESHOLDS['well_ahead']:
+            return 'well_ahead'
+        elif ease_ratio >= self.FIRST_INNINGS_EASE_THRESHOLDS['ahead']:
+            return 'ahead'
+        elif ease_ratio >= self.FIRST_INNINGS_EASE_THRESHOLDS['par']:
+            return 'par'
+        elif ease_ratio >= self.FIRST_INNINGS_EASE_THRESHOLDS['behind']:
+            return 'behind'
+        else:
+            return 'well_behind'
+    
+    def get_first_innings_dynamic_penalty(
+        self,
+        wickets_lost: int,
+        overs_bowled: float,
+        current_run_rate: float
+    ) -> float:
+        """
+        Get first innings wicket penalty with smooth interpolation.
+        
+        Uses 3D lookup: PHASE × EASE × WICKETS with interpolation
+        between phase boundaries and ease levels.
+        
+        Args:
+            wickets_lost: Number of wickets fallen (0-10)
+            overs_bowled: Overs completed (0-20)
+            current_run_rate: Current scoring rate
+            
+        Returns:
+            Penalty multiplier (0.0 to 1.0)
+        """
+        wickets_lost = min(max(wickets_lost, 0), 10)
+        overs_bowled = min(max(overs_bowled, 0), 20)
+        current_run_rate = max(0, current_run_rate)
+        
+        # Get current phase and ease bucket
+        phase = self.get_first_innings_phase(overs_bowled)
+        ease_bucket = self.get_first_innings_ease_bucket(current_run_rate, phase)
+        
+        # Get base penalty from 3D table
+        phase_table = self.FIRST_INNINGS_WICKET_PENALTY_3D.get(phase, {})
+        ease_table = phase_table.get(ease_bucket, {})
+        base_penalty = ease_table.get(wickets_lost, 0.5)
+        
+        # Interpolate between phases for smoother transitions
+        phase_boundaries = [
+            ('powerplay', 0, 6),
+            ('middle', 6, 14),
+            ('death', 14, 18),
+            ('final', 18, 20)
+        ]
+        
+        # Find if we're near a phase boundary (within 1 over)
+        for i, (p_name, p_start, p_end) in enumerate(phase_boundaries):
+            if p_name == phase:
+                # Check if near the end of this phase
+                if overs_bowled >= p_end - 1 and i < len(phase_boundaries) - 1:
+                    next_phase = phase_boundaries[i + 1][0]
+                    next_ease_bucket = self.get_first_innings_ease_bucket(current_run_rate, next_phase)
+                    next_table = self.FIRST_INNINGS_WICKET_PENALTY_3D.get(next_phase, {})
+                    next_ease_table = next_table.get(next_ease_bucket, {})
+                    next_penalty = next_ease_table.get(wickets_lost, 0.5)
+                    
+                    # Blend based on proximity to boundary
+                    blend_weight = (overs_bowled - (p_end - 1)) / 1.0
+                    blend_weight = min(max(blend_weight, 0), 1)
+                    base_penalty = base_penalty * (1 - blend_weight) + next_penalty * blend_weight
+                break
+        
+        # Interpolate between ease levels for smoother transitions
+        expected_rr = self.FIRST_INNINGS_EXPECTED_RR.get(phase, 8.0)
+        if expected_rr > 0:
+            ease_ratio = current_run_rate / expected_rr
+            
+            # Define ease levels and thresholds for interpolation
+            ease_levels = ['well_behind', 'behind', 'par', 'ahead', 'well_ahead']
+            ease_thresholds = [0.0, 0.85, 0.95, 1.05, 1.15]
+            
+            # Find bracket for interpolation
+            lower_idx = 0
+            for i, threshold in enumerate(ease_thresholds):
+                if ease_ratio >= threshold:
+                    lower_idx = i
+            
+            if lower_idx < len(ease_levels) - 1:
+                lower_ease = ease_levels[lower_idx]
+                upper_ease = ease_levels[lower_idx + 1]
+                
+                lower_table = phase_table.get(lower_ease, {})
+                upper_table = phase_table.get(upper_ease, {})
+                
+                lower_pen = lower_table.get(wickets_lost, 0.5)
+                upper_pen = upper_table.get(wickets_lost, 0.5)
+                
+                lower_thresh = ease_thresholds[lower_idx]
+                upper_thresh = ease_thresholds[lower_idx + 1]
+                
+                if upper_thresh > lower_thresh:
+                    weight = (ease_ratio - lower_thresh) / (upper_thresh - lower_thresh)
+                    weight = min(max(weight, 0), 1)
+                    base_penalty = lower_pen + weight * (upper_pen - lower_pen)
+        
+        return float(max(0.01, min(1.0, base_penalty)))
     
     def calculate_resource_percentage(self, overs_remaining: float, wickets_lost: int) -> float:
         """
@@ -361,17 +715,29 @@ class ResourceFeatureCalculator:
             overs_progress = overs_bowled / self.TOTAL_OVERS  # 0 to 1
             
             # -----------------------------------------------------------------
-            # Step 1: Wicket capability decay (PHASE-AWARE)
+            # Step 1: Wicket capability decay (PHASE + SCORE POSITION AWARE)
             # -----------------------------------------------------------------
-            # Improvement: Early wickets are recoverable; late wickets are not
-            # phase_multiplier: 0.8 early → 1.4 late
-            # This makes late wickets hurt ~1.75x more than early wickets
-            phase_multiplier = 0.8 + 0.6 * overs_progress
-            wicket_capability = np.exp(-self.WICKET_DECAY_ALPHA * phase_multiplier * actual_wickets_lost)
-            
-            # Apply wicket decay to expected score
-            # This models "with 5 down in death overs, expected final score is severely reduced"
-            adjusted_expected_score = expected_final_score * wicket_capability
+            # CRITICAL FIX (Jan 2026): Use 3D empirical penalty tables
+            # Wickets matter LESS in death overs when scoring above expected rate
+            # The current score is "banked" - only penalize future potential
+            if overs_bowled >= 19.5:
+                # Innings complete - use actual score directly, no wicket penalty
+                adjusted_expected_score = expected_final_score
+            else:
+                # Get 3D dynamic penalty (Phase × Ease × Wickets)
+                # This replaces the old phase_multiplier + exponential decay approach
+                wicket_penalty = self.get_first_innings_dynamic_penalty(
+                    wickets_lost=actual_wickets_lost,
+                    overs_bowled=overs_bowled,
+                    current_run_rate=current_run_rate
+                )
+                
+                # Apply penalty ONLY to the remaining potential (future runs)
+                # This ensures we never penalize runs already on the board
+                additional_runs_projected = max(0, expected_final_score - current_score)
+                adjusted_additional_runs = additional_runs_projected * wicket_penalty
+                
+                adjusted_expected_score = current_score + adjusted_additional_runs
             
             # -----------------------------------------------------------------
             # Step 2: Calculate Score Quality Index (SQI)
@@ -449,16 +815,16 @@ class ResourceFeatureCalculator:
             # Logistic centered at 1.5 rpb
             endgame_prob = 1.0 / (1.0 + np.exp(4 * (runs_per_ball_needed - 1.5)))
             
-            # Reduce wicket penalty impact in easy endgame situations
-            # At 0.5 rpb (3 off 6), even 5 down should be ~90%+
-            # Scale penalty by difficulty: low rpb = reduced penalty
-            wicket_mult = self.WICKET_PENALTY.get(actual_wickets_lost, 0.01)
-            # Blend toward 1.0 as runs_per_ball_needed decreases
-            # At rpb=0.5, penalty_weight=0.25; at rpb=1.5, penalty_weight=1.0
-            penalty_weight = min(1.0, runs_per_ball_needed / 1.5)
-            adjusted_wicket_mult = 1.0 - penalty_weight * (1.0 - wicket_mult)
+            # Use dynamic wicket penalty based on chase ease
+            # Calculate balls bowled from balls remaining
+            balls_bowled_approx = self.TOTAL_BALLS - balls_remaining
+            effective_crr = (current_score / max(1, balls_bowled_approx)) * 6.0 if balls_bowled_approx > 0 else current_run_rate
+            effective_rrr = runs_per_ball_needed * 6.0  # Convert rpb to run rate
+            wicket_mult = self.get_dynamic_wicket_penalty(
+                actual_wickets_lost, effective_crr, effective_rrr
+            )
             
-            return float(max(0.05, min(0.95, endgame_prob * adjusted_wicket_mult)))
+            return float(max(0.05, min(0.95, endgame_prob * wicket_mult)))
 
         # -------------------------------------
         # CRITICAL: Handle edge cases
@@ -489,10 +855,13 @@ class ResourceFeatureCalculator:
         base_prob = 1.0 / (1.0 + np.exp(exponent))
         
         # -------------------------------------
-        # WICKET PENALTY (Data-Calibrated)
+        # WICKET PENALTY (Dynamic 2D - Chase Difficulty Aware)
         # -------------------------------------
-        # Based on ILT20 EDA: significant drop in win rate after 4 wickets
-        wicket_mult = self.WICKET_PENALTY.get(actual_wickets_lost, 0.01)
+        # Uses CRR/RRR ratio to determine chase ease, then applies
+        # appropriate wicket penalty from empirically-calibrated 2D table
+        wicket_mult = self.get_dynamic_wicket_penalty(
+            actual_wickets_lost, current_run_rate, effective_rrr
+        )
         
         # -------------------------------------
         # CURRENT RUN RATE ADJUSTMENT

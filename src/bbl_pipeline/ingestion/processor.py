@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 logger = structlog.get_logger()
 
-def extract_match_metadata(match_data: Dict[str, Any], match_id: str) -> Dict[str, Any]:
+def extract_match_metadata(match_data: Dict[str, Any], match_id: str, league_slug: Optional[str] = None) -> Dict[str, Any]:
     """Extract match-level metadata."""
     info = match_data.get('info', {})
     
@@ -32,6 +32,11 @@ def extract_match_metadata(match_data: Dict[str, Any], match_id: str) -> Dict[st
     toss_winner = toss.get('winner', None)
     toss_decision = toss.get('decision', None)  # 'bat' or 'field'
     
+    # Extract league from event.name if not provided
+    event = info.get('event', {})
+    event_name = event.get('name', '') if isinstance(event, dict) else ''
+    detected_league = league_slug or _infer_league_from_event(event_name)
+    
     return {
         'match_id': match_id,
         'season': str(info.get('season', 'unknown')),
@@ -44,7 +49,34 @@ def extract_match_metadata(match_data: Dict[str, Any], match_id: str) -> Dict[st
         'match_type': info.get('match_type', 'unknown'),
         'toss_winner': toss_winner,
         'toss_decision': toss_decision,
+        'league': detected_league,
+        'event_name': event_name,
     }
+
+
+def _infer_league_from_event(event_name: str) -> str:
+    """Infer league slug from event name."""
+    event_lower = event_name.lower()
+    league_mapping = {
+        'big bash league': 'bbl',
+        'indian premier league': 'ipl',
+        'pakistan super league': 'psl',
+        'caribbean premier league': 'cpl',
+        'sa20': 'sat',
+        'bangladesh premier league': 'bpl',
+        'lanka premier league': 'lpl',
+        'international league t20': 'ilt',
+        'major league cricket': 'mlc',
+        'super smash': 'ssm',
+        't20 blast': 'ntb',
+        "women's big bash league": 'wbbl',
+        "women's premier league": 'wpl',
+        "women's caribbean premier league": 'wcpl',
+    }
+    for key, slug in league_mapping.items():
+        if key in event_lower:
+            return slug
+    return 'unknown'
 
 def resolve_entity(name: Optional[str], entity_type: str, resolver: Optional['EntityResolver']) -> str:
     """Helper to resolve entity name to ID."""
@@ -107,6 +139,8 @@ def flatten_delivery(
         'winner': meta['winner'],
         'toss_winner': meta.get('toss_winner'),
         'toss_decision': meta.get('toss_decision'),
+        'league': meta.get('league', 'unknown'),
+        'gender': meta.get('gender', 'unknown'),
         
         # Inning Meta
         'innings': inning_meta['innings_num'],
@@ -171,10 +205,17 @@ def should_skip_match(match_data: Dict[str, Any], match_id: str) -> Tuple[bool, 
 def process_match(
     match_data: Dict[str, Any], 
     match_id: str,
-    resolver: Optional['EntityResolver'] = None
+    resolver: Optional['EntityResolver'] = None,
+    league_slug: Optional[str] = None
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     Process a single match into a list of flat records.
+    
+    Args:
+        match_data: The raw match JSON data.
+        match_id: Unique match identifier (filename without extension).
+        resolver: Optional entity resolver for name normalization.
+        league_slug: Optional league identifier (e.g., 'bbl', 'ipl').
     
     Returns:
         Tuple of (main_records, super_over_records)
@@ -186,7 +227,7 @@ def process_match(
         logger.info("Skipping match", match_id=match_id, reason=reason)
         return [], []
     
-    meta = extract_match_metadata(match_data, match_id)
+    meta = extract_match_metadata(match_data, match_id, league_slug)
     
     main_records = []
     super_over_records = []

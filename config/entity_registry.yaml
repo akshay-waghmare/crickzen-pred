@@ -1,3 +1,51 @@
 players: {}
-teams: {}
-venues: {}
+teams:
+  # SA20 Teams
+  DSG:
+    - "Durban's Super Giants"
+    - "Durban Super Giants"
+    - "DSG"
+  MICT:
+    - "MI Cape Town"
+    - "MICT"
+  PR:
+    - "Paarl Royals"
+    - "PR"
+  JSK:
+    - "Joburg Super Kings"
+    - "JSK"
+  PC:
+    - "Pretoria Capitals"
+    - "PC"
+  SEC:
+    - "Sunrisers Eastern Cape"
+    - "SEC"
+
+venues:
+  # SA20 Venues
+  "Kingsmead":
+    - "Kingsmead, Durban"
+    - "Kingsmead"
+    - "Durban"
+  "Newlands":
+    - "Newlands, Cape Town"
+    - "Newlands"
+    - "Cape Town"
+  "Boland Park":
+    - "Boland Park, Paarl"
+    - "Boland Park"
+    - "Paarl"
+  "St George's Park":
+    - "St George's Park, Gqeberha"
+    - "St George's Park"
+    - "Gqeberha"
+  "SuperSport Park":
+    - "SuperSport Park, Centurion"
+    - "SuperSport Park"
+    - "Centurion"
+  "The Wanderers":
+    - "The Wanderers Stadium, Johannesburg"
+    - "The Wanderers"
+    - "Wanderers"
+    - "Johannesburg"
+

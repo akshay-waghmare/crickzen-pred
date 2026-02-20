@@ -105,18 +105,21 @@ def ingest(ctx, input_dir, output_dir, incremental):
     try:
         logger.info("Starting ingestion", input_dir=str(input_path), incremental=is_incremental)
         
-        for file_path in iter_match_files(input_path):
+        for file_path in iter_match_files(input_path, recursive=True):
             summary["total_files_scanned"] += 1
             
             if is_incremental and state.is_processed(file_path):
                 summary["skipped_incremental"] += 1
                 continue
+            
+            # Extract league slug from parent directory (for multi-league structure)
+            league_slug = file_path.parent.name if file_path.parent != input_path else None
                 
             try:
                 data = load_match_file(file_path)
                 match_id = file_path.stem
                 
-                main_recs, super_recs = process_match(data, match_id, resolver)
+                main_recs, super_recs = process_match(data, match_id, resolver, league_slug)
                 
                 main_buffer.extend(main_recs)
                 super_over_buffer.extend(super_recs)
@@ -524,6 +527,132 @@ def analyze(input_file, model_name):
         raise click.ClickException(str(e))
 
 
+@main.command(name='analyze-oof')
+@click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
+@click.option('--model-dir', type=click.Path(exists=True), required=True, help='Model directory containing champion_model.joblib')
+@click.option('--n-splits', type=int, default=5, show_default=True, help='Number of folds for cross-validation')
+@click.option('--target-col', default='is_winner', show_default=True, help='Target column name')
+@click.option('--innings-col', default='innings', show_default=True, help='Innings column name (optional)')
+@click.option('--overs-col', default='overs_remaining', show_default=True, help='Overs remaining column (optional, for phase analysis)')
+def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_col):
+    """
+    Comprehensive OOF calibration analysis comparing 7 methods:
+    - Raw (uncalibrated)
+    - Combined (single isotonic)
+    - Innings-Specific (2 calibrators)
+    - Innings×Phase (6 calibrators)
+    - Brier-Optimized (per-over)
+    - ECE-Optimized (histogram binning)
+    - LogLoss-Optimized (Platt scaling)
+    
+    Generates detailed metrics breakdown by innings, phase, and overall.
+    """
+    from bbl_pipeline.training.oof_analyzer import OOFAnalyzer
+    from sklearn.base import clone
+    import joblib
+    
+    input_path = Path(input_file)
+    model_path = Path(model_dir)
+    champion_path = model_path / 'champion_model.joblib'
+    
+    if not champion_path.exists():
+        raise click.ClickException(f"champion_model.joblib not found at {champion_path}")
+    
+    logger.info('Loading training data', path=str(input_path))
+    df = pd.read_parquet(input_path)
+    
+    if target_col not in df.columns:
+        raise click.ClickException(f"Target column '{target_col}' not found in dataset")
+    
+    y = df[target_col].values
+    
+    # Get innings and overs columns if available
+    innings = df[innings_col].values if innings_col in df.columns else None
+    overs_remaining = df[overs_col].values if overs_col in df.columns else None
+    
+    # Get resource_win_prob if available (for baseline comparison)
+    resource_win_prob = df['resource_win_prob'].values if 'resource_win_prob' in df.columns else None
+    if resource_win_prob is not None:
+        logger.info('Found resource_win_prob feature for baseline comparison')
+    
+    if overs_remaining is not None:
+        # Calculate over number from overs_remaining
+        over = np.ceil(20 - overs_remaining).astype(int) + 1
+        over = np.clip(over, 1, 20)
+    else:
+        over = None
+    
+    # Prepare features
+    X = df.drop(columns=[target_col])
+    
+    # Drop non-feature columns (but keep overs_remaining, is_powerplay, is_death_overs as they ARE features)
+    # Only drop innings (metadata) and is_middle_overs (not used in model)
+    non_feature_cols = [innings_col, 'is_middle_overs']
+    for col in list(X.columns):
+        if str(col).startswith('__') or col in non_feature_cols:
+            if col in X.columns:
+                X = X.drop(columns=[col])
+    
+    # Keep numeric features only
+    X = X.select_dtypes(include=[np.number]).fillna(0)
+    
+    logger.info('Loading champion model', path=str(champion_path))
+    champion_model = joblib.load(champion_path)
+    
+    # Extract base model if wrapped
+    from bbl_pipeline.training.calibration import CalibratedModel
+    base_model = champion_model
+    if isinstance(champion_model, CalibratedModel) and hasattr(champion_model, 'base_estimator'):
+        base_model = champion_model.base_estimator
+        logger.info('Using base estimator from calibrated model')
+    
+    # Align features if model has feature list
+    if hasattr(base_model, 'selected_features_') and base_model.selected_features_:
+        selected_features = [c for c in base_model.selected_features_ if c in X.columns]
+        X = X[selected_features]
+    elif hasattr(base_model, 'feature_names_in_') and base_model.feature_names_in_ is not None:
+        selected_features = [c for c in list(base_model.feature_names_in_) if c in X.columns]
+        X = X[selected_features]
+    
+    logger.info('Starting OOF analysis', samples=len(X), features=X.shape[1], n_splits=n_splits)
+    
+    # Run analysis
+    analyzer = OOFAnalyzer(
+        model=base_model,
+        X=X,
+        y=y,
+        innings=innings,
+        over=over,
+        resource_win_prob=resource_win_prob,
+        n_splits=n_splits
+    )
+    
+    calibrators, results_df = analyzer.run_analysis(output_dir=model_path)
+    
+    # Display summary
+    click.echo("\n" + "="*80)
+    click.echo("OOF CALIBRATION ANALYSIS COMPLETE")
+    click.echo("="*80)
+    
+    # Overall results
+    overall = results_df[results_df['segment'] == 'overall'].sort_values('brier')
+    click.echo("\n📊 OVERALL PERFORMANCE:\n")
+    click.echo(overall[['method', 'brier', 'ece', 'logloss']].to_string(index=False, float_format=lambda x: f'{x:.4f}'))
+    
+    # Rankings
+    click.echo("\n🏆 RANKINGS:\n")
+    click.echo(f"Best Brier:   {overall.iloc[0]['method']} ({overall.iloc[0]['brier']:.4f})")
+    ece_best = overall.sort_values('ece').iloc[0]
+    click.echo(f"Best ECE:     {ece_best['method']} ({ece_best['ece']:.4f})")
+    ll_best = overall.sort_values('logloss').iloc[0]
+    click.echo(f"Best LogLoss: {ll_best['method']} ({ll_best['logloss']:.4f})")
+    
+    click.echo(f"\n✅ Results saved to: {model_path}")
+    click.echo(f"   - oof_calibration_results.csv (detailed metrics)")
+    click.echo(f"   - oof_calibrators.pkl (trained calibrators)")
+    click.echo(f"   - OOF_CALIBRATION_REPORT.md (markdown report)")
+
+
 @main.command(name='generate-oof')
 @click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
 @click.option('--model-dir', type=click.Path(exists=True), required=True, help='Model directory containing champion_model.joblib')
@@ -552,9 +681,24 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
 
     # Check if innings column exists for innings-specific calibration
     has_innings = 'innings' in df.columns
+    has_phase = all(col in df.columns for col in ['is_powerplay', 'is_death_overs'])
+    has_overs = 'overs_remaining' in df.columns
+    
     if has_innings:
         logger.info('Innings column detected - will generate innings-specific calibrators')
         innings_col = df['innings'].copy()
+    
+    if has_overs:
+        logger.info('Overs column detected - will generate per-over (brier_optimized) calibrators')
+        overs_remaining_col = df['overs_remaining'].copy()
+        # Calculate over number from overs_remaining
+        over_col = np.ceil(20 - overs_remaining_col.values).astype(int) + 1
+        over_col = np.clip(over_col, 1, 20)
+    
+    if has_phase:
+        logger.info('Phase columns detected - will generate innings×phase specific calibrators')
+        powerplay_col = df['is_powerplay'].copy()
+        death_col = df['is_death_overs'].copy()
     
     y = df[target_col]
 
@@ -596,13 +740,13 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
         oof_probs[val_idx] = model.predict_proba(X.iloc[val_idx])[:, 1]
         logger.info('OOF fold complete', fold=fold_idx, train_size=len(train_idx), val_size=len(val_idx))
 
-    # Create innings-specific calibrators if innings column exists
+    # Create innings-specific and innings×phase-specific calibrators
     if has_innings:
         # Train separate calibrators for each innings
-        iso_inn1 = IsotonicRegression(out_of_bounds='clip')
-        iso_inn2 = IsotonicRegression(out_of_bounds='clip')
+        iso_inn1 = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
+        iso_inn2 = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
         # Also train a combined calibrator for comparison
-        iso_combined = IsotonicRegression(out_of_bounds='clip')
+        iso_combined = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
         
         mask_inn1 = (innings_col == 1).values
         mask_inn2 = (innings_col == 2).values
@@ -653,6 +797,90 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
         oof_probs_cal[mask_inn2] = oof_probs_cal_inn2
         oof_brier_cal = float(brier_score_loss(y, oof_probs_cal))
         oof_ece_cal = float(expected_calibration_error(y.values if hasattr(y, 'values') else y, oof_probs_cal))
+        
+        # Generate innings×phase specific calibrators if phase columns exist
+        phase_calibrators = {}
+        phase_metrics = {}
+        
+        if has_phase:
+            logger.info('Generating innings×phase specific calibrators')
+            
+            # Define phase masks
+            powerplay_mask = (powerplay_col == 1).values
+            death_mask = (death_col == 1).values
+            middle_mask = ~powerplay_mask & ~death_mask
+            
+            # Train calibrator for each innings × phase combination
+            for inn in [1, 2]:
+                inn_mask = (innings_col == inn).values
+                
+                for phase_name, phase_mask in [('powerplay', powerplay_mask), 
+                                                ('middle', middle_mask), 
+                                                ('death', death_mask)]:
+                    mask = inn_mask & phase_mask
+                    if mask.sum() >= 10:  # Minimum samples requirement
+                        cal = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
+                        y_phase = y.values[mask] if hasattr(y, 'values') else y[mask]
+                        cal.fit(oof_probs[mask], y_phase)
+                        
+                        key = f'inn{inn}_{phase_name}'
+                        phase_calibrators[key] = cal
+                        
+                        # Calculate metrics for this combination
+                        probs_raw = oof_probs[mask]
+                        probs_cal = cal.predict(probs_raw)
+                        
+                        phase_metrics[key] = {
+                            'samples': int(mask.sum()),
+                            'brier_raw': float(brier_score_loss(y_phase, probs_raw)),
+                            'brier_calibrated': float(brier_score_loss(y_phase, probs_cal)),
+                            'ece_raw': float(expected_calibration_error(y_phase, probs_raw)),
+                            'ece_calibrated': float(expected_calibration_error(y_phase, probs_cal)),
+                        }
+                        
+                        logger.info(
+                            f'Phase calibrator: {key}',
+                            samples=phase_metrics[key]['samples'],
+                            brier_raw=phase_metrics[key]['brier_raw'],
+                            brier_cal=phase_metrics[key]['brier_calibrated'],
+                            ece_raw=phase_metrics[key]['ece_raw'],
+                            ece_cal=phase_metrics[key]['ece_calibrated'],
+                        )
+
+        # Generate per-over (brier_optimized) calibrators if overs column exists
+        per_over_calibrators = {}
+        per_over_metrics = {}
+        
+        if has_overs:
+            logger.info('Generating per-over (brier_optimized) calibrators')
+            
+            for inn in [1, 2]:
+                inn_mask = (innings_col == inn).values
+                
+                for ov in range(1, 21):
+                    mask = inn_mask & (over_col == ov)
+                    if mask.sum() >= 30:  # Minimum samples requirement
+                        cal = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
+                        y_over = y.values[mask] if hasattr(y, 'values') else y[mask]
+                        cal.fit(oof_probs[mask], y_over)
+                        
+                        key = f'inn{inn}_over{ov}'
+                        per_over_calibrators[key] = cal
+                        
+                        # Calculate metrics for this combination
+                        probs_raw = oof_probs[mask]
+                        probs_cal = cal.predict(probs_raw)
+                        
+                        per_over_metrics[key] = {
+                            'samples': int(mask.sum()),
+                            'brier_raw': float(brier_score_loss(y_over, probs_raw)),
+                            'brier_calibrated': float(brier_score_loss(y_over, probs_cal)),
+                            'ece_raw': float(expected_calibration_error(y_over, probs_raw)),
+                            'ece_calibrated': float(expected_calibration_error(y_over, probs_cal)),
+                        }
+            
+            logger.info(f'Generated {len(per_over_calibrators)} per-over calibrators')
+
     else:
         # Single calibrator for all data (backward compatible)
         iso = IsotonicRegression(out_of_bounds='clip')
@@ -680,7 +908,7 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     if has_innings:
         # Innings-specific calibrators
         calibrator_metadata = {
-            'type': 'innings_specific',
+            'type': 'innings_phase_specific' if (has_phase and phase_calibrators) else 'innings_specific',
             'calibrator_innings1': iso_inn1,
             'calibrator_innings2': iso_inn2,
             'calibrator_combined': iso_combined,  # For comparison
@@ -708,6 +936,18 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
                 'ece_calibrated': inn2_ece_cal,
             },
         }
+        
+        # Add phase calibrators if available
+        if has_phase and phase_calibrators:
+            calibrator_metadata['phase_calibrators'] = phase_calibrators
+            calibrator_metadata['phase_metrics'] = phase_metrics
+            logger.info(f'Generated {len(phase_calibrators)} innings×phase calibrators')
+        
+        # Add per-over (brier_optimized) calibrators if available
+        if has_overs and per_over_calibrators:
+            calibrator_metadata['per_over_calibrators'] = per_over_calibrators
+            calibrator_metadata['per_over_metrics'] = per_over_metrics
+            logger.info(f'Added {len(per_over_calibrators)} per-over (brier_optimized) calibrators')
     else:
         # Single calibrator (backward compatible)
         calibrator_metadata = {
@@ -727,11 +967,13 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     calibrator_out = model_path / 'isotonic_calibrator.pkl'
     joblib.dump(calibrator_metadata, calibrator_out)
     if has_innings:
+        cal_type = 'innings_phase_specific' if (has_phase and phase_calibrators) else 'innings_specific'
         logger.info(
-            'Saved innings-specific calibrators with metadata',
+            f'Saved {cal_type} calibrators with metadata',
             path=str(calibrator_out),
             feature_hash=feature_hash,
-            type='innings_specific'
+            type=cal_type,
+            n_phase_calibrators=len(phase_calibrators) if phase_calibrators else 0
         )
     else:
         logger.info(
@@ -819,5 +1061,696 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     except Exception as e:
         logger.warning(f'Failed to update model registry: {e}')
 
+@main.command()
+@click.option('--source-dir', type=click.Path(exists=True), default='recently_played_30_male',
+              help='Source directory containing recently played JSON files (default: recently_played_30_male)')
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'all']), required=True,
+              help='League to extract matches for')
+@click.option('--dry-run', is_flag=True, help='Show which files would be copied without actually copying')
+@click.pass_context  
+def update_matches(ctx, source_dir, league, dry_run):
+    """
+    Update league JSON folder with matches from recently_played folder.
+    
+    Scans the source directory for matches matching the specified league
+    and copies them to the appropriate league folder (e.g., sat_male_json for SA20).
+    Existing files are overwritten.
+    
+    Examples:
+        bbl-pipeline update-matches --league sa20
+        bbl-pipeline update-matches --league bbl --source-dir recently_played_30_male
+        bbl-pipeline update-matches --league all --dry-run
+    """
+    import shutil
+    
+    source_path = Path(source_dir)
+    
+    # League name patterns to match in event.name
+    league_patterns = {
+        'bbl': ['Big Bash League'],
+        'sa20': ['SA20'],
+        'ilt20': ['International League T20', 'ILT20'],
+        'bpl': ['Bangladesh Premier League', 'BPL'],
+        'ssm': ['Super Smash'],
+        'wpl': ['Women\'s Premier League', 'WPL'],
+    }
+    
+    # Target directories for each league
+    target_dirs = {
+        'bbl': 'bbl_male_json',
+        'sa20': 'sat_male_json',
+        'ilt20': 'ilt_male_json',
+        'bpl': 'bpl_male_json',
+        'ssm': 'ssm_male_json',
+        'wpl': 'wpl_female_json',
+    }
+    
+    leagues_to_process = list(league_patterns.keys()) if league == 'all' else [league]
+    
+    total_copied = 0
+    results = {}
+    
+    for lg in leagues_to_process:
+        patterns = league_patterns[lg]
+        target_dir = Path(target_dirs[lg])
+        
+        if not target_dir.exists():
+            logger.warning(f'Target directory {target_dir} does not exist, creating it')
+            if not dry_run:
+                target_dir.mkdir(parents=True, exist_ok=True)
+        
+        matches_found = []
+        
+        for json_file in sorted(source_path.glob('*.json')):
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                event_name = data.get('info', {}).get('event', {}).get('name', '')
+                match_type = data.get('info', {}).get('match_type', '')
+                
+                # Check if this matches any of the league patterns
+                if any(pattern.lower() in event_name.lower() for pattern in patterns):
+                    # Also check it's a T20 match
+                    if match_type == 'T20':
+                        match_num = data.get('info', {}).get('event', {}).get('match_number', '?')
+                        teams = data.get('info', {}).get('teams', [])
+                        dates = data.get('info', {}).get('dates', ['?'])
+                        matches_found.append({
+                            'file': json_file.name,
+                            'match_num': match_num,
+                            'teams': teams,
+                            'date': dates[0] if dates else '?'
+                        })
+                        
+            except Exception as e:
+                logger.error(f'Error reading {json_file.name}: {e}')
+        
+        results[lg] = matches_found
+        
+        if matches_found:
+            click.echo(f'\n{lg.upper()}: Found {len(matches_found)} matches')
+            for m in matches_found:
+                team_str = ' vs '.join(m['teams']) if m['teams'] else 'Unknown'
+                click.echo(f"  {m['file']}: Match {m['match_num']} - {team_str} ({m['date']})")
+            
+            if not dry_run:
+                for m in matches_found:
+                    src = source_path / m['file']
+                    dst = target_dir / m['file']
+                    shutil.copy2(src, dst)
+                    total_copied += 1
+                click.echo(f'  Copied {len(matches_found)} files to {target_dir}')
+        else:
+            click.echo(f'\n{lg.upper()}: No matches found')
+    
+    # Summary
+    if dry_run:
+        total_would_copy = sum(len(m) for m in results.values())
+        click.echo(f'\nDRY RUN: Would copy {total_would_copy} files total')
+    else:
+        click.echo(f'\nTotal: Copied {total_copied} files')
+
+
+@main.command()
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 't20_male', 't20_female', 't20i_female']), required=True,
+              help='League to retrain model for')
+@click.option('--version', type=str, required=True,
+              help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
+@click.option('--clean', is_flag=True, default=True,
+              help='Delete existing raw/features before reprocessing (default: True)')
+@click.option('--skip-ingest', is_flag=True, help='Skip ingestion step (use existing raw data)')
+@click.option('--skip-process', is_flag=True, help='Skip processing step (use existing features)')
+@click.option('--n-splits', type=int, default=5, help='Number of CV splits for OOF analysis')
+@click.pass_context
+def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
+    """
+    Full retraining pipeline for a league model.
+    
+    Runs the complete pipeline: ingest → process → train → generate-oof → analyze-oof
+    
+    Examples:
+        bbl-pipeline retrain --league sa20 --version v2
+        bbl-pipeline retrain --league bbl --version v13 --skip-ingest
+        bbl-pipeline retrain --league wpl --version v3 --n-splits 3
+        bbl-pipeline retrain --league t20_male --version v2
+    """
+    import shutil
+    import subprocess
+    import sys
+    
+    # League configurations
+    league_config = {
+        'bbl': {
+            'json_dir': 'bbl_male_json',
+            'raw_dir': 'data/bbl_raw',
+            'features_dir': 'data/bbl_features',
+            'feature_store_dir': 'data/bbl_feature_store',
+            'model_prefix': 'bbl',
+        },
+        'sa20': {
+            'json_dir': 'sat_male_json',
+            'raw_dir': 'data/sat_raw',
+            'features_dir': 'data/sat_features',
+            'feature_store_dir': 'data/sat_feature_store',
+            'model_prefix': 'sat',
+        },
+        'ilt20': {
+            'json_dir': 'ilt_male_json',
+            'raw_dir': 'data/ilt_raw',
+            'features_dir': 'data/ilt_features',
+            'feature_store_dir': 'data/ilt_feature_store',
+            'model_prefix': 'ilt20',
+        },
+        'bpl': {
+            'json_dir': 'bpl_male_json',
+            'raw_dir': 'data/bpl_raw',
+            'features_dir': 'data/bpl_features',
+            'feature_store_dir': 'data/bpl_feature_store',
+            'model_prefix': 'bpl',
+        },
+        'ssm': {
+            'json_dir': 'ssm_male_json',
+            'raw_dir': 'data/ssm_raw',
+            'features_dir': 'data/ssm_features',
+            'feature_store_dir': 'data/ssm_feature_store',
+            'model_prefix': 'ssm',
+        },
+        'wpl': {
+            'json_dir': 'wpl_female_json',
+            'raw_dir': 'data/wpl_raw',
+            'features_dir': 'data/wpl_features',
+            'feature_store_dir': 'data/wpl_feature_store',
+            'model_prefix': 'wpl',
+        },
+        't20_male': {
+            'json_dir': 'data/t20_male_json',  # Combined 11 leagues
+            'raw_dir': 'data/t20_male_raw',
+            'features_dir': 'data/t20_male_features',
+            'feature_store_dir': 'data/t20_male_feature_store',
+            'model_prefix': 't20_male',
+        },
+        't20_female': {
+            'json_dir': 'data/t20_female_json',  # Combined 15 female leagues
+            'raw_dir': 'data/t20_female_raw',
+            'features_dir': 'data/t20_female_features',
+            'feature_store_dir': 'data/t20_female_feature_store',
+            'model_prefix': 't20_female',
+        },
+        't20i_female': {
+            'json_dir': 't20i_female_json',
+            'raw_dir': 'data/t20i_female_raw',
+            'features_dir': 'data/t20i_female_features',
+            'feature_store_dir': 'data/t20i_female_feature_store',
+            'model_prefix': 't20i_female',
+        },
+    }
+    
+    cfg = league_config[league]
+    
+    # Append version to directories
+    features_dir = f"{cfg['features_dir']}_{version}"
+    feature_store_dir = f"{cfg['feature_store_dir']}_{version}"
+    model_dir = f"models/{cfg['model_prefix']}_{version}"
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  RETRAINING {league.upper()} MODEL - {version}")
+    click.echo(f"{'='*60}")
+    click.echo(f"  JSON Source:    {cfg['json_dir']}")
+    click.echo(f"  Raw Data:       {cfg['raw_dir']}")
+    click.echo(f"  Features:       {features_dir}")
+    click.echo(f"  Feature Store:  {feature_store_dir}")
+    click.echo(f"  Model Output:   {model_dir}")
+    click.echo(f"{'='*60}\n")
+    
+    # Count source files
+    json_path = Path(cfg['json_dir'])
+    if json_path.exists():
+        json_count = len(list(json_path.glob('*.json')))
+        click.echo(f"📁 Found {json_count} JSON files in {cfg['json_dir']}")
+    else:
+        click.echo(f"❌ JSON directory not found: {cfg['json_dir']}")
+        return
+    
+    # Step 0: Clean if requested
+    if clean and not skip_ingest:
+        click.echo(f"\n🧹 Cleaning existing data...")
+        for dir_path in [cfg['raw_dir'], features_dir, feature_store_dir]:
+            p = Path(dir_path)
+            if p.exists():
+                shutil.rmtree(p)
+                click.echo(f"   Deleted: {dir_path}")
+    
+    # Step 1: Ingest
+    if not skip_ingest:
+        click.echo(f"\n📥 Step 1/6: INGESTION (JSON → Parquet)")
+        click.echo(f"   bbl-pipeline ingest --input-dir {cfg['json_dir']} --output-dir {cfg['raw_dir']}")
+        result = subprocess.run([
+            sys.executable, '-m', 'bbl_pipeline.cli', 'ingest',
+            '--input-dir', cfg['json_dir'],
+            '--output-dir', cfg['raw_dir']
+        ], capture_output=False)
+        if result.returncode != 0:
+            click.echo(f"❌ Ingestion failed!")
+            return
+        click.echo(f"   ✅ Ingestion complete")
+    else:
+        click.echo(f"\n⏭️  Step 1/6: INGESTION (skipped)")
+    
+    # Step 2: Process
+    if not skip_process:
+        click.echo(f"\n⚙️  Step 2/6: PROCESSING (Parquet → Features)")
+        click.echo(f"   bbl-pipeline process --input-dir {cfg['raw_dir']}/matches --output-dir {features_dir} --feature-store-dir {feature_store_dir}")
+        result = subprocess.run([
+            sys.executable, '-m', 'bbl_pipeline.cli', 'process',
+            '--input-dir', f"{cfg['raw_dir']}/matches",
+            '--output-dir', features_dir,
+            '--feature-store-dir', feature_store_dir
+        ], capture_output=False)
+        if result.returncode != 0:
+            click.echo(f"❌ Processing failed!")
+            return
+        click.echo(f"   ✅ Processing complete")
+    else:
+        click.echo(f"\n⏭️  Step 2/6: PROCESSING (skipped)")
+    
+    # Step 3: Train (without --calibration, calibration comes from generate-oof)
+    click.echo(f"\n🎯 Step 3/6: TRAINING (Features → Model)")
+    click.echo(f"   bbl-pipeline train --input-file {features_dir}/training.parquet --output-dir {model_dir}")
+    result = subprocess.run([
+        sys.executable, '-m', 'bbl_pipeline.cli', 'train',
+        '--input-file', f"{features_dir}/training.parquet",
+        '--output-dir', model_dir
+    ], capture_output=False)
+    if result.returncode != 0:
+        click.echo(f"❌ Training failed!")
+        return
+    click.echo(f"   ✅ Training complete")
+    
+    # Step 4: Generate OOF
+    click.echo(f"\n🔧 Step 4/6: GENERATE-OOF (Create calibrators for inference)")
+    click.echo(f"   bbl-pipeline generate-oof --input-file {features_dir}/training.parquet --model-dir {model_dir}")
+    result = subprocess.run([
+        sys.executable, '-m', 'bbl_pipeline.cli', 'generate-oof',
+        '--input-file', f"{features_dir}/training.parquet",
+        '--model-dir', model_dir
+    ], capture_output=False)
+    if result.returncode != 0:
+        click.echo(f"❌ Generate-OOF failed!")
+        return
+    click.echo(f"   ✅ Generate-OOF complete")
+    
+    # Step 5: Analyze OOF
+    click.echo(f"\n📊 Step 5/6: ANALYZE-OOF (Detailed calibration analysis)")
+    click.echo(f"   bbl-pipeline analyze-oof --input-file {features_dir}/training.parquet --model-dir {model_dir} --n-splits {n_splits}")
+    result = subprocess.run([
+        sys.executable, '-m', 'bbl_pipeline.cli', 'analyze-oof',
+        '--input-file', f"{features_dir}/training.parquet",
+        '--model-dir', model_dir,
+        '--n-splits', str(n_splits)
+    ], capture_output=False)
+    if result.returncode != 0:
+        click.echo(f"❌ Analyze-OOF failed!")
+        return
+    click.echo(f"   ✅ Analyze-OOF complete")
+    
+    # Step 6: Update Model Registry
+    click.echo(f"\n📝 Step 6/6: UPDATING MODEL REGISTRY")
+    
+    # League name mapping for registry
+    registry_league_names = {
+        'bbl': 'BBL',
+        'sa20': 'SA20',
+        'ilt20': 'ILT20',
+        'bpl': 'BPL',
+        'ssm': 'SSM',
+        'wpl': 'WPL',
+        't20_male': 'T20_MALE',
+        't20_female': 'T20_FEMALE',
+        't20i_female': 'T20I_FEMALE',
+    }
+    
+    registry_path = Path('models/model_registry.json')
+    if registry_path.exists():
+        try:
+            with open(registry_path, 'r') as f:
+                registry = json.load(f)
+            
+            league_key = registry_league_names.get(league, league.upper())
+            
+            # Read OOF results for metrics
+            oof_results_path = Path(model_dir) / 'oof_calibration_results.csv'
+            brier_score = None
+            ece_score = None
+            if oof_results_path.exists():
+                oof_df = pd.read_csv(oof_results_path)
+                # Get brier_optimized overall metrics
+                brier_row = oof_df[(oof_df['method'] == 'brier_optimized') & (oof_df['segment'] == 'overall')]
+                if len(brier_row) > 0:
+                    brier_score = float(brier_row['brier'].iloc[0])
+                    ece_score = float(brier_row['ece'].iloc[0])
+            
+            # Count samples from training data
+            training_path = Path(features_dir) / 'training.parquet'
+            samples = 0
+            if training_path.exists():
+                training_df = pd.read_parquet(training_path)
+                samples = len(training_df)
+            
+            # Read calibrator metadata
+            calibrator_path = Path(model_dir) / 'isotonic_calibrator.pkl'
+            calibrator_info = {}
+            if calibrator_path.exists():
+                import joblib
+                cal_data = joblib.load(calibrator_path)
+                if isinstance(cal_data, dict) and 'metadata' in cal_data:
+                    meta = cal_data['metadata']
+                    calibrator_info = {
+                        'path': f"{model_dir}/isotonic_calibrator.pkl",
+                        'type': meta.get('type', 'innings_phase_specific'),
+                        'generated_date': meta.get('created_date', datetime.now().isoformat()),
+                        'oof_metrics': {
+                            'brier_raw': meta.get('oof_brier_raw', 0),
+                            'brier_calibrated': meta.get('oof_brier_calibrated', 0),
+                            'ece_raw': meta.get('oof_ece_raw', 0),
+                            'ece_calibrated': meta.get('oof_ece_calibrated', 0)
+                        },
+                        'n_features': meta.get('n_features', 25),
+                        'feature_hash': meta.get('feature_hash', '')
+                    }
+            
+            # Update or create model entry
+            model_entry = {
+                'path': model_dir,
+                'version': version,
+                'description': f"XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: {brier_score:.4f}, ECE: {ece_score:.4f})" if brier_score else f"XGBLogRegEnsemble retrained {version}",
+                'training': {
+                    'samples': samples,
+                    'date': datetime.now().strftime('%Y-%m-%d'),
+                    'brier_score': brier_score
+                },
+                'calibrator': calibrator_info,
+                'feature_store': {
+                    'path': feature_store_dir,
+                    'version': version,
+                    'generated_date': datetime.now().strftime('%Y-%m-%d'),
+                    'training_data_samples': samples
+                }
+            }
+            
+            # Update active_models
+            registry['active_models'][league_key] = model_entry
+            registry['last_updated'] = datetime.now().strftime('%Y-%m-%d')
+            
+            with open(registry_path, 'w') as f:
+                json.dump(registry, f, indent=2)
+            
+            click.echo(f"   ✅ Updated model_registry.json for {league_key}")
+            
+        except Exception as e:
+            click.echo(f"   ⚠️ Failed to update registry: {e}")
+    else:
+        click.echo(f"   ⚠️ Model registry not found at {registry_path}")
+    
+    # Summary
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  ✅ RETRAINING COMPLETE: {league.upper()} {version}")
+    click.echo(f"{'='*60}")
+    click.echo(f"  Model:         {model_dir}/champion_model.joblib")
+    click.echo(f"  Calibrator:    {model_dir}/isotonic_calibrator.pkl")
+    click.echo(f"  Feature Store: {feature_store_dir}")
+    click.echo(f"  OOF Report:    {model_dir}/OOF_CALIBRATION_REPORT.md")
+    click.echo(f"  Registry:      models/model_registry.json (updated)")
+    click.echo(f"{'='*60}")
+    click.echo(f"\n📌 Next steps:")
+    click.echo(f"   1. Review OOF report: cat {model_dir}/OOF_CALIBRATION_REPORT.md")
+    click.echo(f"   2. Test inference: python -m src.bbl_pipeline.inference.crex_live_predictor --model-dir {model_dir} --feature-store-dir {feature_store_dir}")
+
+
+@main.command(name='calibrate-league')
+@click.option('--global-model', type=click.Path(exists=True), required=True,
+              help='Path to global unified model directory (e.g., models/t20_male_v1)')
+@click.option('--input-file', type=click.Path(exists=True), required=True,
+              help='Training parquet with league/date/innings columns')
+@click.option('--league', type=str, required=True,
+              help='League to calibrate (e.g., bbl, ipl, psl)')
+@click.option('--output-dir', type=click.Path(), default=None,
+              help='Output directory (default: global-model/league_calibrators/<league>)')
+@click.option('--method', type=click.Choice(['temperature', 'platt']), default='temperature',
+              help='Calibration method (temperature recommended)')
+@click.pass_context
+def calibrate_league(ctx, global_model, input_file, league, output_dir, method):
+    """
+    Fit league-specific calibration using Temperature/Platt scaling.
+    
+    Recommended approach:
+    1. Global model trained on all T20s (frozen)
+    2. League adaptation via Temperature/Platt scaling (not isotonic - too steppy)
+    3. Innings-wise calibrators for stability
+    
+    Example:
+        bbl-pipeline calibrate-league \\
+            --global-model models/t20_male_v1 \\
+            --input-file data/t20_male_features_v1/training.parquet \\
+            --league bbl \\
+            --method temperature
+    """
+    import joblib
+    from bbl_pipeline.training.league_calibrator import LeagueCalibrator
+    
+    global_model_path = Path(global_model)
+    input_path = Path(input_file)
+    
+    # Load global model
+    model_file = global_model_path / 'champion_model.joblib'
+    if not model_file.exists():
+        click.echo(f"❌ Model not found: {model_file}")
+        return
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  LEAGUE CALIBRATION: {league.upper()}")
+    click.echo(f"  Method: {method} | Innings-specific: Yes")
+    click.echo(f"{'='*60}\n")
+    
+    model = joblib.load(model_file)
+    click.echo(f"✅ Loaded global model from {model_file}")
+    
+    # Load training data
+    df = pd.read_parquet(input_path)
+    click.echo(f"✅ Loaded {len(df):,} samples from {input_path}")
+    
+    # Filter to league
+    if 'league' in df.columns:
+        league_df = df[df['league'].str.lower() == league.lower()].copy()
+        click.echo(f"   Filtered to {len(league_df):,} samples for {league}")
+    else:
+        # Try to infer from file path or use all
+        click.echo(f"   ⚠️ No 'league' column - using all data")
+        league_df = df.copy()
+    
+    if len(league_df) == 0:
+        click.echo(f"❌ No data found for league: {league}")
+        available = df['league'].unique().tolist() if 'league' in df.columns else []
+        click.echo(f"   Available leagues: {available}")
+        return
+    
+    # Get feature columns from model
+    feature_cols = getattr(model, 'selected_features_', None) or getattr(model, 'feature_columns_', None)
+    if feature_cols is None:
+        click.echo("❌ Model does not have selected_features_ or feature_columns_ attribute")
+        return
+    
+    click.echo(f"   Using {len(feature_cols)} features from model")
+    
+    # Ensure all columns exist
+    missing = [c for c in feature_cols if c not in league_df.columns]
+    if missing:
+        click.echo(f"❌ Missing feature columns: {missing[:5]}...")
+        return
+    
+    # Get raw predictions - pass DataFrame to model (it expects named columns)
+    X = league_df[feature_cols]
+    raw_probs = model.predict_proba(X)[:, 1]
+    y_true = league_df['is_winner'].values
+    
+    click.echo(f"\n📊 Fitting {method} calibrator (innings-specific)...")
+    
+    # Fit league calibrator
+    calibrator = LeagueCalibrator(method=method, innings_specific=True)
+    calibrator.fit(league_df, raw_probs, y_true, league)
+    
+    # Output directory
+    if output_dir is None:
+        output_path = global_model_path / 'league_calibrators' / league
+    else:
+        output_path = Path(output_dir)
+    
+    calibrator.save(output_path)
+    
+    # Display metrics
+    metrics = calibrator.metrics_log
+    overall = metrics['overall']
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  CALIBRATION RESULTS: {league.upper()}")
+    click.echo(f"{'='*60}")
+    click.echo(f"\n  Overall ({overall['samples']:,} samples):")
+    click.echo(f"    Brier:   {overall['brier_raw']:.4f} → {overall['brier_calibrated']:.4f} "
+               f"({(1 - overall['brier_calibrated']/overall['brier_raw'])*100:+.1f}%)")
+    click.echo(f"    LogLoss: {overall['logloss_raw']:.4f} → {overall['logloss_calibrated']:.4f} "
+               f"({(1 - overall['logloss_calibrated']/overall['logloss_raw'])*100:+.1f}%)")
+    
+    # By innings
+    click.echo(f"\n  By Innings:")
+    for inn_key, inn_metrics in metrics['by_innings'].items():
+        click.echo(f"    {inn_key}: Brier {inn_metrics['brier_raw']:.4f} → {inn_metrics['brier_calibrated']:.4f} "
+                   f"| LogLoss {inn_metrics['logloss_raw']:.4f} → {inn_metrics['logloss_calibrated']:.4f}")
+    
+    # Calibrator details
+    click.echo(f"\n  Calibrator Details:")
+    for key, cal in calibrator.calibrators.items():
+        if hasattr(cal, 'temperature'):
+            click.echo(f"    {key}: T = {cal.temperature:.4f}")
+        elif hasattr(cal, 'model'):
+            coef = cal.model.coef_[0][0] if hasattr(cal.model, 'coef_') else 'N/A'
+            intercept = cal.model.intercept_[0] if hasattr(cal.model, 'intercept_') else 'N/A'
+            click.echo(f"    {key}: a = {coef:.4f}, b = {intercept:.4f}")
+    
+    # Show temporal trends if available
+    if metrics.get('by_date'):
+        click.echo(f"\n  Temporal Trends (by month):")
+        for item in metrics['by_date'][-6:]:  # Last 6 months
+            click.echo(f"    {item['month']}: Brier {item['brier_calibrated']:.4f} | "
+                       f"LogLoss {item['logloss_calibrated']:.4f} ({item['samples']} samples)")
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  ✅ Saved to: {output_path}")
+    click.echo(f"     - league_calibrator.pkl")
+    click.echo(f"     - calibration_metrics.json")
+    click.echo(f"{'='*60}")
+    
+    # Also export in OOF format for Streamlit app compatibility
+    oof_output = output_path / 'isotonic_calibrator.pkl'
+    calibrator.export_oof_format(output_path, feature_cols)
+    click.echo(f"\n  📦 OOF-Compatible Export:")
+    click.echo(f"     - {oof_output}")
+    click.echo(f"     (Compatible with Streamlit app calibrator loading)")
+    
+    click.echo(f"\n📌 Usage in inference:")
+    click.echo(f"   from bbl_pipeline.training.league_calibrator import LeagueCalibrator")
+    click.echo(f"   calibrator = LeagueCalibrator.load('{output_path}')")
+    click.echo(f"   calibrated = calibrator.predict(df, raw_probs)")
+
+
+@main.command(name='analyze-states')
+@click.option('--league', type=str, required=True, help='League identifier (e.g., bbl, sa20, ilt20)')
+@click.option('--states-dir', type=click.Path(exists=True), help='Directory containing match state Parquet files')
+@click.option('--consolidate', is_flag=True, help='Consolidate all match files into all_matches.parquet')
+@click.option('--calibration-report', is_flag=True, help='Generate calibration report with Brier/ECE/LogLoss')
+@click.option('--deviation-threshold', type=float, default=0.10, help='Minimum deviation threshold for signal extraction (default: 0.10)')
+@click.pass_context
+def analyze_states(ctx, league, states_dir, consolidate, calibration_report, deviation_threshold):
+    """
+    Analyze recorded match state data.
+    
+    Consolidates match Parquet files, computes calibration metrics (Brier, ECE, LogLoss),
+    and generates reports for drift detection and deviation analysis.
+    
+    Examples:
+        # Consolidate all match files for BBL
+        bbl-pipeline analyze-states --league bbl --consolidate
+        
+        # Generate calibration report for SA20
+        bbl-pipeline analyze-states --league sa20 --calibration-report
+        
+        # Both consolidation and report
+        bbl-pipeline analyze-states --league ilt20 --consolidate --calibration-report
+    """
+    from bbl_pipeline.analysis.state_analyzer import StateAnalyzer
+    
+    # Determine states directory
+    if states_dir:
+        states_path = Path(states_dir)
+    else:
+        states_path = Path(f"data/match_states/{league}")
+    
+    if not states_path.exists():
+        click.echo(f"❌ States directory not found: {states_path}")
+        click.echo(f"   Run predictor with --record-states to collect data first.")
+        return
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  Match State Analysis: {league.upper()}")
+    click.echo(f"{'='*60}")
+    click.echo(f"  States Directory: {states_path}")
+    
+    # Initialize analyzer
+    analyzer = StateAnalyzer(league=league, states_dir=states_path)
+    
+    click.echo(f"  Discovered {len(analyzer.match_files)} match files")
+    
+    if not consolidate and not calibration_report:
+        click.echo(f"\n⚠️  No action specified. Use --consolidate or --calibration-report")
+        return
+    
+    # Consolidate matches
+    if consolidate:
+        click.echo(f"\n🔄 Consolidating match files...")
+        df = analyzer.consolidate()
+        
+        if len(df) > 0:
+            click.echo(f"   ✅ Consolidated {len(df):,} ball states")
+            click.echo(f"   📄 Output: {analyzer.consolidated_file}")
+            
+            # Show summary stats
+            click.echo(f"\n📊 Summary:")
+            click.echo(f"   Matches: {df['match_id'].nunique()}")
+            click.echo(f"   Date Range: {df['timestamp'].min()} to {df['timestamp'].max()}")
+            click.echo(f"   Phases: {', '.join(df['match_phase'].unique())}")
+        else:
+            click.echo(f"   ❌ No match data found")
+            return
+    
+    # Generate calibration report
+    if calibration_report:
+        click.echo(f"\n📈 Generating calibration report...")
+        
+        results = analyzer.calibration_report()
+        
+        if len(results) == 0:
+            click.echo(f"   ❌ No completed matches with outcomes found")
+            return
+        
+        click.echo(f"   ✅ Report generated: {states_path / 'CALIBRATION_REPORT.md'}")
+        
+        # Display overall metrics
+        if "overall" in results:
+            overall = results["overall"]
+            click.echo(f"\n📊 Overall Calibration Metrics:")
+            click.echo(f"   Brier Score: {overall['brier']:.4f}")
+            click.echo(f"   ECE (10-bin): {overall['ece']:.4f}")
+            click.echo(f"   Log Loss: {overall['log_loss']:.4f}")
+            click.echo(f"   Samples: {overall['sample_count']:,}")
+        
+        # Show by innings
+        click.echo(f"\n📊 By Innings:")
+        for key in sorted([k for k in results.keys() if k.startswith("innings_")]):
+            metrics = results[key]
+            click.echo(f"   {metrics['segment']}: Brier {metrics['brier']:.4f} | ECE {metrics['ece']:.4f} | Samples {metrics['sample_count']:,}")
+        
+        # Show by phase highlights
+        click.echo(f"\n📊 By Phase:")
+        for phase in ["powerplay", "middle", "death"]:
+            key = f"phase_{phase}"
+            if key in results:
+                metrics = results[key]
+                click.echo(f"   {metrics['segment']}: Brier {metrics['brier']:.4f} | ECE {metrics['ece']:.4f} | Samples {metrics['sample_count']:,}")
+    
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  ✅ Analysis Complete!")
+    click.echo(f"{'='*60}\n")
+
+
 if __name__ == '__main__':
     main()
+

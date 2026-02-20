@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    env_file: .env
+    volumes:
+      - auth_db:/app/data/db
+      - ./data:/app/data:ro
+    networks:
+      - dashboard_net
+    restart: unless-stopped
+    depends_on: []
+
+  caddy:
+    image: caddy:2.9-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - dashboard_net
+    restart: unless-stopped
+    depends_on:
+      - api
+
+volumes:
+  auth_db:
+  caddy_data:
+  caddy_config:
+
+networks:
+  dashboard_net:
+    driver: bridge

@@ -30,12 +30,20 @@ def load_match_file(file_path: Path) -> Dict[str, Any]:
         logger.error("Failed to read file", file=str(file_path), error=str(e))
         raise e
 
-def iter_match_files(directory: Path) -> Generator[Path, None, None]:
+def iter_match_files(directory: Path, recursive: bool = False) -> Generator[Path, None, None]:
     """
     Yield all JSON files in the directory.
+    
+    Args:
+        directory: Root directory to search.
+        recursive: If True, search subdirectories recursively (for multi-league).
     """
     if not directory.exists():
         raise FileNotFoundError(f"Directory not found: {directory}")
-        
-    for file_path in directory.glob("*.json"):
-        yield file_path
+    
+    if recursive:
+        for file_path in directory.rglob("*.json"):
+            yield file_path
+    else:
+        for file_path in directory.glob("*.json"):
+            yield file_path

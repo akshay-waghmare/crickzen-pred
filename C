@@ -1,0 +1,146 @@
+# Agent Guide for machine_learning_bbl
+
+This file orients coding agents to build/test workflows and local code style.
+It combines repository docs plus Copilot/agent rules. Follow this doc before
+editing code or running commands.
+
+## Sources Of Truth
+
+- `README.md` for CLI workflows and examples.
+- `pyproject.toml` for Python version and packaging.
+- `docs/` for model, calibration, and simulation details.
+- Copilot guidance in:
+  - `.github/copilot-instructions.md`
+  - `.github/agents/copilot-instructions.md`
+
+## Environment And Layout
+
+- Language: Python >= 3.10 (root `pyproject.toml`).
+- Main package: `src/bbl_pipeline/`.
+- Tests: `tests/`, `tests/unit/`, `tests/integration/`.
+- Models are under `models/` with archived ones in `models/archive/`.
+- Data folders (mostly gitignored): `data/`, league JSON folders in repo root.
+- CLI entrypoint: `bbl-pipeline` (from `bbl_pipeline.cli`).
+
+## Build, Lint, Test
+
+### Install
+
+- Editable install: `pip install -e .`
+- Live prediction extras (from README):
+  - `pip install playwright pandas numpy scikit-learn structlog joblib`
+  - `playwright install chromium`
+
+### Tests (Pytest)
+
+- Full suite: `pytest`
+- Single file: `pytest tests/test_simulation.py -v`
+- Single test: `pytest tests/test_simulation.py -k test_name -v`
+- Unit suite: `pytest tests/unit/ -v`
+- Integration suite: `pytest tests/integration/ -v`
+- Monte Carlo tests (docs):
+  - `pytest tests/test_simulation.py -v`
+  - `pytest tests/integration/test_simulation_integration.py -v`
+
+### Lint / Format
+
+- From `.github/agents/copilot-instructions.md`:
+  - `cd src; pytest; ruff check .`
+- The repo does not define Ruff config in root; keep changes aligned with
+  existing style if Ruff is not installed.
+- Scraper subproject formatting is configured in `scraper/pyproject.toml`:
+  - Black line length: 100
+  - Isort profile: black
+  - Flake8 max line length: 100, ignore E203/W503
+
+### Build / Pipeline Commands
+
+- Full retrain (recommended): `bbl-pipeline retrain --league <league> --version <v>`
+- Update matches: `bbl-pipeline update-matches --league <league> [--dry-run]`
+- Ingest: `bbl-pipeline ingest --input-dir data/raw_json/<league> --output-dir data/<league>_raw`
+- Process: `bbl-pipeline process --input-dir data/<league>_raw/matches --output-dir data/<league>_features_v2 --feature-store-dir data/<league>_feature_store_v2`
+- Train: `bbl-pipeline train --input-file data/<league>_features_v2/training.parquet --output-dir models/<league>_vX`
+- Generate OOF calibrators: `bbl-pipeline generate-oof --input-file ... --model-dir ...`
+- Analyze OOF: `bbl-pipeline analyze-oof --input-file ... --model-dir ... --n-splits 5`
+
+## Code Style And Conventions
+
+### Imports
+
+- Use absolute imports from `bbl_pipeline` (Copilot rule).
+- Group imports: standard library, third-party, local.
+- Avoid relative imports across packages; keep modules importable from `src/`.
+
+### Formatting
+
+- Default indentation is 4 spaces.
+- Keep line length near 100 when editing scraper code (per `scraper/pyproject.toml`).
+- Keep long call arguments vertically aligned, as seen in `bbl_pipeline/cli.py`.
+
+### Types And Data
+
+- Use pandas/numpy primitives for dataframes and arrays; avoid hidden schema
+  mutations during processing steps.
+- When writing JSON artifacts, convert numpy types to native Python types
+  (see `convert_types` in `bbl_pipeline/cli.py`).
+- Prefer explicit column drops for target/non-feature columns before training.
+
+### Naming
+
+- Python modules and functions: `snake_case`.
+- Classes: `PascalCase` (e.g., `XGBLogRegEnsemble`, `Trainer`).
+- Constants: `UPPER_SNAKE_CASE` (see feature penalty constants in training code).
+- CLI commands use kebab-case (Click) like `analyze-oof`, `generate-oof`.
+
+### Logging And Errors
+
+- Use `structlog.get_logger()` for structured logging in pipeline modules.
+- Prefer `click.ClickException` or `click.BadParameter` in CLI handlers.
+- For ingestion, use `ErrorHandler` from `bbl_pipeline.utils.errors` and capture
+  context (file path, league).
+- Log summary metrics at the end of long-running commands.
+
+### Files And Artifacts
+
+- Model artifacts expected after training:
+  - `champion_model.joblib`
+  - `oof_calibrators.pkl` or `isotonic_calibrator.pkl`
+  - `oof_calibration_results.csv`
+  - `OOF_CALIBRATION_REPORT.md`
+- Feature stores live under `data/<league>_feature_store_vX`.
+
+## Project-Specific Rules (From Copilot Instructions)
+
+- Active models only: use `models/bbl_v12`, `models/sat_v1`, `models/ilt20_v5`.
+- Ignore `models/archive/` unless explicitly asked.
+- Keep `models/model_registry.json` updated when:
+  - Regenerating feature stores
+  - Retraining models
+  - Adding/modifying feature store columns
+- Prefer the `bbl-pipeline` CLI for standard tasks.
+- Use absolute imports from `bbl_pipeline`.
+- Wicket penalty applies only to future projected runs; death phase penalties
+  are minimal (approx 0.90-1.00).
+- BBL v12 uses `data/bbl_features_v4/` with empirically calibrated penalties.
+
+## League Calibration Guidance
+
+- Recommended approach is global model + league calibration.
+- Use `bbl-pipeline calibrate-league` with temperature or Platt scaling.
+- Do not use isotonic for league calibration (too steppy).
+
+## Testing Guidance For Changes
+
+- Data/feature changes: run `pytest tests/unit/test_ingestion.py` and
+  `pytest tests/unit/test_resolution.py`.
+- Monte Carlo changes: run `pytest tests/test_simulation.py -v` and
+  `pytest tests/integration/test_simulation_integration.py -v`.
+- Pipeline changes: run `pytest tests/integration/test_pipeline.py -v`.
+
+## Working Notes
+
+- Data folders can be large; avoid committing raw data.
+- Keep JSON/YAML outputs stable and deterministic when possible.
+- Favor numpy/pandas vectorized operations over Python loops.
+- When adding new CLI commands, wire them through `bbl_pipeline/cli.py` and
+  update docs in `README.md` or `docs/`.
