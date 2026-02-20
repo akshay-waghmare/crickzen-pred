@@ -153,7 +153,7 @@ document.addEventListener('alpine:init', () => {
         if (newEtag) this.etag = newEtag;
 
         // Detect a new ball (over/ball/score changed)
-        const ballKey = `${data.innings ?? data.is_second_innings ? 2 : 1}.${data.over}.${data.ball}.${data.score}`;
+        const ballKey = `${data.is_second_innings ? 2 : 1}.${data.over}.${data.ball}.${data.score}`;
         const isNewBall = this.lastBallKey !== null && ballKey !== this.lastBallKey;
         if (isNewBall) {
           this.ballCount++;
@@ -254,8 +254,9 @@ document.addEventListener('alpine:init', () => {
 
     // ── Half-donut gauges ──
     _updateGauges(data) {
-      const batProb = data.bat_win_prob ?? 0.5;
-      const bowlProb = data.bowl_win_prob ?? (1 - batProb);
+      // Use final calibrated prob; fall back to bat_win_prob which is the same value
+      const batProb = data.calibrated_per_over_prob ?? data.bat_win_prob ?? 0.5;
+      const bowlProb = 1 - batProb;
 
       // Home gauge (batting team)
       this._gaugeHome = this._renderGauge(
@@ -312,12 +313,20 @@ document.addEventListener('alpine:init', () => {
       const history = data.history || [];
       if (history.length === 0) return;
 
-      const labels = history.map(h => h.ball || h.over?.toString() || '');
-      const probs  = history.map(h => h.bat_win_prob);
+      // history items use: { overs, bat_prob, bowl_prob, score, wickets, innings }
+      const labels = history.map(h => {
+        const o = h.overs ?? h.over ?? '';
+        return o !== '' ? parseFloat(o).toFixed(1) : '';
+      });
+      const probs = history.map(h => h.bat_prob ?? h.bat_win_prob ?? 0.5);
 
-      // Wicket indices for scatter overlay
+      // Detect wickets by comparing successive wickets counts
       const wicketData = history
-        .map((h, i) => h.is_wicket ? { x: i, y: h.bat_win_prob } : null)
+        .map((h, i) => {
+          if (i === 0) return null;
+          const wktDiff = (h.wickets ?? 0) - (history[i - 1].wickets ?? 0);
+          return wktDiff > 0 ? { x: i, y: h.bat_prob ?? h.bat_win_prob ?? 0.5 } : null;
+        })
         .filter(Boolean);
 
       const canvas = document.getElementById('prob-chart');
@@ -415,7 +424,8 @@ document.addEventListener('alpine:init', () => {
       const boundaries = phaseLines();
 
       for (const { over, label } of boundaries) {
-        const idx = history.findIndex(h => (h.over || 0) >= over);
+        // history items use 'overs' (e.g. 6.0) not 'over'
+        const idx = history.findIndex(h => parseFloat(h.overs ?? h.over ?? 0) >= over);
         if (idx > 0) {
           annotations[`phase_${over}`] = {
             type: 'line',
