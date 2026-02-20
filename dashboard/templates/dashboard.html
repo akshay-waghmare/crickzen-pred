@@ -157,6 +157,63 @@
                 </div>
             </div>
 
+            <!-- Current Players -->
+            <div class="card">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">🏏 At the Crease</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+                    <!-- Batsman 1 (striker) -->
+                    <div class="bg-surface-700/50 rounded-xl px-4 py-3 flex items-center gap-3 border border-surface-600">
+                        <span class="text-2xl">🏏</span>
+                        <div class="min-w-0">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide">Striker</p>
+                            <p class="text-white font-semibold truncate" x-text="$store.dashboard.state.batsman1_name || '—'"></p>
+                            <p class="text-emerald-400 text-sm tabular-nums">
+                                <span x-text="$store.dashboard.state.batsman1_runs ?? '—'"></span>
+                                <span class="text-gray-500">(</span><span class="text-gray-300" x-text="$store.dashboard.state.batsman1_balls ?? '—'"></span><span class="text-gray-500">)</span>
+                                <template x-if="$store.dashboard.state.batsman1_balls > 0">
+                                    <span class="text-gray-500 text-xs ml-1">SR <span class="text-gray-400" x-text="((($store.dashboard.state.batsman1_runs / $store.dashboard.state.batsman1_balls) * 100) || 0).toFixed(0)"></span></span>
+                                </template>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Batsman 2 (non-striker) -->
+                    <div class="bg-surface-700/50 rounded-xl px-4 py-3 flex items-center gap-3 border border-surface-600">
+                        <span class="text-2xl">🏏</span>
+                        <div class="min-w-0">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide">Non-Striker</p>
+                            <p class="text-white font-semibold truncate" x-text="$store.dashboard.state.batsman2_name || '—'"></p>
+                            <p class="text-gray-300 text-sm tabular-nums">
+                                <span x-text="$store.dashboard.state.batsman2_runs ?? '—'"></span>
+                                <span class="text-gray-500">(</span><span class="text-gray-300" x-text="$store.dashboard.state.batsman2_balls ?? '—'"></span><span class="text-gray-500">)</span>
+                                <template x-if="$store.dashboard.state.batsman2_balls > 0">
+                                    <span class="text-gray-500 text-xs ml-1">SR <span class="text-gray-400" x-text="((($store.dashboard.state.batsman2_runs / $store.dashboard.state.batsman2_balls) * 100) || 0).toFixed(0)"></span></span>
+                                </template>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bowler -->
+                    <div class="bg-surface-700/50 rounded-xl px-4 py-3 flex items-center gap-3 border border-surface-600">
+                        <span class="text-2xl">🎯</span>
+                        <div class="min-w-0">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide">Bowler</p>
+                            <p class="text-white font-semibold truncate" x-text="$store.dashboard.state.bowler1_name || '—'"></p>
+                            <p class="text-red-400 text-sm tabular-nums" x-show="$store.dashboard.state.bowler1_name" x-cloak>
+                                <span x-text="$store.dashboard.state.bowler1_wickets ?? 0"></span>/<span x-text="$store.dashboard.state.bowler1_runs ?? 0"></span>
+                                <span class="text-gray-500">(</span><span class="text-gray-300" x-text="$store.dashboard.state.bowler1_overs ?? 0"></span><span class="text-gray-500"> ov)</span>
+                                <template x-if="$store.dashboard.state.bowler1_overs > 0">
+                                    <span class="text-gray-500 text-xs ml-1">Econ <span class="text-gray-400" x-text="(($store.dashboard.state.bowler1_runs / $store.dashboard.state.bowler1_overs) || 0).toFixed(1)"></span></span>
+                                </template>
+                            </p>
+                            <p class="text-gray-500 text-sm" x-show="!$store.dashboard.state.bowler1_name" x-cloak>Fetching…</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <!-- Probability Timeline Chart -->
             <div class="card">
                 <div class="flex items-center justify-between mb-4">
