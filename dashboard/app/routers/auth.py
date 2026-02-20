@@ -43,6 +43,12 @@ class CreateUserRequest(BaseModel):
     password: str
 
 
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    confirm_password: str
+
+
 class UserResponse(BaseModel):
     id: str
     email: str
@@ -196,6 +202,60 @@ def create_user(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered",
+        )
+
+    user = User(
+        email=body.email,
+        hashed_password=hash_password(body.password),
+        is_active=True,
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    return UserResponse(id=user.id, email=user.email, is_active=user.is_active)
+
+
+# ---------------------------------------------------------------------------
+# POST /auth/register  (public self-registration)
+# ---------------------------------------------------------------------------
+
+
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("5/minute")
+def register(
+    request: Request,
+    body: RegisterRequest,
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
+):
+    """Self-registration endpoint. Only available when REGISTRATION_OPEN=True."""
+    if not settings.REGISTRATION_OPEN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Registration is currently closed. Contact the administrator.",
+        )
+
+    # Validate passwords match
+    if body.password != body.confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Passwords do not match",
+        )
+
+    # Minimum password length
+    if len(body.password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Password must be at least 8 characters",
+        )
+
+    # Check duplicate email
+    existing = session.exec(select(User).where(User.email == body.email)).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="An account with this email already exists",
         )
 
     user = User(

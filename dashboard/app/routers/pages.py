@@ -20,6 +20,15 @@ def login_page(request: Request, settings: Settings = Depends(get_settings)):
     )
 
 
+@router.get("/register", response_class=HTMLResponse)
+def register_page(request: Request, settings: Settings = Depends(get_settings)):
+    """Render the registration page."""
+    return templates.TemplateResponse(
+        "register.html",
+        {"request": request, "settings": settings},
+    )
+
+
 @router.get("/", response_class=HTMLResponse)
 def dashboard_page(request: Request, settings: Settings = Depends(get_settings)):
     """Render the dashboard page.

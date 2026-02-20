@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     # Capacity
     SESSION_CAP: int = 50
 
+    # Registration
+    # When True: anyone can self-register at /register
+    # When False: only the admin can create users via POST /auth/users
+    REGISTRATION_OPEN: bool = True
+
     # App info
     APP_VERSION: str = "1.0.0"
 
