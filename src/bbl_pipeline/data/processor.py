@@ -1,15 +1,25 @@
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from typing import Optional
 import structlog
 from ..features.calculator import StatsCalculator, ResourceFeatureCalculator
+from ..features.format_config import FormatConfig
 
 logger = structlog.get_logger()
 
-def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path):
+def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
+                     format_config: Optional[FormatConfig] = None):
     """
     Processes raw BBL parquet files into training data and feature store artifacts.
     """
+    if format_config is None:
+        format_config = FormatConfig.t20()
+    
+    total_balls = format_config.total_balls
+    total_overs = format_config.total_overs
+    par_score = format_config.par_score
+    
     logger.info("Starting BBL data processing", input_dir=str(input_dir))
     
     # 1. Load Data
@@ -263,9 +273,6 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     venue_base = venue_base.merge(bat_first_team, on='match_id')
     venue_base = venue_base.merge(winners, on='match_id')
     venue_base['bat_first_win'] = (venue_base['team_bat_first'] == venue_base['winner']).astype(int)
-    
-    print(f"DEBUG: venue_base shape: {venue_base.shape}")
-    print(f"DEBUG: venue_base duplicates on match_id: {venue_base.duplicated(subset=['match_id']).sum()}")
     
     venue_rolling = calc.calculate_venue_stats(venue_base)
     venue_features = pd.concat([venue_base, venue_rolling], axis=1)
@@ -707,11 +714,10 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     df = df.merge(target_map, on='match_id', how='left')
     
     # 2. Balls Remaining
-    # Standard T20 is 120 balls.
     # ball is 1-6 (usually). over is 0-19.
     # balls_bowled = over * 6 + ball
     df['balls_bowled'] = df['over'] * 6 + df['ball']
-    df['balls_remaining'] = 120 - df['balls_bowled']
+    df['balls_remaining'] = total_balls - df['balls_bowled']
     
     # 3. Required Run Rate (RRR)
     # Only valid for innings 2.
@@ -749,9 +755,12 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     # Powerplay: overs 0-5 (0-35 balls)
     # Middle: overs 6-14 (36-89 balls)
     # Death: overs 15-19 (90-119 balls)
+    # Phase boundaries derived from config
+    pp_balls = format_config.phase_thresholds[format_config.phase_names[0]] * format_config.balls_per_over  # T20: 36, ODI: 60
+    mid_end_balls = (format_config.phase_thresholds[format_config.phase_names[1]] + 1) * format_config.balls_per_over  # T20: 90, ODI: 210
     df['match_phase'] = pd.cut(
         df['balls_bowled'],
-        bins=[-1, 36, 90, 120],
+        bins=[-1, pp_balls, mid_end_balls, total_balls],
         labels=[1, 2, 3]
     ).astype(float)
     
@@ -765,15 +774,15 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     
     # 8. Win Probability Proxy (DLS-like resources remaining)
     # Resources = f(balls_remaining, wickets_in_hand)
-    # Simplified: resource_pct = balls_remaining/120 * (10 - wickets_lost)/10
-    df['resources_remaining'] = (df['balls_remaining'] / 120) * ((10 - df['wickets_lost']) / 10)
+    # Simplified: resource_pct = balls_remaining/total_balls * (10 - wickets_lost)/10
+    df['resources_remaining'] = (df['balls_remaining'] / total_balls) * ((10 - df['wickets_lost']) / 10)
     
     # --- DLS-STYLE RESOURCE FEATURES (HYBRID MODEL) ---
     print("Calculating DLS-style resource features...")
-    resource_calc = ResourceFeatureCalculator()
+    resource_calc = ResourceFeatureCalculator(config=format_config)
     
     # Calculate proper DLS resource percentage
-    df['overs_remaining'] = (120 - df['balls_bowled']) / 6
+    df['overs_remaining'] = (total_balls - df['balls_bowled']) / 6
     
     # Vectorized DLS resource calculation
     def get_dls_resource_pct(row):
@@ -787,7 +796,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     # Expected final score based on DLS resources
     def get_expected_score(row):
         if row['balls_bowled'] <= 0:
-            return 160.0  # PAR_SCORE default
+            return par_score  # PAR_SCORE default
         return resource_calc.calculate_expected_score(
             int(row['current_score']),
             row['balls_bowled'] / 6,  # overs_bowled
@@ -796,10 +805,12 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     
     df['expected_final_score'] = df.apply(get_expected_score, axis=1)
     
-    # Phase indicators
-    df['is_powerplay'] = (df['over'] < 6).astype(int)
-    df['is_middle_overs'] = ((df['over'] >= 6) & (df['over'] < 15)).astype(int)
-    df['is_death_overs'] = (df['over'] >= 15).astype(int)
+    # Phase indicators (3-phase: powerplay/middle/death, boundaries from config)
+    pp_boundary = format_config.phase_thresholds[format_config.phase_names[0]]
+    mid_boundary = format_config.phase_thresholds[format_config.phase_names[1]] + 1
+    df['is_powerplay'] = (df['over'] < pp_boundary).astype(int)
+    df['is_middle_overs'] = ((df['over'] >= pp_boundary) & (df['over'] < mid_boundary)).astype(int)
+    df['is_death_overs'] = (df['over'] >= mid_boundary).astype(int)
     
     # DLS-based pressure index (more accurate than simplified version)
     def get_dls_pressure(row):
@@ -870,7 +881,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     )
     
     # 14. Acceleration potential (wickets in hand * balls remaining normalized)
-    df['acceleration_potential'] = ((10 - df['wickets_lost']) * df['balls_remaining']) / 1200
+    df['acceleration_potential'] = ((10 - df['wickets_lost']) * df['balls_remaining']) / (total_balls * 10)
     
     # 15. Chase difficulty (for innings 2)
     # Combines target, resources, and current position
@@ -1009,10 +1020,10 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path)
     
     # Fill DLS-based features
     df['resource_pct'] = df['resource_pct'].fillna(50.0)
-    df['expected_final_score'] = df['expected_final_score'].fillna(160.0)
+    df['expected_final_score'] = df['expected_final_score'].fillna(par_score)
     df['dls_pressure_index'] = df['dls_pressure_index'].fillna(0.5)
     df['resource_win_prob'] = df['resource_win_prob'].fillna(0.5)
-    df['overs_remaining'] = df['overs_remaining'].fillna(10.0)
+    df['overs_remaining'] = df['overs_remaining'].fillna(total_overs / 2.0)
     df['is_powerplay'] = df['is_powerplay'].fillna(0)
     df['is_middle_overs'] = df['is_middle_overs'].fillna(0)
     df['is_death_overs'] = df['is_death_overs'].fillna(0)

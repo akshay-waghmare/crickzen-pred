@@ -66,7 +66,7 @@ class OOFAnalyzer:
     def __init__(self, model, X: pd.DataFrame, y: np.ndarray, 
                  innings: np.ndarray = None, over: np.ndarray = None, 
                  resource_win_prob: np.ndarray = None,
-                 n_splits: int = 5):
+                 n_splits: int = 5, total_overs: int = 20):
         """
         Initialize analyzer.
         
@@ -75,9 +75,10 @@ class OOFAnalyzer:
             X: Feature matrix
             y: Target values
             innings: Innings indicator (1 or 2), optional
-            over: Over number (1-20), optional
+            over: Over number (1-total_overs), optional
             resource_win_prob: Resource-based win probability feature, optional
             n_splits: Number of folds for cross-validation
+            total_overs: Total overs in format (20 for T20, 50 for ODI)
         """
         self.model = model
         self.X = X
@@ -86,6 +87,26 @@ class OOFAnalyzer:
         self.over = over
         self.resource_win_prob = resource_win_prob
         self.n_splits = n_splits
+        self.total_overs = total_overs
+        
+        # Determine phase names and boundaries based on format
+        if total_overs > 20:
+            # ODI format: 4 phases
+            self.phase_names = ['powerplay', 'middle', 'setup', 'death']
+            self.phase_boundaries = {
+                'powerplay': (1, 10),
+                'middle': (11, 34),
+                'setup': (35, 40),
+                'death': (41, total_overs),
+            }
+        else:
+            # T20 format: 3 phases
+            self.phase_names = ['powerplay', 'middle', 'death']
+            self.phase_boundaries = {
+                'powerplay': (1, 6),
+                'middle': (7, 15),
+                'death': (16, total_overs),
+            }
         
         # Calculate phases if over is provided
         if over is not None:
@@ -94,11 +115,11 @@ class OOFAnalyzer:
             self.phases = None
     
     def _calculate_phases(self, over: np.ndarray) -> np.ndarray:
-        """Calculate phase from over number."""
+        """Calculate phase from over number based on format."""
         phases = np.empty(len(over), dtype='U10')
-        phases[over <= 6] = 'powerplay'
-        phases[(over > 6) & (over <= 15)] = 'middle'
-        phases[over > 15] = 'death'
+        for phase_name, (start, end) in self.phase_boundaries.items():
+            mask = (over >= start) & (over <= end)
+            phases[mask] = phase_name
         return phases
     
     def generate_oof_predictions(self) -> np.ndarray:
@@ -149,7 +170,7 @@ class OOFAnalyzer:
             logger.info('Training Innings×Phase calibrators')
             calibrators['innings_phase'] = {}
             for inn in [1, 2]:
-                for phase in ['powerplay', 'middle', 'death']:
+                for phase in self.phase_names:
                     mask = (self.innings == inn) & (self.phases == phase)
                     if mask.sum() > 50:
                         iso = IsotonicRegression(out_of_bounds='clip')
@@ -161,7 +182,7 @@ class OOFAnalyzer:
             logger.info('Training Brier-Optimized calibrators (per-over)')
             calibrators['brier_optimized'] = {}
             for inn in [1, 2]:
-                for ov in range(1, 21):
+                for ov in range(1, self.total_overs + 1):
                     mask = (self.innings == inn) & (self.over == ov)
                     if mask.sum() > 30:
                         iso = IsotonicRegression(out_of_bounds='clip')
@@ -174,7 +195,7 @@ class OOFAnalyzer:
             calibrators['ece_optimized'] = {}
             n_bins = 15
             for inn in [1, 2]:
-                for phase in ['powerplay', 'middle', 'death']:
+                for phase in self.phase_names:
                     mask = (self.innings == inn) & (self.phases == phase)
                     if mask.sum() > 50:
                         probs = oof_probs[mask]
@@ -208,7 +229,7 @@ class OOFAnalyzer:
             logger.info('Training LogLoss-Optimized calibrators (Platt scaling)')
             calibrators['logloss_optimized'] = {}
             for inn in [1, 2]:
-                for phase in ['powerplay', 'middle', 'death']:
+                for phase in self.phase_names:
                     mask = (self.innings == inn) & (self.phases == phase)
                     if mask.sum() > 50:
                         platt = LogisticRegression(C=1e10, solver='lbfgs', max_iter=1000)
@@ -237,7 +258,7 @@ class OOFAnalyzer:
         if 'innings_phase' in calibrators and self.innings is not None and self.phases is not None:
             probs = oof_probs.copy()
             for inn in [1, 2]:
-                for phase in ['powerplay', 'middle', 'death']:
+                for phase in self.phase_names:
                     key = f'inn{inn}_{phase}'
                     if key in calibrators['innings_phase']:
                         mask = (self.innings == inn) & (self.phases == phase)
@@ -248,7 +269,7 @@ class OOFAnalyzer:
         if 'brier_optimized' in calibrators and self.innings is not None and self.over is not None:
             probs = oof_probs.copy()
             for inn in [1, 2]:
-                for ov in range(1, 21):
+                for ov in range(1, self.total_overs + 1):
                     key = f'inn{inn}_over{ov}'
                     if key in calibrators['brier_optimized']:
                         mask = (self.innings == inn) & (self.over == ov)
@@ -259,7 +280,7 @@ class OOFAnalyzer:
         if 'ece_optimized' in calibrators and self.innings is not None and self.phases is not None:
             probs = oof_probs.copy()
             for inn in [1, 2]:
-                for phase in ['powerplay', 'middle', 'death']:
+                for phase in self.phase_names:
                     key = f'inn{inn}_{phase}'
                     if key in calibrators['ece_optimized']:
                         mask = (self.innings == inn) & (self.phases == phase)
@@ -270,7 +291,7 @@ class OOFAnalyzer:
         if 'logloss_optimized' in calibrators and self.innings is not None and self.phases is not None:
             probs = oof_probs.copy()
             for inn in [1, 2]:
-                for phase in ['powerplay', 'middle', 'death']:
+                for phase in self.phase_names:
                     key = f'inn{inn}_{phase}'
                     if key in calibrators['logloss_optimized']:
                         mask = (self.innings == inn) & (self.phases == phase)
@@ -314,7 +335,7 @@ class OOFAnalyzer:
             # Per-innings×phase metrics
             if self.innings is not None and self.phases is not None:
                 for inn in [1, 2]:
-                    for phase in ['powerplay', 'middle', 'death']:
+                    for phase in self.phase_names:
                         mask = (self.innings == inn) & (self.phases == phase)
                         if mask.sum() > 0:
                             row = {
@@ -420,7 +441,7 @@ class OOFAnalyzer:
         # Per-innings×phase
         if self.innings is not None and self.phases is not None:
             for inn in [1, 2]:
-                for phase in ['powerplay', 'middle', 'death']:
+                for phase in self.phase_names:
                     mask = (self.innings == inn) & (self.phases == phase)
                     if mask.sum() > 0:
                         results.append({
@@ -543,7 +564,7 @@ class OOFAnalyzer:
         if self.innings is not None and self.phases is not None:
             report_lines.append("\n\n## Per-Innings × Phase Breakdown\n")
             for inn in [1, 2]:
-                for phase in ['powerplay', 'middle', 'death']:
+                for phase in self.phase_names:
                     segment = f'inn{inn}_{phase}'
                     phase_df = results_df[results_df['segment'] == segment].copy()
                     if not phase_df.empty:
@@ -589,7 +610,7 @@ class OOFAnalyzer:
             # Per-innings×phase
             if self.innings is not None and self.phases is not None:
                 for inn in [1, 2]:
-                    for phase in ['powerplay', 'middle', 'death']:
+                    for phase in self.phase_names:
                         segment = f'inn{inn}_{phase}'
                         seg_df = results_df[results_df['segment'] == segment]
                         if not seg_df.empty:
@@ -614,7 +635,7 @@ class OOFAnalyzer:
         for metric in ['brier', 'ece', 'logloss']:
             segments = ['overall'] + [f'innings_{inn}' for inn in [1, 2]]
             if self.innings is not None and self.phases is not None:
-                segments += [f'inn{inn}_{phase}' for inn in [1, 2] for phase in ['powerplay', 'middle', 'death']]
+                segments += [f'inn{inn}_{phase}' for inn in [1, 2] for phase in self.phase_names]
             
             wins = {}
             for segment in segments:

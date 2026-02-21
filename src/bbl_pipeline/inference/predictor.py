@@ -14,6 +14,7 @@ from .schema import MatchState
 from .realtime_mapper import RealTimeFeatureMapper
 from ..features.store import InMemoryFeatureStore
 from ..features.calculator import ResourceFeatureCalculator
+from ..features.format_config import FormatConfig
 
 logger = structlog.get_logger()
 
@@ -75,13 +76,15 @@ class Predictor:
     """
     def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], 
                  calibrator=None, calibrator_inn1=None, calibrator_inn2=None, phase_calibrators=None, 
-                 per_over_calibrators=None, calibrator_type='none', league_calibrator=None, model_dir: str = None):
+                 per_over_calibrators=None, calibrator_type='none', league_calibrator=None, model_dir: str = None,
+                 format_config: FormatConfig = None):
         # Wrap ensemble model dict if needed
         if isinstance(model, dict) and 'xgb_model' in model:
             self.model = EnsembleModelWrapper(model)
         else:
             self.model = model
         self.model_dir = model_dir  # Store model directory for reference
+        self.format_config = format_config or FormatConfig.t20()
         self.feature_store = feature_store
         self.global_stats = global_stats
         self.calibrator = calibrator  # Single calibrator (legacy/backward compatible)
@@ -91,9 +94,9 @@ class Predictor:
         self.per_over_calibrators = per_over_calibrators  # Per-over (brier_optimized) calibrators dict
         self.calibrator_type = calibrator_type  # 'innings_phase_specific', 'innings_specific', 'single', 'legacy', or 'none'
         self.league_calibrator = league_calibrator  # League-specific temperature/platt calibrator
-        self.resource_calculator = ResourceFeatureCalculator()
+        self.resource_calculator = ResourceFeatureCalculator(config=self.format_config)
         # Use RealTimeFeatureMapper for proper feature generation
-        self.feature_mapper = RealTimeFeatureMapper(feature_store, global_stats)
+        self.feature_mapper = RealTimeFeatureMapper(feature_store, global_stats, format_config=self.format_config)
 
     @classmethod
     def load(cls, model_dir: str | Path, feature_store_dir: str | Path = None, league: str = None):
@@ -325,7 +328,10 @@ class Predictor:
             else:
                 logger.warning(f"League calibrator not found at {league_cal_path}")
         
-        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type, league_calibrator, model_dir=str(path))
+        # Resolve FormatConfig from league
+        format_config = FormatConfig.from_league(league) if league else FormatConfig.t20()
+        
+        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type, league_calibrator, model_dir=str(path), format_config=format_config)
 
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
@@ -345,7 +351,7 @@ class Predictor:
         bowler_econ = bowler_stats.get('bowler_rolling_econ', self.global_stats.get('global_bowling_econ', 7.5))
         bowler_sr = bowler_stats.get('bowler_rolling_sr', self.global_stats.get('global_bowling_sr', 20.0))
         
-        venue_score = venue_stats.get('venue_avg_score', 160.0)
+        venue_score = venue_stats.get('venue_avg_score', self.format_config.par_score)
         venue_wickets = venue_stats.get('venue_avg_wickets', 6.0)
         venue_win_rate = venue_stats.get('venue_bat_first_win_rate', 0.5)
 
@@ -637,13 +643,16 @@ class Predictor:
             per_over_calibrator = None
             
             # Determine phase and over
-            current_over = int(state.over) + 1  # state.over is 0-19, we need 1-20
-            if current_over <= 6:
-                phase = 'powerplay'
-            elif current_over <= 15:
-                phase = 'middle'
-            else:
-                phase = 'death'
+            current_over = int(state.over) + 1  # state.over is 0-indexed, we need 1-indexed
+            thresholds = self.format_config.phase_thresholds
+            phase_names = self.format_config.phase_names
+            # Walk through phases in order; assign the first phase whose
+            # upper boundary has not been reached yet, falling back to the last phase.
+            phase = phase_names[-1]  # default to last phase
+            for pname in phase_names:
+                if current_over <= thresholds.get(pname, 999):
+                    phase = pname
+                    break
             
             phase_key = f'inn{state.innings}_{phase}'
             
@@ -747,7 +756,7 @@ class Predictor:
             # This preserves calibration integrity and makes evaluation straightforward.
             if state.innings == 2 and state.target_runs:
                 runs_needed = state.target_runs - state.current_score
-                balls_remaining = (20 - state.over) * 6 - state.ball
+                balls_remaining = (self.format_config.total_overs - state.over) * 6 - state.ball
                 wickets_remaining = 10 - state.wickets_lost
                 rrr = runs_needed / (balls_remaining / 6) if balls_remaining > 0 else float('inf')
                 
@@ -914,12 +923,12 @@ class Predictor:
                 scores[i] = state.current_score
                 overs[i] = state.over
                 balls[i] = state.ball
-                balls_remaining[i] = (20 - state.over) * 6 - state.ball
+                balls_remaining[i] = (self.format_config.total_overs - state.over) * 6 - state.ball
             else:
                 # Simulation MatchState
                 scores[i] = state.score
                 balls_remaining[i] = state.balls_remaining
-                balls_bowled = 120 - state.balls_remaining
+                balls_bowled = self.format_config.total_balls - state.balls_remaining
                 overs[i] = balls_bowled // 6
                 balls[i] = balls_bowled % 6
                 if balls[i] == 0 and overs[i] > 0:
@@ -1040,14 +1049,14 @@ class Predictor:
             venue_avg_score = feature_context.venue_avg_score
             venue_bat_first_win_rate = feature_context.venue_bat_first_wr
         else:
-            venue_avg_score = 165.0
+            venue_avg_score = self.format_config.par_score
             venue_bat_first_win_rate = 0.45
         venue_avg_wickets = 6.5
         
         # Derived features (vectorized from calculator outputs)
         projected_vs_venue_avg = projected_score - venue_avg_score
         score_per_wicket = nt_scores / (nt_wickets + 1)
-        wickets_times_balls = nt_wickets * (120 - nt_balls_remaining)
+        wickets_times_balls = nt_wickets * (self.format_config.total_balls - nt_balls_remaining)
         rrr_times_wickets = required_run_rate * nt_wickets
         
         chase_difficulty = np.where(

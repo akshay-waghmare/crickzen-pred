@@ -11,6 +11,7 @@ from pathlib import Path
 from .schema import MatchState
 from ..features.store import InMemoryFeatureStore
 from ..features.calculator import ResourceFeatureCalculator
+from ..features.format_config import FormatConfig
 
 logger = structlog.get_logger()
 
@@ -26,17 +27,20 @@ class RealTimeFeatureMapper:
     4. Resource-based feature generation (DLS, pressure, etc.)
     """
     
-    def __init__(self, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float]):
+    def __init__(self, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float],
+                 format_config: FormatConfig = None):
         """
         Initialize the mapper.
         
         Args:
             feature_store: Store for historical player/venue statistics
             global_stats: Global fallback statistics
+            format_config: Format configuration (T20 or ODI). Defaults to T20.
         """
         self.feature_store = feature_store
         self.global_stats = global_stats
-        self.resource_calculator = ResourceFeatureCalculator()
+        self.format_config = format_config or FormatConfig.t20()
+        self.resource_calculator = ResourceFeatureCalculator(config=self.format_config)
         self.ball_history = []
     
     def _update_history(self, current_ball_data: Dict[str, Any]):
@@ -228,8 +232,9 @@ class RealTimeFeatureMapper:
         wickets_lost = scraped_data.get('total_wickets', 0)
         
         # --- Calculated Basic Features ---
-        overs_remaining = 20 - over - (ball / 6.0)
-        balls_remaining = (20 * 6) - (over * 6 + ball)
+        total_overs = self.format_config.total_overs
+        overs_remaining = total_overs - over - (ball / 6.0)
+        balls_remaining = (total_overs * 6) - (over * 6 + ball)
         wickets_remaining = 10 - wickets_lost
         
         # --- Historical Player/Venue Stats (from FeatureStore) ---
@@ -256,7 +261,7 @@ class RealTimeFeatureMapper:
         bowler_rolling_sr = bowler_stats.get('bowler_rolling_sr',
                                               self.global_stats.get('global_bowling_sr', 20.0))
         
-        venue_avg_score = venue_stats.get('venue_avg_score', 160.0)
+        venue_avg_score = venue_stats.get('venue_avg_score', self.format_config.par_score)
         venue_avg_wickets = venue_stats.get('venue_avg_wickets', 6.0)
         venue_bat_first_win_rate = venue_stats.get('venue_bat_first_win_rate', 0.5)
         
@@ -329,9 +334,13 @@ class RealTimeFeatureMapper:
         runs_required = scraped_data.get('runs_needed', 0) if innings == 2 else 0
         
         # --- Phase Features ---
-        is_powerplay = int(scraped_data.get('powerplay', over < 6))
-        is_middle_overs = int(scraped_data.get('middle_overs', (over >= 6 and over < 16)))
-        is_death_overs = int(scraped_data.get('death_overs', over >= 16))
+        thresholds = self.format_config.phase_thresholds
+        pp_limit = thresholds.get('powerplay', 6)
+        mid_limit = thresholds.get('middle', 15)
+        death_limit = thresholds.get('death', total_overs)
+        is_powerplay = int(scraped_data.get('powerplay', over < pp_limit))
+        is_middle_overs = int(scraped_data.get('middle_overs', (over >= pp_limit and over < mid_limit)))
+        is_death_overs = int(scraped_data.get('death_overs', over >= mid_limit))
         
         # --- Pressure Index ---
         # Match training calculation: RRR * (1 + wickets_lost * 0.15) for innings 2
@@ -361,7 +370,7 @@ class RealTimeFeatureMapper:
         
         projected_vs_venue_avg = projected_score - venue_avg_score
         score_per_wicket = current_score / (wickets_lost + 1)
-        wickets_times_balls = wickets_lost * (120 - balls_remaining)
+        wickets_times_balls = wickets_lost * (self.format_config.total_balls - balls_remaining)
         rrr_times_wickets = required_run_rate * wickets_lost
         chase_difficulty = required_run_rate / (current_run_rate + 0.1) if innings == 2 else 0
         

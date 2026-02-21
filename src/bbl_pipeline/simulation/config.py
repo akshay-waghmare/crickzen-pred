@@ -22,18 +22,19 @@ POWERPLAY_END_OVER = 6  # After over 6, middle begins
 MIDDLE_END_OVER = 15    # After over 15, death begins
 
 
-def get_phase(balls_remaining: int) -> str:
+def get_phase(balls_remaining: int, total_balls: int = 120) -> str:
     """
     Determine game phase based on balls remaining.
     
     Args:
-        balls_remaining: Balls remaining in innings (1-120)
+        balls_remaining: Balls remaining in innings (1-total_balls)
+        total_balls: Total balls in innings (120 for T20, 300 for ODI)
         
     Returns:
         Phase name: 'powerplay', 'middle', or 'death'
         
     Examples:
-        >>> get_phase(120)  # Start of innings
+        >>> get_phase(120)  # Start of T20 innings
         'powerplay'
         >>> get_phase(84)   # After 6 overs
         'middle'
@@ -43,7 +44,7 @@ def get_phase(balls_remaining: int) -> str:
     if balls_remaining <= 0:
         return "death"  # Edge case: innings over
     
-    overs_completed = (120 - balls_remaining) / 6
+    overs_completed = (total_balls - balls_remaining) / 6
     
     if overs_completed < POWERPLAY_END_OVER:
         return "powerplay"

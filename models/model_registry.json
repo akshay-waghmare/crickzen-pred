@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-02-15",
+  "last_updated": "2026-02-21",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -723,6 +723,69 @@
         "version": "v1",
         "generated_date": "2026-02-15",
         "training_data_samples": 414237
+      }
+    },
+    "ODM_MALE": {
+      "path": "models/odm_male_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1801, ECE: 0.0000)",
+      "training": {
+        "samples": 778174,
+        "date": "2026-02-21",
+        "brier_score": 0.1801343493390713
+      },
+      "calibrator": {
+        "path": "models/odm_male_v1/isotonic_calibrator.pkl",
+        "type": "isotonic_regression",
+        "generated_date": "2026-02-21T10:51:27.452122",
+        "oof_metrics": {
+          "brier_raw": 0.1839987158294996,
+          "brier_calibrated": 0.18323180658899055,
+          "ece_raw": 0.012382969439904416,
+          "ece_calibrated": 0.00028482061852492
+        },
+        "n_features": 25,
+        "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
+      },
+      "feature_store": {
+        "path": "data/odm_male_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-02-21",
+        "training_data_samples": 778174
+      }
+    },
+    "ODM_FEMALE": {
+      "path": "models/odm_female_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1700, ECE: 0.0000)",
+      "training": {
+        "samples": 143369,
+        "date": "2026-02-21",
+        "brier_score": 0.1700482003274481
+      },
+      "calibrator": {},
+      "feature_store": {
+        "path": "data/odm_female_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-02-21",
+        "training_data_samples": 143369
+      }
+    },
+    "ODI": {
+      "path": "models/odi_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1598, ECE: 0.0000)",
+      "training": {
+        "samples": 1587026,
+        "date": "2026-02-21",
+        "brier_score": 0.1598339754206135
+      },
+      "calibrator": {},
+      "feature_store": {
+        "path": "data/odi_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-02-21",
+        "training_data_samples": 1587026
       }
     }
   },

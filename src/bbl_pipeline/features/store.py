@@ -23,15 +23,18 @@ VENUE_ALIASES = {
     'Sydney Cricket Ground': 'Sydney Cricket Ground',
     
     # Perth (WACA / Optus Stadium)
-    'WACA Ground': 'Perth Stadium',
-    'W.A.C.A. Ground': 'Perth Stadium',
+    'WACA Ground': 'Western Australia Cricket Association Ground, Perth',
+    'WACA Ground, Perth': 'Western Australia Cricket Association Ground, Perth',
+    'W.A.C.A. Ground': 'Western Australia Cricket Association Ground, Perth',
+    'International Cricket Stadium': 'Western Australia Cricket Association Ground, Perth',
     'Optus Stadium': 'Perth Stadium',
     'Perth Stadium': 'Perth Stadium',
+    'WACA': 'Western Australia Cricket Association Ground, Perth',
     
     # The Gabba
-    'The Gabba': 'Brisbane Cricket Ground',
-    'Brisbane Cricket Ground': 'Brisbane Cricket Ground',
-    'Gabba': 'Brisbane Cricket Ground',
+    'The Gabba': 'Brisbane Cricket Ground, Woolloongabba, Brisbane',
+    'Brisbane Cricket Ground': 'Brisbane Cricket Ground, Woolloongabba, Brisbane',
+    'Gabba': 'Brisbane Cricket Ground, Woolloongabba, Brisbane',
     
     # Adelaide Oval
     'Adelaide Oval': 'Adelaide Oval',
@@ -44,8 +47,9 @@ VENUE_ALIASES = {
     'Docklands': 'Docklands',
     
     # Bellerive Oval
-    'Bellerive Oval': 'Bellerive Oval',
-    'Blundstone Arena': 'Bellerive Oval',
+    'Bellerive Oval': 'Bellerive Oval, Hobart',
+    'Blundstone Arena': 'Bellerive Oval, Hobart',
+    'Blundstone Arena, Hobart': 'Bellerive Oval, Hobart',
     
     # Manuka Oval
     'Manuka Oval': 'Manuka Oval',
@@ -55,10 +59,12 @@ VENUE_ALIASES = {
     'Metricon Stadium': 'Carrara Oval',
     
     # North Sydney Oval
-    'North Sydney Oval': 'North Sydney Oval',
+    'North Sydney Oval': 'North Sydney Oval, Sydney',
+    'North Sydney Oval, Sydney': 'North Sydney Oval, Sydney',
     
     # Junction Oval
-    'Junction Oval': 'Junction Oval',
+    'Junction Oval': 'Junction Oval, Melbourne',
+    'Junction Oval, Melbourne': 'Junction Oval, Melbourne',
     
     # Traeger Park
     'Traeger Park': 'Traeger Park',
@@ -213,6 +219,76 @@ VENUE_ALIASES = {
     'Saurashtra Cricket Association Stadium, Rajkot': 'Saurashtra Cricket Association Stadium, Rajkot',
     'SCA Stadium': 'Saurashtra Cricket Association Stadium, Rajkot',
     'Rajkot Stadium': 'Saurashtra Cricket Association Stadium, Rajkot',
+
+    # English County Grounds (ODM venues)
+    'Edgbaston': 'Edgbaston, Birmingham',
+    'Edgbaston, Birmingham': 'Edgbaston, Birmingham',
+    "Lord's": "Lord's, London",
+    "Lord's, London": "Lord's, London",
+    "Lord's Cricket Ground": "Lord's, London",
+    'Trent Bridge': 'Trent Bridge, Nottingham',
+    'Trent Bridge, Nottingham': 'Trent Bridge, Nottingham',
+    'Old Trafford': 'Old Trafford, Manchester',
+    'Old Trafford, Manchester': 'Old Trafford, Manchester',
+    'Emirates Old Trafford': 'Old Trafford, Manchester',
+    'Headingley': 'Headingley, Leeds',
+    'Headingley, Leeds': 'Headingley, Leeds',
+    'Headingley Carnegie': 'Headingley, Leeds',
+    'The Rose Bowl': 'The Rose Bowl, Southampton',
+    'The Rose Bowl, Southampton': 'The Rose Bowl, Southampton',
+    'Rose Bowl': 'The Rose Bowl, Southampton',
+    'Ageas Bowl': 'The Rose Bowl, Southampton',
+    'Utilita Bowl': 'The Rose Bowl, Southampton',
+    'The Oval': 'Kennington Oval, London',
+    'Kennington Oval': 'Kennington Oval, London',
+    'Kennington Oval, London': 'Kennington Oval, London',
+    'Kia Oval': 'Kennington Oval, London',
+    'Sophia Gardens': 'Sophia Gardens, Cardiff',
+    'Sophia Gardens, Cardiff': 'Sophia Gardens, Cardiff',
+    'SWALEC Stadium': 'Sophia Gardens, Cardiff',
+    'Riverside': 'Riverside Ground, Chester-le-Street',
+    'Riverside Ground': 'Riverside Ground, Chester-le-Street',
+    'Riverside Ground, Chester-le-Street': 'Riverside Ground, Chester-le-Street',
+    'Emirates Riverside': 'Riverside Ground, Chester-le-Street',
+    'Seat Unique Riverside': 'Riverside Ground, Chester-le-Street',
+    'St Lawrence Ground': 'St Lawrence Ground, Canterbury',
+    'St Lawrence Ground, Canterbury': 'St Lawrence Ground, Canterbury',
+    'Spitfire Ground': 'St Lawrence Ground, Canterbury',
+    'County Ground, Bristol': 'County Ground, Bristol',
+    'County Ground, Chelmsford': 'County Ground, Chelmsford',
+    'County Ground, Derby': 'County Ground, Derby',
+    'County Ground, Hove': 'County Ground, Hove',
+    'County Ground, New Road, Worcester': 'County Ground, New Road, Worcester',
+    'New Road, Worcester': 'County Ground, New Road, Worcester',
+    'County Ground, Northampton': 'County Ground, Northampton',
+    'County Ground, Taunton': 'County Ground, Taunton',
+    'Cooper Associates County Ground': 'The Cooper Associates County Ground, Taunton',
+    'The Cooper Associates County Ground, Taunton': 'The Cooper Associates County Ground, Taunton',
+    'Grace Road': 'Grace Road, Leicester',
+    'Grace Road, Leicester': 'Grace Road, Leicester',
+    'Uptonsteel County Ground': 'Grace Road, Leicester',
+    'North Marine Road Ground': 'North Marine Road Ground, Scarborough',
+    'North Marine Road Ground, Scarborough': 'North Marine Road Ground, Scarborough',
+    'Scarborough': 'North Marine Road Ground, Scarborough',
+
+    # Additional Australian ODM Venues
+    'Karen Rolton Oval': 'Karen Rolton Oval, Adelaide',
+    'Karen Rolton Oval, Adelaide': 'Karen Rolton Oval, Adelaide',
+    'Allan Border Field': 'Allan Border Field, Brisbane',
+    'Allan Border Field, Brisbane': 'Allan Border Field, Brisbane',
+    'Cricket Central': 'Cricket Central, Sydney',
+    'Cricket Central, Sydney': 'Cricket Central, Sydney',
+    'Bankstown Oval': 'Bankstown Oval, Sydney',
+    'Bankstown Oval, Sydney': 'Bankstown Oval, Sydney',
+    'Kingston Twin Ovals': 'Kingston Twin Ovals, Hobart',
+    'Kingston Twin Ovals, Hobart': 'Kingston Twin Ovals, Hobart',
+    'Great Barrier Reef Arena': 'Great Barrier Reef Arena, Mackay',
+    'Great Barrier Reef Arena, Mackay': 'Great Barrier Reef Arena, Mackay',
+    'Riverway Stadium': 'Riverway Stadium, Townsville',
+    'Riverway Stadium, Townsville': 'Riverway Stadium, Townsville',
+    'University of Tasmania Stadium': 'University of Tasmania Stadium, Launceston',
+    'University of Tasmania Stadium, Launceston': 'University of Tasmania Stadium, Launceston',
+    'UTAS Stadium': 'University of Tasmania Stadium, Launceston',
 }
 
 class FeatureStore(Protocol):
@@ -446,6 +522,18 @@ class InMemoryFeatureStore:
         'NAM': 'Namibia', 'NEP': 'Nepal', 'OMA': 'Oman', 'PNG': 'Papua New Guinea',
         'HK': 'Hong Kong', 'KEN': 'Kenya', 'UGA': 'Uganda', 'GER': 'Germany',
         'JER': 'Jersey', 'USA': 'United States of America', 'CAN': 'Canada',
+        
+        # Australian Domestic ODM (One-Day Cup / Marsh Cup)
+        'QLD': 'Queensland', 'SACA': 'South Australia', 'NSW': 'New South Wales',
+        'VIC': 'Victoria', 'WA': 'Western Australia', 'TAS': 'Tasmania',
+        
+        # English County Teams (Royal London One-Day Cup)
+        'DER': 'Derbyshire', 'DUR': 'Durham', 'GLO': 'Gloucestershire',
+        'GLA': 'Glamorgan', 'HAM': 'Hampshire', 'LAN': 'Lancashire',
+        'LEI': 'Leicestershire', 'MDX': 'Middlesex', 'NOR': 'Northamptonshire',
+        'NOT': 'Nottinghamshire', 'SOM': 'Somerset', 'SUR': 'Surrey',
+        'SUS': 'Sussex', 'WAR': 'Warwickshire', 'WOR': 'Worcestershire',
+        'YOR': 'Yorkshire', 'ESS': 'Essex',
     }
 
     TEAM_ABBREVIATIONS_T20I = {
@@ -511,7 +599,7 @@ class InMemoryFeatureStore:
     # Model trained on historical win rates (~0.55), but CREX can show 0.90 vs 0.30
     # which creates team_strength_diff=0.60 (6x larger than training distribution).
     # Use historical feature store data only for consistency.
-    USE_SEASON_OVERRIDES = False
+    USE_SEASON_OVERRIDES = True
     
     # =====================================================================
     # VENUE SITUATION STATS - Bat/Bowl first win rates from current venue
@@ -526,7 +614,7 @@ class InMemoryFeatureStore:
     # Fixes inflated WRs for associate teams (e.g. UAE 56% all → 33% vs FM)
     # Toggle USE_FM_OVERRIDES=True to use these during T20I inference
     # =====================================================================
-    USE_FM_OVERRIDES = True
+    USE_FM_OVERRIDES = False
     FM_OVERRIDES = {
         # T20I teams: win rates computed ONLY vs ICC Full Member opponents
         # Source: t20_international_male_raw matches, filtered Feb 2026

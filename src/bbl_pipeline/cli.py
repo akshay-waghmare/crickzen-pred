@@ -296,15 +296,22 @@ def validate(ctx, data_dir):
 @click.option('--input-dir', required=True, help="Directory containing raw parquet files (e.g. data/bbl_raw/matches)")
 @click.option('--output-dir', required=True, help="Directory to save training data")
 @click.option('--feature-store-dir', required=True, help="Directory to save feature store artifacts")
-def process(input_dir, output_dir, feature_store_dir):
+@click.option('--league', type=str, default=None, help="League identifier for format-specific config (e.g. 'odi', 'bbl'). Defaults to T20.")
+def process(input_dir, output_dir, feature_store_dir, league):
     """Process raw data into training features."""
     from bbl_pipeline.data.processor import process_bbl_data
+    from bbl_pipeline.features.format_config import FormatConfig
+    
+    # Resolve format config from league
+    format_config = FormatConfig.from_league(league) if league else FormatConfig.t20()
+    click.echo(f"Format: {format_config.format_name} ({format_config.total_overs} overs, par={format_config.par_score})")
     
     try:
         process_bbl_data(
             Path(input_dir), 
             Path(output_dir), 
-            Path(feature_store_dir)
+            Path(feature_store_dir),
+            format_config=format_config,
         )
         click.echo("Data processing complete.")
     except Exception as e:
@@ -534,7 +541,8 @@ def analyze(input_file, model_name):
 @click.option('--target-col', default='is_winner', show_default=True, help='Target column name')
 @click.option('--innings-col', default='innings', show_default=True, help='Innings column name (optional)')
 @click.option('--overs-col', default='overs_remaining', show_default=True, help='Overs remaining column (optional, for phase analysis)')
-def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_col):
+@click.option('--total-overs', type=int, default=None, help='Total overs in format (20 for T20, 50 for ODI). Auto-detected from data if not provided.')
+def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_col, total_overs):
     """
     Comprehensive OOF calibration analysis comparing 7 methods:
     - Raw (uncalibrated)
@@ -576,11 +584,18 @@ def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_
         logger.info('Found resource_win_prob feature for baseline comparison')
     
     if overs_remaining is not None:
+        # Auto-detect total_overs from data if not provided
+        if total_overs is None:
+            max_overs_remaining = float(np.max(overs_remaining))
+            total_overs = 50 if max_overs_remaining > 25 else 20
+            logger.info('Auto-detected format', total_overs=total_overs, max_overs_remaining=max_overs_remaining)
         # Calculate over number from overs_remaining
-        over = np.ceil(20 - overs_remaining).astype(int) + 1
-        over = np.clip(over, 1, 20)
+        over = np.ceil(total_overs - overs_remaining).astype(int) + 1
+        over = np.clip(over, 1, total_overs)
     else:
         over = None
+        if total_overs is None:
+            total_overs = 20  # Default to T20 when no overs data
     
     # Prepare features
     X = df.drop(columns=[target_col])
@@ -624,7 +639,8 @@ def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_
         innings=innings,
         over=over,
         resource_win_prob=resource_win_prob,
-        n_splits=n_splits
+        n_splits=n_splits,
+        total_overs=total_overs
     )
     
     calibrators, results_df = analyzer.run_analysis(output_dir=model_path)
@@ -658,7 +674,8 @@ def analyze_oof(input_file, model_dir, n_splits, target_col, innings_col, overs_
 @click.option('--model-dir', type=click.Path(exists=True), required=True, help='Model directory containing champion_model.joblib')
 @click.option('--n-splits', type=int, default=5, show_default=True, help='Number of folds for OOF predictions')
 @click.option('--target-col', default='is_winner', show_default=True, help='Target column name')
-def generate_oof(input_file, model_dir, n_splits, target_col):
+@click.option('--total-overs', type=int, default=None, help='Total overs in format (20 for T20, 50 for ODI). Auto-detected from data if not provided.')
+def generate_oof(input_file, model_dir, n_splits, target_col, total_overs):
     """Generate an OOF isotonic calibrator (models/.../isotonic_calibrator.pkl) for an existing model."""
     from sklearn.model_selection import KFold
     from sklearn.isotonic import IsotonicRegression
@@ -691,9 +708,14 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
     if has_overs:
         logger.info('Overs column detected - will generate per-over (brier_optimized) calibrators')
         overs_remaining_col = df['overs_remaining'].copy()
+        # Auto-detect total_overs from data if not provided
+        if total_overs is None:
+            max_overs_remaining = float(overs_remaining_col.max())
+            total_overs = 50 if max_overs_remaining > 25 else 20
+            logger.info('Auto-detected format', total_overs=total_overs, max_overs_remaining=max_overs_remaining)
         # Calculate over number from overs_remaining
-        over_col = np.ceil(20 - overs_remaining_col.values).astype(int) + 1
-        over_col = np.clip(over_col, 1, 20)
+        over_col = np.ceil(total_overs - overs_remaining_col.values).astype(int) + 1
+        over_col = np.clip(over_col, 1, total_overs)
     
     if has_phase:
         logger.info('Phase columns detected - will generate innings×phase specific calibrators')
@@ -802,21 +824,34 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
         phase_calibrators = {}
         phase_metrics = {}
         
-        if has_phase:
+        if has_phase or (has_overs and total_overs is not None):
             logger.info('Generating innings×phase specific calibrators')
             
-            # Define phase masks
-            powerplay_mask = (powerplay_col == 1).values
-            death_mask = (death_col == 1).values
-            middle_mask = ~powerplay_mask & ~death_mask
+            # Determine phase masks based on format
+            if has_overs and total_overs is not None and total_overs > 20:
+                # ODI: use over_col for 4-phase system (powerplay/middle/setup/death)
+                phase_masks = [
+                    ('powerplay', (over_col >= 1) & (over_col <= 10)),
+                    ('middle', (over_col >= 11) & (over_col <= 34)),
+                    ('setup', (over_col >= 35) & (over_col <= 40)),
+                    ('death', (over_col >= 41) & (over_col <= total_overs)),
+                ]
+            else:
+                # T20: use binary phase columns
+                powerplay_mask = (powerplay_col == 1).values
+                death_mask = (death_col == 1).values
+                middle_mask = ~powerplay_mask & ~death_mask
+                phase_masks = [
+                    ('powerplay', powerplay_mask),
+                    ('middle', middle_mask),
+                    ('death', death_mask),
+                ]
             
             # Train calibrator for each innings × phase combination
             for inn in [1, 2]:
                 inn_mask = (innings_col == inn).values
                 
-                for phase_name, phase_mask in [('powerplay', powerplay_mask), 
-                                                ('middle', middle_mask), 
-                                                ('death', death_mask)]:
+                for phase_name, phase_mask in phase_masks:
                     mask = inn_mask & phase_mask
                     if mask.sum() >= 10:  # Minimum samples requirement
                         cal = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
@@ -857,7 +892,7 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
             for inn in [1, 2]:
                 inn_mask = (innings_col == inn).values
                 
-                for ov in range(1, 21):
+                for ov in range(1, total_overs + 1):
                     mask = inn_mask & (over_col == ov)
                     if mask.sum() >= 30:  # Minimum samples requirement
                         cal = IsotonicRegression(y_min=0.01, y_max=0.99, out_of_bounds='clip')
@@ -1064,7 +1099,7 @@ def generate_oof(input_file, model_dir, n_splits, target_col):
 @main.command()
 @click.option('--source-dir', type=click.Path(exists=True), default='recently_played_30_male',
               help='Source directory containing recently played JSON files (default: recently_played_30_male)')
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'all']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'odi', 'odm_male', 'odm_female', 'all']), required=True,
               help='League to extract matches for')
 @click.option('--dry-run', is_flag=True, help='Show which files would be copied without actually copying')
 @click.pass_context  
@@ -1093,6 +1128,8 @@ def update_matches(ctx, source_dir, league, dry_run):
         'bpl': ['Bangladesh Premier League', 'BPL'],
         'ssm': ['Super Smash'],
         'wpl': ['Women\'s Premier League', 'WPL'],
+        'odm_male': ['Royal London One-Day Cup', 'Marsh One-Day Cup', 'One-Day Cup', 'Ford Trophy'],
+        'odm_female': ['Rachael Heyhoe Flint Trophy', 'ECB Women\'s One-Day Cup'],
     }
     
     # Target directories for each league
@@ -1103,6 +1140,8 @@ def update_matches(ctx, source_dir, league, dry_run):
         'bpl': 'bpl_male_json',
         'ssm': 'ssm_male_json',
         'wpl': 'wpl_female_json',
+        'odm_male': 'data/odm_male_json',
+        'odm_female': 'data/odm_female_json',
     }
     
     leagues_to_process = list(league_patterns.keys()) if league == 'all' else [league]
@@ -1131,8 +1170,9 @@ def update_matches(ctx, source_dir, league, dry_run):
                 
                 # Check if this matches any of the league patterns
                 if any(pattern.lower() in event_name.lower() for pattern in patterns):
-                    # Also check it's a T20 match
-                    if match_type == 'T20':
+                    # Check it's the correct match format
+                    expected_types = ['ODM'] if lg in ('odm_male', 'odm_female') else ['T20']
+                    if match_type in expected_types:
                         match_num = data.get('info', {}).get('event', {}).get('match_number', '?')
                         teams = data.get('info', {}).get('teams', [])
                         dates = data.get('info', {}).get('dates', ['?'])
@@ -1173,7 +1213,7 @@ def update_matches(ctx, source_dir, league, dry_run):
 
 
 @main.command()
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 't20_male', 't20_female', 't20i_female']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'odi', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_female']), required=True,
               help='League to retrain model for')
 @click.option('--version', type=str, required=True,
               help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
@@ -1207,6 +1247,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/bbl_features',
             'feature_store_dir': 'data/bbl_feature_store',
             'model_prefix': 'bbl',
+            'format_type': 't20',
         },
         'sa20': {
             'json_dir': 'sat_male_json',
@@ -1214,6 +1255,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/sat_features',
             'feature_store_dir': 'data/sat_feature_store',
             'model_prefix': 'sat',
+            'format_type': 't20',
         },
         'ilt20': {
             'json_dir': 'ilt_male_json',
@@ -1221,6 +1263,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/ilt_features',
             'feature_store_dir': 'data/ilt_feature_store',
             'model_prefix': 'ilt20',
+            'format_type': 't20',
         },
         'bpl': {
             'json_dir': 'bpl_male_json',
@@ -1228,6 +1271,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/bpl_features',
             'feature_store_dir': 'data/bpl_feature_store',
             'model_prefix': 'bpl',
+            'format_type': 't20',
         },
         'ssm': {
             'json_dir': 'ssm_male_json',
@@ -1235,6 +1279,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/ssm_features',
             'feature_store_dir': 'data/ssm_feature_store',
             'model_prefix': 'ssm',
+            'format_type': 't20',
         },
         'wpl': {
             'json_dir': 'wpl_female_json',
@@ -1242,6 +1287,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/wpl_features',
             'feature_store_dir': 'data/wpl_feature_store',
             'model_prefix': 'wpl',
+            'format_type': 't20',
         },
         't20_male': {
             'json_dir': 'data/t20_male_json',  # Combined 11 leagues
@@ -1249,6 +1295,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/t20_male_features',
             'feature_store_dir': 'data/t20_male_feature_store',
             'model_prefix': 't20_male',
+            'format_type': 't20',
         },
         't20_female': {
             'json_dir': 'data/t20_female_json',  # Combined 15 female leagues
@@ -1256,6 +1303,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/t20_female_features',
             'feature_store_dir': 'data/t20_female_feature_store',
             'model_prefix': 't20_female',
+            'format_type': 't20',
         },
         't20i_female': {
             'json_dir': 't20i_female_json',
@@ -1263,6 +1311,31 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/t20i_female_features',
             'feature_store_dir': 'data/t20i_female_feature_store',
             'model_prefix': 't20i_female',
+            'format_type': 't20',
+        },
+        'odi': {
+            'json_dir': 'odis_json',
+            'raw_dir': 'data/odi_raw',
+            'features_dir': 'data/odi_features',
+            'feature_store_dir': 'data/odi_feature_store',
+            'model_prefix': 'odi',
+            'format_type': 'odi',
+        },
+        'odm_male': {
+            'json_dir': 'data/odm_male_json',
+            'raw_dir': 'data/odm_male_raw',
+            'features_dir': 'data/odm_male_features',
+            'feature_store_dir': 'data/odm_male_feature_store',
+            'model_prefix': 'odm_male',
+            'format_type': 'odi',
+        },
+        'odm_female': {
+            'json_dir': 'data/odm_female_json',
+            'raw_dir': 'data/odm_female_raw',
+            'features_dir': 'data/odm_female_features',
+            'feature_store_dir': 'data/odm_female_feature_store',
+            'model_prefix': 'odm_female',
+            'format_type': 'odi',
         },
     }
     
@@ -1320,12 +1393,13 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     # Step 2: Process
     if not skip_process:
         click.echo(f"\n⚙️  Step 2/6: PROCESSING (Parquet → Features)")
-        click.echo(f"   bbl-pipeline process --input-dir {cfg['raw_dir']}/matches --output-dir {features_dir} --feature-store-dir {feature_store_dir}")
+        click.echo(f"   bbl-pipeline process --input-dir {cfg['raw_dir']}/matches --output-dir {features_dir} --feature-store-dir {feature_store_dir} --league {league}")
         result = subprocess.run([
             sys.executable, '-m', 'bbl_pipeline.cli', 'process',
             '--input-dir', f"{cfg['raw_dir']}/matches",
             '--output-dir', features_dir,
-            '--feature-store-dir', feature_store_dir
+            '--feature-store-dir', feature_store_dir,
+            '--league', league
         ], capture_output=False)
         if result.returncode != 0:
             click.echo(f"❌ Processing failed!")
@@ -1348,13 +1422,17 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     click.echo(f"   ✅ Training complete")
     
     # Step 4: Generate OOF
+    # Determine total_overs from format_type
+    format_total_overs = 50 if cfg['format_type'] == 'odi' else 20
+    total_overs_args = ['--total-overs', str(format_total_overs)] if cfg['format_type'] == 'odi' else []
+    
     click.echo(f"\n🔧 Step 4/6: GENERATE-OOF (Create calibrators for inference)")
-    click.echo(f"   bbl-pipeline generate-oof --input-file {features_dir}/training.parquet --model-dir {model_dir}")
+    click.echo(f"   bbl-pipeline generate-oof --input-file {features_dir}/training.parquet --model-dir {model_dir}" + (f' --total-overs {format_total_overs}' if total_overs_args else ''))
     result = subprocess.run([
         sys.executable, '-m', 'bbl_pipeline.cli', 'generate-oof',
         '--input-file', f"{features_dir}/training.parquet",
         '--model-dir', model_dir
-    ], capture_output=False)
+    ] + total_overs_args, capture_output=False)
     if result.returncode != 0:
         click.echo(f"❌ Generate-OOF failed!")
         return
@@ -1362,13 +1440,13 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     
     # Step 5: Analyze OOF
     click.echo(f"\n📊 Step 5/6: ANALYZE-OOF (Detailed calibration analysis)")
-    click.echo(f"   bbl-pipeline analyze-oof --input-file {features_dir}/training.parquet --model-dir {model_dir} --n-splits {n_splits}")
+    click.echo(f"   bbl-pipeline analyze-oof --input-file {features_dir}/training.parquet --model-dir {model_dir} --n-splits {n_splits}" + (f' --total-overs {format_total_overs}' if total_overs_args else ''))
     result = subprocess.run([
         sys.executable, '-m', 'bbl_pipeline.cli', 'analyze-oof',
         '--input-file', f"{features_dir}/training.parquet",
         '--model-dir', model_dir,
         '--n-splits', str(n_splits)
-    ], capture_output=False)
+    ] + total_overs_args, capture_output=False)
     if result.returncode != 0:
         click.echo(f"❌ Analyze-OOF failed!")
         return
@@ -1388,6 +1466,8 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
         't20_male': 'T20_MALE',
         't20_female': 'T20_FEMALE',
         't20i_female': 'T20I_FEMALE',
+        'odm_male': 'ODM_MALE',
+        'odm_female': 'ODM_FEMALE',
     }
     
     registry_path = Path('models/model_registry.json')

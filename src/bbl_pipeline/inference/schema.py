@@ -23,6 +23,7 @@ class MatchState:
     
     # Optional enhanced state info
     first_innings_score: Optional[int] = None  # Score of first innings (for 2nd innings context)
+    total_overs: int = 20  # Match format total overs (20 for T20, 50 for ODI)
     
     def get_overs_bowled(self) -> float:
         """Return overs bowled as a float (e.g., 5.3 = 5 overs 3 balls)."""
@@ -32,13 +33,15 @@ class MatchState:
         """Return total balls bowled."""
         return self.over * 6 + self.ball
     
-    def get_overs_remaining(self, total_overs: int = 20) -> float:
+    def get_overs_remaining(self, total_overs: int = None) -> float:
         """Return overs remaining in the innings."""
-        return total_overs - self.get_overs_bowled()
+        total = total_overs if total_overs is not None else self.total_overs
+        return total - self.get_overs_bowled()
     
-    def get_balls_remaining(self, total_overs: int = 20) -> int:
+    def get_balls_remaining(self, total_overs: int = None) -> int:
         """Return balls remaining in the innings."""
-        return (total_overs * 6) - self.get_balls_bowled()
+        total = total_overs if total_overs is not None else self.total_overs
+        return (total * 6) - self.get_balls_bowled()
     
     def get_wickets_remaining(self) -> int:
         """Return wickets in hand."""
@@ -68,12 +71,16 @@ class MatchState:
         return self.current_score / overs_bowled
     
     def is_powerplay(self) -> bool:
-        """Check if current over is in powerplay (overs 1-6)."""
-        return self.over < 6
+        """Check if current over is in powerplay."""
+        # T20: overs 1-6, ODI: overs 1-10
+        pp_limit = 10 if self.total_overs == 50 else 6
+        return self.over < pp_limit
     
     def is_death_overs(self) -> bool:
-        """Check if current over is in death overs (overs 16-20)."""
-        return self.over >= 15
+        """Check if current over is in death overs."""
+        # T20: overs 16-20, ODI: overs 41-50
+        death_start = 40 if self.total_overs == 50 else 15
+        return self.over >= death_start
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for feature extraction."""

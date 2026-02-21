@@ -1,0 +1,163 @@
+# FormatConfig Schema Contract
+
+## Dataclass Definition
+
+```python
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
+
+@dataclass(frozen=True)
+class FormatConfig:
+    """Immutable configuration for cricket format-specific constants."""
+
+    # --- Identity ---
+    format_name: str          # "t20" | "odi"
+    gender: str               # "male" | "female" | "all"
+
+    # --- Match Structure ---
+    total_overs: int          # 20 | 50
+    total_balls: int          # 120 | 300
+    balls_per_over: int = 6
+    total_wickets: int = 10
+
+    # --- Scoring Baselines ---
+    par_score: float          # Average 1st innings total
+    league_avg_score: float   # League average for SQI
+    bat_first_win_rate: float # Historical bat-first win %
+
+    # --- Phase Configuration ---
+    phase_thresholds: Dict[str, int]   # phase_name → last_over_number
+    phase_names: List[str]             # Ordered phase names
+
+    # --- Expected Run Rates ---
+    expected_run_rates: Dict[str, float]  # phase_name → expected_rr
+
+    # --- Resource Tables ---
+    dls_resource_table: Dict[int, Dict[int, float]]            # wickets → {overs_rem: pct}
+    first_innings_wicket_penalty_3d: Dict[str, Dict[str, Dict[int, float]]]
+                                    # phase → ease → wickets → penalty
+    chase_wicket_penalty_2d: Dict[str, Dict[int, float]]
+                                    # chase_ease → wickets → penalty
+
+    # --- Chase Parameters ---
+    rrr_midpoint: float       # RRR where chase win_prob ≈ 50%
+    rrr_beta: float           # Chase RRR logistic steepness
+    chase_ease_thresholds: Dict[str, float]  # category → crr/rrr ratio
+
+    # --- Score Quality ---
+    sqi_beta: float           # SQI → win_prob sigmoid steepness
+    sqi_shift: float          # SQI center shift (bat-first penalty)
+
+    # --- Model Confidence ---
+    confidence_full_overs: float  # Overs until full model confidence
+
+    # --- Projected Score ---
+    score_std_early: float    # Std dev early overs
+    score_std_late: float     # Std dev late overs
+    score_cap_min: float      # Min projected score bound
+    score_cap_max: float      # Max projected score bound
+
+    # --- Endgame ---
+    endgame_balls: int        # Balls remaining threshold for endgame
+
+    # --- Pressure Scale ---
+    pressure_rrr_min: float   # Min RRR for pressure scale
+    pressure_rrr_max: float   # Max RRR for pressure scale
+
+    # --- Ease Category Thresholds ---
+    ease_thresholds: Dict[str, float]  # well_ahead/ahead/par/behind/well_behind
+
+    # ===== Factory Methods =====
+
+    @classmethod
+    def t20(cls) -> 'FormatConfig':
+        """Return T20 format config (current hardcoded defaults)."""
+        ...
+
+    @classmethod
+    def odi(cls, gender: str = 'male') -> 'FormatConfig':
+        """Return ODI format config from empirical analysis."""
+        ...
+
+    @classmethod
+    def from_league(cls, league: str) -> 'FormatConfig':
+        """Resolve format config from league name."""
+        ...
+
+    # ===== Derived Properties =====
+
+    @property
+    def phase_bins_balls(self) -> List[int]:
+        """Phase boundaries in ball numbers for pd.cut."""
+        ...
+
+    @property
+    def total_overs_float(self) -> float:
+        """Total overs as float for division."""
+        ...
+
+    def get_phase(self, over: int) -> str:
+        """Return phase name for a given over number."""
+        ...
+
+    def get_expected_rr(self, over: int) -> float:
+        """Return expected run rate for a given over."""
+        ...
+```
+
+## Invariants
+
+1. `total_balls == total_overs * balls_per_over`
+2. `len(phase_thresholds) == len(phase_names)`
+3. `max(phase_thresholds.values()) == total_overs`
+4. `0 < bat_first_win_rate < 1`
+5. `score_cap_min < par_score < score_cap_max`
+6. All penalty table keys align with `phase_names` and `ease_thresholds`
+
+## T20 Preset Values
+
+```python
+FormatConfig(
+    format_name='t20', gender='male',
+    total_overs=20, total_balls=120,
+    par_score=160.0, league_avg_score=165.0,
+    bat_first_win_rate=0.37,
+    phase_thresholds={'powerplay': 6, 'middle': 14, 'death': 18, 'final': 20},
+    phase_names=['powerplay', 'middle', 'death', 'final'],
+    expected_run_rates={'powerplay': 7.5, 'middle': 7.8, 'death': 9.5, 'final': 11.0},
+    rrr_midpoint=9.5, rrr_beta=0.7,
+    sqi_beta=0.75, sqi_shift=0.35,
+    confidence_full_overs=12.0,
+    score_std_early=15.0, score_std_late=26.0,
+    score_cap_min=100.0, score_cap_max=280.0,
+    endgame_balls=12,
+    pressure_rrr_min=7.0, pressure_rrr_max=15.0,
+    # ... DLS table, penalty tables from current hardcodes
+)
+```
+
+## ODI Preset Values (Placeholder — from empirical analysis)
+
+```python
+FormatConfig(
+    format_name='odi', gender='male',
+    total_overs=50, total_balls=300,
+    par_score=252.0,  # empirical
+    league_avg_score=255.0,
+    bat_first_win_rate=0.48,  # empirical
+    phase_thresholds={'powerplay': 10, 'middle': 34, 'setup': 40, 'death': 50},
+    phase_names=['powerplay', 'middle', 'setup', 'death'],
+    expected_run_rates={'powerplay': 5.2, 'middle': 4.8, 'setup': 6.5, 'death': 8.2},
+    rrr_midpoint=6.0,  # empirical
+    rrr_beta=0.5,
+    sqi_beta=0.6,
+    sqi_shift=0.05,  # ODIs more balanced
+    confidence_full_overs=25.0,
+    score_std_early=20.0,
+    score_std_late=40.0,
+    score_cap_min=100.0, score_cap_max=500.0,
+    endgame_balls=30,
+    pressure_rrr_min=4.0, pressure_rrr_max=10.0,
+    # ... DLS table, penalty tables from empirical analysis
+)
+```

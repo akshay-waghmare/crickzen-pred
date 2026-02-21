@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Optional, Tuple
+
+from bbl_pipeline.features.format_config import FormatConfig
 
 
 class ResourceFeatureCalculator:
@@ -11,9 +13,63 @@ class ResourceFeatureCalculator:
     Key insight: The model benefits from understanding that the same score has very different
     implications depending on overs/wickets remaining. This helps especially for rare or 
     extreme game states the data rarely covers.
+
+    Parameters
+    ----------
+    config : FormatConfig, optional
+        Format-specific constants.  Defaults to ``FormatConfig.t20()`` so that
+        all existing T20 call-sites keep working unchanged.
     """
-    
-    # T20 match constants
+
+    def __init__(self, config: Optional[FormatConfig] = None) -> None:
+        if config is None:
+            config = FormatConfig.t20()
+        self.config = config
+
+        # ── Expose every constant as an instance attribute so existing code
+        #    that reads ``self.TOTAL_OVERS`` etc. keeps working.  The values
+        #    come from the config rather than the class-level literals below
+        #    (which are kept only for documentation purposes).
+        self.TOTAL_OVERS = config.total_overs
+        self.TOTAL_WICKETS = config.total_wickets
+        self.BALLS_PER_OVER = config.balls_per_over
+        self.TOTAL_BALLS = config.total_balls
+
+        self.DLS_RESOURCE_TABLE = config.dls_resource_table
+
+        self.PAR_SCORE_T20 = config.par_score
+
+        self.HISTORICAL_BAT_FIRST_WIN_RATE = config.bat_first_win_rate
+        self.LEAGUE_AVG_SCORE = config.league_avg_score
+        self.WICKET_DECAY_ALPHA = config.wicket_decay_alpha
+
+        self.SCORE_STD_EARLY = config.score_std_early
+        self.SCORE_STD_LATE = config.score_std_late
+        self.CONFIDENCE_FULL_OVERS = config.confidence_full_overs
+
+        self.SQI_BETA = config.sqi_beta
+
+        self.FIRST_INNINGS_SCORE_MIDPOINT = config.first_innings_score_midpoint
+        self.FIRST_INNINGS_SCORE_BETA = config.first_innings_score_beta
+        self.FIRST_INNINGS_WICKET_PENALTY = config.first_innings_wicket_penalty
+
+        self.RRR_BETA = config.rrr_beta
+        self.RRR_MIDPOINT = config.rrr_midpoint
+
+        self.WICKET_PENALTY = config.wicket_penalty
+
+        self.CHASE_EASE_THRESHOLDS = config.chase_ease_thresholds
+        self.WICKET_PENALTY_2D = config.chase_wicket_penalty_2d
+
+        self.FIRST_INNINGS_PHASE_THRESHOLDS = config.phase_thresholds
+        self.FIRST_INNINGS_EXPECTED_RR = config.expected_run_rates
+        self.FIRST_INNINGS_EASE_THRESHOLDS = config.ease_thresholds
+        self.FIRST_INNINGS_WICKET_PENALTY_3D = config.first_innings_wicket_penalty_3d
+
+    # =====================================================================
+    # CLASS-LEVEL CONSTANTS (kept for documentation only — __init__ above
+    # overrides every attribute with config-driven values)
+    # =====================================================================
     TOTAL_OVERS = 20
     TOTAL_WICKETS = 10
     BALLS_PER_OVER = 6
@@ -331,14 +387,14 @@ class ResourceFeatureCalculator:
     
     def get_first_innings_phase(self, overs_bowled: float) -> str:
         """Get the phase name for first innings based on overs bowled."""
-        if overs_bowled < 6:
-            return 'powerplay'
-        elif overs_bowled < 14:
-            return 'middle'
-        elif overs_bowled < 18:
-            return 'death'
-        else:
-            return 'final'
+        phase_names = self.config.phase_names
+        thresholds = self.FIRST_INNINGS_PHASE_THRESHOLDS
+        # Walk through phases in order; return first whose upper boundary
+        # has not been reached yet, falling back to the last phase.
+        for name in phase_names[:-1]:
+            if overs_bowled < thresholds[name]:
+                return name
+        return phase_names[-1]
     
     def get_first_innings_ease_bucket(self, current_run_rate: float, phase: str) -> str:
         """
@@ -390,7 +446,7 @@ class ResourceFeatureCalculator:
             Penalty multiplier (0.0 to 1.0)
         """
         wickets_lost = min(max(wickets_lost, 0), 10)
-        overs_bowled = min(max(overs_bowled, 0), 20)
+        overs_bowled = min(max(overs_bowled, 0), self.TOTAL_OVERS)
         current_run_rate = max(0, current_run_rate)
         
         # Get current phase and ease bucket
@@ -403,12 +459,13 @@ class ResourceFeatureCalculator:
         base_penalty = ease_table.get(wickets_lost, 0.5)
         
         # Interpolate between phases for smoother transitions
-        phase_boundaries = [
-            ('powerplay', 0, 6),
-            ('middle', 6, 14),
-            ('death', 14, 18),
-            ('final', 18, 20)
-        ]
+        # Build phase_boundaries from config: [(name, start, end), ...]
+        phase_boundaries = []
+        prev_boundary = 0
+        for pname in self.config.phase_names:
+            upper = self.FIRST_INNINGS_PHASE_THRESHOLDS[pname]
+            phase_boundaries.append((pname, prev_boundary, upper))
+            prev_boundary = upper
         
         # Find if we're near a phase boundary (within 1 over)
         for i, (p_name, p_start, p_end) in enumerate(phase_boundaries):
@@ -434,7 +491,13 @@ class ResourceFeatureCalculator:
             
             # Define ease levels and thresholds for interpolation
             ease_levels = ['well_behind', 'behind', 'par', 'ahead', 'well_ahead']
-            ease_thresholds = [0.0, 0.85, 0.95, 1.05, 1.15]
+            ease_thresholds = [
+                self.FIRST_INNINGS_EASE_THRESHOLDS.get('well_behind', 0.0),
+                self.FIRST_INNINGS_EASE_THRESHOLDS.get('behind', 0.85),
+                self.FIRST_INNINGS_EASE_THRESHOLDS.get('par', 0.95),
+                self.FIRST_INNINGS_EASE_THRESHOLDS.get('ahead', 1.05),
+                self.FIRST_INNINGS_EASE_THRESHOLDS.get('well_ahead', 1.15),
+            ]
             
             # Find bracket for interpolation
             lower_idx = 0
@@ -547,21 +610,29 @@ class ResourceFeatureCalculator:
         # Regressed projection
         regressed_projection = (trajectory_weight * raw_projection) + ((1 - trajectory_weight) * self.PAR_SCORE_T20)
         
-        # Also cap the projection at reasonable T20 bounds (100-280)
-        return max(100.0, min(280.0, regressed_projection))
+        # Also cap the projection at reasonable bounds (config-driven)
+        return max(self.config.score_cap_min, min(self.config.score_cap_max, regressed_projection))
     
     def calculate_match_phase(self, over: int) -> Tuple[str, int, int, int]:
         """
         Determine match phase and return one-hot encoded indicators.
         
+        Uses a simplified 3-phase system (powerplay / middle / death)
+        derived from the config's phase thresholds.  For T20 the boundaries
+        are at overs 6 and 15; for ODI they follow config boundaries.
+        
         Returns:
             Tuple of (phase_name, is_powerplay, is_middle, is_death)
         """
-        if over < 6:  # Overs 0-5 (1-6 in cricket terms)
+        pp_boundary = self.FIRST_INNINGS_PHASE_THRESHOLDS[self.config.phase_names[0]]
+        # Death starts 1 over after the second phase's upper boundary
+        mid_boundary = self.FIRST_INNINGS_PHASE_THRESHOLDS[self.config.phase_names[1]] + 1
+        
+        if over < pp_boundary:
             return ('powerplay', 1, 0, 0)
-        elif over < 15:  # Overs 6-14 (7-15 in cricket terms)
+        elif over < mid_boundary:
             return ('middle', 0, 1, 0)
-        else:  # Overs 15-19 (16-20 in cricket terms)
+        else:
             return ('death', 0, 0, 1)
     
     def calculate_pressure_index(
@@ -638,8 +709,8 @@ class ResourceFeatureCalculator:
             rate_pressure = min(1.0, max(0.0, (rr_ratio - 1.0) / 0.6))
         else:
             # Fallback: absolute RRR-based pressure
-            # RRR 7 = comfortable (0), RRR 15+ = maximum pressure (1)
-            rate_pressure = min(1.0, max(0.0, (required_rate - 7) / 8))
+            # RRR min = comfortable (0), RRR max = maximum pressure (1)
+            rate_pressure = min(1.0, max(0.0, (required_rate - self.config.pressure_rrr_min) / (self.config.pressure_rrr_max - self.config.pressure_rrr_min)))
 
         # Check if chase is even feasible
         resource_pct = self.calculate_resource_percentage(overs_remaining, wickets_lost)
@@ -720,7 +791,7 @@ class ResourceFeatureCalculator:
             # CRITICAL FIX (Jan 2026): Use 3D empirical penalty tables
             # Wickets matter LESS in death overs when scoring above expected rate
             # The current score is "banked" - only penalize future potential
-            if overs_bowled >= 19.5:
+            if overs_bowled >= self.TOTAL_OVERS - 0.5:
                 # Innings complete - use actual score directly, no wicket penalty
                 adjusted_expected_score = expected_final_score
             else:
@@ -766,7 +837,7 @@ class ResourceFeatureCalculator:
             # Improvement: Shift sigmoid center to encode bat-first disadvantage
             # Instead of SQI=0 → 50%, we shift left by 0.35 to reflect 37% baseline
             # This means SQI=0.35 → 50%, SQI=0 → ~43%
-            sqi_shifted = sqi - 0.35
+            sqi_shifted = sqi - self.config.sqi_shift
             sqi_based_prob = 1.0 / (1.0 + np.exp(-self.SQI_BETA * sqi_shifted))
             
             # -----------------------------------------------------------------
@@ -809,7 +880,7 @@ class ResourceFeatureCalculator:
         # -------------------------------------
         # END-GAME SPECIAL CASE: Last 2 overs
         # -------------------------------------
-        if balls_remaining > 0 and balls_remaining <= 12 and runs_required <= balls_remaining * 2:
+        if balls_remaining > 0 and balls_remaining <= self.config.endgame_balls and runs_required <= balls_remaining * 2:
             # Use runs per ball needed vs typical death over scoring (~1.5 rpb)
             runs_per_ball_needed = runs_required / balls_remaining
             # Logistic centered at 1.5 rpb

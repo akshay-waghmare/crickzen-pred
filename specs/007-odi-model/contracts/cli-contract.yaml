@@ -1,0 +1,160 @@
+# CLI Contract: ODI Pipeline Extension
+
+openapi: "3.1.0"
+info:
+  title: bbl-pipeline CLI — ODI Extension
+  version: "1.0.0"
+  description: |
+    Contract for extending the bbl-pipeline CLI to support ODI format.
+    Defines new flags, league config entries, and behavioral changes.
+
+---
+
+## League Config Entry
+
+```yaml
+odi:
+  json_dir: odis_json
+  raw_dir: data/odi_raw
+  features_dir: data/odi_features
+  feature_store_dir: data/odi_feature_store
+  model_prefix: odi
+  format_type: odi
+```
+
+## New CLI Flags
+
+### --format-type (process command)
+
+```yaml
+flag: --format-type
+type: string
+choices: [t20, odi]
+default: t20
+required: false
+commands: [process]
+description: >
+  Selects the FormatConfig preset for feature engineering.
+  When 'odi', uses 50-over phase boundaries, ODI par scores,
+  and gender-aware resource constants.
+```
+
+### --league odi (retrain, train, generate-oof, analyze-oof)
+
+```yaml
+flag: --league
+new_value: odi
+behavior:
+  retrain: >
+    Runs full pipeline with ODI league config.
+    Ingests from odis_json, processes with --format-type odi,
+    trains model, generates OOF calibrators.
+  train: >
+    Trains XGBLogRegEnsemble on data/odi_features/training.parquet.
+    Uses same architecture as T20 (50/50 XGB+LR blend).
+    gender feature included in TOP_FEATURES.
+  generate-oof: >
+    Generates isotonic OOF calibrators for ODI model.
+  analyze-oof: >
+    Compares 7+ calibration strategies on ODI data.
+```
+
+## FormatConfig Resolution
+
+```yaml
+resolution_order:
+  1: Explicit --format-type flag
+  2: League config format_type field
+  3: Default "t20"
+
+factory_methods:
+  FormatConfig.t20():
+    description: Returns T20 constants (current behavior)
+    gender_handling: None (T20 models do not use gender)
+
+  FormatConfig.odi(gender='male'):
+    description: Returns ODI male constants from empirical analysis
+    source: scripts/odi_empirical_constants.json
+
+  FormatConfig.odi(gender='female'):
+    description: Returns ODI female constants
+    source: scripts/odi_empirical_constants.json
+
+  FormatConfig.from_league(league_name):
+    description: >
+      Resolves format from league config dict.
+      T20 leagues → FormatConfig.t20()
+      ODI league → FormatConfig.odi() (determines gender from data)
+```
+
+## Behavioral Contracts
+
+### Ingestion (No Change)
+
+```yaml
+contract: ingest_odi
+preconditions:
+  - Input directory contains Cricsheet JSON with match_type "ODI"
+  - JSON schema matches existing Cricsheet format
+postconditions:
+  - Output parquet has match_type = "ODI"
+  - Matches with overs < 50 are excluded
+  - Gender field preserved from info.gender
+  - Super overs filtered (already handled)
+changes:
+  - Super-over filter list adds "ODI" alongside "T20"
+```
+
+### Processing (FormatConfig-Driven)
+
+```yaml
+contract: process_odi
+preconditions:
+  - --format-type odi OR league config has format_type: odi
+  - FormatConfig.odi() constants loaded
+postconditions:
+  - Phase columns use 4-phase ODI boundaries (PP:1-10, Mid:11-34, Setup:35-40, Death:41-50)
+  - Par scores use ODI empirical values (gender-aware)
+  - resource_win_prob calculated with ODI DLS table
+  - score_vs_par uses ODI par score
+  - gender column present in output
+  - All 50 overs worth of ball data processed
+changes:
+  - bins parameter uses [0, 60, 204, 240, 300] instead of [0, 36, 90, 120]
+  - Par score from FormatConfig instead of hardcoded 160
+  - Phase booleans: is_powerplay (over<=10), is_middle (11-34), is_setup (35-40), is_death (41-50)
+```
+
+### Training (Minimal Change)
+
+```yaml
+contract: train_odi
+preconditions:
+  - training.parquet has gender column
+  - Features engineered with ODI FormatConfig
+postconditions:
+  - XGBLogRegEnsemble trained with same architecture
+  - gender included in feature list
+  - champion_model.joblib saved
+  - Model registry updated
+changes:
+  - TOP_FEATURES list extended with 'gender'
+  - Training data has 50-over match samples
+```
+
+### T20 Regression Safety
+
+```yaml
+contract: t20_no_regression
+description: >
+  All existing T20 models produce identical predictions.
+  FormatConfig defaults to T20 settings when no format specified.
+verification:
+  method: >
+    Run existing T20 model on known inputs before and after
+    refactoring. Compare predictions to 6 decimal places.
+  scope:
+    - BBL v12 predictions unchanged
+    - ILT20 v5 predictions unchanged
+    - SA20 v2 predictions unchanged
+```

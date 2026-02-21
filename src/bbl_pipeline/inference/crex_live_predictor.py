@@ -17,6 +17,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
+from bbl_pipeline.features.format_config import FormatConfig
+
 logger = structlog.get_logger()
 
 # Monte Carlo simulation imports
@@ -109,6 +111,7 @@ class CrexLivePredictor:
         self.headless = headless
         self.feature_store_dir = feature_store_dir
         self.league = league  # League code for league-specific calibration
+        self.format_config = FormatConfig.from_league(league) if league else FormatConfig.t20()
         self.use_ml_model = use_ml_model  # Use ML model for Monte Carlo terminal evaluation
         self.record_states = record_states  # Enable match state recording
         self.states_dir = states_dir  # Custom states directory
@@ -257,7 +260,7 @@ class CrexLivePredictor:
             # Calculate balls remaining
             overs_float = state.overs
             balls_bowled = int(overs_float) * 6 + int(round((overs_float - int(overs_float)) * 10))
-            balls_remaining = 120 - balls_bowled
+            balls_remaining = self.format_config.total_balls - balls_bowled
             
             if balls_remaining <= 0:
                 return None
@@ -280,6 +283,12 @@ class CrexLivePredictor:
                     league = "ssm"
                 elif "bpl" in model_dir_lower:
                     league = "bpl"
+                elif "odm_male" in model_dir_lower:
+                    league = "odm_male"
+                elif "odm_female" in model_dir_lower:
+                    league = "odm_female"
+                elif "odi" in model_dir_lower:
+                    league = "odi"
                 elif "female" in model_dir_lower:
                     league = None  # Global female model - no specific league calibration
             
@@ -1169,10 +1178,10 @@ class CrexLivePredictor:
                 return 1.0
             
             # Bowling team won - innings complete and target not reached
-            # All out (10 wickets) or all overs bowled (20 overs)
+            # All out (10 wickets) or all overs bowled
             if state.wickets >= 10:
                 return 0.0
-            if state.overs >= 20.0:
+            if state.overs >= float(self.format_config.total_overs):
                 return 0.0
             
             # Match tied - score equals target-1 at end of innings
@@ -1222,6 +1231,8 @@ class CrexLivePredictor:
                 batsman_2=self.match_state.batsman2_name or "Unknown",
                 bowler=self.match_state.bowler1_name or "Unknown",
                 target_runs=self.match_state.target,
+                first_innings_score=self.match_state.target - 1 if self.match_state.target else None,
+                total_overs=self.format_config.total_overs,
             )
             
             # Convert ball history to mapper format for rolling stats
@@ -1352,15 +1363,19 @@ class CrexLivePredictor:
         try:
             # Calculate derived features
             total_balls = int(self.match_state.overs) * 6 + int((self.match_state.overs % 1) * 10)
-            balls_remaining = 120 - total_balls  # T20 = 120 balls
+            balls_remaining = self.format_config.total_balls - total_balls
             
-            # Determine phase
-            if self.match_state.overs <= 6:
+            # Determine phase from format config thresholds
+            overs_bowled = self.match_state.overs
+            thresholds = self.format_config.phase_thresholds
+            if overs_bowled <= thresholds.get('powerplay', 6):
                 phase = 1  # Powerplay
-            elif self.match_state.overs <= 15:
+            elif overs_bowled <= thresholds.get('middle', 15):
                 phase = 2  # Middle overs
+            elif len(thresholds) > 3 and overs_bowled <= thresholds.get('setup', thresholds.get('middle', 15)):
+                phase = 3  # Setup overs (ODI only)
             else:
-                phase = 3  # Death overs
+                phase = len(thresholds)  # Death overs
             
             features = {
                 'total_runs': self.match_state.total_runs,

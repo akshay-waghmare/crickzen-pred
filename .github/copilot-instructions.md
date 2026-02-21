@@ -1,6 +1,6 @@
 # GitHub Copilot Instructions for Win Probability Models
 
-This repository contains the machine learning pipelines for predicting T20 cricket match outcomes.
+This repository contains the machine learning pipelines for predicting cricket match outcomes (T20 and ODI formats).
 
 **Active Models:**
 - **T20 Male v2** (Global Unified Model) - Trained on all T20 leagues, uses league-specific calibrators
@@ -8,6 +8,7 @@ This repository contains the machine learning pipelines for predicting T20 crick
 - **SA20 v2** (South Africa T20 League) - 121 matches, 26,121 samples, Brier 0.1597
 - **ILT20 v5** (International League T20) - 99 matches, Brier 0.1886
 - **WPL v2** (Women's Premier League) - 74 matches, 17,062 samples, Brier 0.1510
+- **ODI v1** (One-Day International) - 2,932 matches, 1,587,026 samples, Brier 0.1609 (combined male+female, gender-aware constants)
 
 All other models have been archived in `models/archive/`.
 
@@ -161,6 +162,10 @@ Each model relies on a specific feature store for inference (player stats, venue
   - 6 teams, 320 players, 3 venues
   - Columns: team, win_rate, matches, bat_first_wr, bowl_first_wr
   - Generated: 2025-12-30
+- **ODI v1:** `data/odi_feature_store_v1`
+  - 28 teams, combined male+female ODI
+  - Gender-aware FormatConfig constants (par: 257.7 male, 227.8 female)
+  - Generated: 2026-02-20
 
 **Feature Store Components:**
 1. **team_ratings.parquet**: Team stats (overall + situation-specific win rates)
@@ -299,7 +304,7 @@ In T20 death overs:
 
 ## ⚠️ Important Notes for Copilot
 
-1.  **Active Models Only:** Only use `models/bbl_v12`, `models/sat_v1`, and `models/ilt20_v5`. Ignore everything in `models/archive/`.
+1.  **Active Models Only:** Only use `models/bbl_v12`, `models/sat_v1`, `models/ilt20_v5`, and `models/odi_v1`. Ignore everything in `models/archive/`.
 2.  **Model Registry:** Keep `models/model_registry.json` updated whenever:
      - Regenerating feature stores (`bbl-pipeline process`)
      - Retraining models (`bbl-pipeline train`)
