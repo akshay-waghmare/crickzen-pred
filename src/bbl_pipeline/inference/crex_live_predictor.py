@@ -337,16 +337,16 @@ class CrexLivePredictor:
             predictor = self.predictor if use_ml_model else None
             
             # Run 1-ball simulation (fast)
-            result_1ball = simulate(sim_state, horizon=1, n_simulations=1000, predictor=predictor)
+            result_1ball = simulate(sim_state, horizon=1, n_simulations=1000, predictor=predictor, model_dir=self.model_dir)
             
             # Run 6-ball (1 over) simulation
-            result_6ball = simulate_one_over(sim_state, n_simulations=2000, predictor=predictor)
+            result_6ball = simulate_one_over(sim_state, n_simulations=2000, predictor=predictor, model_dir=self.model_dir)
             
             # Run 12-ball (2 over) simulation
-            result_12ball = simulate_two_overs(sim_state, n_simulations=2000, predictor=predictor)
+            result_12ball = simulate_two_overs(sim_state, n_simulations=2000, predictor=predictor, model_dir=self.model_dir)
             
             # Run 30-ball (5 over) simulation - useful for first innings uncertainty
-            result_30ball = simulate_five_overs(sim_state, n_simulations=2000, predictor=predictor)
+            result_30ball = simulate_five_overs(sim_state, n_simulations=2000, predictor=predictor, model_dir=self.model_dir)
             
             # Evaluate betting decision if market odds available
             # Uses league-calibrated model_prob for edge calculation (more accurate than simulation mean)
@@ -870,9 +870,12 @@ class CrexLivePredictor:
             # F = Favorite team code, R = Odds in format "back+diff"
             fav_team_code = data.get("F", "").replace("^", "")
             if fav_team_code:
-                # Resolve team code to name using localStorage
-                fav_team_name = self.local_storage.get(f"t_{fav_team_code}_name", fav_team_code)
-                self.match_state.market_fav_team = fav_team_name
+                # Resolve team code to name using localStorage.
+                # Some payloads briefly carry non-team values (e.g. "1I").
+                # Do not overwrite with unresolved code strings.
+                fav_team_name = self.local_storage.get(f"t_{fav_team_code}_name")
+                if fav_team_name:
+                    self.match_state.market_fav_team = fav_team_name
             
             r_val = data.get("R", "")
             if r_val:
