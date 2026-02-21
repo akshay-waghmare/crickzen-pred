@@ -116,6 +116,10 @@ BALL_STATE_SCHEMA = pa.schema([
     ('batting_team_tier', pa.string()),
     ('bowling_team_tier', pa.string()),
     
+    # Reduced-over / DLS fields
+    ('total_overs', pa.int16()),         # Total overs per innings (default 20)
+    ('revised_target', pa.int16()),      # DLS revised target (nullable)
+    
     # Versioning
     ('model_version', pa.string()),
     ('feature_store_version', pa.string()),

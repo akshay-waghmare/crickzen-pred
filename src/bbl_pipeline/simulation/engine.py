@@ -15,12 +15,38 @@ from .state import MatchState, SimulationResult
 from .sampler import NextBallSampler
 from .evaluator import TerminalStateEvaluator, apply_temperature, load_league_temperature
 from .feature_context import FeatureContext
+from ..calibration.mc_calibrator import MCCalibrator
 
 # Avoid circular import
 if TYPE_CHECKING:
     from ..inference.predictor import Predictor
 
 logger = structlog.get_logger()
+
+# Cache loaded MC calibrators by model_dir
+_MC_CALIBRATOR_CACHE: dict = {}
+
+
+def _load_mc_calibrator(model_dir: str) -> Optional[MCCalibrator]:
+    """Load MC Platt calibrator from model_dir (cached)."""
+    if model_dir in _MC_CALIBRATOR_CACHE:
+        return _MC_CALIBRATOR_CACHE[model_dir]
+
+    from pathlib import Path
+    cal_path = Path(model_dir) / "mc_calibrator.pkl"
+    if cal_path.exists():
+        try:
+            cal = MCCalibrator.load(str(cal_path))
+            _MC_CALIBRATOR_CACHE[model_dir] = cal
+            logger.debug("Loaded MC Platt calibrator", path=str(cal_path))
+            return cal
+        except Exception as e:
+            logger.warning("Failed to load MC calibrator", error=str(e))
+            _MC_CALIBRATOR_CACHE[model_dir] = None
+            return None
+    else:
+        _MC_CALIBRATOR_CACHE[model_dir] = None
+        return None
 
 
 def simulate(
@@ -161,6 +187,14 @@ def simulate(
         # Track feature mode for result
         _feature_mode = "full" if feature_context else "simplified"
     
+    # Apply MC Platt calibration for resource_win_prob (not ML model)
+    mc_calibrator_applied = False
+    if not use_ml_model:
+        mc_cal = _load_mc_calibrator(model_dir)
+        if mc_cal is not None:
+            terminal_probs = mc_cal.calibrate_batch(terminal_probs)
+            mc_calibrator_applied = True
+    
     elapsed = time.time() - start_time
     
     # Determine feature mode for result
@@ -273,7 +307,7 @@ def simulate_vectorized(
             break
         
         # Get phases for active simulations
-        phases = np.array([get_phase(br) for br in balls_remaining[active_mask]])
+        phases = np.array([get_phase(br, total_balls=state.total_balls) for br in balls_remaining[active_mask]])
         active_wickets = wickets[active_mask]
         
         # Sample outcomes for all active simulations
@@ -311,6 +345,7 @@ def simulate_vectorized(
                 bowling_team=state.bowling_team,
                 venue=state.venue,
                 league=state.league,
+                total_balls=state.total_balls,
             )
             terminal_states.append(eval_state)
         
@@ -364,6 +399,7 @@ def simulate_vectorized(
                 bowling_team=state.bowling_team,
                 venue=state.venue,
                 league=state.league,
+                total_balls=state.total_balls,
             )
             
             terminal_probs[i] = evaluator.evaluate(eval_state, apply_temp=False)
@@ -372,6 +408,12 @@ def simulate_vectorized(
     if not use_ml_model and temperature is not None and temperature != 1.0:
         from .evaluator import apply_temperature_vectorized
         terminal_probs = apply_temperature_vectorized(terminal_probs, temperature)
+    
+    # Apply MC Platt calibration for resource_win_prob (not ML model)
+    if not use_ml_model:
+        mc_cal = _load_mc_calibrator(model_dir)
+        if mc_cal is not None:
+            terminal_probs = mc_cal.calibrate_batch(terminal_probs)
     
     elapsed = time.time() - start_time
     

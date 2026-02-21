@@ -20,7 +20,8 @@ class MatchState:
         innings: 1 (batting first) or 2 (chasing)
         score: Current runs scored (0+)
         wickets_lost: Wickets lost (0-10)
-        balls_remaining: Balls remaining in innings (0-120)
+        balls_remaining: Balls remaining in innings (0-total_balls)
+        total_balls: Total balls in innings (6-120, default 120 for T20)
         target_runs: Target to chase (required if innings=2)
         league: League code for temperature calibration
         batting_team: Canonical batting team name
@@ -38,6 +39,7 @@ class MatchState:
     league: str
     batting_team: str
     bowling_team: str
+    total_balls: int = 120
     target_runs: Optional[int] = None
     venue: Optional[str] = None
     batting_team_win_rate: float = 0.5
@@ -53,20 +55,22 @@ class MatchState:
             raise ValueError(f"score must be >= 0, got {self.score}")
         if not 0 <= self.wickets_lost <= 10:
             raise ValueError(f"wickets_lost must be 0-10, got {self.wickets_lost}")
-        if not 0 <= self.balls_remaining <= 120:
-            raise ValueError(f"balls_remaining must be 0-120, got {self.balls_remaining}")
+        if not (6 <= self.total_balls <= 120 and self.total_balls % 6 == 0):
+            raise ValueError(f"total_balls must be 6-120 and divisible by 6, got {self.total_balls}")
+        if not 0 <= self.balls_remaining <= self.total_balls:
+            raise ValueError(f"balls_remaining must be 0-{self.total_balls}, got {self.balls_remaining}")
         if self.innings == 2 and self.target_runs is None:
             raise ValueError("target_runs required for innings 2")
     
     @property
     def overs_completed(self) -> float:
         """Overs completed in current innings."""
-        return (120 - self.balls_remaining) / 6
+        return (self.total_balls - self.balls_remaining) / 6
     
     @property
     def phase(self) -> str:
         """Current game phase: powerplay, middle, or death."""
-        return get_phase(self.balls_remaining)
+        return get_phase(self.balls_remaining, total_balls=self.total_balls)
     
     @property
     def is_over(self) -> bool:
@@ -105,6 +109,7 @@ class MatchState:
             league=self.league,
             batting_team=self.batting_team,
             bowling_team=self.bowling_team,
+            total_balls=self.total_balls,
             target_runs=self.target_runs,
             venue=self.venue,
         )
@@ -128,6 +133,7 @@ class MatchState:
             league=self.league,
             batting_team=self.batting_team,
             bowling_team=self.bowling_team,
+            total_balls=self.total_balls,
             target_runs=self.target_runs,
             venue=self.venue,
         )

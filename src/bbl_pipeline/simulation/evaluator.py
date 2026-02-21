@@ -13,6 +13,7 @@ import joblib
 import structlog
 
 from ..features.calculator import ResourceFeatureCalculator
+from ..features.format_config import FormatConfig
 from .state import MatchState
 
 # Avoid circular import - only import Predictor and FeatureContext for type hints
@@ -136,6 +137,9 @@ class TerminalStateEvaluator:
     Uses ResourceFeatureCalculator for core evaluation (fast, heuristic-based).
     Optionally uses ML Predictor for more accurate evaluation (slower but better).
     Applies league-specific temperature calibration.
+    
+    Automatically creates FormatConfig-aware calculators for reduced-over matches
+    so that par scores, phase thresholds, and RRR calculations are properly scaled.
     """
     
     def __init__(self, model_dir: str = "models/t20_male_v2", predictor: Optional["Predictor"] = None):
@@ -148,9 +152,20 @@ class TerminalStateEvaluator:
                       If provided, evaluate_batch_with_model() uses the ML model
                       instead of resource_win_prob heuristic.
         """
+        # Default calculator for standard 20-over T20
         self.calculator = ResourceFeatureCalculator()
+        # Cache of calculators keyed by total_balls for reduced-over matches
+        self._calculator_cache: Dict[int, ResourceFeatureCalculator] = {120: self.calculator}
         self.model_dir = model_dir
         self.predictor = predictor
+    
+    def _get_calculator(self, total_balls: int) -> ResourceFeatureCalculator:
+        """Get or create a FormatConfig-aware calculator for the given total_balls."""
+        if total_balls not in self._calculator_cache:
+            total_overs = total_balls // 6
+            config = FormatConfig.t20_reduced(total_overs)
+            self._calculator_cache[total_balls] = ResourceFeatureCalculator(config=config)
+        return self._calculator_cache[total_balls]
     
     def evaluate(
         self,
@@ -181,7 +196,7 @@ class TerminalStateEvaluator:
                 pass
         
         # Convert balls_remaining to over/ball format
-        balls_bowled = 120 - state.balls_remaining
+        balls_bowled = state.total_balls - state.balls_remaining
         over = balls_bowled // 6  # 0-indexed over
         ball = balls_bowled % 6  # 0-5, need to convert to 1-6
         if ball == 0 and over > 0:
@@ -191,8 +206,9 @@ class TerminalStateEvaluator:
         elif ball == 0:
             ball = 1  # Very start of match
         
-        # Calculate features using ResourceFeatureCalculator
-        features = self.calculator.calculate_all_features(
+        # Use format-aware calculator (handles reduced-over matches correctly)
+        calculator = self._get_calculator(state.total_balls)
+        features = calculator.calculate_all_features(
             innings=state.innings,
             over=over,
             ball=ball,
@@ -266,11 +282,15 @@ class TerminalStateEvaluator:
         
         # Evaluate non-terminal states
         eval_indices = np.where(eval_mask)[0]
+        total_balls_val = states_data.get('total_balls', 120)
+        
+        # Use format-aware calculator for reduced-over matches
+        calculator = self._get_calculator(total_balls_val)
         
         for i in eval_indices:
             # Convert balls_remaining to over/ball format
             br = int(balls_remaining[i])
-            balls_bowled = 120 - br
+            balls_bowled = total_balls_val - br
             over = balls_bowled // 6
             ball = balls_bowled % 6
             if ball == 0 and over > 0:
@@ -279,7 +299,7 @@ class TerminalStateEvaluator:
             elif ball == 0:
                 ball = 1
             
-            features = self.calculator.calculate_all_features(
+            features = calculator.calculate_all_features(
                 innings=innings,
                 over=over,
                 ball=ball,

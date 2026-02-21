@@ -112,9 +112,13 @@ TEAM_COLORS = {
 }
 T20I_TEAM_COLORS = {
     "Australia": "#FFD700", "AUS": "#FFD700",
+    "Australia Women": "#FFD700", "AUSW": "#FFD700", "AUS-W": "#FFD700",
     "India": "#0033A0", "IND": "#0033A0",
+    "India Women": "#0033A0", "INDW": "#0033A0", "IND-W": "#0033A0",
     "England": "#001840", "ENG": "#001840",
+    "England Women": "#001840", "ENGW": "#001840", "ENG-W": "#001840",
     "New Zealand": "#000000", "NZ": "#000000",
+    "New Zealand Women": "#000000", "NZW": "#000000", "NZ-W": "#000000",
     "South Africa": "#006B3F", "SA": "#006B3F",
     "Pakistan": "#006400", "PAK": "#006400",
     "West Indies": "#800020", "WI": "#800020",
@@ -201,9 +205,13 @@ TEAM_NAMES = {
 
 T20I_TEAM_NAMES = {
     "Australia": "Australia", "AUS": "Australia",
+    "Australia Women": "Australia Women", "AUSW": "Australia Women", "AUS-W": "Australia Women",
     "India": "India", "IND": "India",
+    "India Women": "India Women", "INDW": "India Women", "IND-W": "India Women",
     "England": "England", "ENG": "England",
+    "England Women": "England Women", "ENGW": "England Women", "ENG-W": "England Women",
     "New Zealand": "New Zealand", "NZ": "New Zealand",
+    "New Zealand Women": "New Zealand Women", "NZW": "New Zealand Women", "NZ-W": "New Zealand Women",
     "South Africa": "South Africa", "SA": "South Africa",
     "Pakistan": "Pakistan", "PAK": "Pakistan",
     "West Indies": "West Indies", "WI": "West Indies",
@@ -456,6 +464,64 @@ def get_name(team):
     if _league_context == "t20i":
         return T20I_TEAM_NAMES.get(team, TEAM_NAMES.get(team, team))
     return TEAM_NAMES.get(team, team)
+
+
+def _team_aliases(team: str) -> set[str]:
+    if not team:
+        return set()
+
+    upper = str(team).upper().strip()
+    compact = "".join(char for char in upper if char.isalnum())
+    aliases = {upper, compact}
+
+    country_code_map = {
+        "AUSTRALIA": "AUS",
+        "INDIA": "IND",
+        "ENGLAND": "ENG",
+        "NEWZEALAND": "NZ",
+        "SOUTHAFRICA": "SA",
+        "PAKISTAN": "PAK",
+        "WESTINDIES": "WI",
+        "SRILANKA": "SL",
+        "BANGLADESH": "BAN",
+        "AFGHANISTAN": "AFG",
+        "ZIMBABWE": "ZIM",
+        "IRELAND": "IRE",
+        "SCOTLAND": "SCO",
+        "NETHERLANDS": "NED",
+        "NAMIBIA": "NAM",
+        "CANADA": "CAN",
+        "OMAN": "OMA",
+        "NEPAL": "NEP",
+        "UNITEDARABEMIRATES": "UAE",
+        "PAPUANEWGUINEA": "PNG",
+        "HONGKONG": "HK",
+        "UGANDA": "UGA",
+    }
+
+    for country_name, code in country_code_map.items():
+        if country_name in compact:
+            aliases.update({code, f"{code}W"})
+
+    if compact.endswith("WOMEN"):
+        base = compact[:-5]
+        aliases.add(base)
+        for country_name, code in country_code_map.items():
+            if country_name == base:
+                aliases.update({code, f"{code}W"})
+
+    if compact.endswith("W") and len(compact) > 3:
+        aliases.add(compact[:-1])
+
+    return {alias for alias in aliases if alias}
+
+
+def _teams_match(left: str, right: str) -> bool:
+    left_aliases = _team_aliases(left)
+    right_aliases = _team_aliases(right)
+    return bool(left_aliases and right_aliases and left_aliases.intersection(right_aliases))
+
+
 def prob_to_odds(prob): 
     """Convert probability to decimal odds."""
     if prob <= 0: return 999.99
@@ -1127,16 +1193,9 @@ def main():
         batting_team_full = get_name(batting_team)
         bowling_team_full = get_name(bowling_team)
         
-        # Match favorite team to batting/bowling using full names
-        # fav_team is resolved name like "Sydney Sixers", batting_team might be code "SYS"
-        is_fav_batting = (fav_team == batting_team_full or 
-                         fav_team == batting_team or 
-                         fav_team.lower() in batting_team_full.lower() or 
-                         batting_team_full.lower() in fav_team.lower())
-        is_fav_bowling = (fav_team == bowling_team_full or 
-                         fav_team == bowling_team or 
-                         fav_team.lower() in bowling_team_full.lower() or 
-                         bowling_team_full.lower() in fav_team.lower())
+        # Match favorite team to batting/bowling using normalized aliases
+        is_fav_batting = _teams_match(fav_team, batting_team_full) or _teams_match(fav_team, batting_team)
+        is_fav_bowling = _teams_match(fav_team, bowling_team_full) or _teams_match(fav_team, bowling_team)
         
         if is_fav_batting:
             fav_full_name = get_name(batting_team)

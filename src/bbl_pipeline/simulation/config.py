@@ -22,6 +22,37 @@ POWERPLAY_END_OVER = 6  # After over 6, middle begins
 MIDDLE_END_OVER = 15    # After over 15, death begins
 
 
+def get_scaled_phase_boundaries(total_overs: int) -> tuple:
+    """
+    Compute phase boundaries for reduced-over matches.
+    
+    Uses proportional scaling with minimums:
+    - Powerplay: ~30% of total overs (min 2, max 6)
+    - Death: last ~25% of overs (min 2 overs)
+    - Middle: everything in between
+    
+    Args:
+        total_overs: Total overs in innings (1-20)
+        
+    Returns:
+        (powerplay_end, middle_end) over thresholds
+    """
+    if total_overs <= 2:
+        # Super over or very short: everything is "death"
+        return (0, 0)
+    
+    powerplay_end = max(2, min(6, round(total_overs * 0.30)))
+    death_overs = max(2, round(total_overs * 0.25))
+    death_start = total_overs - death_overs + 1
+    middle_end = death_start - 1
+    
+    # Ensure middle_end >= powerplay_end (no empty middle phase)
+    if middle_end < powerplay_end:
+        middle_end = powerplay_end
+    
+    return (powerplay_end, middle_end)
+
+
 def get_phase(balls_remaining: int, total_balls: int = 120) -> str:
     """
     Determine game phase based on balls remaining.
@@ -46,9 +77,17 @@ def get_phase(balls_remaining: int, total_balls: int = 120) -> str:
     
     overs_completed = (total_balls - balls_remaining) / 6
     
-    if overs_completed < POWERPLAY_END_OVER:
+    # Use scaled boundaries for reduced-over matches; constants for standard T20
+    if total_balls == 120:
+        pp_end = POWERPLAY_END_OVER
+        mid_end = MIDDLE_END_OVER
+    else:
+        total_overs = total_balls // 6
+        pp_end, mid_end = get_scaled_phase_boundaries(total_overs)
+    
+    if overs_completed < pp_end:
         return "powerplay"
-    elif overs_completed < MIDDLE_END_OVER:
+    elif overs_completed < mid_end:
         return "middle"
     else:
         return "death"

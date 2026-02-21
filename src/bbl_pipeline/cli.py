@@ -1376,7 +1376,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     
     # Step 1: Ingest
     if not skip_ingest:
-        click.echo(f"\n📥 Step 1/6: INGESTION (JSON → Parquet)")
+        click.echo(f"\n📥 Step 1/7: INGESTION (JSON → Parquet)")
         click.echo(f"   bbl-pipeline ingest --input-dir {cfg['json_dir']} --output-dir {cfg['raw_dir']}")
         result = subprocess.run([
             sys.executable, '-m', 'bbl_pipeline.cli', 'ingest',
@@ -1388,11 +1388,11 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             return
         click.echo(f"   ✅ Ingestion complete")
     else:
-        click.echo(f"\n⏭️  Step 1/6: INGESTION (skipped)")
+        click.echo(f"\n⏭️  Step 1/7: INGESTION (skipped)")
     
     # Step 2: Process
     if not skip_process:
-        click.echo(f"\n⚙️  Step 2/6: PROCESSING (Parquet → Features)")
+        click.echo(f"\n⚙️  Step 2/7: PROCESSING (Parquet → Features)")
         click.echo(f"   bbl-pipeline process --input-dir {cfg['raw_dir']}/matches --output-dir {features_dir} --feature-store-dir {feature_store_dir} --league {league}")
         result = subprocess.run([
             sys.executable, '-m', 'bbl_pipeline.cli', 'process',
@@ -1406,10 +1406,10 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             return
         click.echo(f"   ✅ Processing complete")
     else:
-        click.echo(f"\n⏭️  Step 2/6: PROCESSING (skipped)")
+        click.echo(f"\n⏭️  Step 2/7: PROCESSING (skipped)")
     
     # Step 3: Train (without --calibration, calibration comes from generate-oof)
-    click.echo(f"\n🎯 Step 3/6: TRAINING (Features → Model)")
+    click.echo(f"\n🎯 Step 3/7: TRAINING (Features → Model)")
     click.echo(f"   bbl-pipeline train --input-file {features_dir}/training.parquet --output-dir {model_dir}")
     result = subprocess.run([
         sys.executable, '-m', 'bbl_pipeline.cli', 'train',
@@ -1426,7 +1426,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     format_total_overs = 50 if cfg['format_type'] == 'odi' else 20
     total_overs_args = ['--total-overs', str(format_total_overs)] if cfg['format_type'] == 'odi' else []
     
-    click.echo(f"\n🔧 Step 4/6: GENERATE-OOF (Create calibrators for inference)")
+    click.echo(f"\n🔧 Step 4/7: GENERATE-OOF (Create calibrators for inference)")
     click.echo(f"   bbl-pipeline generate-oof --input-file {features_dir}/training.parquet --model-dir {model_dir}" + (f' --total-overs {format_total_overs}' if total_overs_args else ''))
     result = subprocess.run([
         sys.executable, '-m', 'bbl_pipeline.cli', 'generate-oof',
@@ -1439,7 +1439,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     click.echo(f"   ✅ Generate-OOF complete")
     
     # Step 5: Analyze OOF
-    click.echo(f"\n📊 Step 5/6: ANALYZE-OOF (Detailed calibration analysis)")
+    click.echo(f"\n📊 Step 5/7: ANALYZE-OOF (Detailed calibration analysis)")
     click.echo(f"   bbl-pipeline analyze-oof --input-file {features_dir}/training.parquet --model-dir {model_dir} --n-splits {n_splits}" + (f' --total-overs {format_total_overs}' if total_overs_args else ''))
     result = subprocess.run([
         sys.executable, '-m', 'bbl_pipeline.cli', 'analyze-oof',
@@ -1452,8 +1452,27 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
         return
     click.echo(f"   ✅ Analyze-OOF complete")
     
-    # Step 6: Update Model Registry
-    click.echo(f"\n📝 Step 6/6: UPDATING MODEL REGISTRY")
+    # Step 6: MC Calibrator (for simulation engine)
+    if cfg['format_type'] == 't20':
+        click.echo(f"\n🎲 Step 6/7: CALIBRATE-MC (Platt scaling for MC simulation)")
+        click.echo(f"   bbl-pipeline calibrate-mc --json-dir {cfg['json_dir']} --model-dir {model_dir} --league {league}")
+        result = subprocess.run([
+            sys.executable, '-m', 'bbl_pipeline.cli', 'calibrate-mc',
+            '--json-dir', cfg['json_dir'],
+            '--model-dir', model_dir,
+            '--league', league,
+            '--max-matches', '200',
+            '--n-sims', '200',
+        ], capture_output=False)
+        if result.returncode != 0:
+            click.echo(f"   ⚠️ MC calibration failed (non-fatal, simulation will use uncalibrated heuristic)")
+        else:
+            click.echo(f"   ✅ MC calibration complete")
+    else:
+        click.echo(f"\n⏭️  Step 6/7: CALIBRATE-MC (skipped, ODI format)")
+    
+    # Step 7: Update Model Registry
+    click.echo(f"\n📝 Step 7/7: UPDATING MODEL REGISTRY")
     
     # League name mapping for registry
     registry_league_names = {
@@ -1558,6 +1577,9 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     click.echo(f"{'='*60}")
     click.echo(f"  Model:         {model_dir}/champion_model.joblib")
     click.echo(f"  Calibrator:    {model_dir}/isotonic_calibrator.pkl")
+    mc_cal_path = Path(model_dir) / "mc_calibrator.pkl"
+    if mc_cal_path.exists():
+        click.echo(f"  MC Calibrator: {model_dir}/mc_calibrator.pkl")
     click.echo(f"  Feature Store: {feature_store_dir}")
     click.echo(f"  OOF Report:    {model_dir}/OOF_CALIBRATION_REPORT.md")
     click.echo(f"  Registry:      models/model_registry.json (updated)")
@@ -1565,6 +1587,74 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
     click.echo(f"\n📌 Next steps:")
     click.echo(f"   1. Review OOF report: cat {model_dir}/OOF_CALIBRATION_REPORT.md")
     click.echo(f"   2. Test inference: python -m src.bbl_pipeline.inference.crex_live_predictor --model-dir {model_dir} --feature-store-dir {feature_store_dir}")
+
+
+@main.command(name='calibrate-mc')
+@click.option('--json-dir', type=click.Path(exists=True), required=True,
+              help='Directory containing Cricsheet JSON match files')
+@click.option('--model-dir', type=click.Path(exists=True), required=True,
+              help='Model directory (output: mc_calibrator.pkl)')
+@click.option('--league', type=str, default='bbl', show_default=True,
+              help='League code for MC sampler distributions')
+@click.option('--max-matches', type=int, default=200, show_default=True,
+              help='Maximum number of matches to backtest')
+@click.option('--n-sims', type=int, default=200, show_default=True,
+              help='MC simulations per checkpoint (more = slower but more stable)')
+@click.option('--seed', type=int, default=42, show_default=True, help='Random seed')
+def calibrate_mc(json_dir, model_dir, league, max_matches, n_sims, seed):
+    """
+    Train a Platt-scaling calibrator for the MC simulation engine.
+
+    Backtests MC predictions against actual match outcomes from historical
+    Cricsheet JSON files and fits a logistic regression on logit(mc_prob)
+    to correct systematic biases in the resource_win_prob heuristic.
+
+    Output: {model-dir}/mc_calibrator.pkl
+
+    Examples:
+        bbl-pipeline calibrate-mc --json-dir bbl_male_json --model-dir models/t20_male_v2
+        bbl-pipeline calibrate-mc --json-dir sat_male_json --model-dir models/t20_male_v2 --league sa20
+        bbl-pipeline calibrate-mc --json-dir ilt_male_json --model-dir models/t20_male_v2 --league ilt20 --max-matches 100
+    """
+    from bbl_pipeline.calibration.mc_trainer import train_mc_calibrator
+
+    click.echo(f"\n{'='*60}")
+    click.echo(f"  MC CALIBRATOR TRAINING")
+    click.echo(f"{'='*60}")
+    click.echo(f"  JSON Source:    {json_dir}")
+    click.echo(f"  Model Dir:      {model_dir}")
+    click.echo(f"  League:         {league}")
+    click.echo(f"  Max Matches:    {max_matches}")
+    click.echo(f"  MC Simulations: {n_sims}")
+    click.echo(f"{'='*60}\n")
+
+    try:
+        result = train_mc_calibrator(
+            json_dir=json_dir,
+            model_dir=model_dir,
+            league=league,
+            max_matches=max_matches,
+            n_sims=n_sims,
+            seed=seed,
+        )
+
+        click.echo(f"\n{result.summary()}")
+
+        # Show reliability diagram
+        if result.reliability:
+            click.echo(f"\n  Reliability (validation):")
+            for r in result.reliability:
+                click.echo(
+                    f"    {r['bin']}: pred={r['pred']:.3f}, "
+                    f"actual={r['actual']:.3f}, gap={r['gap']:+.3f}, n={r['n']}"
+                )
+
+        click.echo(f"\n  Saved to: {result.output_path}")
+
+    except ValueError as e:
+        raise click.ClickException(str(e))
+    except Exception as e:
+        raise click.ClickException(f"MC calibrator training failed: {e}")
 
 
 @main.command(name='calibrate-league')

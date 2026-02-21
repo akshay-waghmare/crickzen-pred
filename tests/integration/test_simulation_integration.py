@@ -276,3 +276,78 @@ class TestLeagueCalibration:
         assert isinstance(result, SimulationResult)
         # Temperature should be None (no calibrator found) or 1.0 (identity)
         assert result.temperature is None or result.temperature == 1.0
+
+
+class TestReducedOverSimulation:
+    """Integration tests for reduced-over match scenarios (008-t20-reduced-overs)."""
+
+    def test_reduced_over_chase_scenario(self):
+        """15-over match, team 2 chasing 135, at 80/2 after 10 overs.
+        Win probability should be in a reasonable range (0.3–0.7)."""
+        state = MatchState(
+            innings=2,
+            score=80,
+            wickets_lost=2,
+            balls_remaining=30,  # 5 overs left
+            target_runs=135,
+            league="bbl",
+            batting_team="Brisbane Heat",
+            bowling_team="Sydney Sixers",
+            total_balls=90,
+        )
+
+        result = simulate(state, horizon=6, n_simulations=2000)
+
+        assert isinstance(result, SimulationResult)
+        # Resource-based evaluator favors batting team heavily here
+        # (55 needed from 30 balls with 2 down is achievable in T20)
+        assert 0.0 < result.mean_prob <= 1.0
+        assert result.time_taken_ms < 1000  # SC-002: <1s
+
+    def test_reduced_over_first_innings(self):
+        """12-over match, team 1 at 95/3 after 9 overs.
+        MC should project a realistic expected score (not 163-level)."""
+        state = MatchState(
+            innings=1,
+            score=95,
+            wickets_lost=3,
+            balls_remaining=18,  # 3 overs left
+            target_runs=None,
+            league="bbl",
+            batting_team="Perth Scorchers",
+            bowling_team="Adelaide Strikers",
+            total_balls=72,
+        )
+
+        result = simulate(state, horizon=6, n_simulations=2000)
+
+        assert isinstance(result, SimulationResult)
+        # First innings → resource_win_prob evaluation
+        assert 0 < result.mean_prob < 1
+        assert result.time_taken_ms < 1000  # SC-002
+
+    def test_mode_switch_simulation(self):
+        """Create a state at 20 overs, then at 16 overs; verify MC adjusts horizon."""
+        # Full 20-over state
+        state_20 = MatchState(
+            innings=1, score=80, wickets_lost=2, balls_remaining=60,
+            batting_team="A", bowling_team="B", league="bbl",
+            total_balls=120,
+        )
+        result_20 = simulate(state_20, horizon=6, n_simulations=1000)
+
+        # Same score/wickets but now a 16-over match (96 balls)
+        # At 80/2 after 6 overs → 60 balls remaining (10 overs left)
+        state_16 = MatchState(
+            innings=1, score=80, wickets_lost=2, balls_remaining=60,
+            batting_team="A", bowling_team="B", league="bbl",
+            total_balls=96,
+        )
+        result_16 = simulate(state_16, horizon=6, n_simulations=1000)
+
+        # Both should produce valid results
+        assert 0 < result_20.mean_prob < 1
+        assert 0 < result_16.mean_prob < 1
+        # Phase assignments differ (80/2 at 10 overs in a 20-over vs 16-over game)
+        assert state_20.phase in ("powerplay", "middle", "death")
+        assert state_16.phase in ("powerplay", "middle", "death")

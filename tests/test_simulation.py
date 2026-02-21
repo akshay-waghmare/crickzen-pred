@@ -209,6 +209,98 @@ class TestMatchState:
         assert copy == state
         assert copy is not state
 
+    # ------------------------------------------------------------------
+    # Reduced-over / total_balls tests (008-t20-reduced-overs, E1)
+    # ------------------------------------------------------------------
+
+    def test_total_balls_default_120(self):
+        """total_balls defaults to 120 for standard T20 (regression)."""
+        state = MatchState(
+            innings=1, score=0, wickets_lost=0, balls_remaining=120,
+            batting_team="A", bowling_team="B", league="bbl",
+        )
+        assert state.total_balls == 120
+
+    def test_reduced_total_balls_valid(self):
+        """MatchState with total_balls=90 (15-over match) is valid."""
+        state = MatchState(
+            innings=1, score=0, wickets_lost=0, balls_remaining=90,
+            batting_team="A", bowling_team="B", league="bbl",
+            total_balls=90,
+        )
+        assert state.total_balls == 90
+        assert state.balls_remaining == 90
+
+    def test_balls_remaining_exceeds_total_balls_raises(self):
+        """balls_remaining > total_balls raises ValueError."""
+        with pytest.raises(ValueError, match="balls_remaining must be 0-90"):
+            MatchState(
+                innings=1, score=0, wickets_lost=0, balls_remaining=91,
+                batting_team="A", bowling_team="B", league="bbl",
+                total_balls=90,
+            )
+
+    def test_total_balls_not_divisible_by_6_raises(self):
+        """total_balls not divisible by 6 raises ValueError."""
+        with pytest.raises(ValueError, match="total_balls must be 6-120 and divisible by 6"):
+            MatchState(
+                innings=1, score=0, wickets_lost=0, balls_remaining=10,
+                batting_team="A", bowling_team="B", league="bbl",
+                total_balls=10,
+            )
+
+    def test_total_balls_below_6_raises(self):
+        """total_balls below 6 raises ValueError."""
+        with pytest.raises(ValueError, match="total_balls must be 6-120 and divisible by 6"):
+            MatchState(
+                innings=1, score=0, wickets_lost=0, balls_remaining=3,
+                batting_team="A", bowling_team="B", league="bbl",
+                total_balls=3,
+            )
+
+    def test_overs_completed_reduced(self):
+        """overs_completed is correct for a 90-ball (15-over) match."""
+        state = MatchState(
+            innings=1, score=50, wickets_lost=2, balls_remaining=60,
+            batting_team="A", bowling_team="B", league="bbl",
+            total_balls=90,
+        )
+        # (90 - 60) / 6 = 5.0
+        assert state.overs_completed == pytest.approx(5.0)
+
+    def test_copy_propagates_total_balls(self):
+        """copy() preserves total_balls for reduced-over states."""
+        state = MatchState(
+            innings=1, score=30, wickets_lost=1, balls_remaining=54,
+            batting_team="A", bowling_team="B", league="bbl",
+            total_balls=72,
+        )
+        copy = state.copy()
+        assert copy.total_balls == 72
+        assert copy == state
+
+    def test_apply_outcome_propagates_total_balls(self):
+        """apply_outcome() preserves total_balls."""
+        state = MatchState(
+            innings=1, score=30, wickets_lost=1, balls_remaining=54,
+            batting_team="A", bowling_team="B", league="bbl",
+            total_balls=72,
+        )
+        new_state = state.apply_outcome(runs=4, is_wicket=False)
+        assert new_state.total_balls == 72
+        assert new_state.balls_remaining == 53
+        assert new_state.score == 34
+
+    def test_super_over_state(self):
+        """MatchState with total_balls=6 (super over) is valid."""
+        state = MatchState(
+            innings=1, score=0, wickets_lost=0, balls_remaining=6,
+            batting_team="A", bowling_team="B", league="bbl",
+            total_balls=6,
+        )
+        assert state.total_balls == 6
+        assert state.phase == "death"  # super over is all death
+
 
 class TestNextBallSampler:
     """Tests for NextBallSampler."""
@@ -615,6 +707,31 @@ class TestGetPhase:
         assert get_phase(18) == 'death'  # Over 17
         assert get_phase(6) == 'death'   # Over 20
         assert get_phase(1) == 'death'   # Last ball
+
+    def test_phase_reduced_overs_regression(self):
+        """Default total_balls=120 uses standard phase constants (regression)."""
+        # Should behave identically to tests above
+        assert get_phase(120, total_balls=120) == 'powerplay'
+        assert get_phase(84, total_balls=120) == 'middle'
+        assert get_phase(30, total_balls=120) == 'death'
+
+    def test_phase_15_over_boundaries(self):
+        """Phase boundaries scale correctly for 15-over match."""
+        # 15 overs: pp_end = max(2, min(6, round(15*0.3))) = round(4.5) = 4
+        # death_overs = max(2, round(15*0.25)) = round(3.75) = 4
+        # death_start = 15 - 4 + 1 = 12
+        # middle_end = 11
+        # Over 1 (balls_remaining=90) → powerplay
+        assert get_phase(90, total_balls=90) == 'powerplay'
+        # Over 4 (balls_remaining=66, overs_completed=4) → middle
+        assert get_phase(66, total_balls=90) == 'middle'
+        # Over 12 (balls_remaining=18, overs_completed=12) → death
+        assert get_phase(18, total_balls=90) == 'death'
+
+    def test_phase_super_over(self):
+        """Super over (1 over) is all death."""
+        assert get_phase(6, total_balls=6) == 'death'
+        assert get_phase(1, total_balls=6) == 'death'
 
 
 class TestSimulateIntegration:

@@ -156,6 +156,62 @@ class MatchStateLogger:
             return "mid"
         else:
             return "bottom"
+
+    def _team_aliases(self, team: str) -> set[str]:
+        """Build comparable aliases for team strings (code/full name, men/women variants)."""
+        if not team:
+            return set()
+
+        upper = str(team).upper().strip()
+        compact = "".join(char for char in upper if char.isalnum())
+        aliases = {upper, compact}
+
+        country_code_map = {
+            "AUSTRALIA": "AUS",
+            "INDIA": "IND",
+            "ENGLAND": "ENG",
+            "NEWZEALAND": "NZ",
+            "SOUTHAFRICA": "SA",
+            "PAKISTAN": "PAK",
+            "WESTINDIES": "WI",
+            "SRILANKA": "SL",
+            "BANGLADESH": "BAN",
+            "AFGHANISTAN": "AFG",
+            "ZIMBABWE": "ZIM",
+            "IRELAND": "IRE",
+            "SCOTLAND": "SCO",
+            "NETHERLANDS": "NED",
+            "NAMIBIA": "NAM",
+            "CANADA": "CAN",
+            "OMAN": "OMA",
+            "NEPAL": "NEP",
+            "UNITEDARABEMIRATES": "UAE",
+            "PAPUANEWGUINEA": "PNG",
+            "HONGKONG": "HK",
+            "UGANDA": "UGA",
+        }
+
+        for country_name, code in country_code_map.items():
+            if country_name in compact:
+                aliases.update({code, f"{code}W"})
+
+        if compact.endswith("WOMEN"):
+            base = compact[:-5]
+            aliases.add(base)
+            for country_name, code in country_code_map.items():
+                if country_name == base:
+                    aliases.update({code, f"{code}W"})
+
+        if compact.endswith("W") and len(compact) > 3:
+            aliases.add(compact[:-1])
+
+        return {alias for alias in aliases if alias}
+
+    def _teams_match(self, left: str, right: str) -> bool:
+        """Return True when two team strings represent the same team."""
+        left_aliases = self._team_aliases(left)
+        right_aliases = self._team_aliases(right)
+        return bool(left_aliases and right_aliases and left_aliases.intersection(right_aliases))
     
     def _map_market_probs(
         self,
@@ -176,9 +232,9 @@ class MatchStateLogger:
         Returns:
             (batting_team_prob, bowling_team_prob)
         """
-        if market_fav_team == batting_team:
+        if self._teams_match(market_fav_team, batting_team):
             return (market_fav_prob, 1.0 - market_fav_prob)
-        elif market_fav_team == bowling_team:
+        elif self._teams_match(market_fav_team, bowling_team):
             return (1.0 - market_fav_prob, market_fav_prob)
         else:
             # Market favorite doesn't match either team (shouldn't happen)
@@ -187,6 +243,9 @@ class MatchStateLogger:
                 market_fav=market_fav_team,
                 batting=batting_team,
                 bowling=bowling_team,
+                market_aliases=sorted(self._team_aliases(market_fav_team)),
+                batting_aliases=sorted(self._team_aliases(batting_team)),
+                bowling_aliases=sorted(self._team_aliases(bowling_team)),
             )
             return (None, None)
     

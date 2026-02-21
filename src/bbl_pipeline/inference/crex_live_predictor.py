@@ -105,18 +105,33 @@ class CrexLivePredictor:
     def __init__(self, match_url: str, model_dir: str, headless: bool = True,
                  feature_store_dir: str = None, output_json: str = None,
                  live_match_json: str = None, venue: str = None, league: str = None,
-                 use_ml_model: bool = False, record_states: bool = False, states_dir: str = None):
+                 use_ml_model: bool = False, record_states: bool = False, states_dir: str = None,
+                 total_overs: int = None, revised_target: int = None):
         self.match_url = match_url
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
         self.league = league  # League code for league-specific calibration
-        self.format_config = FormatConfig.from_league(league) if league else FormatConfig.t20()
         self.use_ml_model = use_ml_model  # Use ML model for Monte Carlo terminal evaluation
         self.record_states = record_states  # Enable match state recording
         self.states_dir = states_dir  # Custom states directory
         self.output_json = output_json  # Path for JSON output (for Streamlit)
         self.venue_override = venue
+
+        # Reduced-over support
+        self._cli_total_overs = total_overs  # CLI override (None = auto-detect or default 20)
+        self._cli_revised_target = revised_target  # CLI override for DLS revised target
+        self._effective_total_overs = total_overs  # Currently effective total overs (may change mid-match)
+
+        # Create format config — reduced if total_overs explicitly set < 20
+        if total_overs is not None and 1 <= total_overs < 20:
+            self.format_config = FormatConfig.t20_reduced(total_overs)
+            logger.info(f"Reduced-over mode: {total_overs} overs, par={self.format_config.par_score:.1f}")
+        else:
+            self.format_config = FormatConfig.from_league(league) if league else FormatConfig.t20()
+
+        # MC calibrator for reduced-over mode (loaded lazily)
+        self._mc_calibrator = None
         # Optional richer debug output (defaults to sibling livematch.json if output_json is set)
         if live_match_json is None and output_json:
             try:
@@ -327,6 +342,7 @@ class CrexLivePredictor:
                 bowling_team=state.bowling_team,
                 league=league,
                 venue=state.venue,
+                total_balls=self.format_config.total_balls,
                 batting_team_win_rate=batting_team_wr,
                 bowling_team_win_rate=bowling_team_wr,
                 batting_team_situation_wr=batting_team_sit_wr,
@@ -965,6 +981,31 @@ class CrexLivePredictor:
             # Get page text to detect second innings and extract data
             page_text = await self.page.inner_text("body")
             
+            # --- DLS / Reduced-over auto-detection ---
+            # Detect revised target (e.g. "Revised Target: 156 (DLS)" or "Target: 156 (D/L)")
+            dls_target_match = re.search(
+                r'(?:revised\s+)?target\s*[:\-]\s*(\d+)\s*\(?(?:d/?l/?s?|dls)\)?',
+                page_text, re.IGNORECASE
+            )
+            if dls_target_match and self._cli_revised_target is None:
+                detected_target = int(dls_target_match.group(1))
+                if self._cli_revised_target != detected_target:
+                    logger.info(f"CREX detected DLS revised target: {detected_target}")
+                    self._cli_revised_target = detected_target
+            
+            # Detect reduced overs (e.g. "15 overs match" or "12 overs per side")
+            reduced_overs_match = re.search(
+                r'(\d+)\s+ov(?:er)?s?\s+(?:match|per\s+side|a\s+side)',
+                page_text, re.IGNORECASE
+            )
+            if reduced_overs_match:
+                detected_overs = int(reduced_overs_match.group(1))
+                if 1 <= detected_overs < 20:
+                    prev = self._effective_total_overs or self.format_config.total_overs
+                    if detected_overs != prev:
+                        logger.info(f"CREX detected reduced overs: {detected_overs} (was: {prev})")
+                        self._update_total_overs(detected_overs)
+            
             # Detect second innings by looking for "need X runs" or "RRR"
             needs_runs_match = re.search(r'need\s+(\d+)\s+runs?\s+(?:in|from)\s+(\d+)\s+balls?', page_text, re.IGNORECASE)
             rrr_match = re.search(r'RRR\s*:\s*([\d.]+)', page_text)
@@ -1144,6 +1185,32 @@ class CrexLivePredictor:
         except Exception as e:
             print(f"[WARN] Error extracting match info: {e}")
     
+    def _update_total_overs(self, new_total_overs: int) -> None:
+        """Switch to a different total_overs mid-match (e.g. rain interruption).
+        
+        Rebuilds the format config and logs the transition.
+        CLI override takes priority — this only applies to auto-detected changes.
+        """
+        if self._cli_total_overs is not None:
+            # CLI explicitly set — don't auto-switch
+            return
+        
+        if new_total_overs == self._effective_total_overs:
+            return
+        
+        old = self._effective_total_overs or self.format_config.total_overs
+        self._effective_total_overs = new_total_overs
+        
+        if new_total_overs < 20:
+            self.format_config = FormatConfig.t20_reduced(new_total_overs)
+            logger.info(
+                f"Switching to MC-only mode: total_overs={new_total_overs} "
+                f"(was {old}), par={self.format_config.par_score:.1f}"
+            )
+        else:
+            self.format_config = FormatConfig.from_league(self.league) if self.league else FormatConfig.t20()
+            logger.info(f"Reverting to standard mode: total_overs={new_total_overs} (was {old})")
+    
     async def poll_and_predict(self) -> Optional[float]:
         """Poll for updates and run prediction."""
         if not self.page:
@@ -1195,13 +1262,99 @@ class CrexLivePredictor:
         
         return None  # Match still in progress
     
+    def _load_mc_calibrator(self):
+        """Lazily load MC Platt calibrator if available."""
+        if self._mc_calibrator is not None:
+            return self._mc_calibrator
+        try:
+            from bbl_pipeline.calibration.mc_calibrator import MCCalibrator
+            import os
+            cal_path = os.path.join(self.model_dir, "mc_calibrator.pkl")
+            if os.path.exists(cal_path):
+                self._mc_calibrator = MCCalibrator.load(cal_path)
+                logger.info(f"Loaded MC calibrator: {self._mc_calibrator.summary()}")
+            else:
+                logger.info("No MC calibrator found — using raw MC probabilities")
+                self._mc_calibrator = False  # sentinel: tried but not found
+        except Exception as e:
+            logger.warning(f"Failed to load MC calibrator: {e}")
+            self._mc_calibrator = False
+        return self._mc_calibrator
+    
+    def _run_reduced_over_prediction(self) -> Optional[float]:
+        """MC-only prediction for reduced-over matches.
+        
+        Bypasses the trained model (calibrated on 20-over data) and uses
+        Monte Carlo simulation directly, optionally calibrated via Platt
+        scaling.
+        
+        Returns:
+            Win probability for the batting team (0-1), or None on error.
+        """
+        try:
+            mc_result = self._run_monte_carlo_simulation(
+                model_prob=None,
+                use_ml_model=self.use_ml_model,
+            )
+            if not mc_result or not mc_result.get("available"):
+                logger.warning("MC simulation unavailable for reduced-over prediction")
+                return None
+            
+            # Use 6-ball sim as primary (most stable for betting)
+            raw_prob = mc_result["simulation_6ball"]["mean_prob"]
+            
+            # Apply MC calibrator if available
+            calibrator = self._load_mc_calibrator()
+            if calibrator and calibrator is not False:
+                calibrated_prob = calibrator.calibrate(raw_prob)
+                logger.info(
+                    f"Reduced-over MC: raw={raw_prob:.4f} → calibrated={calibrated_prob:.4f} "
+                    f"(total_overs={self._effective_total_overs})"
+                )
+                win_prob = calibrated_prob
+            else:
+                logger.info(
+                    f"Reduced-over MC (uncalibrated): prob={raw_prob:.4f} "
+                    f"(total_overs={self._effective_total_overs})"
+                )
+                win_prob = raw_prob
+            
+            # Store MC-derived probabilities for output chain
+            self.last_raw_prob = raw_prob
+            self.last_smoothed_prob = win_prob
+            self.last_calibrated_prob = win_prob
+            self.last_calibrated_combined = win_prob
+            self.last_calibrated_phase = win_prob
+            self.last_calibrated_per_over = win_prob
+            
+            return float(win_prob)
+            
+        except Exception as e:
+            logger.warning(f"Reduced-over prediction failed: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+    
     def _run_prediction(self) -> Optional[float]:
-        """Run the prediction model on current match state."""
+        """Run the prediction model on current match state.
+        
+        For reduced-over matches (total_overs < 20), uses MC-only mode
+        instead of the trained XGBLogRegEnsemble model.
+        """
         try:
             # First check if match has a definitive result
             final_result = self._check_match_result()
             if final_result is not None:
                 return final_result
+            
+            # Apply CLI revised_target override for 2nd innings
+            if self._cli_revised_target and self.match_state.is_second_innings:
+                self.match_state.target = self._cli_revised_target
+            
+            # Reduced-over mode: MC-only prediction
+            effective_overs = self._effective_total_overs or self.format_config.total_overs
+            if effective_overs < 20:
+                return self._run_reduced_over_prediction()
             
             from bbl_pipeline.inference.schema import MatchState as PredictorMatchState
             
@@ -1647,7 +1800,10 @@ class CrexLivePredictor:
                 "market_lay_odds": state.market_lay_odds,
                 "market_fav_prob": state.market_fav_prob,
                 # Monte Carlo simulation results (uses league-calibrated win_prob for betting edge)
-                "monte_carlo": self._run_monte_carlo_simulation(model_prob=win_prob, use_ml_model=self.use_ml_model)
+                "monte_carlo": self._run_monte_carlo_simulation(model_prob=win_prob, use_ml_model=self.use_ml_model),
+                # Reduced-over / DLS fields
+                "total_overs": self._effective_total_overs or self.format_config.total_overs,
+                "revised_target": self._cli_revised_target,
             }
             
             # Write atomically
@@ -1766,6 +1922,19 @@ async def main():
         default=None,
         help="Directory for recorded match states (default: data/match_states/<league>/)",
     )
+    parser.add_argument(
+        "--total-overs",
+        type=int,
+        default=None,
+        help="Total overs per innings (1-20). Auto-detected from CREX if not specified. "
+             "When < 20, switches to MC-only prediction mode.",
+    )
+    parser.add_argument(
+        "--revised-target",
+        type=int,
+        default=None,
+        help="DLS revised target for 2nd innings. Auto-detected from CREX if not specified.",
+    )
     
     args = parser.parse_args()
     
@@ -1781,6 +1950,8 @@ async def main():
         use_ml_model=args.use_ml_model,
         record_states=args.record_states,
         states_dir=args.states_dir,
+        total_overs=args.total_overs,
+        revised_target=args.revised_target,
     )
     
     await predictor.run(poll_interval=args.poll_interval)

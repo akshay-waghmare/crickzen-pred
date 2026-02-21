@@ -19,6 +19,46 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 
+def _interpolate_dls(overs_to_pct: Dict[int, float], overs: int) -> float:
+    """Linearly interpolate a DLS resource table row for a given overs value.
+
+    The DLS table stores resource percentages at discrete overs-remaining
+    points (e.g. {0, 1, 5, 10, 15, 20}).  This helper interpolates for
+    overs values between those points (e.g. 12 → interpolate between 10
+    and 15).
+
+    Parameters
+    ----------
+    overs_to_pct : dict
+        Mapping of ``overs_remaining`` → ``resource_pct`` (0-100).
+    overs : int
+        The overs-remaining value to look up.
+
+    Returns
+    -------
+    float
+        Interpolated resource percentage.
+    """
+    if overs in overs_to_pct:
+        return overs_to_pct[overs]
+
+    keys = sorted(overs_to_pct.keys())
+    # Clamp to table range
+    if overs <= keys[0]:
+        return overs_to_pct[keys[0]]
+    if overs >= keys[-1]:
+        return overs_to_pct[keys[-1]]
+
+    # Find bracketing keys
+    for i in range(len(keys) - 1):
+        lo, hi = keys[i], keys[i + 1]
+        if lo < overs < hi:
+            frac = (overs - lo) / (hi - lo)
+            return overs_to_pct[lo] + frac * (overs_to_pct[hi] - overs_to_pct[lo])
+
+    return overs_to_pct[keys[-1]]  # fallback
+
+
 @dataclass(frozen=True)
 class FormatConfig:
     """Immutable configuration holding all format-specific constants.
@@ -275,6 +315,130 @@ class FormatConfig:
             endgame_balls=12,
             pressure_rrr_min=7.0,
             pressure_rrr_max=15.0,
+        )
+
+    @classmethod
+    def t20_reduced(cls, total_overs: int) -> "FormatConfig":
+        """Return a T20 configuration scaled for reduced-over matches.
+
+        Uses the standard T20 preset as the base and scales match-structure
+        fields (overs, balls, par score, phase thresholds) using DLS resource
+        curves and proportional phase scaling.
+
+        Parameters
+        ----------
+        total_overs : int
+            Total overs per innings (1–20).  ``t20_reduced(20)`` returns
+            the same config as ``t20()``.
+
+        Returns
+        -------
+        FormatConfig
+            Frozen config scaled for the given number of overs.
+
+        Raises
+        ------
+        ValueError
+            If ``total_overs`` is not in [1, 20].
+
+        Examples
+        --------
+        >>> FormatConfig.t20_reduced(15).total_balls
+        90
+        >>> FormatConfig.t20_reduced(20) == FormatConfig.t20()
+        True
+        """
+        if not 1 <= total_overs <= 20:
+            raise ValueError(
+                f"total_overs must be 1-20, got {total_overs}"
+            )
+
+        # Identity case — avoid any rounding differences
+        if total_overs == 20:
+            return cls.t20()
+
+        base = cls.t20()
+        total_balls = total_overs * 6
+
+        # --- Phase thresholds (proportional scaling) ---
+        if total_overs <= 2:
+            # Super over or 2-over match: all death
+            phase_thresholds = {
+                "powerplay": 0,
+                "middle": 0,
+                "death": max(total_overs - 1, 0),
+                "final": total_overs,
+            }
+        else:
+            pp_end = max(2, min(6, round(total_overs * 0.30)))
+            death_overs = max(2, round(total_overs * 0.25))
+            death_start_over = total_overs - death_overs + 1
+            middle_end = death_start_over - 1
+            if middle_end < pp_end:
+                middle_end = pp_end
+            phase_thresholds = {
+                "powerplay": pp_end,
+                "middle": middle_end,
+                "death": total_overs - 1 if total_overs > 1 else total_overs,
+                "final": total_overs,
+            }
+
+        # --- Par score via DLS resource table ---
+        dls_table = base.dls_resource_table
+        # Interpolate resource % for 0 wickets at total_overs remaining
+        resource_pct = _interpolate_dls(dls_table[0], total_overs)
+        par_score = base.par_score * resource_pct / 100.0
+
+        # --- Scale other match-length-dependent fields ---
+        overs_ratio = total_overs / 20.0
+        confidence_full = max(3.0, base.confidence_full_overs * overs_ratio)
+        endgame = max(6, round(base.endgame_balls * overs_ratio))
+
+        # Score caps scaled proportionally
+        score_cap_min = max(20.0, base.score_cap_min * overs_ratio)
+        score_cap_max = base.score_cap_max * overs_ratio
+
+        # Ensure score_cap_min < par_score < score_cap_max
+        if par_score <= score_cap_min:
+            score_cap_min = par_score - 5.0
+        if par_score >= score_cap_max:
+            score_cap_max = par_score + 20.0
+
+        return cls(
+            format_name="t20_reduced",
+            gender=base.gender,
+            total_overs=total_overs,
+            total_balls=total_balls,
+            balls_per_over=6,
+            total_wickets=10,
+            par_score=par_score,
+            league_avg_score=base.league_avg_score * overs_ratio,
+            bat_first_win_rate=base.bat_first_win_rate,
+            phase_thresholds=phase_thresholds,
+            phase_names=base.phase_names,
+            expected_run_rates=base.expected_run_rates,
+            ease_thresholds=base.ease_thresholds,
+            dls_resource_table=base.dls_resource_table,
+            first_innings_wicket_penalty_3d=base.first_innings_wicket_penalty_3d,
+            first_innings_score_midpoint=par_score + 5.0,
+            first_innings_score_beta=base.first_innings_score_beta,
+            first_innings_wicket_penalty=base.first_innings_wicket_penalty,
+            chase_wicket_penalty_2d=base.chase_wicket_penalty_2d,
+            chase_ease_thresholds=base.chase_ease_thresholds,
+            wicket_penalty=base.wicket_penalty,
+            rrr_midpoint=base.rrr_midpoint,
+            rrr_beta=base.rrr_beta,
+            sqi_beta=base.sqi_beta,
+            sqi_shift=base.sqi_shift,
+            confidence_full_overs=confidence_full,
+            score_std_early=base.score_std_early * overs_ratio,
+            score_std_late=base.score_std_late * overs_ratio,
+            wicket_decay_alpha=base.wicket_decay_alpha,
+            score_cap_min=score_cap_min,
+            score_cap_max=score_cap_max,
+            endgame_balls=endgame,
+            pressure_rrr_min=base.pressure_rrr_min,
+            pressure_rrr_max=base.pressure_rrr_max,
         )
 
     @classmethod
