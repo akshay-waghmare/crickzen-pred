@@ -106,7 +106,7 @@ class CrexLivePredictor:
                  feature_store_dir: str = None, output_json: str = None,
                  live_match_json: str = None, venue: str = None, league: str = None,
                  use_ml_model: bool = False, record_states: bool = False, states_dir: str = None,
-                 total_overs: int = None, revised_target: int = None):
+                 total_overs: int = None, revised_target: int = None, mc_only: bool = False):
         self.match_url = match_url
         self.model_dir = model_dir
         self.headless = headless
@@ -117,6 +117,7 @@ class CrexLivePredictor:
         self.states_dir = states_dir  # Custom states directory
         self.output_json = output_json  # Path for JSON output (for Streamlit)
         self.venue_override = venue
+        self.mc_only = mc_only  # Force MC-only mode even for 20-over matches
 
         # Reduced-over support
         self._cli_total_overs = total_overs  # CLI override (None = auto-detect or default 20)
@@ -1263,16 +1264,25 @@ class CrexLivePredictor:
         return None  # Match still in progress
     
     def _load_mc_calibrator(self):
-        """Lazily load MC Platt calibrator if available."""
+        """Lazily load MC calibrator (innings-specific or legacy) if available."""
         if self._mc_calibrator is not None:
             return self._mc_calibrator
         try:
-            from bbl_pipeline.calibration.mc_calibrator import MCCalibrator
+            from bbl_pipeline.calibration.mc_calibrator import MCCalibrator, InningsMCCalibrators
             import os
+
+            # Prefer innings-specific calibrators
+            innings_path = os.path.join(self.model_dir, "mc_calibrators_innings.pkl")
+            if os.path.exists(innings_path):
+                self._mc_calibrator = InningsMCCalibrators.load(innings_path)
+                logger.info(f"Loaded innings-specific MC calibrators:\n{self._mc_calibrator.summary()}")
+                return self._mc_calibrator
+
+            # Fall back to legacy single calibrator
             cal_path = os.path.join(self.model_dir, "mc_calibrator.pkl")
             if os.path.exists(cal_path):
                 self._mc_calibrator = MCCalibrator.load(cal_path)
-                logger.info(f"Loaded MC calibrator: {self._mc_calibrator.summary()}")
+                logger.info(f"Loaded MC calibrator (legacy): {self._mc_calibrator.summary()}")
             else:
                 logger.info("No MC calibrator found — using raw MC probabilities")
                 self._mc_calibrator = False  # sentinel: tried but not found
@@ -1285,8 +1295,9 @@ class CrexLivePredictor:
         """MC-only prediction for reduced-over matches.
         
         Bypasses the trained model (calibrated on 20-over data) and uses
-        Monte Carlo simulation directly, optionally calibrated via Platt
-        scaling.
+        Monte Carlo simulation directly. Platt calibration is applied
+        inside the simulation engine (per-terminal-state) — NOT applied
+        again here to avoid double-calibration distortion.
         
         Returns:
             Win probability for the batting team (0-1), or None on error.
@@ -1300,27 +1311,23 @@ class CrexLivePredictor:
                 logger.warning("MC simulation unavailable for reduced-over prediction")
                 return None
             
-            # Use 6-ball sim as primary (most stable for betting)
-            raw_prob = mc_result["simulation_6ball"]["mean_prob"]
+            # Use 6-ball sim as primary (most stable for betting).
+            # NOTE: mean_prob is already Platt-calibrated inside the
+            # simulation engine (per-terminal-state via mc_calibrator.pkl).
+            # Do NOT apply the calibrator again here — that was a
+            # double-calibration bug causing ~5-9% probability distortion.
+            win_prob = mc_result["simulation_6ball"]["mean_prob"]
             
-            # Apply MC calibrator if available
+            mode_label = "MC-only" if self.mc_only else "Reduced-over MC"
             calibrator = self._load_mc_calibrator()
-            if calibrator and calibrator is not False:
-                calibrated_prob = calibrator.calibrate(raw_prob)
-                logger.info(
-                    f"Reduced-over MC: raw={raw_prob:.4f} → calibrated={calibrated_prob:.4f} "
-                    f"(total_overs={self._effective_total_overs})"
-                )
-                win_prob = calibrated_prob
-            else:
-                logger.info(
-                    f"Reduced-over MC (uncalibrated): prob={raw_prob:.4f} "
-                    f"(total_overs={self._effective_total_overs})"
-                )
-                win_prob = raw_prob
+            cal_status = "engine-calibrated" if (calibrator and calibrator is not False) else "uncalibrated"
+            logger.info(
+                f"{mode_label} ({cal_status}): prob={win_prob:.4f} "
+                f"(total_overs={self._effective_total_overs or 20})"
+            )
             
             # Store MC-derived probabilities for output chain
-            self.last_raw_prob = raw_prob
+            self.last_raw_prob = win_prob
             self.last_smoothed_prob = win_prob
             self.last_calibrated_prob = win_prob
             self.last_calibrated_combined = win_prob
@@ -1351,9 +1358,9 @@ class CrexLivePredictor:
             if self._cli_revised_target and self.match_state.is_second_innings:
                 self.match_state.target = self._cli_revised_target
             
-            # Reduced-over mode: MC-only prediction
+            # MC-only mode: reduced overs OR explicit --mc-only flag
             effective_overs = self._effective_total_overs or self.format_config.total_overs
-            if effective_overs < 20:
+            if effective_overs < 20 or self.mc_only:
                 return self._run_reduced_over_prediction()
             
             from bbl_pipeline.inference.schema import MatchState as PredictorMatchState
@@ -1935,6 +1942,13 @@ async def main():
         default=None,
         help="DLS revised target for 2nd innings. Auto-detected from CREX if not specified.",
     )
+    parser.add_argument(
+        "--mc-only",
+        action="store_true",
+        default=False,
+        help="Force Monte Carlo-only prediction mode even for 20-over matches. "
+             "Bypasses the trained XGBLogRegEnsemble model and uses MC + Platt calibration.",
+    )
     
     args = parser.parse_args()
     
@@ -1952,6 +1966,7 @@ async def main():
         states_dir=args.states_dir,
         total_overs=args.total_overs,
         revised_target=args.revised_target,
+        mc_only=args.mc_only,
     )
     
     await predictor.run(poll_interval=args.poll_interval)

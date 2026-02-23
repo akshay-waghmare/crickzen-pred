@@ -206,3 +206,89 @@ class MCCalibrator:
             f"log_loss={self.training_log_loss:.4f}, "
             f"fitted={self.fitted_date})"
         )
+
+
+@dataclass
+class InningsMCCalibrators:
+    """Container for innings-specific MC Platt calibrators.
+
+    Holds separate ``MCCalibrator`` instances for innings 1 and innings 2
+    so each innings can have its own bias-correction mapping.
+
+    Attributes
+    ----------
+    inn1 : MCCalibrator | None
+        Calibrator for innings 1 (batting-first).
+    inn2 : MCCalibrator | None
+        Calibrator for innings 2 (chasing).
+    """
+
+    inn1: Optional[MCCalibrator] = None
+    inn2: Optional[MCCalibrator] = None
+
+    # ------------------------------------------------------------------
+    # Inference
+    # ------------------------------------------------------------------
+
+    def get(self, innings: int) -> Optional[MCCalibrator]:
+        """Return the calibrator for the given innings (1 or 2)."""
+        if innings == 1:
+            return self.inn1
+        return self.inn2
+
+    def calibrate(self, mc_raw_prob: float, innings: int) -> float:
+        """Calibrate a single MC probability using the innings-specific calibrator.
+
+        Falls back to returning the raw probability if no calibrator exists
+        for the given innings.
+        """
+        cal = self.get(innings)
+        if cal is None or cal.model is None:
+            return mc_raw_prob
+        return cal.calibrate(mc_raw_prob)
+
+    def calibrate_batch(self, mc_raw_probs: np.ndarray, innings: int) -> np.ndarray:
+        """Calibrate an array of MC probabilities for a specific innings.
+
+        Falls back to returning raw probabilities if no calibrator exists.
+        """
+        cal = self.get(innings)
+        if cal is None or cal.model is None:
+            return mc_raw_probs
+        return cal.calibrate_batch(mc_raw_probs)
+
+    # ------------------------------------------------------------------
+    # Persistence
+    # ------------------------------------------------------------------
+
+    def save(self, path: str) -> None:
+        """Serialise both calibrators to disk via joblib."""
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(self, path)
+
+    @classmethod
+    def load(cls, path: str) -> "InningsMCCalibrators":
+        """Deserialise a saved innings-specific calibrator pair."""
+        obj = joblib.load(path)
+        if not isinstance(obj, cls):
+            raise TypeError(
+                f"Expected InningsMCCalibrators, got {type(obj).__name__}"
+            )
+        return obj
+
+    # ------------------------------------------------------------------
+    # Diagnostics
+    # ------------------------------------------------------------------
+
+    def summary(self) -> str:
+        """Return a multi-line summary of both calibrators."""
+        parts = ["InningsMCCalibrators:"]
+        if self.inn1 and self.inn1.model is not None:
+            parts.append(f"  Inn1: {self.inn1.summary()}")
+        else:
+            parts.append("  Inn1: (none)")
+        if self.inn2 and self.inn2.model is not None:
+            parts.append(f"  Inn2: {self.inn2.summary()}")
+        else:
+            parts.append("  Inn2: (none)")
+        return "\n".join(parts)

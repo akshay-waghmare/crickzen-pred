@@ -1593,7 +1593,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
 @click.option('--json-dir', type=click.Path(exists=True), required=True,
               help='Directory containing Cricsheet JSON match files')
 @click.option('--model-dir', type=click.Path(exists=True), required=True,
-              help='Model directory (output: mc_calibrator.pkl)')
+              help='Model directory (output: mc_calibrators_innings.pkl)')
 @click.option('--league', type=str, default='bbl', show_default=True,
               help='League code for MC sampler distributions')
 @click.option('--max-matches', type=int, default=200, show_default=True,
@@ -1601,25 +1601,31 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
 @click.option('--n-sims', type=int, default=200, show_default=True,
               help='MC simulations per checkpoint (more = slower but more stable)')
 @click.option('--seed', type=int, default=42, show_default=True, help='Random seed')
-def calibrate_mc(json_dir, model_dir, league, max_matches, n_sims, seed):
+@click.option('--by-innings/--combined', default=True, show_default=True,
+              help='Train innings-specific calibrators (default) or a single combined one')
+def calibrate_mc(json_dir, model_dir, league, max_matches, n_sims, seed, by_innings):
     """
-    Train a Platt-scaling calibrator for the MC simulation engine.
+    Train Platt-scaling calibrator(s) for the MC simulation engine.
 
-    Backtests MC predictions against actual match outcomes from historical
-    Cricsheet JSON files and fits a logistic regression on logit(mc_prob)
-    to correct systematic biases in the resource_win_prob heuristic.
+    By default, trains innings-specific calibrators (one for innings 1,
+    one for innings 2) which corrects the systematic bias where a single
+    calibrator trained on innings 2 data worsens innings 1 predictions.
 
-    Output: {model-dir}/mc_calibrator.pkl
+    Use --combined to train a single calibrator (legacy behaviour, innings 2 only).
+
+    Output (default):  {model-dir}/mc_calibrators_innings.pkl
+    Output (combined): {model-dir}/mc_calibrator.pkl
 
     Examples:
         bbl-pipeline calibrate-mc --json-dir bbl_male_json --model-dir models/t20_male_v2
         bbl-pipeline calibrate-mc --json-dir sat_male_json --model-dir models/t20_male_v2 --league sa20
         bbl-pipeline calibrate-mc --json-dir ilt_male_json --model-dir models/t20_male_v2 --league ilt20 --max-matches 100
+        bbl-pipeline calibrate-mc --json-dir t20_international_male --model-dir models/t20_international_male_v1 --league t20i --combined
     """
-    from bbl_pipeline.calibration.mc_trainer import train_mc_calibrator
 
+    mode_label = "INNINGS-SPECIFIC" if by_innings else "COMBINED (legacy)"
     click.echo(f"\n{'='*60}")
-    click.echo(f"  MC CALIBRATOR TRAINING")
+    click.echo(f"  MC CALIBRATOR TRAINING — {mode_label}")
     click.echo(f"{'='*60}")
     click.echo(f"  JSON Source:    {json_dir}")
     click.echo(f"  Model Dir:      {model_dir}")
@@ -1629,25 +1635,40 @@ def calibrate_mc(json_dir, model_dir, league, max_matches, n_sims, seed):
     click.echo(f"{'='*60}\n")
 
     try:
-        result = train_mc_calibrator(
-            json_dir=json_dir,
-            model_dir=model_dir,
-            league=league,
-            max_matches=max_matches,
-            n_sims=n_sims,
-            seed=seed,
-        )
+        if by_innings:
+            from bbl_pipeline.calibration.mc_trainer import train_mc_calibrator_by_innings
 
-        click.echo(f"\n{result.summary()}")
+            result = train_mc_calibrator_by_innings(
+                json_dir=json_dir,
+                model_dir=model_dir,
+                league=league,
+                max_matches=max_matches,
+                n_sims=n_sims,
+                seed=seed,
+            )
+            click.echo(f"\n{result.summary()}")
+            click.echo(f"\n  Calibrator details:")
+            click.echo(f"  {result.calibrators.summary()}")
+        else:
+            from bbl_pipeline.calibration.mc_trainer import train_mc_calibrator
 
-        # Show reliability diagram
-        if result.reliability:
-            click.echo(f"\n  Reliability (validation):")
-            for r in result.reliability:
-                click.echo(
-                    f"    {r['bin']}: pred={r['pred']:.3f}, "
-                    f"actual={r['actual']:.3f}, gap={r['gap']:+.3f}, n={r['n']}"
-                )
+            result = train_mc_calibrator(
+                json_dir=json_dir,
+                model_dir=model_dir,
+                league=league,
+                max_matches=max_matches,
+                n_sims=n_sims,
+                seed=seed,
+            )
+            click.echo(f"\n{result.summary()}")
+
+            if result.reliability:
+                click.echo(f"\n  Reliability (validation):")
+                for r in result.reliability:
+                    click.echo(
+                        f"    {r['bin']}: pred={r['pred']:.3f}, "
+                        f"actual={r['actual']:.3f}, gap={r['gap']:+.3f}, n={r['n']}"
+                    )
 
         click.echo(f"\n  Saved to: {result.output_path}")
 

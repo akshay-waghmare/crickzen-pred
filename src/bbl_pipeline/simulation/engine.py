@@ -15,7 +15,7 @@ from .state import MatchState, SimulationResult
 from .sampler import NextBallSampler
 from .evaluator import TerminalStateEvaluator, apply_temperature, load_league_temperature
 from .feature_context import FeatureContext
-from ..calibration.mc_calibrator import MCCalibrator
+from ..calibration.mc_calibrator import MCCalibrator, InningsMCCalibrators
 
 # Avoid circular import
 if TYPE_CHECKING:
@@ -24,29 +24,49 @@ if TYPE_CHECKING:
 logger = structlog.get_logger()
 
 # Cache loaded MC calibrators by model_dir
+# Values can be: InningsMCCalibrators, MCCalibrator, or None
 _MC_CALIBRATOR_CACHE: dict = {}
 
 
-def _load_mc_calibrator(model_dir: str) -> Optional[MCCalibrator]:
-    """Load MC Platt calibrator from model_dir (cached)."""
+def _load_mc_calibrator(model_dir: str):
+    """Load MC calibrator from model_dir (cached).
+
+    Prefers innings-specific calibrators (``mc_calibrators_innings.pkl``)
+    over the legacy single calibrator (``mc_calibrator.pkl``).
+
+    Returns
+    -------
+    InningsMCCalibrators | MCCalibrator | None
+    """
     if model_dir in _MC_CALIBRATOR_CACHE:
         return _MC_CALIBRATOR_CACHE[model_dir]
 
     from pathlib import Path
+
+    # Prefer innings-specific calibrators
+    innings_path = Path(model_dir) / "mc_calibrators_innings.pkl"
+    if innings_path.exists():
+        try:
+            cal = InningsMCCalibrators.load(str(innings_path))
+            _MC_CALIBRATOR_CACHE[model_dir] = cal
+            logger.debug("Loaded innings-specific MC calibrators", path=str(innings_path))
+            return cal
+        except Exception as e:
+            logger.warning("Failed to load innings MC calibrators", error=str(e))
+
+    # Fall back to legacy single calibrator
     cal_path = Path(model_dir) / "mc_calibrator.pkl"
     if cal_path.exists():
         try:
             cal = MCCalibrator.load(str(cal_path))
             _MC_CALIBRATOR_CACHE[model_dir] = cal
-            logger.debug("Loaded MC Platt calibrator", path=str(cal_path))
+            logger.debug("Loaded MC Platt calibrator (legacy)", path=str(cal_path))
             return cal
         except Exception as e:
             logger.warning("Failed to load MC calibrator", error=str(e))
-            _MC_CALIBRATOR_CACHE[model_dir] = None
-            return None
-    else:
-        _MC_CALIBRATOR_CACHE[model_dir] = None
-        return None
+
+    _MC_CALIBRATOR_CACHE[model_dir] = None
+    return None
 
 
 def simulate(
@@ -192,7 +212,10 @@ def simulate(
     if not use_ml_model:
         mc_cal = _load_mc_calibrator(model_dir)
         if mc_cal is not None:
-            terminal_probs = mc_cal.calibrate_batch(terminal_probs)
+            if isinstance(mc_cal, InningsMCCalibrators):
+                terminal_probs = mc_cal.calibrate_batch(terminal_probs, state.innings)
+            else:
+                terminal_probs = mc_cal.calibrate_batch(terminal_probs)
             mc_calibrator_applied = True
     
     elapsed = time.time() - start_time
@@ -413,7 +436,10 @@ def simulate_vectorized(
     if not use_ml_model:
         mc_cal = _load_mc_calibrator(model_dir)
         if mc_cal is not None:
-            terminal_probs = mc_cal.calibrate_batch(terminal_probs)
+            if isinstance(mc_cal, InningsMCCalibrators):
+                terminal_probs = mc_cal.calibrate_batch(terminal_probs, state.innings)
+            else:
+                terminal_probs = mc_cal.calibrate_batch(terminal_probs)
     
     elapsed = time.time() - start_time
     
