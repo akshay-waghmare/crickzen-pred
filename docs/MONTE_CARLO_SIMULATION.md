@@ -143,15 +143,16 @@ Current match situation for simulation.
 Aggregated simulation results with uncertainty.
 
 **Fields:**
-- `mean_prob` (float): Mean win probability [0, 1]
-- `std_prob` (float): Standard deviation
-- `p5` (float): 5th percentile
-- `p95` (float): 95th percentile
+- `mean_prob` (float): Mean win probability [0, 1] (calibrated if MC calibrator exists)
+- `std_prob` (float): Standard deviation (from raw terminal distribution)
+- `p5` (float): 5th percentile (from raw terminal distribution)
+- `p95` (float): 95th percentile (from raw terminal distribution)
 - `n_sims` (int): Number of simulations
 - `horizon_balls` (int): Balls simulated per path
 - `time_taken_ms` (float): Execution time in milliseconds
 - `league` (str): League identifier
 - `temperature` (float | None): Applied temperature (if any)
+- `raw_mean` (float | None): Pre-calibration mean probability (for tracking calibration shift)
 
 **Properties:**
 - `ci_low`: Lower 90% confidence bound (p5)
@@ -218,6 +219,34 @@ League-specific probability adjustments applied at terminal evaluation.
 - **T < 1.0**: Sharper probabilities (more confident)
 - **T = 1.0**: Identity (no adjustment)
 - **T > 1.0**: Softer probabilities (less confident)
+
+## MC Platt Calibration (Innings-Specific)
+
+After temperature adjustment, an innings-specific Platt calibrator corrects systematic biases in the MC engine's `resource_win_prob`-based evaluations.
+
+**Formula:** `p_cal = sigmoid(a * logit(p_raw) + b)`
+
+**Key Design**: Calibration is applied to the **aggregated mean** probability (not individual terminal states). Terminal states are binary (0/1), so Platt scaling only works on the continuous mean. See [MC_CALIBRATION_FIX.md](MC_CALIBRATION_FIX.md) for details.
+
+### Calibration Pipeline
+
+```
+Terminal States (0/1 × N)
+    → raw_mean = mean(terminal_probs)     # continuous probability
+    → SimulationResult(std, p5, p95)      # from raw distribution
+    → mean_prob = calibrate(raw_mean)     # Platt scaling on aggregate
+```
+
+### Current Calibrators (T20I)
+
+| Innings | Platt a | Platt b | Samples | Brier | Effect |
+|---------|---------|---------|---------|-------|--------|
+| **Inn 1** | 1.2543 | +0.6711 | 3,052 | 0.2053 | Shifts up (batting team undervalued) |
+| **Inn 2** | 1.1696 | -0.2073 | 2,756 | 0.1185 | Shifts slightly down |
+
+**Training**: Calibrators are trained via `bbl-pipeline train-mc-calibrator` using historical matches.
+
+**When applied**: Only for `resource_win_prob`-based simulation (no ML predictor). When a `Predictor` is provided, the ML model handles its own calibration chain.
 
 ## Betting Decision Logic
 
