@@ -167,6 +167,7 @@ class SimulationResult:
     league: str
     temperature: Optional[float] = None
     feature_mode: Optional[str] = None  # "full" or "simplified"
+    raw_mean: Optional[float] = None    # Raw mean before calibration
     all_probs: Optional[np.ndarray] = field(default=None, repr=False)
     
     def __post_init__(self) -> None:
@@ -187,6 +188,7 @@ class SimulationResult:
         league: str,
         temperature: Optional[float] = None,
         feature_mode: Optional[str] = None,
+        raw_mean: Optional[float] = None,
     ) -> "SimulationResult":
         """
         Create SimulationResult from array of probabilities.
@@ -198,6 +200,7 @@ class SimulationResult:
             league: League code
             temperature: Temperature applied (if any)
             feature_mode: "full" (FeatureContext used) or "simplified" (defaults)
+            raw_mean: Mean probability before calibration
             
         Returns:
             SimulationResult with computed statistics
@@ -213,6 +216,7 @@ class SimulationResult:
             league=league,
             temperature=temperature,
             feature_mode=feature_mode,
+            raw_mean=raw_mean,
             all_probs=probs,
         )
     

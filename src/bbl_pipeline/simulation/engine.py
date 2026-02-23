@@ -208,15 +208,11 @@ def simulate(
         _feature_mode = "full" if feature_context else "simplified"
     
     # Apply MC Platt calibration for resource_win_prob (not ML model)
-    mc_calibrator_applied = False
+    # Calibration is applied to the aggregate mean, not individual terminal states,
+    # because Platt scaling expects a continuous probability estimate.
+    raw_mean = None
     if not use_ml_model:
-        mc_cal = _load_mc_calibrator(model_dir)
-        if mc_cal is not None:
-            if isinstance(mc_cal, InningsMCCalibrators):
-                terminal_probs = mc_cal.calibrate_batch(terminal_probs, state.innings)
-            else:
-                terminal_probs = mc_cal.calibrate_batch(terminal_probs)
-            mc_calibrator_applied = True
+        raw_mean = float(np.mean(terminal_probs))
     
     elapsed = time.time() - start_time
     
@@ -233,7 +229,20 @@ def simulate(
         league=state.league,
         temperature=temperature if not use_ml_model else None,
         feature_mode=sim_feature_mode,
+        raw_mean=raw_mean,
     )
+    
+    # Apply calibration to the final aggregated mean
+    if not use_ml_model:
+        mc_cal = _load_mc_calibrator(model_dir)
+        if mc_cal is not None:
+            if isinstance(mc_cal, InningsMCCalibrators):
+                result.mean_prob = mc_cal.calibrate(result.mean_prob, state.innings)
+            else:
+                result.mean_prob = mc_cal.calibrate(result.mean_prob)
+            
+            # Ensure final probability is bounded
+            result.mean_prob = float(np.clip(result.mean_prob, 0.0, 1.0))
     
     # Get model source info for logging
     predictor_model_dir = None
@@ -433,13 +442,9 @@ def simulate_vectorized(
         terminal_probs = apply_temperature_vectorized(terminal_probs, temperature)
     
     # Apply MC Platt calibration for resource_win_prob (not ML model)
+    raw_mean = None
     if not use_ml_model:
-        mc_cal = _load_mc_calibrator(model_dir)
-        if mc_cal is not None:
-            if isinstance(mc_cal, InningsMCCalibrators):
-                terminal_probs = mc_cal.calibrate_batch(terminal_probs, state.innings)
-            else:
-                terminal_probs = mc_cal.calibrate_batch(terminal_probs)
+        raw_mean = float(np.mean(terminal_probs))
     
     elapsed = time.time() - start_time
     
@@ -450,7 +455,20 @@ def simulate_vectorized(
         league=state.league,
         temperature=temperature if not use_ml_model else None,
         feature_mode=vec_feature_mode,
+        raw_mean=raw_mean,
     )
+    
+    # Apply calibration to the final aggregated mean
+    if not use_ml_model:
+        mc_cal = _load_mc_calibrator(model_dir)
+        if mc_cal is not None:
+            if isinstance(mc_cal, InningsMCCalibrators):
+                result.mean_prob = mc_cal.calibrate(result.mean_prob, state.innings)
+            else:
+                result.mean_prob = mc_cal.calibrate(result.mean_prob)
+            
+            # Ensure final probability is bounded
+            result.mean_prob = float(np.clip(result.mean_prob, 0.0, 1.0))
     
     # Get model source info for logging
     predictor_model_dir = None
