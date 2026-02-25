@@ -292,3 +292,119 @@ class InningsMCCalibrators:
         else:
             parts.append("  Inn2: (none)")
         return "\n".join(parts)
+
+
+# Phase names used as keys
+PHASE_PP = "pp"
+PHASE_MID = "mid"
+PHASE_DEATH = "death"
+VALID_PHASES = {PHASE_PP, PHASE_MID, PHASE_DEATH}
+
+
+def over_to_phase(over: int) -> str:
+    """Map a 0-indexed over number to a phase key.
+
+    Parameters
+    ----------
+    over : int
+        Over number (0-indexed: 0 = first over, 19 = last over of T20).
+
+    Returns
+    -------
+    str
+        One of ``'pp'``, ``'mid'``, ``'death'``.
+    """
+    if over < 6:
+        return PHASE_PP
+    if over < 15:
+        return PHASE_MID
+    return PHASE_DEATH
+
+
+@dataclass
+class InningsPhaseCalibrators:
+    """Container for innings × phase MC Platt calibrators (6 total).
+
+    Holds separate ``MCCalibrator`` instances for each combination of
+    innings (1, 2) and phase (pp, mid, death).
+
+    Keys follow the pattern ``inn{1,2}_{pp,mid,death}``.
+    """
+
+    calibrators: dict = field(default_factory=dict)
+
+    # ------------------------------------------------------------------
+    # Access helpers
+    # ------------------------------------------------------------------
+
+    def _key(self, innings: int, phase: str) -> str:
+        return f"inn{innings}_{phase}"
+
+    def set(self, innings: int, phase: str, cal: MCCalibrator) -> None:
+        """Store a calibrator for a given innings + phase."""
+        if phase not in VALID_PHASES:
+            raise ValueError(f"Invalid phase '{phase}'. Must be one of {VALID_PHASES}")
+        self.calibrators[self._key(innings, phase)] = cal
+
+    def get(self, innings: int, phase: str) -> Optional[MCCalibrator]:
+        """Return the calibrator for the given innings + phase, or ``None``."""
+        return self.calibrators.get(self._key(innings, phase))
+
+    # ------------------------------------------------------------------
+    # Inference
+    # ------------------------------------------------------------------
+
+    def calibrate(self, mc_raw_prob: float, innings: int, phase: str) -> float:
+        """Calibrate a single MC probability using innings × phase calibrator.
+
+        Falls back to raw probability if no calibrator is available.
+        """
+        cal = self.get(innings, phase)
+        if cal is None or cal.model is None:
+            return mc_raw_prob
+        return cal.calibrate(mc_raw_prob)
+
+    def calibrate_batch(
+        self, mc_raw_probs: np.ndarray, innings: int, phase: str
+    ) -> np.ndarray:
+        """Calibrate an array of MC probabilities for a specific innings + phase."""
+        cal = self.get(innings, phase)
+        if cal is None or cal.model is None:
+            return mc_raw_probs
+        return cal.calibrate_batch(mc_raw_probs)
+
+    # ------------------------------------------------------------------
+    # Persistence
+    # ------------------------------------------------------------------
+
+    def save(self, path: str) -> None:
+        """Serialise all calibrators to disk via joblib."""
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(self, path)
+
+    @classmethod
+    def load(cls, path: str) -> "InningsPhaseCalibrators":
+        """Deserialise a saved innings × phase calibrator set."""
+        obj = joblib.load(path)
+        if not isinstance(obj, cls):
+            raise TypeError(
+                f"Expected InningsPhaseCalibrators, got {type(obj).__name__}"
+            )
+        return obj
+
+    # ------------------------------------------------------------------
+    # Diagnostics
+    # ------------------------------------------------------------------
+
+    def summary(self) -> str:
+        """Return a multi-line summary of all 6 calibrators."""
+        parts = ["InningsPhaseCalibrators:"]
+        for innings in [1, 2]:
+            for phase in [PHASE_PP, PHASE_MID, PHASE_DEATH]:
+                key = self._key(innings, phase)
+                cal = self.calibrators.get(key)
+                if cal and cal.model is not None:
+                    parts.append(f"  {key}: {cal.summary()}")
+                else:
+                    parts.append(f"  {key}: (none)")
+        return "\n".join(parts)

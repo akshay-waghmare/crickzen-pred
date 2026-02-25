@@ -728,13 +728,22 @@ class InMemoryFeatureStore:
             return fm_stats
 
         # 0.1 CHECK SEASON OVERRIDES FIRST (if enabled)
-        if self.USE_SEASON_OVERRIDES and full_name in self.SEASON_OVERRIDES:
+        # Skip for international formats (ODI, T20I) where historical feature store
+        # rates from 100+ matches are more representative than CREX "last 10 matches"
+        # which can produce extreme team_strength_diff values (0.60+) outside training distribution
+        _international_leagues = {'odi', 'odi_female', 'odi_male', 'odis',
+                                  't20i', 't20i_female', 't20_international',
+                                  't20_international_male'}
+        _is_international = (self.league_context or '').lower() in _international_leagues
+        if self.USE_SEASON_OVERRIDES and full_name in self.SEASON_OVERRIDES and not _is_international:
             season_stats = self.SEASON_OVERRIDES[full_name].copy()
             # Log what we're using
             bat_wr = season_stats.get('bat_first_wr', season_stats['win_rate'])
             bowl_wr = season_stats.get('bowl_first_wr', season_stats['win_rate'])
             logger.info(f"Using SEASON stats for '{full_name}': {season_stats['matches']} matches, {season_stats['win_rate']*100:.0f}% win rate (bat_first={bat_wr:.0%}, bowl_first={bowl_wr:.0%})")
             return season_stats
+        elif _is_international and full_name in self.SEASON_OVERRIDES:
+            logger.info(f"Skipping SEASON override for '{full_name}' (international format — using historical feature store)")
         
         # 0.2 Check if this is a new team that should use default stats
         if full_name in self.NEW_TEAMS:
@@ -844,6 +853,18 @@ class InMemoryFeatureStore:
                 logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
                 base_stats = self._venue_stats[match].copy()
         
+        # 3.5 Try stripping/adding city suffix (handles different feature stores)
+        # e.g. "SuperSport Park, Centurion" ↔ "SuperSport Park"
+        if base_stats is None and ',' in venue_name:
+            short_name = venue_name.rsplit(',', 1)[0].strip()
+            if short_name in self._venue_stats:
+                logger.info(f"Matched venue '{venue_name}' to '{short_name}' (stripped city suffix)")
+                base_stats = self._venue_stats[short_name].copy()
+            elif short_name.lower() in self._venue_names_lower:
+                real_name = self._venue_names_lower[short_name.lower()]
+                logger.info(f"Matched venue '{venue_name}' to '{real_name}' (stripped city suffix, case-insensitive)")
+                base_stats = self._venue_stats[real_name].copy()
+
         # 4. If no historical data found, create default stats
         if base_stats is None:
             # Only log warning if venue name is meaningful (not generic placeholder)

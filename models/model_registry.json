@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-02-21",
+  "last_updated": "2026-02-25",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -786,6 +786,23 @@
         "version": "v1",
         "generated_date": "2026-02-21",
         "training_data_samples": 1587026
+      }
+    },
+    "ODI_FEMALE": {
+      "path": "models/odi_female_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1390, ECE: 0.0000)",
+      "training": {
+        "samples": 291106,
+        "date": "2026-02-25",
+        "brier_score": 0.1389750330961823
+      },
+      "calibrator": {},
+      "feature_store": {
+        "path": "data/odi_female_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-02-25",
+        "training_data_samples": 291106
       }
     }
   },

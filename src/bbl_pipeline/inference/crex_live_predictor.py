@@ -398,6 +398,7 @@ class CrexLivePredictor:
                 "use_ml_model": use_ml_model,  # Indicates whether ML model was used for terminal evaluation
                 "simulation_1ball": {
                     "mean_prob": result_1ball.mean_prob,
+                    "raw_mean": result_1ball.raw_mean,
                     "std_prob": result_1ball.std_prob,
                     "p5": result_1ball.p5,
                     "p95": result_1ball.p95,
@@ -406,6 +407,7 @@ class CrexLivePredictor:
                 },
                 "simulation_6ball": {
                     "mean_prob": result_6ball.mean_prob,
+                    "raw_mean": result_6ball.raw_mean,
                     "std_prob": result_6ball.std_prob,
                     "p5": result_6ball.p5,
                     "p95": result_6ball.p95,
@@ -414,6 +416,7 @@ class CrexLivePredictor:
                 },
                 "simulation_12ball": {
                     "mean_prob": result_12ball.mean_prob,
+                    "raw_mean": result_12ball.raw_mean,
                     "std_prob": result_12ball.std_prob,
                     "p5": result_12ball.p5,
                     "p95": result_12ball.p95,
@@ -422,6 +425,7 @@ class CrexLivePredictor:
                 },
                 "simulation_30ball": {
                     "mean_prob": result_30ball.mean_prob,
+                    "raw_mean": result_30ball.raw_mean,
                     "std_prob": result_30ball.std_prob,
                     "p5": result_30ball.p5,
                     "p95": result_30ball.p95,
@@ -1296,8 +1300,8 @@ class CrexLivePredictor:
         
         Bypasses the trained model (calibrated on 20-over data) and uses
         Monte Carlo simulation directly. Platt calibration is applied
-        inside the simulation engine (per-terminal-state) — NOT applied
-        again here to avoid double-calibration distortion.
+        inside the simulation engine (to the aggregated mean, not individual
+        terminal states) — NOT applied again here to avoid double-calibration.
         
         Returns:
             Win probability for the batting team (0-1), or None on error.
@@ -1313,21 +1317,24 @@ class CrexLivePredictor:
             
             # Use 6-ball sim as primary (most stable for betting).
             # NOTE: mean_prob is already Platt-calibrated inside the
-            # simulation engine (per-terminal-state via mc_calibrator.pkl).
-            # Do NOT apply the calibrator again here — that was a
-            # double-calibration bug causing ~5-9% probability distortion.
+            # simulation engine (applied to aggregated mean probability).
+            # Do NOT apply the calibrator again here — that would be
+            # double-calibration.
             win_prob = mc_result["simulation_6ball"]["mean_prob"]
+            raw_mean = mc_result["simulation_6ball"].get("raw_mean")
             
             mode_label = "MC-only" if self.mc_only else "Reduced-over MC"
             calibrator = self._load_mc_calibrator()
             cal_status = "engine-calibrated" if (calibrator and calibrator is not False) else "uncalibrated"
+            cal_shift = f" (raw={raw_mean:.4f}, shift={win_prob - raw_mean:+.4f})" if raw_mean is not None else ""
             logger.info(
-                f"{mode_label} ({cal_status}): prob={win_prob:.4f} "
+                f"{mode_label} ({cal_status}): prob={win_prob:.4f}{cal_shift} "
                 f"(total_overs={self._effective_total_overs or 20})"
             )
             
             # Store MC-derived probabilities for output chain
-            self.last_raw_prob = win_prob
+            # raw_mean is the pre-calibration probability, win_prob is post-calibration
+            self.last_raw_prob = raw_mean if raw_mean is not None else win_prob
             self.last_smoothed_prob = win_prob
             self.last_calibrated_prob = win_prob
             self.last_calibrated_combined = win_prob

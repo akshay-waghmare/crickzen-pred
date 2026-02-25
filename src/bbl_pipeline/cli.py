@@ -1213,7 +1213,7 @@ def update_matches(ctx, source_dir, league, dry_run):
 
 
 @main.command()
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'odi', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_female']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'odi', 'odi_female', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_female']), required=True,
               help='League to retrain model for')
 @click.option('--version', type=str, required=True,
               help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
@@ -1319,6 +1319,14 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/odi_features',
             'feature_store_dir': 'data/odi_feature_store',
             'model_prefix': 'odi',
+            'format_type': 'odi',
+        },
+        'odi_female': {
+            'json_dir': 'odis_female_json',
+            'raw_dir': 'data/odi_female_raw',
+            'features_dir': 'data/odi_female_features',
+            'feature_store_dir': 'data/odi_female_feature_store',
+            'model_prefix': 'odi_female',
             'format_type': 'odi',
         },
         'odm_male': {
@@ -1485,6 +1493,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
         't20_male': 'T20_MALE',
         't20_female': 'T20_FEMALE',
         't20i_female': 'T20I_FEMALE',
+        'odi_female': 'ODI_FEMALE',
         'odm_male': 'ODM_MALE',
         'odm_female': 'ODM_FEMALE',
     }
