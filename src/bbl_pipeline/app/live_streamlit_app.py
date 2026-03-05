@@ -408,6 +408,43 @@ def render_backend_controls():
             time.sleep(0.5)
             st.rerun()
 
+    # Log viewer — dynamically build log list from predictor configs
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("## 📋 Logs")
+    
+    # Build log map from predictor configs (not hardcoded)
+    log_map = {}
+    for name, cfg in PREDICTOR_CONFIGS.items():
+        log_name = "wc_ml" if not cfg["mc_only"] else "wc_mc"
+        log_path = f"logs/{log_name}.log"
+        pid = pids.get(name)
+        is_alive = pid is not None and _is_pid_alive(pid)
+        status = f"🟢 PID {pid}" if is_alive else "⚪ stopped"
+        log_map[f"{name} ({status})"] = log_path
+    log_map["Streamlit"] = "logs/streamlit.log"
+    
+    log_choice = st.sidebar.selectbox("View Log", list(log_map.keys()), key="log_choice")
+    log_lines = st.sidebar.slider("Lines", 5, 100, 30, key="log_lines")
+    
+    log_file = Path(log_map[log_choice])
+    if log_file.exists():
+        try:
+            lines = log_file.read_text(errors="replace").splitlines()
+            tail = lines[-log_lines:] if len(lines) > log_lines else lines
+            
+            # Show latest prediction line prominently (the progress bar output)
+            for line in reversed(tail):
+                line_s = line.strip()
+                if "|" in line_s and "%" in line_s and ("ov)" in line_s or "CRR" in line_s):
+                    st.sidebar.info(f"📊 {line_s}")
+                    break
+            
+            st.sidebar.code("\n".join(tail), language="log")
+        except Exception as e:
+            st.sidebar.error(f"Error reading log: {e}")
+    else:
+        st.sidebar.info(f"Log file not found: {log_file}")
+
 
 # Load per-over calibrators for ECE-optimized predictions (smoother than phase calibrators)
 # NOTE: SA20 and WPL use phase calibrators instead of per-over due to small datasets
