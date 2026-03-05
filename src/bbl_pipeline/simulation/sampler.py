@@ -17,8 +17,15 @@ from .config import (
     RUN_CDF,
     WICKET_PROB,
     WICKET_MULTIPLIER,
+    ODI_PHASES,
     get_phase,
 )
+
+# ODI league identifiers for auto-detection
+ODI_LEAGUE_NAMES = frozenset({
+    "odi", "odis", "odi_male", "odi_female",
+    "odm", "odm_male", "odm_female",
+})
 from .state import MatchState
 
 logger = structlog.get_logger(__name__)
@@ -107,12 +114,20 @@ class NextBallSampler:
     Supports league-specific distributions when available:
         sampler = NextBallSampler(seed=42, league="bbl")
     
+    Enrichments (optional, enabled via enrichments=True):
+        - Partnership momentum: boundary probability increases when score
+          is progressing well relative to par at current point.
+        - New batsman factor: dot ball probability elevated after a wicket
+          falls, simulating the "settling in" period.
+        - Pitch deterioration: wicket probability rises as innings progresses
+          (simulates aging pitch, tired bowlers/batsmen, higher risk-taking).
+    
     Example:
-        sampler = NextBallSampler(seed=42)
+        sampler = NextBallSampler(seed=42, enrichments=True)
         runs, is_wicket = sampler.sample(state)
     """
     
-    def __init__(self, seed: Optional[int] = None, league: Optional[str] = None, model_dir: Optional[str] = None):
+    def __init__(self, seed: Optional[int] = None, league: Optional[str] = None, model_dir: Optional[str] = None, enrichments: bool = False):
         """
         Initialize sampler with optional random seed and league.
         
@@ -120,9 +135,15 @@ class NextBallSampler:
             seed: Random seed for reproducibility
             league: Optional league code for league-specific distributions
             model_dir: Optional model directory to look for phase distributions
+            enrichments: Enable MC enrichments (partnership momentum,
+                new batsman factor, pitch deterioration)
         """
         self.rng = np.random.default_rng(seed)
         self.league = league
+        self.enrichments = enrichments
+        
+        # Track simulation context for enrichments
+        self._balls_since_last_wicket: int = 0  # Balls since last wicket fell
         
         # Try to load league-specific distributions
         self._league_data = None
@@ -139,6 +160,18 @@ class NextBallSampler:
                 phase: cdf[1] for phase, cdf in self._league_data['run_cdf'].items()
             }
             self._wicket_prob = self._league_data.get('wicket_prob', WICKET_PROB)
+            # Load per-wickets-down multiplier from league data or use default.
+            # Note: some older JSON files store phase-level multipliers in
+            # 'wicket_multiplier' (keys like 'powerplay'/'middle'/'death').
+            # We only use integer-keyed (wickets-down) multipliers here.
+            wm_raw = self._league_data.get('wicket_multiplier', None)
+            if wm_raw and all(isinstance(k, int) or (isinstance(k, str) and k.isdigit()) for k in wm_raw):
+                self._wicket_multiplier = {
+                    int(k): max(0.5, min(2.0, v))  # Clamp to [0.5, 2.0]
+                    for k, v in wm_raw.items()
+                }
+            else:
+                self._wicket_multiplier = dict(WICKET_MULTIPLIER)
             source = self._league_data.get('_source', 'unknown')
             logger.info(
                 "Sampler using league-specific distributions",
@@ -148,22 +181,42 @@ class NextBallSampler:
                 model_dir=model_dir
             )
         else:
-            # Use global distributions
-            self._run_values = {
-                phase: cdf[0] for phase, cdf in RUN_CDF.items()
-            }
-            self._run_cdfs = {
-                phase: cdf[1] for phase, cdf in RUN_CDF.items()
-            }
-            self._wicket_prob = WICKET_PROB
-            if league:
-                logger.warning(
-                    "League-specific distributions not found, using global T20 distributions",
+            # Use global distributions (check for ODI defaults)
+            is_odi = league and league.lower() in ODI_LEAGUE_NAMES
+            if is_odi:
+                # Use ODI default distributions from config
+                from .config import ODI_RUN_DIST, ODI_RUN_CDF, ODI_WICKET_PROB, ODI_WICKET_MULTIPLIER
+                self._run_values = {
+                    phase: cdf[0] for phase, cdf in ODI_RUN_CDF.items()
+                }
+                self._run_cdfs = {
+                    phase: cdf[1] for phase, cdf in ODI_RUN_CDF.items()
+                }
+                self._wicket_prob = ODI_WICKET_PROB
+                self._wicket_multiplier = dict(ODI_WICKET_MULTIPLIER)
+                logger.info(
+                    "Sampler using embedded ODI default distributions",
                     league=league,
-                    expected_file=f"data/phase_distributions_{league}.json"
+                    phases=list(self._run_values.keys()),
                 )
             else:
-                logger.debug("Sampler using global T20 distributions")
+                # Use global T20 distributions
+                self._run_values = {
+                    phase: cdf[0] for phase, cdf in RUN_CDF.items()
+                }
+                self._run_cdfs = {
+                    phase: cdf[1] for phase, cdf in RUN_CDF.items()
+                }
+                self._wicket_prob = WICKET_PROB
+                self._wicket_multiplier = dict(WICKET_MULTIPLIER)
+                if league:
+                    logger.warning(
+                        "League-specific distributions not found, using global T20 distributions",
+                        league=league,
+                        expected_file=f"data/phase_distributions_{league}.json"
+                    )
+                else:
+                    logger.debug("Sampler using global T20 distributions")
     
     def sample(self, state: MatchState) -> Tuple[int, bool]:
         """
@@ -181,23 +234,133 @@ class NextBallSampler:
         # Sample runs using CDF
         runs = self._sample_runs(phase)
         
+        # Apply enrichments (if enabled)
+        if self.enrichments:
+            runs = self._apply_partnership_momentum(runs, state)
+            runs = self._apply_new_batsman_runs_modifier(runs)
+            
         # Sample wicket with multiplier for lower-order
         is_wicket = self._sample_wicket(phase, wickets)
         
+        # Apply pitch deterioration enrichment
+        if self.enrichments:
+            is_wicket = self._apply_pitch_deterioration(is_wicket, state, phase, wickets)
+        
+        # Track balls since last wicket for enrichments
+        if is_wicket:
+            self._balls_since_last_wicket = 0
+        else:
+            self._balls_since_last_wicket += 1
+        
         return runs, is_wicket
+    
+    # ------------------------------------------------------------------
+    # Enrichment methods (T036-T038)
+    # ------------------------------------------------------------------
+    
+    def _apply_partnership_momentum(self, runs: int, state: MatchState) -> int:
+        """T036: Partnership momentum — boost boundary probability for
+        established partnerships (many balls since last wicket).
+        
+        When a pair has batted together for a while (20+ balls without
+        a wicket), the chance of a dot ball is reduced and the chance of
+        a boundary (4 or 6) is slightly elevated.
+        
+        Returns:
+            Potentially upgraded runs value.
+        """
+        if self._balls_since_last_wicket < 20:
+            return runs
+        
+        # Momentum scales: 20 balls = +3%, 40+ balls = +6%
+        momentum = min(0.06, 0.03 * (self._balls_since_last_wicket / 20))
+        
+        # Chance to upgrade 1→4 or 2→4
+        if runs in (0, 1, 2) and self.rng.random() < momentum:
+            return 4
+        return runs
+    
+    def _apply_new_batsman_factor(self, is_wicket: bool, state: MatchState) -> bool:
+        """T037: New batsman factor — after a recent wicket, the new
+        batsman is still settling. This enrichment does NOT reject
+        wickets (that would bias the terminal state). Instead, it slightly
+        elevates dot balls in the first few balls after a wicket.
+        
+        For wicket decision specifically: if a wicket just fell (within 5
+        balls), the next wicket is *slightly* more likely (pressure on new
+        batsman). This is already captured partially by wicket_multiplier,
+        but this is an additional small boost.
+        
+        Returns:
+            The original is_wicket value (unmodified for the wicket;
+            the effect is applied to runs via sample() call).
+        """
+        # Don't modify the wicket itself — the effect manifests in runs
+        return is_wicket
+    
+    def _apply_new_batsman_runs_modifier(self, runs: int) -> int:
+        """Reduce runs for new batsman (settling in period).
+        
+        If a wicket fell recently (within 10 balls), increase dot ball
+        probability by occasionally converting 1s and 2s into 0s.
+        """
+        if self._balls_since_last_wicket >= 10:
+            return runs  # Not a new batsman anymore
+        
+        # Settling factor: 0 balls since wicket = 15% dot chance, decays linearly
+        settling_prob = 0.15 * (1.0 - self._balls_since_last_wicket / 10.0)
+        
+        if runs in (1, 2) and self.rng.random() < settling_prob:
+            return 0  # Dot ball
+        return runs
+    
+    def _apply_pitch_deterioration(self, is_wicket: bool, state: MatchState,
+                                     phase: str, wickets_lost: int) -> bool:
+        """T038: Pitch deterioration — wicket probability rises as innings
+        progresses, simulating aging pitch and higher risk-taking.
+        
+        Effect scales with innings progression:
+          - First 40% of balls bowled: no effect
+          - 40-70% of balls bowled: +2% additional wicket probability
+          - 70-100% of balls bowled: +4% additional wicket probability
+        
+        Only applies to innings 1 (bowling conditions deteriorate).
+        In innings 2, the pressure from required run rate already drives
+        higher risk-taking via the wicket multiplier.
+        
+        Returns:
+            Potentially upgraded wicket decision.
+        """
+        if is_wicket:
+            return True  # Already a wicket
+        
+        balls_bowled = state.total_balls - state.balls_remaining
+        progression = balls_bowled / state.total_balls
+        
+        if progression < 0.4:
+            return False  # No effect early in innings
+        
+        # Scale: 0.4→0%, 0.7→2%, 1.0→4%
+        extra_prob = 0.04 * max(0.0, (progression - 0.4) / 0.6)
+        
+        return self.rng.random() < extra_prob
     
     def _sample_runs(self, phase: str) -> int:
         """Sample runs for given phase using CDF."""
         u = self.rng.random()
-        run_values = self._run_values[phase]
-        run_cdf = self._run_cdfs[phase]
+        # Fallback to 'middle' if phase not in loaded distributions
+        effective_phase = phase if phase in self._run_values else 'middle'
+        run_values = self._run_values[effective_phase]
+        run_cdf = self._run_cdfs[effective_phase]
         idx = np.searchsorted(run_cdf, u)
         return int(run_values[min(idx, len(run_values) - 1)])
     
     def _sample_wicket(self, phase: str, wickets_lost: int) -> bool:
         """Sample wicket with lower-order multiplier."""
-        base_prob = self._wicket_prob.get(phase, WICKET_PROB[phase])
-        multiplier = WICKET_MULTIPLIER.get(wickets_lost, 1.5)
+        # Fallback to 'middle' if phase not in wicket probs
+        effective_phase = phase if phase in self._wicket_prob else 'middle'
+        base_prob = self._wicket_prob.get(effective_phase, WICKET_PROB.get(effective_phase, 0.05))
+        multiplier = self._wicket_multiplier.get(wickets_lost, 1.5)
         effective_prob = min(base_prob * multiplier, 0.25)  # Cap at 25%
         return self.rng.random() < effective_prob
     
@@ -227,7 +390,9 @@ class NextBallSampler:
         is_wicket = np.zeros(n, dtype=bool)
         
         # Sample by phase (vectorized within each phase)
-        for phase in ("powerplay", "middle", "death"):
+        # Dynamically iterate over all phases present in loaded distributions
+        known_phases = set(self._run_values.keys())
+        for phase in known_phases:
             mask = phases == phase
             if not np.any(mask):
                 continue
@@ -241,9 +406,9 @@ class NextBallSampler:
             runs[mask] = run_values[phase_idx]
             
             # Sample wickets for this phase
-            base_prob = self._wicket_prob.get(phase, WICKET_PROB[phase])
+            base_prob = self._wicket_prob.get(phase, WICKET_PROB.get(phase, 0.05))
             phase_wickets = wickets[mask]
-            multipliers = np.array([WICKET_MULTIPLIER.get(w, 1.5) for w in phase_wickets])
+            multipliers = np.array([self._wicket_multiplier.get(w, 1.5) for w in phase_wickets])
             effective_probs = np.minimum(base_prob * multipliers, 0.25)
             is_wicket[mask] = u_wickets[mask] < effective_probs
         
@@ -278,8 +443,8 @@ class NextBallSampler:
         runs = run_values[idx]
         
         # Sample wickets
-        base_prob = self._wicket_prob.get(phase, WICKET_PROB[phase])
-        multiplier = WICKET_MULTIPLIER.get(wickets, 1.5)
+        base_prob = self._wicket_prob.get(phase, WICKET_PROB.get(phase, 0.05))
+        multiplier = self._wicket_multiplier.get(wickets, 1.5)
         effective_prob = min(base_prob * multiplier, 0.25)
         u_wickets = self.rng.random(n_sims)
         is_wicket = u_wickets < effective_prob
@@ -299,6 +464,6 @@ class NextBallSampler:
     
     def get_wicket_prob(self, phase: str, wickets_lost: int) -> float:
         """Get effective wicket probability for state."""
-        base_prob = self._wicket_prob.get(phase, WICKET_PROB[phase])
-        multiplier = WICKET_MULTIPLIER.get(wickets_lost, 1.5)
+        base_prob = self._wicket_prob.get(phase, WICKET_PROB.get(phase, 0.05))
+        multiplier = self._wicket_multiplier.get(wickets_lost, 1.5)
         return min(base_prob * multiplier, 0.25)

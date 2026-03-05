@@ -297,23 +297,38 @@ class InningsMCCalibrators:
 # Phase names used as keys
 PHASE_PP = "pp"
 PHASE_MID = "mid"
+PHASE_SETUP = "setup"
 PHASE_DEATH = "death"
-VALID_PHASES = {PHASE_PP, PHASE_MID, PHASE_DEATH}
+VALID_PHASES_T20 = {PHASE_PP, PHASE_MID, PHASE_DEATH}
+VALID_PHASES_ODI = {PHASE_PP, PHASE_MID, PHASE_SETUP, PHASE_DEATH}
+VALID_PHASES = VALID_PHASES_T20 | VALID_PHASES_ODI
 
 
-def over_to_phase(over: int) -> str:
+def over_to_phase(over: int, total_overs: int = 20) -> str:
     """Map a 0-indexed over number to a phase key.
 
     Parameters
     ----------
     over : int
-        Over number (0-indexed: 0 = first over, 19 = last over of T20).
+        Over number (0-indexed: 0 = first over).
+    total_overs : int
+        Total overs in the match format (20 for T20, 50 for ODI).
 
     Returns
     -------
     str
-        One of ``'pp'``, ``'mid'``, ``'death'``.
+        One of ``'pp'``, ``'mid'``, ``'setup'`` (ODI only), ``'death'``.
     """
+    if total_overs >= 40:
+        # ODI: PP 0-9, Mid 10-33, Setup 34-39, Death 40-49
+        if over < 10:
+            return PHASE_PP
+        if over < 34:
+            return PHASE_MID
+        if over < 40:
+            return PHASE_SETUP
+        return PHASE_DEATH
+    # T20: PP 0-5, Mid 6-14, Death 15-19
     if over < 6:
         return PHASE_PP
     if over < 15:
@@ -323,15 +338,16 @@ def over_to_phase(over: int) -> str:
 
 @dataclass
 class InningsPhaseCalibrators:
-    """Container for innings × phase MC Platt calibrators (6 total).
+    """Container for innings × phase MC Platt calibrators.
 
-    Holds separate ``MCCalibrator`` instances for each combination of
-    innings (1, 2) and phase (pp, mid, death).
+    For T20: 6 calibrators (2 innings × 3 phases: pp, mid, death).
+    For ODI: 8 calibrators (2 innings × 4 phases: pp, mid, setup, death).
 
-    Keys follow the pattern ``inn{1,2}_{pp,mid,death}``.
+    Keys follow the pattern ``inn{1,2}_{pp,mid,setup,death}``.
     """
 
     calibrators: dict = field(default_factory=dict)
+    total_overs: int = 20
 
     # ------------------------------------------------------------------
     # Access helpers
@@ -340,10 +356,17 @@ class InningsPhaseCalibrators:
     def _key(self, innings: int, phase: str) -> str:
         return f"inn{innings}_{phase}"
 
+    @property
+    def valid_phases(self) -> set:
+        """Return valid phases based on format."""
+        if self.total_overs >= 40:
+            return VALID_PHASES_ODI
+        return VALID_PHASES_T20
+
     def set(self, innings: int, phase: str, cal: MCCalibrator) -> None:
         """Store a calibrator for a given innings + phase."""
-        if phase not in VALID_PHASES:
-            raise ValueError(f"Invalid phase '{phase}'. Must be one of {VALID_PHASES}")
+        if phase not in self.valid_phases:
+            raise ValueError(f"Invalid phase '{phase}'. Must be one of {self.valid_phases}")
         self.calibrators[self._key(innings, phase)] = cal
 
     def get(self, innings: int, phase: str) -> Optional[MCCalibrator]:
@@ -397,10 +420,11 @@ class InningsPhaseCalibrators:
     # ------------------------------------------------------------------
 
     def summary(self) -> str:
-        """Return a multi-line summary of all 6 calibrators."""
-        parts = ["InningsPhaseCalibrators:"]
+        """Return a multi-line summary of all calibrators."""
+        phases = sorted(self.valid_phases)
+        parts = [f"InningsPhaseCalibrators(total_overs={self.total_overs}):"]
         for innings in [1, 2]:
-            for phase in [PHASE_PP, PHASE_MID, PHASE_DEATH]:
+            for phase in phases:
                 key = self._key(innings, phase)
                 cal = self.calibrators.get(key)
                 if cal and cal.model is not None:

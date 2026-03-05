@@ -195,52 +195,53 @@
       }
     },
     "T20_INTERNATIONAL_MALE": {
-      "path": "models/t20_international_male_v1",
-      "version": "v1",
-      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1583, ECE: 0.0000)",
+      "path": "models/t20_international_male_v2",
+      "version": "v2",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1580, ECE: 0.0000)",
       "training": {
-        "samples": 686832,
-        "date": "2026-01-21",
-        "brier_score": 0.1605
+        "samples": 701623,
+        "matches": 3177,
+        "date": "2026-03-04",
+        "brier_score": 0.1604
       },
       "calibrator": {
-        "path": "models/t20_international_male_v1/isotonic_calibrator.pkl",
+        "path": "models/t20_international_male_v2/isotonic_calibrator.pkl",
         "type": "isotonic_regression",
-        "generated_date": "2026-01-21T13:00:29",
+        "generated_date": "2026-03-04",
         "oof_metrics": {
-          "brier_raw": 0.1599,
-          "brier_calibrated": 0.1583,
-          "ece_raw": 0.0041,
+          "brier_raw": 0.1597,
+          "brier_calibrated": 0.1580,
+          "ece_raw": 0.0053,
           "ece_calibrated": 0.0
         },
         "innings_specific": {
           "innings1": {
-            "samples": 366089,
-            "brier_raw": 0.198,
-            "brier_calibrated": 0.1976,
-            "ece_raw": 0.01,
-            "ece_calibrated": 0.0001
+            "samples": 373852,
+            "brier_raw": 0.1979,
+            "brier_calibrated": 0.1963,
+            "ece_raw": 0.0101,
+            "ece_calibrated": 0.0
           },
           "innings2": {
-            "samples": 320743,
-            "brier_raw": 0.1165,
-            "brier_calibrated": 0.1162,
-            "ece_raw": 0.009,
-            "ece_calibrated": 0.0014
+            "samples": 327771,
+            "brier_raw": 0.1162,
+            "brier_calibrated": 0.1144,
+            "ece_raw": 0.0091,
+            "ece_calibrated": 0.0
           }
         },
         "n_features": 25,
         "feature_hash": "38e1118fcd20b75d2440171a4cef23d8"
       },
       "feature_store": {
-        "path": "data/t20_international_male_feature_store_v1",
-        "version": "v1",
-        "generated_date": "2026-01-21",
-        "training_data_samples": 686832,
+        "path": "data/t20_international_male_feature_store_v2",
+        "version": "v2",
+        "generated_date": "2026-03-04",
+        "training_data_samples": 701623,
         "statistics": {
           "teams": 107,
-          "players": 4238,
-          "venues": 323,
+          "players": 4248,
+          "venues": 324,
           "team_columns": [
             "team",
             "win_rate",
@@ -261,9 +262,9 @@
           ]
         },
         "recent_changes": {
-          "date": "2026-01-21",
-          "description": "Initial T20 International Male model trained on 686,832 samples; includes per-over brier-optimized calibrators (38 calibrators) and innings\u00c3\u2014phase calibrators (6 calibrators)",
-          "impact": "Best overall OOF performance: Brier 0.1583 (best), ECE 0.0000 (perfect), LogLoss 0.4719. Per-over calibration outperforms all other methods."
+          "date": "2026-03-04",
+          "description": "Retrained with 64 new T20 WC 2026 matches (701,623 samples total, 3,177 matches); per-over brier-optimized calibrators (38) and innings×phase calibrators (6)",
+          "impact": "OOF Brier improved: 0.1580 (v2) vs 0.1583 (v1). Added 10 new players, 1 new venue from T20 WC 2026."
         }
       }
     },
@@ -935,6 +936,46 @@
           "death_wicket_prob": 0.0909
         }
       }
+    },
+    "odi_mc": {
+      "version": "v1",
+      "type": "mc_only",
+      "created": "2026-02-28",
+      "description": "ODI Monte Carlo standalone predictor - no ML model required. Uses empirical phase distributions and resource-based terminal evaluation for any ODI/List A match.",
+      "format": "odi",
+      "total_overs": 50,
+      "par_score": 257.7,
+      "phases": ["powerplay", "middle", "setup", "death"],
+      "phase_boundaries": {
+        "powerplay": "overs 1-10",
+        "middle": "overs 11-34",
+        "setup": "overs 35-40",
+        "death": "overs 41-50"
+      },
+      "phase_distributions": {
+        "path": "data/phase_distributions_odi.json",
+        "source": "1760 male ODIs (2010+, Cricsheet)",
+        "total_balls": 935224,
+        "total_wickets": 25740,
+        "extraction_script": "scripts/extract_odi_phase_distributions.py"
+      },
+      "calibrator": {
+        "type": "none",
+        "status": "uncalibrated",
+        "training_script": "scripts/train_odi_mc_calibrator.py",
+        "notes": "Run train_odi_mc_calibrator.py to fit Platt/isotonic calibrators on historical ODI data"
+      },
+      "enrichments": {
+        "partnership_momentum": "Increased boundary probability for partnerships > 20 balls",
+        "new_batsman_factor": "Elevated dot ball probability for first 10 balls after wicket",
+        "pitch_deterioration": "Progressive wicket probability increase after 40% of innings bowled"
+      },
+      "metrics": {
+        "target_brier": 0.185,
+        "notes": "MC-only mode; expected ~15% worse than trained ML model (0.1609)"
+      },
+      "feature_store": null,
+      "notes": "Zero-dependency predictor. Use with crex_live_predictor --mc-only for ODI matches. No model-dir or feature-store required."
     }
   }
 }

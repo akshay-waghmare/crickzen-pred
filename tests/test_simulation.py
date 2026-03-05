@@ -242,7 +242,7 @@ class TestMatchState:
 
     def test_total_balls_not_divisible_by_6_raises(self):
         """total_balls not divisible by 6 raises ValueError."""
-        with pytest.raises(ValueError, match="total_balls must be 6-120 and divisible by 6"):
+        with pytest.raises(ValueError, match="total_balls must be 6-300 and divisible by 6"):
             MatchState(
                 innings=1, score=0, wickets_lost=0, balls_remaining=10,
                 batting_team="A", bowling_team="B", league="bbl",
@@ -251,7 +251,7 @@ class TestMatchState:
 
     def test_total_balls_below_6_raises(self):
         """total_balls below 6 raises ValueError."""
-        with pytest.raises(ValueError, match="total_balls must be 6-120 and divisible by 6"):
+        with pytest.raises(ValueError, match="total_balls must be 6-300 and divisible by 6"):
             MatchState(
                 innings=1, score=0, wickets_lost=0, balls_remaining=3,
                 batting_team="A", bowling_team="B", league="bbl",

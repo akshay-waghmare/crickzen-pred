@@ -692,7 +692,7 @@ class InMemoryFeatureStore:
         for _ in range(max_depth):
             if current in self._team_stats:
                 if len(chain) > 1:
-                    logger.info(f"Resolved team chain: {' → '.join(chain)}")
+                    logger.info(f"Resolved team chain: {' -> '.join(chain)}")
                 return current
             
             if current in aliases:
@@ -703,7 +703,7 @@ class InMemoryFeatureStore:
         
         # Final check
         if current in self._team_stats:
-            logger.info(f"Resolved team chain: {' → '.join(chain)}")
+            logger.info(f"Resolved team chain: {' -> '.join(chain)}")
             return current
         
         return None
@@ -743,7 +743,7 @@ class InMemoryFeatureStore:
             logger.info(f"Using SEASON stats for '{full_name}': {season_stats['matches']} matches, {season_stats['win_rate']*100:.0f}% win rate (bat_first={bat_wr:.0%}, bowl_first={bowl_wr:.0%})")
             return season_stats
         elif _is_international and full_name in self.SEASON_OVERRIDES:
-            logger.info(f"Skipping SEASON override for '{full_name}' (international format — using historical feature store)")
+            logger.info(f"Skipping SEASON override for '{full_name}' (international format - using historical feature store)")
         
         # 0.2 Check if this is a new team that should use default stats
         if full_name in self.NEW_TEAMS:
@@ -755,9 +755,9 @@ class InMemoryFeatureStore:
         if resolved:
             # Warn if using a proxy team (not same as original)
             if resolved != full_name:
-                logger.warning(f"⚠️ Using PROXY stats: '{full_name}' → '{resolved}' (no direct data for this team)")
+                logger.warning(f"Using PROXY stats: '{full_name}' -> '{resolved}' (no direct data for this team)")
             if team_name != full_name:
-                logger.info(f"Mapped team abbreviation '{team_name}' → '{full_name}' → '{resolved}'")
+                logger.info(f"Mapped team abbreviation '{team_name}' -> '{full_name}' -> '{resolved}'")
             return self._team_stats[resolved]
             
         # 1. Exact match

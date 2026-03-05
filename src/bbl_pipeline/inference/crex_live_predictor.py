@@ -124,10 +124,15 @@ class CrexLivePredictor:
         self._cli_revised_target = revised_target  # CLI override for DLS revised target
         self._effective_total_overs = total_overs  # Currently effective total overs (may change mid-match)
 
-        # Create format config — reduced if total_overs explicitly set < 20
+        # Create format config based on total_overs
         if total_overs is not None and 1 <= total_overs < 20:
             self.format_config = FormatConfig.t20_reduced(total_overs)
             logger.info(f"Reduced-over mode: {total_overs} overs, par={self.format_config.par_score:.1f}")
+        elif total_overs is not None and total_overs >= 40:
+            # ODI format (40-50 overs) - detect gender from league
+            odi_gender = "female" if league and "female" in league else "male"
+            self.format_config = FormatConfig.odi(gender=odi_gender)
+            logger.info(f"ODI mode ({odi_gender}): {total_overs} overs, par={self.format_config.par_score:.1f}")
         else:
             self.format_config = FormatConfig.from_league(league) if league else FormatConfig.t20()
 
@@ -201,6 +206,11 @@ class CrexLivePredictor:
     
     def _load_model(self):
         """Load the trained prediction model."""
+        # Skip model loading entirely in MC-only mode
+        if self.mc_only:
+            print("[INFO] MC-only mode — skipping ML model loading")
+            self.predictor = None
+            return
         try:
             from bbl_pipeline.inference.predictor import Predictor
             self.predictor = Predictor.load(self.model_dir, self.feature_store_dir, league=self.league)
@@ -281,32 +291,38 @@ class CrexLivePredictor:
             if balls_remaining <= 0:
                 return None
             
-            # Use self.league if provided, otherwise detect from model_dir
+            # Use self.league if provided, otherwise detect from format/model_dir
             league = self.league  # Prefer explicitly set league
             if not league:
-                # Fallback: detect from model_dir
-                league = "bbl"  # Default
-                model_dir_lower = self.model_dir.lower()
-                if "t20_international" in model_dir_lower or "t20i" in model_dir_lower:
-                    league = "t20i"
-                elif "sa20" in model_dir_lower or "sat_" in model_dir_lower:
-                    league = "sa20"
-                elif "ilt20" in model_dir_lower or "ilt_" in model_dir_lower:
-                    league = "ilt20"
-                elif "wpl" in model_dir_lower:
-                    league = "wpl"
-                elif "ssm" in model_dir_lower:
-                    league = "ssm"
-                elif "bpl" in model_dir_lower:
-                    league = "bpl"
-                elif "odm_male" in model_dir_lower:
-                    league = "odm_male"
-                elif "odm_female" in model_dir_lower:
-                    league = "odm_female"
-                elif "odi" in model_dir_lower:
+                # Auto-detect ODI from format config
+                effective_overs = self._effective_total_overs or self.format_config.total_overs
+                if effective_overs >= 40:
                     league = "odi"
-                elif "female" in model_dir_lower:
-                    league = None  # Global female model - no specific league calibration
+                else:
+                    # Fallback: detect from model_dir path
+                    model_dir_lower = self.model_dir.lower() if self.model_dir else ""
+                    if "t20_international" in model_dir_lower or "t20i" in model_dir_lower:
+                        league = "t20i"
+                    elif "sa20" in model_dir_lower or "sat_" in model_dir_lower:
+                        league = "sa20"
+                    elif "ilt20" in model_dir_lower or "ilt_" in model_dir_lower:
+                        league = "ilt20"
+                    elif "wpl" in model_dir_lower:
+                        league = "wpl"
+                    elif "ssm" in model_dir_lower:
+                        league = "ssm"
+                    elif "bpl" in model_dir_lower:
+                        league = "bpl"
+                    elif "odm_male" in model_dir_lower:
+                        league = "odm_male"
+                    elif "odm_female" in model_dir_lower:
+                        league = "odm_female"
+                    elif "odi" in model_dir_lower:
+                        league = "odi"
+                    elif "female" in model_dir_lower:
+                        league = None  # Global female model
+                    else:
+                        league = "bbl"  # Default for T20
             
             # Create simulation state
             # Get team stats from feature store for accurate Monte Carlo
@@ -353,17 +369,36 @@ class CrexLivePredictor:
             # Choose predictor for ML model mode
             predictor = self.predictor if use_ml_model else None
             
+            # Resolve model_dir for MC calibrator loading.
+            # For ODI mc-only mode, fall back to models/odi_mc_v1 if self.model_dir
+            # doesn't contain MC calibrators (e.g. default models/champion_final).
+            mc_model_dir = self.model_dir
+            if league == "odi" or league == "odi_female" or (self._effective_total_overs or self.format_config.total_overs) >= 40:
+                import os
+                if not os.path.exists(os.path.join(self.model_dir, "mc_calibrators_innings_phase.pkl")):
+                    # Try gender-specific fallback first, then generic ODI
+                    is_female = league and "female" in league
+                    fallback_candidates = (
+                        ["models/odi_female_mc_v1", "models/odi_mc_v1"] if is_female
+                        else ["models/odi_mc_v1"]
+                    )
+                    for odi_fallback in fallback_candidates:
+                        if os.path.isdir(odi_fallback):
+                            mc_model_dir = odi_fallback
+                            logger.debug(f"Using ODI MC calibrator dir: {mc_model_dir}")
+                            break
+            
             # Run 1-ball simulation (fast)
-            result_1ball = simulate(sim_state, horizon=1, n_simulations=1000, predictor=predictor, model_dir=self.model_dir)
+            result_1ball = simulate(sim_state, horizon=1, n_simulations=1000, predictor=predictor, model_dir=mc_model_dir)
             
             # Run 6-ball (1 over) simulation
-            result_6ball = simulate_one_over(sim_state, n_simulations=2000, predictor=predictor, model_dir=self.model_dir)
+            result_6ball = simulate_one_over(sim_state, n_simulations=2000, predictor=predictor, model_dir=mc_model_dir)
             
             # Run 12-ball (2 over) simulation
-            result_12ball = simulate_two_overs(sim_state, n_simulations=2000, predictor=predictor, model_dir=self.model_dir)
+            result_12ball = simulate_two_overs(sim_state, n_simulations=2000, predictor=predictor, model_dir=mc_model_dir)
             
             # Run 30-ball (5 over) simulation - useful for first innings uncertainty
-            result_30ball = simulate_five_overs(sim_state, n_simulations=2000, predictor=predictor, model_dir=self.model_dir)
+            result_30ball = simulate_five_overs(sim_state, n_simulations=2000, predictor=predictor, model_dir=mc_model_dir)
             
             # Evaluate betting decision if market odds available
             # Uses league-calibrated model_prob for edge calculation (more accurate than simulation mean)
@@ -943,6 +978,28 @@ class CrexLivePredictor:
                 self.match_state.wickets = int(title_match.group(3))
                 self.match_state.overs = float(title_match.group(4))
                 
+                # Auto-detect ODI from current overs > 20 (can't be T20 if over 20 bowled)
+                current_overs = self.match_state.overs
+                if current_overs > 20.0 and (self._effective_total_overs is None or self._effective_total_overs <= 20):
+                    logger.info(f"Auto-detected ODI format: current overs {current_overs} > 20")
+                    self._update_total_overs(50)
+                
+                # Auto-detect ODI from first innings overs in title: "vs Team 259-7 ((42.0))"
+                first_inn_title = re.search(r'vs\s+[A-Za-z\s]+\s+(\d+)-\d+\s+\(\(([\d.]+)\)\)', title)
+                if first_inn_title:
+                    first_inn_overs = float(first_inn_title.group(2))
+                    first_inn_score = int(first_inn_title.group(1))
+                    if first_inn_overs > 20.0 and (self._effective_total_overs is None or self._effective_total_overs <= 20):
+                        logger.info(f"Auto-detected ODI format from title: first innings {first_inn_overs} overs (score: {first_inn_score})")
+                        self._update_total_overs(50)
+                    # Also set second innings info
+                    if not self.match_state.is_second_innings:
+                        logger.info("Innings change detected from title (first innings score found)")
+                        self.match_state.is_second_innings = True
+                    if self.match_state.target is None:
+                        self.match_state.target = first_inn_score + 1
+                        logger.info(f"Set target from title: {first_inn_score} + 1 = {self.match_state.target}")
+                
                 # Helper to normalize team names for comparison (e.g. "IND-W" vs "INDW")
                 def _norm_team(name: str) -> str:
                     return name.replace('-', '').replace(' ', '').upper()
@@ -998,17 +1055,17 @@ class CrexLivePredictor:
                     logger.info(f"CREX detected DLS revised target: {detected_target}")
                     self._cli_revised_target = detected_target
             
-            # Detect reduced overs (e.g. "15 overs match" or "12 overs per side")
+            # Detect overs format (e.g. "15 overs match", "50 overs per side")
             reduced_overs_match = re.search(
                 r'(\d+)\s+ov(?:er)?s?\s+(?:match|per\s+side|a\s+side)',
                 page_text, re.IGNORECASE
             )
             if reduced_overs_match:
                 detected_overs = int(reduced_overs_match.group(1))
-                if 1 <= detected_overs < 20:
+                if 1 <= detected_overs <= 50:
                     prev = self._effective_total_overs or self.format_config.total_overs
                     if detected_overs != prev:
-                        logger.info(f"CREX detected reduced overs: {detected_overs} (was: {prev})")
+                        logger.info(f"CREX detected overs format: {detected_overs} (was: {prev})")
                         self._update_total_overs(detected_overs)
             
             # Detect second innings by looking for "need X runs" or "RRR"
@@ -1017,7 +1074,15 @@ class CrexLivePredictor:
             
             # Also try to extract the first innings total from "vs Team XXX-Y" or "((overs))" pattern
             # Pattern: "vs Sydney Sixers 113-5 ((11.0))" -> target = 114
-            first_innings_match = re.search(r'vs\s+[A-Za-z\s]+\s+(\d+)-\d+\s+\(\(', page_text)
+            first_innings_match = re.search(r'vs\s+[A-Za-z\s]+\s+(\d+)-\d+\s+\(\(([\d.]+)\)\)', page_text)
+            
+            # Auto-detect ODI format from first innings overs (e.g. ((42.0)) means > 20 overs = ODI)
+            if first_innings_match:
+                first_inn_overs = float(first_innings_match.group(2))
+                if first_inn_overs > 20 and (self._effective_total_overs is None or self._effective_total_overs <= 20):
+                    detected_total = 50  # Standard ODI
+                    logger.info(f"Auto-detected ODI format from first innings overs: {first_inn_overs} -> {detected_total} overs")
+                    self._update_total_overs(detected_total)
             
             if needs_runs_match or rrr_match or first_innings_match:
                 # Note: We do NOT clear balls_data here anymore!
@@ -1212,6 +1277,14 @@ class CrexLivePredictor:
                 f"Switching to MC-only mode: total_overs={new_total_overs} "
                 f"(was {old}), par={self.format_config.par_score:.1f}"
             )
+        elif new_total_overs >= 40:
+            # Detect gender from league for correct par score
+            odi_gender = "female" if self.league and "female" in self.league else "male"
+            self.format_config = FormatConfig.odi(gender=odi_gender)
+            logger.info(
+                f"Switching to ODI mode ({odi_gender}): total_overs={new_total_overs} "
+                f"(was {old}), par={self.format_config.par_score:.1f}"
+            )
         else:
             self.format_config = FormatConfig.from_league(self.league) if self.league else FormatConfig.t20()
             logger.info(f"Reverting to standard mode: total_overs={new_total_overs} (was {old})")
@@ -1225,8 +1298,10 @@ class CrexLivePredictor:
             # Refresh match state from DOM
             await self._extract_match_info()
             
-            # Run prediction if model is loaded
-            if self.model:
+            # Run prediction if model is loaded or MC-only mode
+            effective_overs = self._effective_total_overs or self.format_config.total_overs
+            can_predict = self.model or self.mc_only or effective_overs < 20
+            if can_predict:
                 win_prob = self._run_prediction()
                 return win_prob
             
@@ -1236,6 +1311,38 @@ class CrexLivePredictor:
             print(f"[WARN] Error in poll_and_predict: {e}")
             return None
     
+    def _is_match_complete(self) -> bool:
+        """
+        Check if match is completely finished.
+        
+        Returns True only if:
+        - Innings 1 complete: all overs bowled OR all out (10 wickets)
+        - Innings 2 complete: target reached OR all out OR all overs bowled
+        """
+        state = self.match_state
+        total_overs = float(self.format_config.total_overs)
+        
+        if not state.is_second_innings:
+            # Innings 1: complete when all overs bowled or all out
+            if state.overs >= total_overs or state.wickets >= 10:
+                return True
+            return False
+        
+        # Innings 2: complete when result is determined
+        if not state.target:
+            # Target not yet set - still in Innings 1 or early Innings 2
+            return False
+        
+        # Batting team won - scored enough
+        if state.total_runs >= state.target:
+            return True
+        
+        # Bowling team won - all out or all overs
+        if state.wickets >= 10 or state.overs >= float(self.format_config.total_overs):
+            return True
+        
+        return False  # Still in progress
+
     def _check_match_result(self) -> Optional[float]:
         """
         Check if match is definitively over and return final probability.
@@ -1268,28 +1375,48 @@ class CrexLivePredictor:
         return None  # Match still in progress
     
     def _load_mc_calibrator(self):
-        """Lazily load MC calibrator (innings-specific or legacy) if available."""
+        """Lazily load MC calibrator (innings×phase, innings-specific, or legacy) if available."""
         if self._mc_calibrator is not None:
             return self._mc_calibrator
         try:
-            from bbl_pipeline.calibration.mc_calibrator import MCCalibrator, InningsMCCalibrators
+            from bbl_pipeline.calibration.mc_calibrator import MCCalibrator, InningsMCCalibrators, InningsPhaseCalibrators
             import os
 
-            # Prefer innings-specific calibrators
-            innings_path = os.path.join(self.model_dir, "mc_calibrators_innings.pkl")
-            if os.path.exists(innings_path):
-                self._mc_calibrator = InningsMCCalibrators.load(innings_path)
-                logger.info(f"Loaded innings-specific MC calibrators:\n{self._mc_calibrator.summary()}")
-                return self._mc_calibrator
+            # Directories to search: model_dir first, then ODI fallback
+            search_dirs = [self.model_dir]
+            effective_overs = self._effective_total_overs or self.format_config.total_overs
+            if effective_overs >= 40:
+                is_female = self.league and "female" in self.league
+                # Try gender-specific fallback first
+                if is_female and os.path.isdir("models/odi_female_mc_v1"):
+                    search_dirs.append("models/odi_female_mc_v1")
+                if os.path.isdir("models/odi_mc_v1"):
+                    search_dirs.append("models/odi_mc_v1")
 
-            # Fall back to legacy single calibrator
-            cal_path = os.path.join(self.model_dir, "mc_calibrator.pkl")
-            if os.path.exists(cal_path):
-                self._mc_calibrator = MCCalibrator.load(cal_path)
-                logger.info(f"Loaded MC calibrator (legacy): {self._mc_calibrator.summary()}")
-            else:
-                logger.info("No MC calibrator found — using raw MC probabilities")
-                self._mc_calibrator = False  # sentinel: tried but not found
+            for search_dir in search_dirs:
+                # Prefer innings × phase calibrators (supports ODI 4-phase)
+                phase_path = os.path.join(search_dir, "mc_calibrators_innings_phase.pkl")
+                if os.path.exists(phase_path):
+                    self._mc_calibrator = InningsPhaseCalibrators.load(phase_path)
+                    logger.info(f"Loaded innings×phase MC calibrators from {search_dir}:\n{self._mc_calibrator.summary()}")
+                    return self._mc_calibrator
+
+                # Prefer innings-specific calibrators
+                innings_path = os.path.join(search_dir, "mc_calibrators_innings.pkl")
+                if os.path.exists(innings_path):
+                    self._mc_calibrator = InningsMCCalibrators.load(innings_path)
+                    logger.info(f"Loaded innings-specific MC calibrators from {search_dir}:\n{self._mc_calibrator.summary()}")
+                    return self._mc_calibrator
+
+                # Fall back to legacy single calibrator
+                cal_path = os.path.join(search_dir, "mc_calibrator.pkl")
+                if os.path.exists(cal_path):
+                    self._mc_calibrator = MCCalibrator.load(cal_path)
+                    logger.info(f"Loaded MC calibrator (legacy) from {search_dir}: {self._mc_calibrator.summary()}")
+                    return self._mc_calibrator
+
+            logger.info("No MC calibrator found — using raw MC probabilities")
+            self._mc_calibrator = False  # sentinel: tried but not found
         except Exception as e:
             logger.warning(f"Failed to load MC calibrator: {e}")
             self._mc_calibrator = False
@@ -1329,7 +1456,7 @@ class CrexLivePredictor:
             cal_shift = f" (raw={raw_mean:.4f}, shift={win_prob - raw_mean:+.4f})" if raw_mean is not None else ""
             logger.info(
                 f"{mode_label} ({cal_status}): prob={win_prob:.4f}{cal_shift} "
-                f"(total_overs={self._effective_total_overs or 20})"
+                f"(total_overs={self._effective_total_overs or self.format_config.total_overs})"
             )
             
             # Store MC-derived probabilities for output chain
@@ -1365,7 +1492,7 @@ class CrexLivePredictor:
             if self._cli_revised_target and self.match_state.is_second_innings:
                 self.match_state.target = self._cli_revised_target
             
-            # MC-only mode: reduced overs OR explicit --mc-only flag
+            # MC-only mode: reduced overs or explicit --mc-only flag
             effective_overs = self._effective_total_overs or self.format_config.total_overs
             if effective_overs < 20 or self.mc_only:
                 return self._run_reduced_over_prediction()
@@ -1616,10 +1743,24 @@ class CrexLivePredictor:
             # Finalize match state recording if enabled
             if self.match_state_logger:
                 try:
-                    self.match_state_logger.finalize(result_type="in_progress")
-                    print("[RECORD] Match state recording finalized")
+                    # Determine if match is complete
+                    match_complete = self._is_match_complete()
+                    
+                    if match_complete:
+                        # Match is finished - finalize with result
+                        print("[RECORD] Match complete - finalizing recording")
+                        self.match_state_logger.finalize(result_type="completed")
+                    else:
+                        # Match interrupted mid-play - DON'T call finalize()
+                        # This allows recording to resume if predictor restarts
+                        # Just flush any remaining buffer
+                        self.match_state_logger.flush()
+                        state = self.match_state
+                        print(f"[RECORD] Recording paused at {state.batting_team}: {state.total_runs}/{state.wickets} ({state.overs} overs)")
+                        print("[RECORD] ⚠️  Match incomplete - recording NOT finalized (allows resume)")
+                    
                 except Exception as e:
-                    print(f"[WARN] Logger finalize failed: {e}")
+                    print(f"[WARN] Logger finalize/flush failed: {e}")
             await self.stop()
     
     def _display_state(self, win_prob: Optional[float]):
@@ -1815,9 +1956,12 @@ class CrexLivePredictor:
                 "market_fav_prob": state.market_fav_prob,
                 # Monte Carlo simulation results (uses league-calibrated win_prob for betting edge)
                 "monte_carlo": self._run_monte_carlo_simulation(model_prob=win_prob, use_ml_model=self.use_ml_model),
-                # Reduced-over / DLS fields
+                # Reduced-over / DLS / ODI fields
                 "total_overs": self._effective_total_overs or self.format_config.total_overs,
                 "revised_target": self._cli_revised_target,
+                "format": self.format_config.format_name,
+                "par_score": self.format_config.par_score,
+                "mc_only": self.mc_only or (self._effective_total_overs or self.format_config.total_overs) < 20 or (self._effective_total_overs or self.format_config.total_overs) >= 40,
             }
             
             # Write atomically
@@ -1940,8 +2084,8 @@ async def main():
         "--total-overs",
         type=int,
         default=None,
-        help="Total overs per innings (1-20). Auto-detected from CREX if not specified. "
-             "When < 20, switches to MC-only prediction mode.",
+        help="Total overs per innings (1-50). Auto-detected from CREX if not specified. "
+             "When < 20, switches to MC-only prediction. When >= 40, uses ODI format.",
     )
     parser.add_argument(
         "--revised-target",
@@ -1953,8 +2097,9 @@ async def main():
         "--mc-only",
         action="store_true",
         default=False,
-        help="Force Monte Carlo-only prediction mode even for 20-over matches. "
-             "Bypasses the trained XGBLogRegEnsemble model and uses MC + Platt calibration.",
+        help="Force Monte Carlo-only prediction mode. "
+             "Bypasses the trained XGBLogRegEnsemble model. "
+             "Automatically enabled for ODI (>= 40 overs) and reduced-over (< 20) matches.",
     )
     
     args = parser.parse_args()

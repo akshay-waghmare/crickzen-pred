@@ -15,7 +15,7 @@ from .state import MatchState, SimulationResult
 from .sampler import NextBallSampler
 from .evaluator import TerminalStateEvaluator, apply_temperature, load_league_temperature
 from .feature_context import FeatureContext
-from ..calibration.mc_calibrator import MCCalibrator, InningsMCCalibrators
+from ..calibration.mc_calibrator import MCCalibrator, InningsMCCalibrators, InningsPhaseCalibrators, over_to_phase
 
 # Avoid circular import
 if TYPE_CHECKING:
@@ -31,17 +31,30 @@ _MC_CALIBRATOR_CACHE: dict = {}
 def _load_mc_calibrator(model_dir: str):
     """Load MC calibrator from model_dir (cached).
 
-    Prefers innings-specific calibrators (``mc_calibrators_innings.pkl``)
-    over the legacy single calibrator (``mc_calibrator.pkl``).
+    Priority order:
+    1. Innings × phase calibrators (``mc_calibrators_innings_phase.pkl``)
+    2. Innings-specific calibrators (``mc_calibrators_innings.pkl``)
+    3. Legacy single calibrator (``mc_calibrator.pkl``)
 
     Returns
     -------
-    InningsMCCalibrators | MCCalibrator | None
+    InningsPhaseCalibrators | InningsMCCalibrators | MCCalibrator | None
     """
     if model_dir in _MC_CALIBRATOR_CACHE:
         return _MC_CALIBRATOR_CACHE[model_dir]
 
     from pathlib import Path
+
+    # Prefer innings × phase calibrators (best granularity)
+    phase_path = Path(model_dir) / "mc_calibrators_innings_phase.pkl"
+    if phase_path.exists():
+        try:
+            cal = InningsPhaseCalibrators.load(str(phase_path))
+            _MC_CALIBRATOR_CACHE[model_dir] = cal
+            logger.debug("Loaded innings×phase MC calibrators", path=str(phase_path))
+            return cal
+        except Exception as e:
+            logger.warning("Failed to load innings×phase MC calibrators", error=str(e))
 
     # Prefer innings-specific calibrators
     innings_path = Path(model_dir) / "mc_calibrators_innings.pkl"
@@ -236,7 +249,12 @@ def simulate(
     if not use_ml_model:
         mc_cal = _load_mc_calibrator(model_dir)
         if mc_cal is not None:
-            if isinstance(mc_cal, InningsMCCalibrators):
+            if isinstance(mc_cal, InningsPhaseCalibrators):
+                total_overs = state.total_balls // 6
+                current_over = int(state.overs_completed)
+                phase = over_to_phase(current_over, total_overs=total_overs)
+                result.mean_prob = mc_cal.calibrate(result.mean_prob, state.innings, phase)
+            elif isinstance(mc_cal, InningsMCCalibrators):
                 result.mean_prob = mc_cal.calibrate(result.mean_prob, state.innings)
             else:
                 result.mean_prob = mc_cal.calibrate(result.mean_prob)
@@ -462,7 +480,12 @@ def simulate_vectorized(
     if not use_ml_model:
         mc_cal = _load_mc_calibrator(model_dir)
         if mc_cal is not None:
-            if isinstance(mc_cal, InningsMCCalibrators):
+            if isinstance(mc_cal, InningsPhaseCalibrators):
+                total_overs = state.total_balls // 6
+                current_over = int(state.overs_completed)
+                phase = over_to_phase(current_over, total_overs=total_overs)
+                result.mean_prob = mc_cal.calibrate(result.mean_prob, state.innings, phase)
+            elif isinstance(mc_cal, InningsMCCalibrators):
                 result.mean_prob = mc_cal.calibrate(result.mean_prob, state.innings)
             else:
                 result.mean_prob = mc_cal.calibrate(result.mean_prob)

@@ -162,8 +162,13 @@ class TerminalStateEvaluator:
     def _get_calculator(self, total_balls: int) -> ResourceFeatureCalculator:
         """Get or create a FormatConfig-aware calculator for the given total_balls."""
         if total_balls not in self._calculator_cache:
-            total_overs = total_balls // 6
-            config = FormatConfig.t20_reduced(total_overs)
+            if total_balls > 120:
+                # ODI format (50 overs = 300 balls)
+                config = FormatConfig.odi()
+            else:
+                # T20 or reduced-over T20
+                total_overs = total_balls // 6
+                config = FormatConfig.t20_reduced(total_overs)
             self._calculator_cache[total_balls] = ResourceFeatureCalculator(config=config)
         return self._calculator_cache[total_balls]
     

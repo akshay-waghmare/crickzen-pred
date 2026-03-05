@@ -1213,7 +1213,7 @@ def update_matches(ctx, source_dir, league, dry_run):
 
 
 @main.command()
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'odi', 'odi_female', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_female']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'odi', 'odi_female', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_male', 't20i_female']), required=True,
               help='League to retrain model for')
 @click.option('--version', type=str, required=True,
               help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
@@ -1303,6 +1303,14 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/t20_female_features',
             'feature_store_dir': 'data/t20_female_feature_store',
             'model_prefix': 't20_female',
+            'format_type': 't20',
+        },
+        't20i_male': {
+            'json_dir': 't20_international_male',
+            'raw_dir': 'data/t20_international_male_raw',
+            'features_dir': 'data/t20_international_male_features',
+            'feature_store_dir': 'data/t20_international_male_feature_store',
+            'model_prefix': 't20_international_male',
             'format_type': 't20',
         },
         't20i_female': {
@@ -1492,6 +1500,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
         'wpl': 'WPL',
         't20_male': 'T20_MALE',
         't20_female': 'T20_FEMALE',
+        't20i_male': 'T20_INTERNATIONAL_MALE',
         't20i_female': 'T20I_FEMALE',
         'odi_female': 'ODI_FEMALE',
         'odm_male': 'ODM_MALE',

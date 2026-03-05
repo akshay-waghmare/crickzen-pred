@@ -13,6 +13,9 @@ from typing import Dict, Tuple
 
 PHASES = ("powerplay", "middle", "death")
 
+# ODI uses 4 phases including "setup" (acceleration phase, overs 35-40)
+ODI_PHASES = ("powerplay", "middle", "setup", "death")
+
 # Phase boundaries (overs completed)
 # Powerplay: overs 1-6 (balls_remaining 120-85)
 # Middle: overs 7-15 (balls_remaining 84-31)
@@ -20,6 +23,21 @@ PHASES = ("powerplay", "middle", "death")
 
 POWERPLAY_END_OVER = 6  # After over 6, middle begins
 MIDDLE_END_OVER = 15    # After over 15, death begins
+
+# ODI phase boundaries (overs completed)
+ODI_POWERPLAY_END_OVER = 10   # After over 10, middle begins
+ODI_MIDDLE_END_OVER = 34      # After over 34, setup begins
+ODI_SETUP_END_OVER = 40       # After over 40, death begins
+
+
+def get_odi_phase_boundaries() -> tuple:
+    """
+    Return ODI phase boundaries as (pp_end, mid_end, setup_end) over thresholds.
+    
+    Returns:
+        (10, 34, 40) — overs completed thresholds for ODI phases
+    """
+    return (ODI_POWERPLAY_END_OVER, ODI_MIDDLE_END_OVER, ODI_SETUP_END_OVER)
 
 
 def get_scaled_phase_boundaries(total_overs: int) -> tuple:
@@ -57,12 +75,15 @@ def get_phase(balls_remaining: int, total_balls: int = 120) -> str:
     """
     Determine game phase based on balls remaining.
     
+    For T20 (total_balls <= 120): returns 'powerplay', 'middle', or 'death'
+    For ODI (total_balls > 120): returns 'powerplay', 'middle', 'setup', or 'death'
+    
     Args:
         balls_remaining: Balls remaining in innings (1-total_balls)
         total_balls: Total balls in innings (120 for T20, 300 for ODI)
         
     Returns:
-        Phase name: 'powerplay', 'middle', or 'death'
+        Phase name
         
     Examples:
         >>> get_phase(120)  # Start of T20 innings
@@ -71,12 +92,29 @@ def get_phase(balls_remaining: int, total_balls: int = 120) -> str:
         'middle'
         >>> get_phase(30)   # After 15 overs
         'death'
+        >>> get_phase(240, total_balls=300)  # ODI after 10 overs
+        'middle'
+        >>> get_phase(90, total_balls=300)   # ODI after 35 overs
+        'setup'
     """
     if balls_remaining <= 0:
         return "death"  # Edge case: innings over
     
     overs_completed = (total_balls - balls_remaining) / 6
     
+    # ODI format: 4-phase system
+    if total_balls > 120:
+        pp_end, mid_end, setup_end = get_odi_phase_boundaries()
+        if overs_completed < pp_end:
+            return "powerplay"
+        elif overs_completed < mid_end:
+            return "middle"
+        elif overs_completed < setup_end:
+            return "setup"
+        else:
+            return "death"
+    
+    # T20 format: 3-phase system
     # Use scaled boundaries for reduced-over matches; constants for standard T20
     if total_balls == 120:
         pp_end = POWERPLAY_END_OVER
@@ -165,6 +203,85 @@ WICKET_MULTIPLIER: Dict[int, float] = {
 
 
 # =============================================================================
+# ODI RUN DISTRIBUTIONS BY PHASE (4 phases)
+# =============================================================================
+# Empirically derived from 1,760 male ODI matches (2010+), 935K balls.
+# Extracted via scripts/extract_odi_phase_distributions.py.
+
+ODI_RUN_DIST: Dict[str, Dict[int, float]] = {
+    "powerplay": {  # Overs 1-10, ~4.68 RPO
+        0: 0.6350,
+        1: 0.2020,
+        2: 0.0420,
+        3: 0.0100,
+        4: 0.1000,
+        5: 0.0020,
+        6: 0.0090,
+    },
+    "middle": {  # Overs 11-34, ~4.80 RPO
+        0: 0.5080,
+        1: 0.3640,
+        2: 0.0480,
+        3: 0.0050,
+        4: 0.0620,
+        5: 0.0010,
+        6: 0.0120,
+    },
+    "setup": {  # Overs 35-40, ~5.61 RPO
+        0: 0.4581,
+        1: 0.3850,
+        2: 0.0570,
+        3: 0.0050,
+        4: 0.0750,
+        5: 0.0010,
+        6: 0.0189,
+    },
+    "death": {  # Overs 41-50, ~7.10 RPO
+        0: 0.3641,
+        1: 0.4230,
+        2: 0.0810,
+        3: 0.0050,
+        4: 0.0890,
+        5: 0.0010,
+        6: 0.0369,
+    },
+}
+
+
+# =============================================================================
+# ODI WICKET PROBABILITIES BY PHASE
+# =============================================================================
+# Empirically derived from 935K balls across 1,760 male ODIs (2010+).
+
+ODI_WICKET_PROB: Dict[str, float] = {
+    "powerplay": 0.0230,
+    "middle": 0.0215,
+    "setup": 0.0305,
+    "death": 0.0547,
+}
+
+
+# =============================================================================
+# ODI WICKET MULTIPLIER BY WICKETS DOWN
+# =============================================================================
+# Empirically derived. Clamped to [0.5, 2.0] per data-model validation rules.
+# Openers/top-order have lower base rate; tail is more vulnerable.
+
+ODI_WICKET_MULTIPLIER: Dict[int, float] = {
+    0: 0.84,
+    1: 0.79,
+    2: 0.75,
+    3: 0.82,
+    4: 0.95,
+    5: 1.12,
+    6: 1.39,
+    7: 1.77,
+    8: 2.00,  # Clamped from 2.09
+    9: 2.00,  # Clamped from 2.61
+}
+
+
+# =============================================================================
 # PRE-COMPUTED CUMULATIVE DISTRIBUTIONS FOR SAMPLING
 # =============================================================================
 # Used with np.searchsorted() for efficient sampling
@@ -179,6 +296,10 @@ def _build_cdf(dist: Dict[int, float]) -> Tuple[np.ndarray, np.ndarray]:
 
 RUN_CDF: Dict[str, Tuple[np.ndarray, np.ndarray]] = {
     phase: _build_cdf(dist) for phase, dist in RUN_DIST.items()
+}
+
+ODI_RUN_CDF: Dict[str, Tuple[np.ndarray, np.ndarray]] = {
+    phase: _build_cdf(dist) for phase, dist in ODI_RUN_DIST.items()
 }
 
 

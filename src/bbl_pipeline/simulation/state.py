@@ -39,7 +39,7 @@ class MatchState:
     league: str
     batting_team: str
     bowling_team: str
-    total_balls: int = 120
+    total_balls: int = 120  # 120 for T20, 300 for ODI
     target_runs: Optional[int] = None
     venue: Optional[str] = None
     batting_team_win_rate: float = 0.5
@@ -55,8 +55,8 @@ class MatchState:
             raise ValueError(f"score must be >= 0, got {self.score}")
         if not 0 <= self.wickets_lost <= 10:
             raise ValueError(f"wickets_lost must be 0-10, got {self.wickets_lost}")
-        if not (6 <= self.total_balls <= 120 and self.total_balls % 6 == 0):
-            raise ValueError(f"total_balls must be 6-120 and divisible by 6, got {self.total_balls}")
+        if not (6 <= self.total_balls <= 300 and self.total_balls % 6 == 0):
+            raise ValueError(f"total_balls must be 6-300 and divisible by 6, got {self.total_balls}")
         if not 0 <= self.balls_remaining <= self.total_balls:
             raise ValueError(f"balls_remaining must be 0-{self.total_balls}, got {self.balls_remaining}")
         if self.innings == 2 and self.target_runs is None:

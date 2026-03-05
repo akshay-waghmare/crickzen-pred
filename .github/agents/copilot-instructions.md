@@ -13,6 +13,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-09
 - Apache Parquet (snappy compression) at `data/match_states/<league>/` (001-match-state-logging)
 - Python 3.11+ + XGBoost, scikit-learn, numpy, playwright (CREX scraping), joblib (008-t20-reduced-overs)
 - Parquet (match states), joblib/pickle (calibrators) (008-t20-reduced-overs)
+- Python 3.13.7 (`requires-python = ">=3.10"`) + pandas>=2.0, numpy, scikit-learn>=1.3, xgboost>=2.0, joblib>=1.3, structlog>=23.0, playwright (for CREX scraping) (009-odi-mc-predictor)
+- Parquet files (features, match states), JSON (phase distributions, match data), joblib/pkl (models, calibrators) (009-odi-mc-predictor)
 
 - Python 3.10+ (001-bbl-data-pipeline)
 
@@ -32,9 +34,9 @@ cd src; pytest; ruff check .
 Python 3.10+: Follow standard conventions
 
 ## Recent Changes
+- 009-odi-mc-predictor: Added Python 3.13.7 (`requires-python = ">=3.10"`) + pandas>=2.0, numpy, scikit-learn>=1.3, xgboost>=2.0, joblib>=1.3, structlog>=23.0, playwright (for CREX scraping)
+- 009-odi-mc-predictor: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - 008-t20-reduced-overs: Added Python 3.11+ + XGBoost, scikit-learn, numpy, playwright (CREX scraping), joblib
-- 007-odi-female-model: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
-- 001-match-state-logging: Added Python 3.11+ + pandas, pyarrow, numpy, scikit-learn (brier_score_loss), structlog, click (CLI), playwright (CREX scraping — existing)
 
 
 <!-- MANUAL ADDITIONS START -->
