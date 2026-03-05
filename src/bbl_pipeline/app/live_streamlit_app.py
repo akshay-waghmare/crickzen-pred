@@ -234,6 +234,16 @@ T20I_TEAM_NAMES = {
 }
 
 DEFAULT_JSON = "data/live_state.json"
+
+# Pre-configured JSON source options (displayed in dropdown)
+JSON_SOURCES = {
+    "T20 WC ML+MC (wc_live_ml.json)": "data/wc_live_ml.json",
+    "T20 WC MC-only (wc_live_mc.json)": "data/wc_live_mc.json",
+    "Default (live_state.json)": "data/live_state.json",
+    "SA20 (sa20_live_state.json)": "data/sa20_live_state.json",
+    "Custom path...": "__custom__",
+}
+
 _league_context = None
 
 # Load per-over calibrators for ECE-optimized predictions (smoother than phase calibrators)
@@ -870,8 +880,13 @@ def main():
     # Controls
     col1, col2, col3 = st.columns([3, 1, 1])
     with col1:
-        json_path = st.text_input("JSON State File", value=DEFAULT_JSON, 
-                                  help="Path to the live state JSON file produced by crex_live_predictor")
+        source_label = st.selectbox("JSON Source", options=list(JSON_SOURCES.keys()),
+                                     help="Select the live state JSON source")
+        selected = JSON_SOURCES[source_label]
+        if selected == "__custom__":
+            json_path = st.text_input("Custom JSON path", value=DEFAULT_JSON)
+        else:
+            json_path = selected
     with col2:
         refresh = st.button("🔄 Refresh")
     with col3:
