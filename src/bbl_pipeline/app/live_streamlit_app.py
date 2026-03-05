@@ -24,6 +24,9 @@ from datetime import datetime
 from pathlib import Path
 import time
 import joblib
+import subprocess
+import signal
+import os
 
 # Page config
 st.set_page_config(
@@ -245,6 +248,166 @@ JSON_SOURCES = {
 }
 
 _league_context = None
+
+# ── Backend Predictor Control ────────────────────────────────────
+PID_FILE = Path("data/.predictor_pids.json")
+
+PREDICTOR_CONFIGS = {
+    "T20 WC ML+MC": {
+        "output_json": "data/wc_live_ml.json",
+        "mc_only": False,
+        "model_dir": "models/t20_international_male_v2",
+        "feature_store_dir": "data/t20_international_male_feature_store_v2",
+        "league": "t20i_male",
+        "states_dir": "data/match_states/t20_wc_2026",
+    },
+    "T20 WC MC-only": {
+        "output_json": "data/wc_live_mc.json",
+        "mc_only": True,
+        "model_dir": "models/t20_international_male_v2",
+        "feature_store_dir": "data/t20_international_male_feature_store_v2",
+        "league": "t20i_male",
+        "states_dir": "data/match_states/t20_wc_2026",
+    },
+}
+
+
+def _read_pids() -> dict:
+    """Read running predictor PIDs from file."""
+    if PID_FILE.exists():
+        try:
+            return json.loads(PID_FILE.read_text())
+        except Exception:
+            pass
+    return {}
+
+
+def _write_pids(pids: dict):
+    """Write predictor PIDs to file."""
+    PID_FILE.parent.mkdir(parents=True, exist_ok=True)
+    PID_FILE.write_text(json.dumps(pids, indent=2))
+
+
+def _is_pid_alive(pid: int) -> bool:
+    """Check if a process with the given PID is still running."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except (OSError, ProcessLookupError):
+        return False
+
+
+def _start_predictor(name: str, match_url: str) -> int:
+    """Start a predictor process and return its PID."""
+    cfg = PREDICTOR_CONFIGS[name]
+    cmd = [
+        sys.executable, "-m", "src.bbl_pipeline.inference.crex_live_predictor",
+        "--match-url", match_url,
+        "--model-dir", cfg["model_dir"],
+        "--feature-store-dir", cfg["feature_store_dir"],
+        "--output-json", cfg["output_json"],
+        "--league", cfg["league"],
+        "--record-states",
+        "--states-dir", cfg["states_dir"],
+    ]
+    if cfg["mc_only"]:
+        cmd.append("--mc-only")
+    
+    log_name = "wc_ml" if not cfg["mc_only"] else "wc_mc"
+    log_path = Path(f"logs/{log_name}.log")
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_file = open(log_path, "a")
+    
+    proc = subprocess.Popen(
+        cmd,
+        stdout=log_file,
+        stderr=subprocess.STDOUT,
+        start_new_session=True,
+    )
+    return proc.pid
+
+
+def _stop_predictor(pid: int):
+    """Stop a predictor process by PID."""
+    try:
+        os.kill(pid, signal.SIGTERM)
+    except (OSError, ProcessLookupError):
+        pass
+
+
+import sys  # needed for _start_predictor
+
+
+def render_backend_controls():
+    """Render sidebar controls for starting/stopping predictors."""
+    st.sidebar.markdown("## 🎛️ Backend Control")
+    
+    match_url = st.sidebar.text_input(
+        "CREX Match URL",
+        value="https://crex.com/scoreboard/YAA/1UY/2nd-Semi-Final/S/O/eng-vs-ind-2nd-semi-final-t20-world-cup-2026/info",
+        help="Paste the CREX match URL here",
+    )
+    
+    pids = _read_pids()
+    
+    for name, cfg in PREDICTOR_CONFIGS.items():
+        st.sidebar.markdown(f"### {name}")
+        pid = pids.get(name)
+        is_running = pid is not None and _is_pid_alive(pid)
+        
+        if is_running:
+            st.sidebar.success(f"Running (PID {pid})")
+            st.sidebar.caption(f"Output: `{cfg['output_json']}`")
+            if st.sidebar.button(f"⏹ Stop {name}", key=f"stop_{name}"):
+                _stop_predictor(pid)
+                pids.pop(name, None)
+                _write_pids(pids)
+                st.sidebar.warning(f"Stopped PID {pid}")
+                time.sleep(0.5)
+                st.rerun()
+        else:
+            # Clean up stale PID
+            if pid is not None:
+                pids.pop(name, None)
+                _write_pids(pids)
+            st.sidebar.info("Not running")
+            if st.sidebar.button(f"▶ Start {name}", key=f"start_{name}"):
+                if not match_url.strip():
+                    st.sidebar.error("Enter a CREX match URL first!")
+                else:
+                    new_pid = _start_predictor(name, match_url.strip())
+                    pids[name] = new_pid
+                    _write_pids(pids)
+                    st.sidebar.success(f"Started (PID {new_pid})")
+                    time.sleep(1)
+                    st.rerun()
+    
+    # Stop All / Start All
+    st.sidebar.markdown("---")
+    col_a, col_b = st.sidebar.columns(2)
+    with col_a:
+        if st.button("▶ Start All", key="start_all"):
+            if not match_url.strip():
+                st.sidebar.error("Enter a CREX match URL first!")
+            else:
+                for name in PREDICTOR_CONFIGS:
+                    pid = pids.get(name)
+                    if pid is None or not _is_pid_alive(pid):
+                        new_pid = _start_predictor(name, match_url.strip())
+                        pids[name] = new_pid
+                _write_pids(pids)
+                st.sidebar.success("All started!")
+                time.sleep(1)
+                st.rerun()
+    with col_b:
+        if st.button("⏹ Stop All", key="stop_all"):
+            for name, pid in list(pids.items()):
+                _stop_predictor(pid)
+            _write_pids({})
+            st.sidebar.warning("All stopped.")
+            time.sleep(0.5)
+            st.rerun()
+
 
 # Load per-over calibrators for ECE-optimized predictions (smoother than phase calibrators)
 # NOTE: SA20 and WPL use phase calibrators instead of per-over due to small datasets
@@ -876,6 +1039,9 @@ def create_probability_timeline(history, batting_team=None, bowling_team=None):
 def main():
     st.markdown('<h1 class="main-header">🏏 T20 Live Predictor</h1>', unsafe_allow_html=True)
     st.markdown('<p style="text-align:center;color:#666;">Powered by ML Win Probability Models</p>', unsafe_allow_html=True)
+    
+    # Sidebar: backend predictor controls
+    render_backend_controls()
     
     # Controls
     col1, col2, col3 = st.columns([3, 1, 1])
