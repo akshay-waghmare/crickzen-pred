@@ -265,8 +265,9 @@ class LauncherApp:
             self.predictor_proc = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, bufsize=1,
+                text=True, bufsize=1, encoding="utf-8", errors="replace",
                 cwd=str(PROJECT_ROOT),
+                env={**os.environ, "PYTHONIOENCODING": "utf-8"},
                 creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == "win32" else 0,
             )
             self.pred_status.set(f"Predictor: running (PID {self.predictor_proc.pid})")
@@ -307,8 +308,9 @@ class LauncherApp:
             self.streamlit_proc = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, bufsize=1,
+                text=True, bufsize=1, encoding="utf-8", errors="replace",
                 cwd=str(PROJECT_ROOT),
+                env={**os.environ, "PYTHONIOENCODING": "utf-8"},
                 creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == "win32" else 0,
             )
             self.st_status.set(f"Streamlit: running (PID {self.streamlit_proc.pid})")

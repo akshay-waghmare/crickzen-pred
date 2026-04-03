@@ -17,6 +17,14 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
+# Force UTF-8 stdout on Windows to avoid charmap encoding crashes with emoji
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 PROJECT_SRC = Path(__file__).resolve().parents[2]
 if str(PROJECT_SRC) not in sys.path:
     sys.path.insert(0, str(PROJECT_SRC))
@@ -830,7 +838,7 @@ class CrexLivePredictor:
                 print(f"[ON-VENUE] Combined on-venue avg: ({left_avg}+{right_avg})/2 = {combined_avg:.1f} -> {round(combined_avg)} "
                       f"(was {old_avg}). Overriding venue_avg_score.")
                 logger.info(f"On-venue simple avg = {combined_avg:.1f} "
-                            f"({left_avg}+{right_avg})/2 → overrides avg_1st_inns")
+                            f"({left_avg}+{right_avg})/2 -> overrides avg_1st_inns")
             else:
                 print(f"[ON-VENUE] Insufficient venue matches (left={left_matches}, right={right_matches}), "
                       f"keeping existing venue avg")
