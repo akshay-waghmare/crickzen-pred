@@ -15,7 +15,7 @@ Usage:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Dict, List, Optional
 
 
@@ -315,6 +315,29 @@ class FormatConfig:
             endgame_balls=12,
             pressure_rrr_min=7.0,
             pressure_rrr_max=15.0,
+        )
+
+    @classmethod
+    def ipl(cls) -> "FormatConfig":
+        """Return an IPL-tuned T20 configuration.
+
+        The IPL uses the same 20-over match structure as the default T20
+        preset, but its first-innings scoring environment is materially higher.
+        These overrides are derived from the historical IPL raw match dataset
+        currently stored in ``data/ipl_raw/matches``.
+        """
+        base = cls.t20()
+        return replace(
+            base,
+            par_score=173.45,
+            league_avg_score=167.28,
+            bat_first_win_rate=0.4581,
+            expected_run_rates={
+                "powerplay": 7.53,
+                "middle": 7.51,
+                "death": 9.02,
+                "final": 10.68,
+            },
         )
 
     @classmethod
@@ -782,5 +805,7 @@ class FormatConfig:
         if league in _ODI_LEAGUES:
             gender = "female" if "female" in league else "male"
             return cls.odi(gender=gender)
+        if league == "ipl":
+            return cls.ipl()
         # All other leagues are T20
         return cls.t20()

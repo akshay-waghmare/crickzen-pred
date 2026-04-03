@@ -17,6 +17,10 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
+PROJECT_SRC = Path(__file__).resolve().parents[2]
+if str(PROJECT_SRC) not in sys.path:
+    sys.path.insert(0, str(PROJECT_SRC))
+
 from bbl_pipeline.features.format_config import FormatConfig
 
 logger = structlog.get_logger()
@@ -107,7 +111,8 @@ class CrexLivePredictor:
                  live_match_json: str = None, venue: str = None, league: str = None,
                  use_ml_model: bool = False, record_states: bool = False, states_dir: str = None,
                  total_overs: int = None, revised_target: int = None, mc_only: bool = False):
-        self.match_url = match_url
+        self.original_match_url = match_url
+        self.match_url = self._normalize_live_url(match_url)
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
@@ -141,7 +146,7 @@ class CrexLivePredictor:
         # Optional richer debug output (defaults to sibling livematch.json if output_json is set)
         if live_match_json is None and output_json:
             try:
-                live_match_json = str(Path(output_json).with_name("livematch.json"))
+                live_match_json = self._build_live_match_json_path(output_json)
             except Exception:
                 live_match_json = None
         self.live_match_json = live_match_json
@@ -156,7 +161,7 @@ class CrexLivePredictor:
         
         # Persist history to separate file for Streamlit page refresh resilience
         if output_json:
-            self._history_file = str(Path(output_json).with_name("prediction_history.json"))
+            self._history_file = self._build_history_file_path(output_json)
             self._load_history()  # Load existing history on startup
         else:
             self._history_file = None
@@ -169,6 +174,92 @@ class CrexLivePredictor:
         self.match_state_logger = None
         if self.record_states:
             self._init_match_state_logger()
+
+    def _normalize_team_key(self, team_name: str) -> str:
+        """Normalize a team string for comparison across codes/full names."""
+        return re.sub(r'[^A-Z0-9]', '', (team_name or '').upper())
+
+    @staticmethod
+    def _normalize_live_url(match_url: str) -> str:
+        """Normalize CREX match URLs to the live match page."""
+        url = (match_url or "").strip().rstrip("/")
+        for suffix in ("/match-details", "/match-scorecard", "/scorecard", "/info"):
+            if url.endswith(suffix):
+                return url[:-len(suffix)]
+        return url
+
+    @staticmethod
+    def _build_live_match_json_path(output_json: str) -> str:
+        """Build a per-feed debug JSON path so multiple predictors don't collide."""
+        output_path = Path(output_json)
+        return str(output_path.with_name(f"{output_path.stem}_livematch.json"))
+
+    @staticmethod
+    def _build_history_file_path(output_json: str) -> str:
+        """Build a per-feed history JSON path so multiple predictors don't collide."""
+        output_path = Path(output_json)
+        return str(output_path.with_name(f"{output_path.stem}_history.json"))
+
+    @staticmethod
+    def _clean_team_text(team_name: str) -> str:
+        """Trim CREX section labels from team-like text snippets."""
+        candidate = re.sub(r'\s+', ' ', (team_name or '').strip()).strip(' -|,')
+        candidate = re.sub(
+            r'\s+(?:in\s+Points\s+Table|Points\s+Table|Team\s+Form|Match\s+Info|Live|Scorecard|Commentary)\b.*$',
+            '',
+            candidate,
+            flags=re.IGNORECASE,
+        )
+        candidate = re.sub(r'\s+\d+(?:st|nd|rd|th)[-\s]*Match\b.*$', '', candidate, flags=re.IGNORECASE)
+        return candidate.strip(' -|,')
+
+    def _resolve_team_name(self, team_name: str) -> str:
+        """Resolve CREX team codes into displayable team names when possible."""
+        candidate = self._clean_team_text(team_name)
+        if not candidate:
+            return ""
+
+        storage_name = self.local_storage.get(f"t_{candidate.upper()}_name")
+        if isinstance(storage_name, str) and storage_name.strip():
+            return storage_name.strip()
+
+        try:
+            from bbl_pipeline.features.store import InMemoryFeatureStore
+
+            feature_store = getattr(getattr(self, 'predictor', None), 'feature_store', None)
+            if feature_store and hasattr(feature_store, '_resolve_team_abbrev'):
+                resolved = feature_store._resolve_team_abbrev(candidate)
+            else:
+                league = (self.league or '').lower()
+                if league in ('ipl', 'indian_premier_league'):
+                    resolved = InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL.get(candidate.upper())
+                else:
+                    resolved = InMemoryFeatureStore.TEAM_ABBREVIATIONS.get(candidate.upper())
+            if isinstance(resolved, str) and resolved.strip():
+                return resolved.strip()
+        except Exception:
+            pass
+
+        return candidate
+
+    def _extract_vs_teams(self, text: str) -> Optional[tuple[str, str]]:
+        """Extract and resolve both teams from CREX text/title content."""
+        if not text:
+            return None
+
+        patterns = [
+            r"([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,50}?)\s+vs\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,60}?)(?:\s+\d+(?:st|nd|rd|th)[-\s]*Match\b|\s+\|\s+|\s+Team Form\b|\s+Match Info\b|\s+Live\b|\s+Scorecard\b|\s+Commentary\b|$)",
+            r"([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,50}?)\s+vs\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,60}?)(?:\n|$)",
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if not match:
+                continue
+            team1 = self._resolve_team_name(match.group(1))
+            team2 = self._resolve_team_name(match.group(2))
+            if team1 and team2 and self._normalize_team_key(team1) != self._normalize_team_key(team2):
+                return team1, team2
+        return None
     
     def _init_match_state_logger(self):
         """Initialize match state logger if recording is enabled."""
@@ -475,8 +566,16 @@ class CrexLivePredictor:
             return {"available": False, "error": str(e)}
 
     def _get_info_url(self) -> str:
-        """Convert live URL to info URL."""
-        return self.match_url.replace("/live", "/info")
+        """Convert live URL to info URL.
+        
+        CREX info page format: .../match-details
+        Legacy format (some leagues): .../live → .../info
+        """
+        url = self._normalize_live_url(self.match_url).rstrip("/")
+        if "/live" in url:
+            return url.replace("/live", "/match-details")
+        # Default: append /match-details
+        return url + "/match-details"
     
     async def _extract_team_comparison(self, page_text: str, team1: str, team2: str):
         """
@@ -552,6 +651,8 @@ class CrexLivePredictor:
             feature_store = getattr(self.predictor, 'feature_store', None) if hasattr(self, 'predictor') else None
             if feature_store and hasattr(feature_store, '_resolve_team_abbrev'):
                 full_name = feature_store._resolve_team_abbrev(team_abbrev)
+            elif team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL:
+                full_name = InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL[team_abbrev.upper()]
             elif team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS:
                 full_name = InMemoryFeatureStore.TEAM_ABBREVIATIONS[team_abbrev.upper()]
             
@@ -659,7 +760,84 @@ class CrexLivePredictor:
                 
         except Exception as e:
             logger.warning(f"Could not extract venue stats: {e}")
-    
+
+    async def _extract_on_venue_avg(self, team1: str, team2: str):
+        """
+        Click the 'On Venue' tab in Team Comparison and extract both teams' avg scores
+        at this venue. Averages them to produce a realistic match-day scoring estimate,
+        which overrides the all-time venue avg in VENUE_SITUATION_STATS.
+        
+        Priority: on-venue combined avg > Venue Stats section avg > feature store prior.
+        """
+        try:
+            import re
+            from bbl_pipeline.features.store import InMemoryFeatureStore
+
+            # Try clicking the "On Venue" tab. Playwright text selectors:
+            # 'text=On Venue' matches any element containing this exact text.
+            clicked = False
+            for selector in ['text="On Venue"', 'text=On Venue', ':text("On Venue")']:
+                try:
+                    await self.page.click(selector, timeout=3000)
+                    clicked = True
+                    break
+                except Exception:
+                    pass
+
+            if not clicked:
+                logger.info("[ON-VENUE] Could not find/click 'On Venue' tab — skipping on-venue avg extraction")
+                return
+
+            await asyncio.sleep(1)
+            on_venue_text = await self.page.inner_text("body")
+
+            # Extract team headers to identify left/right columns
+            team_headers_pattern = r'([A-Z0-9\-]+)\s+vs\s+all\s+teams\s+([A-Z0-9\-]+)\s+vs\s+all\s+teams'
+            hdr = re.search(team_headers_pattern, on_venue_text, re.IGNORECASE)
+            if not hdr:
+                logger.info("[ON-VENUE] Could not parse team headers after tab click")
+                return
+
+            left_abbrev = hdr.group(1)
+            right_abbrev = hdr.group(2)
+
+            # How many matches each team has played at this venue
+            matches_pattern = r'(\d+)\s*Matches\s*Played\s*(\d+)'
+            avg_pattern     = r'(\d+)\s*Avg\s*Score\s*(\d+)'
+
+            matches_m = re.search(matches_pattern, on_venue_text, re.IGNORECASE)
+            avg_m     = re.search(avg_pattern,     on_venue_text, re.IGNORECASE)
+
+            if not avg_m:
+                logger.info("[ON-VENUE] No 'Avg Score' found in On Venue tab")
+                return
+
+            left_matches  = int(matches_m.group(1)) if matches_m else 0
+            right_matches = int(matches_m.group(2)) if matches_m else 0
+            left_avg      = int(avg_m.group(1))
+            right_avg     = int(avg_m.group(2))
+
+            print(f"[ON-VENUE] {left_abbrev}: {left_avg} avg ({left_matches} venue matches), "
+                  f"{right_abbrev}: {right_avg} avg ({right_matches} venue matches)")
+
+            # Simple average of both teams' on-venue scores
+            combined_avg = (left_avg + right_avg) / 2
+
+            # Only override venue avg if both teams have at least 2 venue matches
+            if left_matches >= 2 and right_matches >= 2:
+                old_avg = InMemoryFeatureStore.VENUE_SITUATION_STATS.get('avg_1st_inns', 'N/A')
+                InMemoryFeatureStore.VENUE_SITUATION_STATS['avg_1st_inns'] = round(combined_avg)
+                print(f"[ON-VENUE] Combined on-venue avg: ({left_avg}+{right_avg})/2 = {combined_avg:.1f} -> {round(combined_avg)} "
+                      f"(was {old_avg}). Overriding venue_avg_score.")
+                logger.info(f"On-venue simple avg = {combined_avg:.1f} "
+                            f"({left_avg}+{right_avg})/2 → overrides avg_1st_inns")
+            else:
+                print(f"[ON-VENUE] Insufficient venue matches (left={left_matches}, right={right_matches}), "
+                      f"keeping existing venue avg")
+
+        except Exception as e:
+            logger.warning(f"Could not extract on-venue avg: {e}")
+
     async def _fetch_match_info_page(self):
         """Fetch additional match info from the info page (toss, venue, etc)."""
         try:
@@ -746,6 +924,28 @@ class CrexLivePredictor:
                         r'(Bellerive Oval|Blundstone Arena)',
                         r'(Manuka Oval)',
                         r'(Junction Oval)',
+                        # IPL venues (India)
+                        r'(Eden Gardens[\w\s,]*)',
+                        r'(Wankhede Stadium[\w\s,]*)',
+                        r'(M\.?\s*A\.?\s*Chidambaram Stadium[\w\s,]*)',
+                        r'(Chepauk[\w\s,]*)',
+                        r'(Chinnaswamy Stadium[\w\s,]*)',
+                        r'(M\.?\s*Chinnaswamy Stadium[\w\s,]*)',
+                        r'(Arun Jaitley Stadium[\w\s,]*)',
+                        r'(Feroz Shah Kotla[\w\s,]*)',
+                        r'(Rajiv Gandhi International[\w\s,]*)',
+                        r'(Uppal[\w\s,]*)',
+                        r'(Sawai Mansingh Stadium[\w\s,]*)',
+                        r'(Narendra Modi Stadium[\w\s,]*)',
+                        r'(Motera[\w\s,]*)',
+                        r'(Punjab Cricket Association[\w\s,]*)',
+                        r'(IS Bindra Stadium[\w\s,]*)',
+                        r'(Maharashtra Cricket Association Stadium[\w\s,]*)',
+                        r'(Ekana Cricket Stadium[\w\s,]*)',
+                        r'(BRSABV Ekana[\w\s,]*)',
+                        r'(Bharat Ratna[\w\s,]*)',
+                        r'(Himachal Pradesh Cricket Association[\w\s,]*)',
+                        r'(HPCA Stadium[\w\s,]*)',
                         # UAE venues
                         r'(Dubai International Cricket Stadium)',
                         r'(Zayed Cricket Stadium[\w\s,]*)',
@@ -773,9 +973,9 @@ class CrexLivePredictor:
                                 break
             
             # Extract teams from info page - store both teams, we'll figure out batting/bowling from title
-            vs_match = re.search(r'([A-Z0-9\-]+)\s+vs\s+([A-Z0-9\-]+)', page_text)
-            if vs_match:
-                team1, team2 = vs_match.group(1), vs_match.group(2)
+            teams = self._extract_vs_teams(page_text)
+            if teams:
+                team1, team2 = teams
                 # Store as team1 and team2 initially - batting will be set from title later
                 self._team1 = team1
                 self._team2 = team2
@@ -787,6 +987,10 @@ class CrexLivePredictor:
                 # Extract team comparison stats (season form) and inject into feature store
                 # This will use venue stats for situation rates if available
                 await self._extract_team_comparison(page_text, team1, team2)
+                
+                # Click "On Venue" tab and extract both teams' on-venue avg scores.
+                # Average of the two teams' venue avg = realistic match-day scoring estimate.
+                await self._extract_on_venue_avg(team1, team2)
             
             # Navigate back to live page
             await self.page.goto(self.match_url, timeout=30000)
@@ -971,9 +1175,9 @@ class CrexLivePredictor:
             title = await self.page.title()
             # Title format: "PRS-W 66-1 (7.2) (Sophie Devine 0(0), Beth Mooney 22(14)) vs Sydney..."
             # Extract score first
-            title_match = re.match(r'^([A-Z0-9\-]+)\s+(\d+)[-/](\d+)\s+\((\d+\.?\d*)\)', title)
+            title_match = re.match(r"^([A-Za-z0-9][A-Za-z0-9&.'\- ]*?)\s+(\d+)[-/](\d+)\s+\((\d+\.?\d*)\)", title)
             if title_match:
-                current_batting_team = title_match.group(1)
+                current_batting_team = self._resolve_team_name(title_match.group(1))
                 self.match_state.total_runs = int(title_match.group(2))
                 self.match_state.wickets = int(title_match.group(3))
                 self.match_state.overs = float(title_match.group(4))
@@ -1000,20 +1204,16 @@ class CrexLivePredictor:
                         self.match_state.target = first_inn_score + 1
                         logger.info(f"Set target from title: {first_inn_score} + 1 = {self.match_state.target}")
                 
-                # Helper to normalize team names for comparison (e.g. "IND-W" vs "INDW")
-                def _norm_team(name: str) -> str:
-                    return name.replace('-', '').replace(' ', '').upper()
-                
                 # If batting team changed, update bowling team accordingly
-                if self.match_state.batting_team and _norm_team(self.match_state.batting_team) != _norm_team(current_batting_team):
+                if self.match_state.batting_team and self._normalize_team_key(self.match_state.batting_team) != self._normalize_team_key(current_batting_team):
                     # The current batting was the previous bowling
                     self.match_state.bowling_team = self.match_state.batting_team
                 elif not self.match_state.bowling_team:
                     # First time setting teams - use info page teams if available
                     if hasattr(self, '_team1') and hasattr(self, '_team2'):
-                        if _norm_team(current_batting_team) == _norm_team(self._team1):
+                        if self._normalize_team_key(current_batting_team) == self._normalize_team_key(self._team1):
                             self.match_state.bowling_team = self._team2
-                        else:
+                        elif self._normalize_team_key(current_batting_team) == self._normalize_team_key(self._team2):
                             self.match_state.bowling_team = self._team1
                 
                 self.match_state.batting_team = current_batting_team
@@ -1023,11 +1223,9 @@ class CrexLivePredictor:
                     self.match_state.batting_team = self._team1
                     self.match_state.bowling_team = self._team2
                 else:
-                    # Try to extract from title "ADKR vs GG"
-                    vs_match = re.search(r'([A-Z0-9\-]+)\s+vs\s+([A-Z0-9\-]+)', title)
-                    if vs_match:
-                        self.match_state.batting_team = vs_match.group(1)
-                        self.match_state.bowling_team = vs_match.group(2)
+                    teams = self._extract_vs_teams(title)
+                    if teams:
+                        self.match_state.batting_team, self.match_state.bowling_team = teams
             
             # Extract batsmen names from title: "(Sophie Devine 0(0), Beth Mooney 22(14))"
             # Pattern: Name Runs(Balls), Name Runs(Balls)
@@ -1110,25 +1308,24 @@ class CrexLivePredictor:
             if not self.match_state.bowling_team or self.match_state.bowling_team == self.match_state.batting_team:
                 # First try using stored teams from info page
                 if hasattr(self, '_team1') and hasattr(self, '_team2'):
-                    if self.match_state.batting_team == self._team1:
+                    if self._normalize_team_key(self.match_state.batting_team) == self._normalize_team_key(self._team1):
                         self.match_state.bowling_team = self._team2
-                    elif self.match_state.batting_team == self._team2:
+                    elif self._normalize_team_key(self.match_state.batting_team) == self._normalize_team_key(self._team2):
                         self.match_state.bowling_team = self._team1
                 
                 # If still not set, look for "vs TEAM" pattern - "PRS-W vs SYS-W"
                 if not self.match_state.bowling_team or self.match_state.bowling_team == self.match_state.batting_team:
-                    vs_match = re.search(r'([A-Z0-9\-]+)\s+vs\s+([A-Z0-9\-]+)', page_text)
-                    if vs_match:
-                        team1 = vs_match.group(1)
-                        team2 = vs_match.group(2)
+                    teams = self._extract_vs_teams(page_text) or self._extract_vs_teams(title)
+                    if teams:
+                        team1, team2 = teams
                         # The batting team is from title, bowling is the other
-                        if self.match_state.batting_team == team1:
+                        if self._normalize_team_key(self.match_state.batting_team) == self._normalize_team_key(team1):
                             self.match_state.bowling_team = team2
-                        elif self.match_state.batting_team == team2:
+                        elif self._normalize_team_key(self.match_state.batting_team) == self._normalize_team_key(team2):
                             self.match_state.bowling_team = team1
                         else:
                             # Fuzzy match - batting team might be abbreviated differently
-                            if team1.startswith(self.match_state.batting_team[:3]):
+                            if self._normalize_team_key(team1).startswith(self._normalize_team_key(self.match_state.batting_team)[:3]):
                                 self.match_state.bowling_team = team2
                             else:
                                 self.match_state.bowling_team = team1

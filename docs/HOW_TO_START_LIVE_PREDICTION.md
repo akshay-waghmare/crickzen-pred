@@ -1,301 +1,140 @@
-# 🚀 How to Start Live Match Visualization
+# 🚀 How to Start Live Match Prediction
 
-## ⚡ Super Quick Start (3 Steps)
-
-### Step 1: Find a Live Match URL 🔍
-
-Go to **ESPN Cricinfo** → Find a **LIVE** match → Copy the URL
-
-Example URL:
-```
-https://www.espncricinfo.com/series/big-bash-league-2024-25/perth-scorchers-vs-sydney-sixers-1st-match-1419756/live-cricket-score
-```
-
-**Important:** Must be a **LIVE** match, not a scheduled or completed match!
-
----
-
-### Step 2: Open Terminal/Command Prompt 💻
-
-Navigate to your project directory:
-```bash
-cd C:\Users\ADMINS\Documents\projects\machine_learning
-```
-
----
-
-### Step 3: Run the Command 🎯
-
-**Copy this command and replace `YOUR_URL_HERE` with your match URL:**
+## ⚡ Quick Start (Recommended: Use the Launcher App)
 
 ```bash
-python src/run_integrated_prediction.py --match-url "YOUR_URL_HERE" --model-dir "./models/champion"
+python scripts/launcher.py
 ```
 
-**Full Example:**
+This opens a desktop GUI where you can paste a CREX URL, pick a league, and start everything with one click. See [Launcher App](#-launcher-app) below.
+
+---
+
+## 🔧 Manual CLI Start
+
+### Prerequisites
+
+1. **Verify the correct package is installed** (see [Worktree Guide](WORKTREE_PACKAGE_GUIDE.md)):
+   ```bash
+   python -c "import bbl_pipeline.features.format_config as m; print('Loaded from:', m.__file__)"
+   ```
+2. **Playwright browser** installed: `playwright install chromium`
+
+### Step 1: Find a Live CREX Match URL
+
+Go to **[crex.com](https://crex.com)** → Find a **LIVE** match → Copy the URL
+
+Example:
+```
+https://crex.com/cricket-live-score/csk-vs-pbks-7th-match-indian-premier-league-2026-match-updates-10Y5
+```
+
+### Step 2: Start the Predictor
+
 ```bash
-python src/run_integrated_prediction.py --match-url "https://www.espncricinfo.com/series/big-bash-league-2024-25/perth-scorchers-vs-sydney-sixers-1st-match-1419756/live-cricket-score" --model-dir "./models/champion"
+python -m src.bbl_pipeline.inference.crex_live_predictor \
+  --match-url "CREX_URL" \
+  --model-dir models/t20_male_v2 \
+  --feature-store-dir data/bbl_feature_store_v2 \
+  --league ipl \
+  --output-json data/ipl_live_ml.json \
+  --record-states \
+  --states-dir data/match_states/ipl
 ```
 
----
+### Step 3: Start the Streamlit Visualization (separate terminal)
 
-## 📺 What You'll See
-
-### Initial Loading
-```
-═══════════════════════════════════════════════════════════
-           🏏 BBL LIVE MATCH PREDICTOR                
-═══════════════════════════════════════════════════════════
-
-📦 Loading model and feature store...
-✅ Model loaded successfully!
-
-🌐 Initializing scraper...
-✅ Scraper initialized!
-
-🎯 Starting live monitoring for: [Your Match URL]
-⏱️  Polling every 2.0 seconds
-⌨️  Press Ctrl+C to stop
-```
-
-### Live Updates (Every Ball!)
-```
-═══════════════════════════════════════════════════════════════════════════
-                   🏏 LIVE CRICKET MATCH PREDICTION                        
-═══════════════════════════════════════════════════════════════════════════
-
-Innings        : 2
-Batting        : Sydney Sixers
-Bowling        : Perth Scorchers
-Current Ball   : Over 15.3
-
-────────────────────────────────────────────────────────────────────────────
-
-                          WIN PROBABILITY                                   
-
-Sydney Sixers: 67.5% 🔥🔥
-[████████████████████████████████████████░░░░░░░░░░░░░░░░░░░░░░]
-                           FAVORITE                                        
-
-📊 Model is more optimistic than DLS baseline by 5.2%
-
-────────────────────────────────────────────────────────────────────────────
-
-                         MATCH SITUATION                                    
-
-Score                 : 145/4
-Target                : 32 runs from 27 balls (4.5 overs)
-Required Run Rate     : 7.11
-Current Run Rate      : 9.35
-Status                : ✅ On track!
-
-Pressure Index        : [▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0.35
-Pressure Level        : 🟡 MODERATE PRESSURE
-
-────────────────────────────────────────────────────────────────────────────
-
-                   PROBABILITY TREND (Last 10 balls)                       
-
- 70.0% │ █ █   █ █ █   █ █ █ █ 
- 65.0% │ █ █ █ █ █ █ █ █ █ █ █ 
- 60.0% │ █ █ █ █ █ █ █ █ █ █ █ 
-       └──────────────────────
-        1 2 3 4 5 6 1 2 3 4 5
-
-────────────────────────────────────────────────────────────────────────────
-
-                             KEY METRICS                                    
-
-Wickets Remaining : 6        Balls Remaining : 27       Resource %   : 45.3%
-
-────────────────────────────────────────────────────────────────────────────
-
-                            RECENT BALLS                                    
-
-Ball         Score           Win Prob    Pressure    Change      
-────────────────────────────────────────────────────────────────────────────
-15.1         143/4           65.2%       0.33        📈 +2.1%    
-15.2         145/4           67.5%       0.35        📈 +2.3%    
-15.3         145/4           67.5%       0.35        ─           
-
-═══════════════════════════════════════════════════════════════════════════
-Last Updated          : 2025-12-10 18:45:32                                 
-                       Press Ctrl+C to stop                                  
-═══════════════════════════════════════════════════════════════════════════
-```
-
----
-
-## 🎮 Controls
-
-- **Watch**: Just sit back and watch! Updates automatically every 2 seconds
-- **Stop**: Press `Ctrl+C` (or `Cmd+C` on Mac)
-- **Results**: Automatically saved to CSV when you stop
-
----
-
-## 💾 After Stopping
-
-When you press `Ctrl+C`, you'll see:
-
-```
-✋ Stopped by user
-
-📊 PREDICTION SUMMARY
-
-Total Balls Predicted    : 48
-Current Win Probability  : 67.5%
-Average Win Probability  : 55.3%
-Win Probability Range    : 45.2% - 78.9%
-Average Pressure Index   : 0.42
-
-💾 Predictions exported to: live_predictions_20241210_184532.csv
-
-👋 Goodbye!
-```
-
-Your predictions are saved in a CSV file with the timestamp!
-
----
-
-## 📊 View Your Results
-
-### Option 1: Open in Excel/Numbers
-```
-Double-click the CSV file
-```
-
-### Option 2: View in Python
-```python
-import pandas as pd
-
-df = pd.read_csv('live_predictions_20241210_184532.csv')
-print(df.head())
-```
-
-### Option 3: Plot Results
-```python
-import pandas as pd
-import matplotlib.pyplot as plt
-
-df = pd.read_csv('live_predictions_20241210_184532.csv')
-
-plt.figure(figsize=(12, 6))
-plt.plot(df.index, df['win_probability'] * 100)
-plt.xlabel('Ball Number')
-plt.ylabel('Win Probability (%)')
-plt.title('Win Probability Throughout Match')
-plt.grid(True)
-plt.show()
-```
-
----
-
-## 🔧 Customization Options
-
-### Check More Frequently
 ```bash
-# Check every 1 second instead of 2
-python src/run_integrated_prediction.py \
-    --match-url "YOUR_URL" \
-    --model-dir "./models/champion" \
-    --poll-interval 1.0
+streamlit run src/bbl_pipeline/app/live_streamlit_app.py
 ```
 
-### Custom Save Location
-```bash
-# Save to specific file
-python src/run_integrated_prediction.py \
-    --match-url "YOUR_URL" \
-    --model-dir "./models/champion" \
-    --export "./my_predictions/match_1.csv"
-```
-
-### Different Model
-```bash
-# Use different model
-python src/run_integrated_prediction.py \
-    --match-url "YOUR_URL" \
-    --model-dir "./models/another_model"
-```
+Open **http://localhost:8501** in your browser.
 
 ---
 
-## ❓ FAQ
+## 🏏 League Configurations
 
-### Where do I find live match URLs?
-1. Go to https://www.espncricinfo.com
-2. Click on "Live Matches" or "Scores"
-3. Click on any live match
-4. Copy the URL from your browser
+| League | `--league` | `--model-dir` | `--feature-store-dir` | `--output-json` |
+|--------|-----------|---------------|----------------------|-----------------|
+| **IPL** | `ipl` | `models/t20_male_v2` | `data/bbl_feature_store_v2` | `data/ipl_live_ml.json` |
+| **BBL** | `bbl` | `models/bbl_v12` | `data/bbl_feature_store_v2` | `data/bbl_live_ml.json` |
+| **SA20** | `sa20` | `models/t20_male_v2` | `data/bbl_feature_store_v2` | `data/sa20_live_ml.json` |
+| **ILT20** | `ilt20` | `models/ilt20_v5` | `data/ilt_feature_store_v3` | `data/ilt20_live_ml.json` |
+| **WPL** | `wpl` | `models/t20_male_v2` | `data/bbl_feature_store_v2` | `data/wpl_live_ml.json` |
+| **T20 WC** | `t20i_male` | `models/t20_international_male_v2` | `data/t20_international_male_feature_store_v2` | `data/wc_live_ml.json` |
+| **SSM** | `ssm` | `models/t20_male_v2` | `data/bbl_feature_store_v2` | `data/ssm_live_ml.json` |
 
-### What if no match is live?
-- Wait for a match to start
-- You can test with historical matches, but predictions won't update (match is over)
+### IPL-Specific Configuration
 
-### Can I monitor multiple matches?
-Yes! Open multiple terminal windows:
-```bash
-# Terminal 1
-python src/run_integrated_prediction.py --match-url "MATCH_1_URL" --model-dir "./models/champion"
-
-# Terminal 2
-python src/run_integrated_prediction.py --match-url "MATCH_2_URL" --model-dir "./models/champion"
-```
-
-### What if it hangs or freezes?
-1. Press `Ctrl+C` to stop
-2. Check your internet connection
-3. Verify the match URL is correct
-4. Make sure the match is actually live
-
-### Can I run this without the visualization?
-Yes! Set headless mode in the script (browser won't open):
-- Edit `src/run_integrated_prediction.py`
-- Change line: `browser = p.chromium.launch(headless=True)`
+The IPL uses a league-specific `FormatConfig.ipl()` with tuned parameters:
+- **par_score:** 173.45 (vs 160.0 generic T20) — reflects IPL's higher scoring
+- **league_avg_score:** 167.28
+- **bat_first_win_rate:** 45.81%
+- **Expected run rates:** PP 7.53, Middle 7.51, Death 9.02, Final 10.68
 
 ---
 
-## 🎯 Pro Tips
+## 📊 Venue Average Score
 
-1. **Best Experience**: Use a wide terminal window (at least 100 characters wide)
-2. **Multiple Monitors**: Run predictions on one screen, watch match on another
-3. **Save Everything**: Each run creates a new CSV - you can compare different matches
-4. **Analyze Later**: Use the CSV files to study prediction accuracy vs actual results
+The predictor extracts venue-specific scoring data from CREX's match info page:
+
+1. **Venue Stats section**: Overall venue average 1st innings score
+2. **On Venue tab**: Each team's average score at this venue → **simple average** `(Team1_avg + Team2_avg) / 2`
+
+Priority chain (highest first):
+1. On-Venue team averages (both teams need ≥2 matches)
+2. CREX Venue Stats section (Avg 1st Inns)
+3. Feature store historical data
+4. Hardcoded IPL venue defaults (e.g., Chepauk: 156)
+5. T20 default: 160.0
+
+---
+
+## 📺 Match State Recording
+
+Use `--record-states` to capture ball-by-ball data for post-match analysis:
+
+```bash
+--record-states --states-dir data/match_states/ipl
+```
+
+Records 80+ columns per ball: raw match state, computed features, calibration chain, CREX market odds, and model metadata. Output: Parquet files in the states directory.
+
+---
+
+## 🖥️ Launcher App
+
+A desktop GUI for one-click match prediction setup:
+
+```bash
+python scripts/launcher.py
+```
+
+Features:
+- Paste any CREX URL and select the league
+- Auto-configures model, feature store, and output paths
+- Starts predictor + Streamlit with one click
+- Record states enabled by default
+- Shows live process status and log output
+- Stop all processes cleanly
 
 ---
 
 ## 🚨 Troubleshooting
+
+### Wrong par_score or model behavior
+The package may be installed from a different worktree. See [Worktree Guide](WORKTREE_PACKAGE_GUIDE.md).
+
+### "League calibrator not found"
+This warning is expected — not all leagues have dedicated calibrators. The phase/per-over calibrators still apply.
+
+### Browser opens but no predictions
+- Verify the match is **LIVE** on CREX
+- Check the terminal for error messages
+- CREX page structure may have changed — check scraper selectors
 
 ### "Playwright not installed"
 ```bash
 pip install playwright
 playwright install chromium
 ```
-
-### "Model not found"
-Check that this path exists: `./models/champion/champion_model.joblib`
-
-### "No such file or directory"
-Make sure you're in the project directory:
-```bash
-cd C:\Users\ADMINS\Documents\projects\machine_learning
-```
-
-### Browser opens but nothing happens
-- The match might not be live yet
-- Check if the match URL is correct
-- Wait a few seconds for the page to load
-
----
-
-## 🎉 You're Ready!
-
-Just run:
-```bash
-python src/run_integrated_prediction.py \
-    --match-url "YOUR_LIVE_MATCH_URL" \
-    --model-dir "./models/champion"
-```
-
-And watch the magic happen! 🏏✨
