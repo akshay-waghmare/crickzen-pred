@@ -1,0 +1,30 @@
+{
+  "league": "ipl",
+  "method": "temperature",
+  "fitted_at": "2026-04-04T15:55:27.129995",
+  "overall": {
+    "brier_raw": 0.18312639882186174,
+    "brier_calibrated": 0.18295743572166143,
+    "logloss_raw": 0.5343649275453346,
+    "logloss_calibrated": 0.5335129003732615,
+    "samples": 273503
+  },
+  "by_innings": {
+    "innings_1": {
+      "brier_raw": 0.22119488240771923,
+      "brier_calibrated": 0.22078177535520063,
+      "logloss_raw": 0.6304468721492613,
+      "logloss_calibrated": 0.6296853417524185,
+      "samples": 141496
+    },
+    "innings_2": {
+      "brier_raw": 0.14232145549715558,
+      "brier_calibrated": 0.14241418603954403,
+      "logloss_raw": 0.431376367592626,
+      "logloss_calibrated": 0.4304273385061999,
+      "samples": 132007
+    }
+  },
+  "by_phase": {},
+  "by_date": []
+}

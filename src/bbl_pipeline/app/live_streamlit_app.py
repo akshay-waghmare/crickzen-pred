@@ -27,6 +27,12 @@ import joblib
 import subprocess
 import signal
 import os
+import sys
+
+# Add project src to path
+PROJECT_SRC = Path(__file__).resolve().parent.parent.parent
+if str(PROJECT_SRC) not in sys.path:
+    sys.path.insert(0, str(PROJECT_SRC))
 
 # Page config
 st.set_page_config(
@@ -236,10 +242,12 @@ T20I_TEAM_NAMES = {
     "Uganda": "Uganda", "UGA": "Uganda",
 }
 
-DEFAULT_JSON = "data/live_state.json"
+DEFAULT_JSON = os.environ.get("PREDICTOR_JSON", "data/live_state.json")
 
 # Pre-configured JSON source options (displayed in dropdown)
 JSON_SOURCES = {
+    "IPL ML+MC (ipl_live_ml.json)": "data/ipl_live_ml.json",
+    "IPL MC-only (ipl_live_mc.json)": "data/ipl_live_mc.json",
     "T20 WC ML+MC (wc_live_ml.json)": "data/wc_live_ml.json",
     "T20 WC MC-only (wc_live_mc.json)": "data/wc_live_mc.json",
     "Default (live_state.json)": "data/live_state.json",
@@ -253,6 +261,22 @@ _league_context = None
 PID_FILE = Path("data/.predictor_pids.json")
 
 PREDICTOR_CONFIGS = {
+    "IPL ML+MC": {
+        "output_json": "data/ipl_live_ml.json",
+        "mc_only": False,
+        "model_dir": "models/t20_male_v2",
+        "feature_store_dir": "data/bbl_feature_store_v2",
+        "league": "ipl",
+        "states_dir": "data/match_states/ipl",
+    },
+    "IPL MC-only": {
+        "output_json": "data/ipl_live_mc.json",
+        "mc_only": True,
+        "model_dir": "models/t20_male_v2",
+        "feature_store_dir": "data/bbl_feature_store_v2",
+        "league": "ipl",
+        "states_dir": "data/match_states/ipl",
+    },
     "T20 WC ML+MC": {
         "output_json": "data/wc_live_ml.json",
         "mc_only": False,
@@ -313,7 +337,7 @@ def _start_predictor(name: str, match_url: str) -> int:
     if cfg["mc_only"]:
         cmd.append("--mc-only")
     
-    log_name = "wc_ml" if not cfg["mc_only"] else "wc_mc"
+    log_name = name.lower().replace(" ", "_").replace("+", "plus").replace("-", "_")
     log_path = Path(f"logs/{log_name}.log")
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_file = open(log_path, "a")
@@ -415,7 +439,7 @@ def render_backend_controls():
     # Build log map from predictor configs (not hardcoded)
     log_map = {}
     for name, cfg in PREDICTOR_CONFIGS.items():
-        log_name = "wc_ml" if not cfg["mc_only"] else "wc_mc"
+        log_name = name.lower().replace(" ", "_").replace("+", "plus").replace("-", "_")
         log_path = f"logs/{log_name}.log"
         pid = pids.get(name)
         is_alive = pid is not None and _is_pid_alive(pid)
@@ -769,6 +793,11 @@ def check_match_result(state: dict) -> tuple:
     return state.get("bat_win_prob", 0.5), state.get("bowl_win_prob", 0.5), False, None
 
 
+def _history_path_for_json(json_path: str) -> Path:
+    path = Path(json_path)
+    return path.with_name(f"{path.stem}_history.json")
+
+
 def load_state(json_path: str) -> dict:
     """Load state from JSON file."""
     try:
@@ -777,7 +806,10 @@ def load_state(json_path: str) -> dict:
         
         # Also try to load full history from persistent history file
         try:
-            history_path = Path(json_path).with_name("prediction_history.json")
+            history_path = _history_path_for_json(json_path)
+            legacy_history_path = Path(json_path).with_name("prediction_history.json")
+            if not history_path.exists() and legacy_history_path.exists():
+                history_path = legacy_history_path
             if history_path.exists():
                 with open(history_path, 'r') as f:
                     history_data = json.load(f)

@@ -128,6 +128,69 @@ The package may be installed from a different worktree. See [Worktree Guide](WOR
 ### "League calibrator not found"
 This warning is expected — not all leagues have dedicated calibrators. The phase/per-over calibrators still apply.
 
+### IPL-specific name resolution and calibration pitfalls
+
+The IPL live flow needed extra repository support because several assumptions in the generic T20 path were not true for IPL:
+
+1. **Team abbreviations collided with other leagues**
+   - `DC` can mean **Delhi Capitals** in IPL or **Dubai Capitals** in ILT20
+   - `RR` can mean **Rajasthan Royals** in IPL or **Rangpur Riders** in BPL
+   - `MI` should resolve to **Mumbai Indians** in IPL context
+   - Fix: use IPL-specific team abbreviation resolution whenever `--league ipl` is active
+
+2. **Generic venue aliases could mis-map IPL grounds**
+   - A very generic alias like `International Cricket Stadium` is unsafe because it can accidentally map an IPL venue to the wrong historical ground
+   - Fix: remove overly generic aliases and add IPL-specific venue aliases/priors instead
+
+3. **The default BBL feature store does not contain IPL historical venue priors**
+   - The live predictor uses `data/bbl_feature_store_v2` for the global T20 male model
+   - That store is fine for shared player/team plumbing, but IPL venue priors had to be seeded in code so the predictor has sane values even before CREX overrides land
+   - CREX venue stats still take precedence at runtime:
+     1. On-Venue team averages
+     2. CREX Venue Stats section
+     3. Seeded historical venue priors
+     4. Generic T20 fallback
+
+4. **IPL needed dedicated simulation/calibration artifacts**
+   - The live predictor will fall back if these files do not exist:
+     - `data/phase_distributions_ipl.json`
+     - `models/t20_male_v2/league_calibrators/ipl/league_calibrator.pkl`
+   - Once generated, the logs should show:
+     - `Loaded IPL league calibrator`
+     - `Sampler using league-specific distributions`
+     - `[LEAGUE] League (IPL): ...`
+
+5. **Streamlit needed explicit IPL feed support**
+   - IPL live JSON feeds are `data/ipl_live_ml.json` and `data/ipl_live_mc.json`
+   - These should be exposed directly in the Streamlit dropdown/backend controls so the dashboard opens the correct feed by default
+
+### IPL artifact generation workflow
+
+If the IPL calibrator or phase distributions are missing, regenerate them from the IPL historical JSON archive:
+
+```bash
+python -m src.bbl_pipeline.cli ingest \
+  --input-dir "C:\Users\ADMINS\Downloads\ipl_json" \
+  --output-dir data/ipl_raw
+
+python -m src.bbl_pipeline.cli process \
+  --input-dir data/ipl_raw/matches \
+  --output-dir data/ipl_features_v1 \
+  --feature-store-dir data/ipl_feature_store_v1 \
+  --league ipl
+
+python scripts/analysis/extract_phase_distributions.py \
+  --json-dir "C:\Users\ADMINS\Downloads\ipl_json" \
+  --league ipl \
+  --output data/phase_distributions_ipl.json
+
+python -m src.bbl_pipeline.cli calibrate-league \
+  --global-model models/t20_male_v2 \
+  --input-file data/ipl_features_v1/training.parquet \
+  --league ipl \
+  --method temperature
+```
+
 ### Browser opens but no predictions
 - Verify the match is **LIVE** on CREX
 - Check the terminal for error messages

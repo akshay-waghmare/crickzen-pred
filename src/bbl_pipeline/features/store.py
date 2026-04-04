@@ -26,7 +26,7 @@ VENUE_ALIASES = {
     'WACA Ground': 'Western Australia Cricket Association Ground, Perth',
     'WACA Ground, Perth': 'Western Australia Cricket Association Ground, Perth',
     'W.A.C.A. Ground': 'Western Australia Cricket Association Ground, Perth',
-    'International Cricket Stadium': 'Western Australia Cricket Association Ground, Perth',
+    # NOTE: 'International Cricket Stadium' removed — too generic, collides with IPL venues
     'Optus Stadium': 'Perth Stadium',
     'Perth Stadium': 'Perth Stadium',
     'WACA': 'Western Australia Cricket Association Ground, Perth',
@@ -192,6 +192,8 @@ VENUE_ALIASES = {
     'Rajiv Gandhi International Stadium': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
     'Rajiv Gandhi International Stadium, Uppal, Hyderabad': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
     'Rajiv Gandhi International Stadium, Hyderabad': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Rajiv Gandhi International Cricket Stadium': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
+    'Rajiv Gandhi International Cricket Stadium, Uppal, Hyderabad': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
     'Uppal Stadium': 'Rajiv Gandhi International Stadium, Uppal, Hyderabad',
     'Narendra Modi Stadium': 'Narendra Modi Stadium, Ahmedabad',
     'Narendra Modi Stadium, Ahmedabad': 'Narendra Modi Stadium, Ahmedabad',
@@ -367,6 +369,33 @@ class InMemoryFeatureStore:
         
         # Load player-venue and player-vs-team lookup tables
         self._load_player_venue_tables()
+
+        # Seed IPL venue averages — these are not in the BBL feature store parquet.
+        # Based on recent IPL T20 first-innings averages. CREX live venue stats
+        # (VENUE_SITUATION_STATS) will override these once the info page is scraped.
+        _ipl_venues = {
+            'Eden Gardens, Kolkata':                                            {'venue_avg_score': 175.0, 'venue_avg_wickets': 6.0, 'venue_bat_first_win_rate': 0.52},
+            'Wankhede Stadium, Mumbai':                                         {'venue_avg_score': 178.0, 'venue_avg_wickets': 6.0, 'venue_bat_first_win_rate': 0.47},
+            'MA Chidambaram Stadium, Chepauk, Chennai':                         {'venue_avg_score': 156.0, 'venue_avg_wickets': 6.5, 'venue_bat_first_win_rate': 0.57},
+            'M Chinnaswamy Stadium, Bengaluru':                                 {'venue_avg_score': 184.0, 'venue_avg_wickets': 5.5, 'venue_bat_first_win_rate': 0.44},
+            'Arun Jaitley Stadium, Delhi':                                      {'venue_avg_score': 166.0, 'venue_avg_wickets': 6.2, 'venue_bat_first_win_rate': 0.52},
+            'Rajiv Gandhi International Stadium, Uppal, Hyderabad':             {'venue_avg_score': 172.0, 'venue_avg_wickets': 6.1, 'venue_bat_first_win_rate': 0.54},
+            'Narendra Modi Stadium, Ahmedabad':                                 {'venue_avg_score': 175.0, 'venue_avg_wickets': 6.0, 'venue_bat_first_win_rate': 0.50},
+            'Sawai Mansingh Stadium, Jaipur':                                   {'venue_avg_score': 172.0, 'venue_avg_wickets': 6.2, 'venue_bat_first_win_rate': 0.52},
+            'Punjab Cricket Association IS Bindra Stadium, Mohali':             {'venue_avg_score': 168.0, 'venue_avg_wickets': 6.3, 'venue_bat_first_win_rate': 0.51},
+            'Himachal Pradesh Cricket Association Stadium, Dharamsala':         {'venue_avg_score': 168.0, 'venue_avg_wickets': 6.0, 'venue_bat_first_win_rate': 0.50},
+            'Maharashtra Cricket Association Stadium, Pune':                    {'venue_avg_score': 176.0, 'venue_avg_wickets': 6.1, 'venue_bat_first_win_rate': 0.52},
+            'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow': {'venue_avg_score': 172.0, 'venue_avg_wickets': 6.2, 'venue_bat_first_win_rate': 0.53},
+            'Dr DY Patil Sports Academy, Mumbai':                               {'venue_avg_score': 175.0, 'venue_avg_wickets': 6.0, 'venue_bat_first_win_rate': 0.50},
+            'Brabourne Stadium, Mumbai':                                        {'venue_avg_score': 172.0, 'venue_avg_wickets': 6.1, 'venue_bat_first_win_rate': 0.50},
+            'Holkar Cricket Stadium, Indore':                                   {'venue_avg_score': 180.0, 'venue_avg_wickets': 5.8, 'venue_bat_first_win_rate': 0.48},
+            'Vidarbha Cricket Association Stadium, Jamtha, Nagpur':             {'venue_avg_score': 162.0, 'venue_avg_wickets': 6.4, 'venue_bat_first_win_rate': 0.53},
+            'Saurashtra Cricket Association Stadium, Rajkot':                   {'venue_avg_score': 175.0, 'venue_avg_wickets': 6.0, 'venue_bat_first_win_rate': 0.52},
+        }
+        for v, stats in _ipl_venues.items():
+            if v not in self._venue_stats:
+                self._venue_stats[v] = stats
+                self._venue_names_lower[v.lower()] = v
         
         self._loaded = True
     
@@ -546,6 +575,23 @@ class InMemoryFeatureStore:
         'JER': 'Jersey', 'USA': 'United States of America', 'CAN': 'Canada',
     }
 
+    # IPL team abbreviations — separate dict to avoid conflicts with ILT20 (DC=Dubai Capitals)
+    # and BPL (RR=Rangpur Riders). Used when league_context == 'ipl'.
+    TEAM_ABBREVIATIONS_IPL = {
+        'KKR':  'Kolkata Knight Riders',
+        'SRH':  'Sunrisers Hyderabad',
+        'DC':   'Delhi Capitals',
+        'MI':   'Mumbai Indians',
+        'CSK':  'Chennai Super Kings',
+        'RCB':  'Royal Challengers Bengaluru',
+        'RCBB': 'Royal Challengers Bengaluru',   # alternate seen on some platforms
+        'PBKS': 'Punjab Kings',
+        'PK':   'Punjab Kings',
+        'RR':   'Rajasthan Royals',
+        'GT':   'Gujarat Titans',
+        'LSG':  'Lucknow Super Giants',
+    }
+
     def _resolve_team_abbrev(self, team_name: str) -> str:
         code = team_name.upper()
         league_context = (self.league_context or '').lower()
@@ -560,7 +606,14 @@ class InMemoryFeatureStore:
             candidate = code[:-1]
             if candidate in self.TEAM_ABBREVIATIONS or candidate in self.TEAM_ABBREVIATIONS_T20I:
                 base_code = candidate
-        
+
+        # IPL must be checked first — DC/RR/MI conflict with ILT20/BPL entries in TEAM_ABBREVIATIONS
+        if league_context == 'ipl':
+            if code in self.TEAM_ABBREVIATIONS_IPL:
+                return self.TEAM_ABBREVIATIONS_IPL[code]
+            if base_code in self.TEAM_ABBREVIATIONS_IPL:
+                return self.TEAM_ABBREVIATIONS_IPL[base_code]
+
         if league_context in ('t20i', 't20_international') or 't20_international' in league_context or 't20i_female' in league_context:
             if base_code in self.TEAM_ABBREVIATIONS_T20I:
                 return self.TEAM_ABBREVIATIONS_T20I[base_code]
@@ -658,6 +711,20 @@ class InMemoryFeatureStore:
         # Auto-populated from CREX match info page during live prediction
         # Example entry (added automatically):
         # 'Rajshahi Warriors': {'win_rate': 0.60, 'matches': 10, 'avg_score': 148, ...}
+        #
+        # IPL historical priors — approximate all-time win rates.
+        # These are seeded here because IPL teams aren't in the BBL feature store.
+        # CREX live season stats (scraped from match page) will overwrite these automatically.
+        'Chennai Super Kings':          {'win_rate': 0.59, 'matches': 100, 'avg_score': 172, 'bat_first_wr': 0.58, 'bowl_first_wr': 0.60},
+        'Mumbai Indians':               {'win_rate': 0.57, 'matches': 100, 'avg_score': 171, 'bat_first_wr': 0.55, 'bowl_first_wr': 0.59},
+        'Kolkata Knight Riders':        {'win_rate': 0.54, 'matches': 100, 'avg_score': 166, 'bat_first_wr': 0.53, 'bowl_first_wr': 0.55},
+        'Royal Challengers Bengaluru':  {'win_rate': 0.47, 'matches': 100, 'avg_score': 168, 'bat_first_wr': 0.46, 'bowl_first_wr': 0.48},
+        'Sunrisers Hyderabad':          {'win_rate': 0.53, 'matches': 100, 'avg_score': 162, 'bat_first_wr': 0.52, 'bowl_first_wr': 0.54},
+        'Delhi Capitals':               {'win_rate': 0.50, 'matches': 100, 'avg_score': 164, 'bat_first_wr': 0.49, 'bowl_first_wr': 0.51},
+        'Punjab Kings':                 {'win_rate': 0.47, 'matches': 100, 'avg_score': 165, 'bat_first_wr': 0.46, 'bowl_first_wr': 0.48},
+        'Rajasthan Royals':             {'win_rate': 0.51, 'matches': 100, 'avg_score': 163, 'bat_first_wr': 0.50, 'bowl_first_wr': 0.52},
+        'Gujarat Titans':               {'win_rate': 0.60, 'matches': 60,  'avg_score': 168, 'bat_first_wr': 0.59, 'bowl_first_wr': 0.61},
+        'Lucknow Super Giants':         {'win_rate': 0.53, 'matches': 60,  'avg_score': 165, 'bat_first_wr': 0.52, 'bowl_first_wr': 0.54},
     }
     # =====================================================================
     
@@ -665,13 +732,13 @@ class InMemoryFeatureStore:
     # New teams typically struggle in their first season due to lack of team cohesion,
     # unfamiliar conditions, and untested squad combinations
     DEFAULT_TEAM_STATS = {
-        'win_rate': 0.40,  # New teams perform below average historically
+        'win_rate': 0.50,  # Neutral prior — CREX season stats will override once scraped
         'matches': 0,
-        'bat_first_wr': 0.40,
-        'bowl_first_wr': 0.40,
+        'bat_first_wr': 0.50,
+        'bowl_first_wr': 0.50,
     }
     
-    # Teams that should use default average stats (none currently - all mapped)
+    # Teams that should use default average stats (none — all IPL teams are seeded in SEASON_OVERRIDES below)
     NEW_TEAMS = set()
 
     def _resolve_team_alias(self, team_name: str, max_depth: int = 5) -> Optional[str]:
@@ -852,6 +919,13 @@ class InMemoryFeatureStore:
                 match = matches[0]
                 logger.info(f"Fuzzy matched venue '{venue_name}' to '{match}'")
                 base_stats = self._venue_stats[match].copy()
+
+        # Guard: if fuzzy/exact match returned a dict with NaN avg score, discard it
+        if base_stats is not None:
+            import math
+            if math.isnan(base_stats.get('venue_avg_score', float('nan'))):
+                logger.info(f"Discarding venue stats for '{venue_name}' (NaN avg score), falling back to defaults")
+                base_stats = None
         
         # 3.5 Try stripping/adding city suffix (handles different feature stores)
         # e.g. "SuperSport Park, Centurion" ↔ "SuperSport Park"
