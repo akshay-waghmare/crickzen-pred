@@ -43,22 +43,51 @@ Expected outputs:
 3. `data/odm_v1/reports/by_league.csv`
 4. `data/odm_v1/reports/by_league_innings_phase.csv`
 
-## Step 3: Evaluate against baselines
+## Step 3: Train the first ODM direction model
+
+```powershell
+bbl-pipeline train-odm \
+  --input-file data/odm_v1/training.parquet \
+  --output-dir models/odm_v1
+```
+
+Expected outputs:
+
+1. `models/odm_v1/champion_model.joblib`
+2. `models/odm_v1/feature_columns.json`
+3. `models/odm_v1/metrics.json`
+4. `models/odm_v1/baseline_metrics.json`
+5. `models/odm_v1/training_manifest.json`
+
+Current checked result on this branch:
+
+1. Holdout accuracy: `0.6178`
+2. Momentum baseline accuracy: `0.5286`
+3. Lift vs momentum: `+0.0891`
+4. Holdout ROC AUC: `0.6580`
+
+## Step 4: Evaluate against baselines
+
+```powershell
+bbl-pipeline evaluate-odm \
+  --input-file data/odm_v1/training.parquet \
+  --model-dir models/odm_v1
+```
+
+Minimum go/no-go checks:
+
+1. Holdout accuracy beats the momentum baseline.
+2. Lift vs momentum is positive by a practical margin.
+3. Per-league holdout accuracy is not collapsing in IPL or PSL.
+4. Dataset validation still passes:
 
 ```powershell
 python scripts/validation/validate_odm_dataset.py data/odm_v1/training.parquet
 ```
 
-Minimum go/no-go checks:
+## Step 5: Wire into live predictor
 
-1. ODM dataset builds without alignment or null failures.
-2. `momentum_baseline_12` is available everywhere the target is available.
-3. Baseline slices exist overall, by league, by innings, and by phase.
-4. Phase 4 training is the next step after this dataset checkpoint.
-
-## Step 4: Wire into live predictor
-
-This is not implemented in the current checkpoint. V1 live inference waits for Phase 4 and Phase 5 ODM model artifacts.
+Basic training artifacts now exist, but live ODM inference is still not wired. Phase 5 integration remains pending.
 
 ```powershell
 python -m src.bbl_pipeline.inference.crex_live_predictor \
@@ -76,6 +105,6 @@ Expected runtime behavior after later phases:
 2. After warm-up, live JSON includes direction, central delta, interval, and momentum comparison.
 3. Core ML probability output remains unchanged.
 
-## Step 5: Replay smoke test on recorded states
+## Step 6: Replay smoke test on recorded states
 
 Use the available `data/match_states/ipl` and `data/match_states/psl` files to confirm inference wiring and output shape, not to claim final model quality.

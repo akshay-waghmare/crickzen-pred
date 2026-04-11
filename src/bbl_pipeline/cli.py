@@ -392,6 +392,48 @@ def build_odm_dataset(leagues, base_dir, features_root, global_model_dir, output
         logger.error("ODM dataset build failed", error=str(e), leagues=list(leagues))
         raise click.ClickException(str(e))
 
+
+@main.command(name='train-odm')
+@click.option('--input-file', type=click.Path(exists=True), required=True, help='ODM training dataset parquet')
+@click.option('--output-dir', type=click.Path(), required=True, help='Directory to save ODM model artifacts')
+@click.option('--holdout-frac', type=float, default=0.2, show_default=True, help='Fraction of latest matches per league used for holdout')
+def train_odm_command(input_file, output_dir, holdout_frac):
+    """Train the first ODM direction model and compare it to baselines."""
+    from bbl_pipeline.training.odm_trainer import train_odm
+
+    try:
+        result = train_odm(Path(input_file), Path(output_dir), holdout_frac=holdout_frac)
+        overall = result['metrics']['overall']
+        momentum = result['baseline_metrics']['momentum']
+        click.echo(f"ODM holdout accuracy: {overall['accuracy']:.4f}")
+        click.echo(f"Momentum baseline:    {momentum['accuracy']:.4f}")
+        click.echo(f"Lift vs momentum:     {result['metrics']['lift_vs_momentum_accuracy']:+.4f}")
+        click.echo(f"Artifacts saved to {output_dir}")
+    except Exception as e:
+        logger.error("ODM training failed", error=str(e), input_file=input_file)
+        raise click.ClickException(str(e))
+
+
+@main.command(name='evaluate-odm')
+@click.option('--input-file', type=click.Path(exists=True), required=True, help='ODM training dataset parquet')
+@click.option('--model-dir', type=click.Path(exists=True), required=True, help='Directory containing ODM model artifacts')
+@click.option('--holdout-frac', type=float, default=0.2, show_default=True, help='Fraction of latest matches per league used for holdout')
+def evaluate_odm_command(input_file, model_dir, holdout_frac):
+    """Evaluate a trained ODM direction model on the deterministic holdout split."""
+    from bbl_pipeline.training.odm_trainer import evaluate_odm
+
+    try:
+        result = evaluate_odm(Path(input_file), Path(model_dir), holdout_frac=holdout_frac)
+        overall = result['metrics']['overall']
+        momentum = result['baseline_metrics']['momentum']
+        click.echo(f"ODM holdout accuracy: {overall['accuracy']:.4f}")
+        click.echo(f"Momentum baseline:    {momentum['accuracy']:.4f}")
+        click.echo(f"Lift vs momentum:     {result['metrics']['lift_vs_momentum_accuracy']:+.4f}")
+        click.echo(f"ROC AUC:              {overall['roc_auc']:.4f}")
+    except Exception as e:
+        logger.error("ODM evaluation failed", error=str(e), input_file=input_file, model_dir=model_dir)
+        raise click.ClickException(str(e))
+
 @main.command()
 @click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
 @click.option('--output-dir', type=click.Path(), required=True, help='Directory to save model artifacts')
