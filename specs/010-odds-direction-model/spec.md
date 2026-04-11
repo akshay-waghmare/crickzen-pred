@@ -81,25 +81,41 @@ Before building the model, we need EDA to identify which features most strongly 
 
 ### Phase 1: Target Variable Construction
 
-Using recorded match states from `data/match_states/`, construct the target:
+Using training data features + the trained ML model to generate probabilities:
 
 ```python
-# For each ball i in a match:
-target_delta = prob[i + horizon] - prob[i]   # Actual prob change
-target_direction = sign(target_delta)          # UP=1, DOWN=-1, FLAT=0 (±1% threshold)
+# Load global T20 model → generate ml_prob for every ball in training data
+model = joblib.load('models/t20_male_v2/champion_model.joblib')
+ml_prob = model.predict_proba(X[TOP_FEATURES])[:, 1]  # Raw P(batting team wins)
+
+# PRIMARY: ML model probability delta
+target_delta = ml_prob[i + 12] - ml_prob[i]
+target_direction = 1 if delta > 0 else 0  # Binary UP/DOWN
+
+# RESIDUAL (pro level): unexpected movement only
+momentum_baseline = ml_prob[i] - ml_prob[i - 12]  # Simple trend continuation
+target_residual = target_delta - momentum_baseline  # What momentum can't explain
 ```
 
-**Fixed horizon**: 12 balls (2 overs) — best signal-to-noise ratio per review.
+**Fixed horizon**: 12 balls (2 overs) — best signal-to-noise ratio.
+
+**Why ML prob over resource_win_prob?**
+- ML encodes venue, pressure, player quality, context — resource_win_prob is just DLS physics
+- Predicting ML movement = directly useful for the betting system (we bet on ML output)
+- Closer to market behavior (market reacts more like ML than DLS)
+
+**Self-referential risk**: ODM may learn ML's internal patterns rather than real cricketedge. **Mitigation**: momentum baseline comparison — if ODM ≈ momentum, it's useless.
 
 **Data sources for target construction:**
-- `resource_win_prob` from training data features (deterministic, available for every ball across all matches)
-- `model_final_prob` from recorded match states (ML calibrated — only 2 matches available, useful for validation only)
+- `ml_prob` = `model.predict_proba(features)[:, 1]` — generated from global T20 model on training features
+- `resource_win_prob` from training data — used as **comparison baseline** only
 - ~~`market_batting_team_prob`~~ — **NOT AVAILABLE** (no historical market odds data)
 
 **Training data available:**
 - IPL: ~1,146 matches, ~273K balls (`data/ipl_features_v1/training.parquet`)
 - PSL: ~75K balls (`data/psl_features_v1/training.parquet`)
-- Recorded match states: 2 matches only (1 IPL, 1 PSL) — too few for training, useful for validation
+- All 25 TOP_FEATURES present in both datasets
+- Recorded match states: 2 matches only (1 IPL, 1 PSL) — validation only
 
 ### Phase 2: Candidate Features for EDA
 
@@ -150,6 +166,10 @@ target_direction = sign(target_delta)          # UP=1, DOWN=-1, FLAT=0 (±1% thr
 3. **SHAP Analysis**: SHAP values to understand feature interactions and nonlinear effects
 4. **Segment Analysis**: Does feature importance change by innings, phase, or match situation?
 5. ~~**Market vs Model**~~: No historical market odds available — model prob only.
+
+7. **Self-referential learning**: ODM predicts future output of the ML model using features that the ML model also uses. Risk: ODM just learns ML's internal update patterns. Mitigation: (a) momentum baseline comparison, (b) residual target to strip trivial momentum, (c) keep ODM as advisory layer only — never feed back into ML training.
+
+8. **Feedback loop**: If ODM output influences betting, and betting data influences future model training → circular logic. Rule: ODM is advisory only, never feeds into ML training pipeline.
 
 ### Phase 4: Baseline Models
 
