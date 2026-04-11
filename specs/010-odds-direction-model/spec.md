@@ -30,9 +30,14 @@ We currently have two models running during live prediction:
 
 Build an **Odds Direction Model (ODM)** that predicts:
 
-1. **Direction**: Will batting team win probability increase or decrease over the next N balls? (classification: UP / DOWN / FLAT)
+1. **Direction**: Will batting team win probability increase or decrease over the next 12 balls? (binary classification: UP / DOWN — no FLAT class)
 2. **Expected Δ (delta)**: By how much? (regression: predicted change in probability, e.g., +3.2%)
 3. **Confidence Interval on Δ**: What's the range of likely movement? (e.g., Δ = +3.2% with 90% CI [-1.1%, +7.5%])
+
+> **Design decisions (from review):**
+> - **Binary only**: DROP the FLAT class — most balls produce tiny deltas, FLAT dominates and destroys signal. UP vs DOWN binary is cleaner.
+> - **12-ball horizon**: 6 balls too noisy, 30 balls too diluted. 12 balls (2 overs) is the sweet spot.
+> - **Model prob target only**: We do NOT have historical market odds data. Use `resource_win_prob` delta as target (deterministic, available for every ball in training data). Market direction prediction is out of scope.
 
 ### Output Schema (per prediction)
 
@@ -84,12 +89,17 @@ target_delta = prob[i + horizon] - prob[i]   # Actual prob change
 target_direction = sign(target_delta)          # UP=1, DOWN=-1, FLAT=0 (±1% threshold)
 ```
 
-**Horizons to investigate**: 6 balls (1 over), 12 balls (2 overs), 30 balls (5 overs)
+**Fixed horizon**: 12 balls (2 overs) — best signal-to-noise ratio per review.
 
 **Data sources for target construction:**
-- `model_final_prob` from recorded match states (ML calibrated probability at each ball)
-- `mc_win_prob` from MC simulations (alternative target)
-- `market_batting_team_prob` from CREX odds (market-based target — gold standard)
+- `resource_win_prob` from training data features (deterministic, available for every ball across all matches)
+- `model_final_prob` from recorded match states (ML calibrated — only 2 matches available, useful for validation only)
+- ~~`market_batting_team_prob`~~ — **NOT AVAILABLE** (no historical market odds data)
+
+**Training data available:**
+- IPL: ~1,146 matches, ~273K balls (`data/ipl_features_v1/training.parquet`)
+- PSL: ~75K balls (`data/psl_features_v1/training.parquet`)
+- Recorded match states: 2 matches only (1 IPL, 1 PSL) — too few for training, useful for validation
 
 ### Phase 2: Candidate Features for EDA
 
@@ -139,7 +149,7 @@ target_direction = sign(target_delta)          # UP=1, DOWN=-1, FLAT=0 (±1% thr
 2. **Feature Importance (RF/XGB)**: Train quick Random Forest on direction classification → extract feature importances
 3. **SHAP Analysis**: SHAP values to understand feature interactions and nonlinear effects
 4. **Segment Analysis**: Does feature importance change by innings, phase, or match situation?
-5. **Market vs Model**: Compare direction prediction when targeting `model_final_prob` delta vs `market_batting_team_prob` delta — are the same features important?
+5. ~~**Market vs Model**~~: No historical market odds available — model prob only.
 
 ### Phase 4: Baseline Models
 
@@ -262,7 +272,7 @@ odm_result = odm.predict(
 
 5. **Horizon selection**: 6 balls may be too noisy, 30 balls may be too smooth. EDA should test multiple horizons and pick the one with best signal-to-noise.
 
-6. **FLAT class imbalance**: Most balls produce small prob changes (FLAT). May need asymmetric thresholds or drop FLAT class entirely (UP vs DOWN binary).
+6. ~~**FLAT class imbalance**~~: Resolved — using binary UP/DOWN only (drop FLAT).
 
 ---
 
