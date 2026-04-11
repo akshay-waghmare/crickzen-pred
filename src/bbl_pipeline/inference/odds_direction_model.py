@@ -114,6 +114,14 @@ class OddsDirectionModel:
         row['ball'] = float(ball)
         row['ball_number'] = float(over * 6 + ball)
         row['ml_prob'] = current_ml_prob
+        row.setdefault('is_super_over', 0.0)
+        row.setdefault('runs_batter', 0.0)
+        row.setdefault('runs_extras', 0.0)
+        row.setdefault('runs_total', 0.0)
+        row.setdefault('score_adjusted_by_team', 0.0)
+        row.setdefault('projected_adjusted', 0.0)
+        row.setdefault('resource_team_adjusted', 0.0)
+        row.setdefault('run_rate_team_adj', 0.0)
 
         deduped_history = self._dedupe_history(history)
         raw_history = [self._safe_float(item.get('raw_win_prob', item.get('bat_prob'))) for item in deduped_history]

@@ -28,11 +28,207 @@ import subprocess
 import signal
 import os
 import sys
+from types import SimpleNamespace
 
 # Add project src to path
-PROJECT_SRC = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_SRC = PROJECT_ROOT / "src"
 if str(PROJECT_SRC) not in sys.path:
     sys.path.insert(0, str(PROJECT_SRC))
+
+
+def _python_executable() -> str:
+    """Prefer the repository virtualenv interpreter for backend subprocesses."""
+    candidates = [
+        PROJECT_ROOT / ".venv" / "Scripts" / "python.exe",
+        PROJECT_ROOT / ".venv" / "bin" / "python",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+    return sys.executable
+
+
+def _normalized_path(path_like: str | Path) -> str:
+    return Path(path_like).as_posix().lower()
+
+
+def _predictor_config_for_json(json_path: str) -> dict | None:
+    normalized = _normalized_path(json_path)
+    for cfg in PREDICTOR_CONFIGS.values():
+        output_json = cfg.get("output_json")
+        display_json = cfg.get("display_json")
+        if output_json and _normalized_path(output_json) == normalized:
+            return cfg
+        if display_json and _normalized_path(display_json) == normalized:
+            return cfg
+    return None
+
+
+def _raw_json_path_for_source(json_path: str) -> Path | None:
+    cfg = _predictor_config_for_json(json_path)
+    if not cfg:
+        return None
+    display_json = cfg.get("display_json")
+    if display_json and _normalized_path(display_json) == _normalized_path(json_path):
+        return Path(cfg["output_json"])
+    return None
+
+
+def _load_json_file(path: Path) -> dict | None:
+    try:
+        with open(path, 'r', encoding='utf-8') as handle:
+            data = json.load(handle)
+        return data if isinstance(data, dict) else None
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return None
+
+
+def _write_json_file(path: Path, payload: dict) -> None:
+    tmp_path = path.with_suffix('.tmp')
+    with open(tmp_path, 'w', encoding='utf-8') as handle:
+        json.dump(payload, handle, indent=2)
+    tmp_path.replace(path)
+
+
+def _odm_history_path_for_raw(raw_json_path: Path) -> Path:
+    return raw_json_path.with_name(f"{raw_json_path.stem}_odm_history.json")
+
+
+def _load_history_list(path: Path) -> list[dict]:
+    try:
+        with open(path, 'r', encoding='utf-8') as handle:
+            data = json.load(handle)
+        return data if isinstance(data, list) else []
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return []
+
+
+def _save_history_list(path: Path, history: list[dict]) -> None:
+    tmp_path = path.with_suffix('.tmp')
+    with open(tmp_path, 'w', encoding='utf-8') as handle:
+        json.dump(history[-200:], handle, indent=2)
+    tmp_path.replace(path)
+
+
+def _snapshot_key(item: dict) -> tuple:
+    return (item.get('innings'), item.get('over'), item.get('ball'))
+
+
+def _append_distinct_snapshot(history: list[dict], live_state: dict) -> list[dict]:
+    snapshot = {
+        'innings': 2 if live_state.get('is_second_innings') else 1,
+        'over': live_state.get('over'),
+        'ball': live_state.get('ball'),
+        'bat_prob': live_state.get('bat_win_prob'),
+        'raw_win_prob': live_state.get('raw_win_prob', live_state.get('bat_win_prob')),
+        'resource_win_prob': (live_state.get('features') or {}).get('resource_win_prob', 0.0),
+        'score': live_state.get('score'),
+        'wickets': live_state.get('wickets'),
+        'batting_team': live_state.get('batting_team'),
+        'bowling_team': live_state.get('bowling_team'),
+        'timestamp': live_state.get('timestamp'),
+    }
+    if history and _snapshot_key(history[-1]) == _snapshot_key(snapshot):
+        history[-1] = snapshot
+    else:
+        history.append(snapshot)
+    return history
+
+
+@st.cache_resource
+def _load_live_odm_runtime(feature_store_dir: str, league: str, odm_model_dir: str):
+    from bbl_pipeline.features.format_config import FormatConfig
+    from bbl_pipeline.features.store import InMemoryFeatureStore
+    from bbl_pipeline.inference.odds_direction_model import OddsDirectionModel
+
+    model = OddsDirectionModel.load(odm_model_dir)
+    feature_store = InMemoryFeatureStore(
+        Path(feature_store_dir) / 'player_stats.parquet',
+        Path(feature_store_dir) / 'venue_stats.parquet',
+    )
+    feature_store.load()
+    predictor = SimpleNamespace(
+        feature_store=feature_store,
+        format_config=FormatConfig.from_league(league),
+    )
+    return model, predictor
+
+
+def _refresh_odm_mirror_from_raw(json_path: str) -> dict | None:
+    cfg = _predictor_config_for_json(json_path)
+    raw_json_path = _raw_json_path_for_source(json_path)
+    if not cfg or not raw_json_path:
+        return None
+
+    mirror_json_path = Path(json_path)
+    raw_state = _load_json_file(raw_json_path)
+    if not raw_state or not isinstance(raw_state.get('features'), dict):
+        return _load_json_file(mirror_json_path)
+
+    try:
+        raw_mtime = raw_json_path.stat().st_mtime
+        mirror_mtime = mirror_json_path.stat().st_mtime if mirror_json_path.exists() else 0.0
+    except OSError:
+        raw_mtime = 0.0
+        mirror_mtime = 0.0
+
+    if mirror_json_path.exists() and mirror_mtime >= raw_mtime:
+        return _load_json_file(mirror_json_path)
+
+    if not cfg.get('odm_model_dir'):
+        return raw_state
+
+    history_path = _odm_history_path_for_raw(raw_json_path)
+    history = _load_history_list(history_path)
+    history = _append_distinct_snapshot(history, raw_state)
+    _save_history_list(history_path, history)
+
+    model, predictor = _load_live_odm_runtime(
+        cfg['feature_store_dir'],
+        cfg['league'],
+        cfg['odm_model_dir'],
+    )
+
+    row = model._build_feature_row(
+        live_features=raw_state['features'],
+        predictor=predictor,
+        batting_team=raw_state.get('batting_team', ''),
+        venue=raw_state.get('venue') or 'Unknown',
+        league=raw_state.get('league') or cfg['league'],
+        innings=2 if raw_state.get('is_second_innings') else 1,
+        over=int(raw_state.get('over', 0) or 0),
+        ball=int(raw_state.get('ball', 0) or 0),
+        target_score=raw_state.get('target'),
+        current_ml_prob=float(raw_state.get('raw_win_prob', raw_state.get('bat_win_prob', 0.0)) or 0.0),
+        history=history,
+    )
+    missing = [column for column in (model.feature_columns or []) if column not in row]
+    odm = model.predict(
+        live_features=raw_state['features'],
+        predictor=predictor,
+        batting_team=raw_state.get('batting_team', ''),
+        bowling_team=raw_state.get('bowling_team', ''),
+        venue=raw_state.get('venue') or 'Unknown',
+        league=raw_state.get('league') or cfg['league'],
+        innings=2 if raw_state.get('is_second_innings') else 1,
+        over=int(raw_state.get('over', 0) or 0),
+        ball=int(raw_state.get('ball', 0) or 0),
+        target_score=raw_state.get('target'),
+        current_ml_prob=float(raw_state.get('raw_win_prob', raw_state.get('bat_win_prob', 0.0)) or 0.0),
+        history=history,
+    )
+
+    enriched_state = dict(raw_state)
+    enriched_state['odm'] = odm
+    enriched_state['odm_feature_audit'] = {
+        'feature_count': len(model.feature_columns or []),
+        'missing_count': len(missing),
+        'missing_columns': missing,
+        'history_points': len(history),
+    }
+    _write_json_file(mirror_json_path, enriched_state)
+    return enriched_state
 
 # Page config
 st.set_page_config(
@@ -246,8 +442,10 @@ DEFAULT_JSON = os.environ.get("PREDICTOR_JSON", "data/live_state.json")
 
 # Pre-configured JSON source options (displayed in dropdown)
 JSON_SOURCES = {
-    "IPL ML+MC (ipl_live_ml.json)": "data/ipl_live_ml.json",
+    "IPL ML+MC (odm mirror)": "data/ipl_live_ml_odm.json",
+    "IPL ML+MC raw (ipl_live_ml.json)": "data/ipl_live_ml.json",
     "IPL MC-only (ipl_live_mc.json)": "data/ipl_live_mc.json",
+    "PSL ML+MC (odm mirror)": "data/psl_live_ml_odm.json",
     "PSL ML+MC (psl_live_ml.json)": "data/psl_live_ml.json",
     "PSL MC-only (psl_live_mc.json)": "data/psl_live_mc.json",
     "T20 WC ML+MC (wc_live_ml.json)": "data/wc_live_ml.json",
@@ -265,8 +463,10 @@ PID_FILE = Path("data/.predictor_pids.json")
 PREDICTOR_CONFIGS = {
     "IPL ML+MC": {
         "output_json": "data/ipl_live_ml.json",
+        "display_json": "data/ipl_live_ml_odm.json",
         "mc_only": False,
         "model_dir": "models/t20_male_v2",
+        "odm_model_dir": "models/odm_v1",
         "feature_store_dir": "data/ipl_feature_store_v1",
         "league": "ipl",
         "states_dir": "data/match_states/ipl",
@@ -281,8 +481,10 @@ PREDICTOR_CONFIGS = {
     },
     "PSL ML+MC": {
         "output_json": "data/psl_live_ml.json",
+        "display_json": "data/psl_live_ml_odm.json",
         "mc_only": False,
         "model_dir": "models/t20_male_v2",
+        "odm_model_dir": "models/odm_v1",
         "feature_store_dir": "data/psl_feature_store_v1",
         "league": "psl",
         "states_dir": "data/match_states/psl",
@@ -314,6 +516,18 @@ PREDICTOR_CONFIGS = {
 }
 
 
+def _display_json_path(cfg: dict) -> str:
+    return cfg.get("display_json", cfg["output_json"])
+
+
+def _bridge_pid_key(name: str) -> str:
+    return f"{name}::odm_bridge"
+
+
+def _log_stem(name: str) -> str:
+    return name.lower().replace(" ", "_").replace("+", "plus").replace("-", "_")
+
+
 def _read_pids() -> dict:
     """Read running predictor PIDs from file."""
     if PID_FILE.exists():
@@ -339,11 +553,40 @@ def _is_pid_alive(pid: int) -> bool:
         return False
 
 
-def _start_predictor(name: str, match_url: str) -> int:
-    """Start a predictor process and return its PID."""
+def _start_odm_bridge(name: str, cfg: dict) -> int | None:
+    """Start an ODM bridge sidecar for enriched live JSON output when configured."""
+    bridge_output = cfg.get("display_json")
+    odm_model_dir = cfg.get("odm_model_dir")
+    if not bridge_output or not odm_model_dir:
+        return None
+
+    cmd = [
+        _python_executable(), "scripts/odm_live_json_bridge.py",
+        "--input-json", cfg["output_json"],
+        "--output-json", bridge_output,
+        "--feature-store-dir", cfg["feature_store_dir"],
+        "--league", cfg["league"],
+        "--odm-model-dir", odm_model_dir,
+    ]
+
+    log_path = Path(f"logs/{_log_stem(name)}_odm_bridge.log")
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_file = open(log_path, "a")
+
+    proc = subprocess.Popen(
+        cmd,
+        stdout=log_file,
+        stderr=subprocess.STDOUT,
+        start_new_session=True,
+    )
+    return proc.pid
+
+
+def _start_predictor(name: str, match_url: str) -> tuple[int, int | None]:
+    """Start predictor and optional ODM bridge processes and return their PIDs."""
     cfg = PREDICTOR_CONFIGS[name]
     cmd = [
-        sys.executable, "-m", "src.bbl_pipeline.inference.crex_live_predictor",
+        _python_executable(), "-m", "src.bbl_pipeline.inference.crex_live_predictor",
         "--match-url", match_url,
         "--model-dir", cfg["model_dir"],
         "--feature-store-dir", cfg["feature_store_dir"],
@@ -355,8 +598,7 @@ def _start_predictor(name: str, match_url: str) -> int:
     if cfg["mc_only"]:
         cmd.append("--mc-only")
     
-    log_name = name.lower().replace(" ", "_").replace("+", "plus").replace("-", "_")
-    log_path = Path(f"logs/{log_name}.log")
+    log_path = Path(f"logs/{_log_stem(name)}.log")
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_file = open(log_path, "a")
     
@@ -366,7 +608,8 @@ def _start_predictor(name: str, match_url: str) -> int:
         stderr=subprocess.STDOUT,
         start_new_session=True,
     )
-    return proc.pid
+    bridge_pid = _start_odm_bridge(name, cfg)
+    return proc.pid, bridge_pid
 
 
 def _stop_predictor(pid: int):
@@ -377,7 +620,34 @@ def _stop_predictor(pid: int):
         pass
 
 
+def _stop_managed_processes(name: str, pids: dict) -> None:
+    predictor_pid = pids.pop(name, None)
+    if predictor_pid is not None:
+        _stop_predictor(predictor_pid)
+
+    bridge_key = _bridge_pid_key(name)
+    bridge_pid = pids.pop(bridge_key, None)
+    if bridge_pid is not None:
+        _stop_predictor(bridge_pid)
+
+
 import sys  # needed for _start_predictor
+
+
+def _safe_float_or_none(value):
+    try:
+        if value is None or value == "":
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _format_signed_pct(value):
+    number = _safe_float_or_none(value)
+    if number is None:
+        return "N/A"
+    return f"{number * 100:+.1f}%"
 
 
 def render_backend_controls():
@@ -396,29 +666,35 @@ def render_backend_controls():
         st.sidebar.markdown(f"### {name}")
         pid = pids.get(name)
         is_running = pid is not None and _is_pid_alive(pid)
+        bridge_pid = pids.get(_bridge_pid_key(name))
+        bridge_running = bridge_pid is not None and _is_pid_alive(bridge_pid)
         
         if is_running:
             st.sidebar.success(f"Running (PID {pid})")
-            st.sidebar.caption(f"Output: `{cfg['output_json']}`")
+            st.sidebar.caption(f"Output: `{_display_json_path(cfg)}`")
+            if cfg.get("display_json") and cfg.get("display_json") != cfg["output_json"]:
+                bridge_status = f"ODM bridge PID {bridge_pid}" if bridge_running else "ODM bridge stopped"
+                st.sidebar.caption(bridge_status)
             if st.sidebar.button(f"⏹ Stop {name}", key=f"stop_{name}"):
-                _stop_predictor(pid)
-                pids.pop(name, None)
+                _stop_managed_processes(name, pids)
                 _write_pids(pids)
                 st.sidebar.warning(f"Stopped PID {pid}")
                 time.sleep(0.5)
                 st.rerun()
         else:
             # Clean up stale PID
-            if pid is not None:
-                pids.pop(name, None)
+            if pid is not None or bridge_pid is not None:
+                _stop_managed_processes(name, pids)
                 _write_pids(pids)
             st.sidebar.info("Not running")
             if st.sidebar.button(f"▶ Start {name}", key=f"start_{name}"):
                 if not match_url.strip():
                     st.sidebar.error("Enter a CREX match URL first!")
                 else:
-                    new_pid = _start_predictor(name, match_url.strip())
+                    new_pid, bridge_pid = _start_predictor(name, match_url.strip())
                     pids[name] = new_pid
+                    if bridge_pid is not None:
+                        pids[_bridge_pid_key(name)] = bridge_pid
                     _write_pids(pids)
                     st.sidebar.success(f"Started (PID {new_pid})")
                     time.sleep(1)
@@ -435,16 +711,18 @@ def render_backend_controls():
                 for name in PREDICTOR_CONFIGS:
                     pid = pids.get(name)
                     if pid is None or not _is_pid_alive(pid):
-                        new_pid = _start_predictor(name, match_url.strip())
+                        new_pid, bridge_pid = _start_predictor(name, match_url.strip())
                         pids[name] = new_pid
+                        if bridge_pid is not None:
+                            pids[_bridge_pid_key(name)] = bridge_pid
                 _write_pids(pids)
                 st.sidebar.success("All started!")
                 time.sleep(1)
                 st.rerun()
     with col_b:
         if st.button("⏹ Stop All", key="stop_all"):
-            for name, pid in list(pids.items()):
-                _stop_predictor(pid)
+            for name in list(PREDICTOR_CONFIGS):
+                _stop_managed_processes(name, pids)
             _write_pids({})
             st.sidebar.warning("All stopped.")
             time.sleep(0.5)
@@ -457,12 +735,16 @@ def render_backend_controls():
     # Build log map from predictor configs (not hardcoded)
     log_map = {}
     for name, cfg in PREDICTOR_CONFIGS.items():
-        log_name = name.lower().replace(" ", "_").replace("+", "plus").replace("-", "_")
-        log_path = f"logs/{log_name}.log"
+        log_path = f"logs/{_log_stem(name)}.log"
         pid = pids.get(name)
         is_alive = pid is not None and _is_pid_alive(pid)
         status = f"🟢 PID {pid}" if is_alive else "⚪ stopped"
         log_map[f"{name} ({status})"] = log_path
+        if cfg.get("display_json") and cfg.get("display_json") != cfg["output_json"]:
+            bridge_pid = pids.get(_bridge_pid_key(name))
+            bridge_alive = bridge_pid is not None and _is_pid_alive(bridge_pid)
+            bridge_status = f"🟢 PID {bridge_pid}" if bridge_alive else "⚪ stopped"
+            log_map[f"{name} ODM bridge ({bridge_status})"] = f"logs/{_log_stem(name)}_odm_bridge.log"
     log_map["Streamlit"] = "logs/streamlit.log"
     
     log_choice = st.sidebar.selectbox("View Log", list(log_map.keys()), key="log_choice")
@@ -812,15 +1094,21 @@ def check_match_result(state: dict) -> tuple:
 
 
 def _history_path_for_json(json_path: str) -> Path:
-    path = Path(json_path)
+    raw_json_path = _raw_json_path_for_source(json_path)
+    if raw_json_path is not None:
+        path = raw_json_path
+    else:
+        path = Path(json_path)
     return path.with_name(f"{path.stem}_history.json")
 
 
 def load_state(json_path: str) -> dict:
     """Load state from JSON file."""
     try:
-        with open(json_path, 'r') as f:
-            state = json.load(f)
+        state = _refresh_odm_mirror_from_raw(json_path)
+        if state is None:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                state = json.load(f)
         
         # Also try to load full history from persistent history file
         try:
@@ -1412,6 +1700,67 @@ def main():
                 <span style="font-size: 0.9em; color: #666;">League-Calibrated</span>
             </div>
             ''', unsafe_allow_html=True)
+
+    odm = d.get("odm") if isinstance(d.get("odm"), dict) else None
+    if odm:
+        st.markdown("---")
+        st.subheader("📡 ODM Advisory (Next 12 Balls)")
+
+        odm_status = str(odm.get("status", "unavailable"))
+        if odm_status == "ready":
+            delta_12 = odm.get("delta_12") if isinstance(odm.get("delta_12"), dict) else {}
+            direction = str(odm.get("direction", "")).upper() or "N/A"
+            confidence = _safe_float_or_none(odm.get("direction_confidence"))
+            point_estimate = _format_signed_pct(delta_12.get("point_estimate"))
+            lower_90 = _format_signed_pct(delta_12.get("lower_90"))
+            upper_90 = _format_signed_pct(delta_12.get("upper_90"))
+            phase_name = odm.get("phase", "unknown")
+            history_points = odm.get("history_points", "?")
+            delta_mode = odm.get("selected_delta_mode", "unknown")
+
+            odm_cols = st.columns(3)
+            with odm_cols[0]:
+                st.markdown(f'''
+                <div style="text-align: center; padding: 10px; background: #eef6ff; border-radius: 10px; border-left: 4px solid #1565c0;">
+                    <b>📈 Direction</b><br>
+                    <span style="font-size: 1.6em; color: #1565c0;">{direction}</span><br>
+                    <span style="font-size: 0.95em; color: #444;">Confidence: <b>{(confidence or 0.0) * 100:.1f}%</b></span><br>
+                    <span style="font-size: 0.9em; color: #666;">Phase: {phase_name}</span>
+                </div>
+                ''', unsafe_allow_html=True)
+
+            with odm_cols[1]:
+                st.markdown(f'''
+                <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #2e7d32;">
+                    <b>🎯 90% Delta Band</b><br>
+                    <span style="font-size: 1.3em; color: #2e7d32;">{lower_90} to {upper_90}</span><br>
+                    <span style="font-size: 0.95em; color: #444;">Next 12 balls</span><br>
+                    <span style="font-size: 0.9em; color: #666;">Mode: {delta_mode}</span>
+                </div>
+                ''', unsafe_allow_html=True)
+
+            with odm_cols[2]:
+                st.markdown(f'''
+                <div style="text-align: center; padding: 10px; background: #fff8e1; border-radius: 10px; border-left: 4px solid #ef6c00;">
+                    <b>🧪 Point Estimate</b><br>
+                    <span style="font-size: 1.5em; color: #ef6c00;">{point_estimate}</span><br>
+                    <span style="font-size: 0.95em; color: #444;">Experimental only</span><br>
+                    <span style="font-size: 0.9em; color: #666;">History points: {history_points}</span>
+                </div>
+                ''', unsafe_allow_html=True)
+
+            point_note = "Central ODM delta is still experimental. Use direction and interval as the primary advisory signals."
+            st.caption(point_note)
+
+        elif odm_status == "warming_up":
+            history_points = odm.get("history_points", 0)
+            required_points = odm.get("required_history_points", 12)
+            reason = odm.get("reason", "ODM is collecting enough live history before issuing advisory output.")
+            st.info(f"ODM warming up: {history_points}/{required_points} distinct-ball snapshots collected. {reason}")
+
+        else:
+            reason = odm.get("reason", "ODM advisory is unavailable for the current live state.")
+            st.warning(f"ODM status: {odm_status}. {reason}")
     
     st.markdown("<br>", unsafe_allow_html=True)
     

@@ -27,3 +27,13 @@ def test_build_sidecar_paths_are_feed_specific():
 def test_clean_team_text_removes_crex_section_labels():
     assert CrexLivePredictor._clean_team_text("PBKS in Points Table") == "PBKS"
     assert CrexLivePredictor._clean_team_text("Punjab Kings Team Form") == "Punjab Kings"
+
+
+def test_resolve_team_name_uses_psl_abbreviations():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.local_storage = {}
+    predictor.league = "psl"
+    predictor.predictor = None
+
+    assert predictor._resolve_team_name("ISU") == "Islamabad United"
+    assert predictor._resolve_team_name("RWP") == "Rawalpindiz"

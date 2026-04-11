@@ -19,6 +19,46 @@ from ..features.format_config import FormatConfig
 logger = structlog.get_logger()
 
 
+def _restore_simple_imputer_compatibility(root) -> int:
+    """Restore sklearn 1.7 -> 1.8 SimpleImputer state for persisted models."""
+    seen: set[int] = set()
+    stack = [root]
+    patched = 0
+
+    while stack:
+        current = stack.pop()
+        current_id = id(current)
+        if current is None or current_id in seen:
+            continue
+        seen.add(current_id)
+
+        if type(current).__name__ == 'SimpleImputer':
+            if hasattr(current, '_fit_dtype') and not hasattr(current, '_fill_dtype'):
+                current._fill_dtype = current._fit_dtype
+                patched += 1
+
+        if isinstance(current, dict):
+            stack.extend(current.values())
+            continue
+
+        if isinstance(current, (list, tuple, set)):
+            stack.extend(current)
+            continue
+
+        if hasattr(current, '__dict__'):
+            stack.extend(current.__dict__.values())
+
+    return patched
+
+
+def _coerce_probability_scalar(value: Any) -> float:
+    """Convert scalar-like numpy/list outputs into a single float probability."""
+    array = np.asarray(value)
+    if array.size == 0:
+        raise ValueError("Cannot coerce empty probability output to scalar")
+    return float(array.reshape(-1)[0])
+
+
 class DummyFeatureStore:
     """Fallback feature store that returns empty dicts (uses global defaults)."""
     
@@ -116,6 +156,13 @@ class Predictor:
         if not model_path.exists():
             raise FileNotFoundError(f"Model not found at {model_path}")
         model = joblib.load(model_path)
+        patched_imputers = _restore_simple_imputer_compatibility(model)
+        if patched_imputers:
+            logger.warning(
+                "Patched sklearn SimpleImputer compatibility for persisted model",
+                patched_imputers=patched_imputers,
+                model_dir=str(path),
+            )
         
         # Load metadata (optional, but good for verification)
         meta = {}
@@ -812,7 +859,7 @@ class Predictor:
                     scaler = calibrators[innings_key]
                     if hasattr(scaler, 'predict'):
                         import numpy as np
-                        prob = float(scaler.predict(np.array([[prob]]))[0])
+                        prob = _coerce_probability_scalar(scaler.predict(np.array([[prob]])))
                         if debug:
                             print(f"[LEAGUE] League ({league_name}): {pre_league_prob:.1%} -> {prob:.1%}")
                 elif method == 'temperature':

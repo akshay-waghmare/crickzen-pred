@@ -592,6 +592,27 @@ class InMemoryFeatureStore:
         'LSG':  'Lucknow Super Giants',
     }
 
+    # PSL team abbreviations — separate dict because CREX short codes differ from the
+    # canonical historical team names stored in the PSL feature store (for example RWP
+    # must resolve to Rawalpindiz).
+    TEAM_ABBREVIATIONS_PSL = {
+        'ISU': 'Islamabad United',
+        'IU': 'Islamabad United',
+        'KRK': 'Karachi Kings',
+        'KK': 'Karachi Kings',
+        'LHQ': 'Lahore Qalandars',
+        'LQ': 'Lahore Qalandars',
+        'MS': 'Multan Sultans',
+        'MSU': 'Multan Sultans',
+        'PZ': 'Peshawar Zalmi',
+        'QTG': 'Quetta Gladiators',
+        'QG': 'Quetta Gladiators',
+        'RWP': 'Rawalpindiz',
+        'RPZ': 'Rawalpindiz',
+        'HYK': 'Hyderabad Kingsmen',
+        'HK': 'Hyderabad Kingsmen',
+    }
+
     def _resolve_team_abbrev(self, team_name: str) -> str:
         code = team_name.upper()
         league_context = (self.league_context or '').lower()
@@ -613,6 +634,12 @@ class InMemoryFeatureStore:
                 return self.TEAM_ABBREVIATIONS_IPL[code]
             if base_code in self.TEAM_ABBREVIATIONS_IPL:
                 return self.TEAM_ABBREVIATIONS_IPL[base_code]
+
+        if league_context in ('psl', 'pakistan_super_league'):
+            if code in self.TEAM_ABBREVIATIONS_PSL:
+                return self.TEAM_ABBREVIATIONS_PSL[code]
+            if base_code in self.TEAM_ABBREVIATIONS_PSL:
+                return self.TEAM_ABBREVIATIONS_PSL[base_code]
 
         if league_context in ('t20i', 't20_international') or 't20_international' in league_context or 't20i_female' in league_context:
             if base_code in self.TEAM_ABBREVIATIONS_T20I:
@@ -884,8 +911,12 @@ class InMemoryFeatureStore:
             }
             # Override with live VENUE_SITUATION_STATS from CREX if available
             if self.VENUE_SITUATION_STATS:
-                if 'avg_1st_inns' in self.VENUE_SITUATION_STATS:
-                    base_stats['venue_avg_score'] = float(self.VENUE_SITUATION_STATS['avg_1st_inns'])
+                match_details_avg = self.VENUE_SITUATION_STATS.get(
+                    'match_details_avg_1st_inns',
+                    self.VENUE_SITUATION_STATS.get('avg_1st_inns')
+                )
+                if match_details_avg is not None:
+                    base_stats['venue_avg_score'] = float(match_details_avg)
                     logger.info(f"Using CREX venue stats for empty venue: avg_score={base_stats['venue_avg_score']}")
                 if 'bat_first_wr' in self.VENUE_SITUATION_STATS:
                     base_stats['venue_bat_first_win_rate'] = float(self.VENUE_SITUATION_STATS['bat_first_wr'])
@@ -956,9 +987,13 @@ class InMemoryFeatureStore:
         # This ensures we use the actual venue avg from the current match info page
         # for consistency with what's displayed on CREX
         if self.VENUE_SITUATION_STATS:
-            if 'avg_1st_inns' in self.VENUE_SITUATION_STATS:
+            match_details_avg = self.VENUE_SITUATION_STATS.get(
+                'match_details_avg_1st_inns',
+                self.VENUE_SITUATION_STATS.get('avg_1st_inns')
+            )
+            if match_details_avg is not None:
                 # Use avg_1st_inns as venue_avg_score (consistent with training which uses first innings avg)
-                base_stats['venue_avg_score'] = float(self.VENUE_SITUATION_STATS['avg_1st_inns'])
+                base_stats['venue_avg_score'] = float(match_details_avg)
                 logger.info(f"Overrode venue_avg_score with CREX avg_1st_inns: {base_stats['venue_avg_score']}")
             if 'bat_first_wr' in self.VENUE_SITUATION_STATS:
                 base_stats['venue_bat_first_win_rate'] = float(self.VENUE_SITUATION_STATS['bat_first_wr'])
