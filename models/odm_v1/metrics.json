@@ -1,0 +1,162 @@
+{
+  "direction_model": {
+    "overall": {
+      "rows": 56473,
+      "accuracy": 0.5772670125546722,
+      "balanced_accuracy": 0.5761786398201568,
+      "macro_f1": 0.5757813474156219,
+      "roc_auc": 0.6125704301643152,
+      "up_rate_actual": 0.5393550900430294,
+      "up_rate_pred": 0.5198236325323606
+    },
+    "by_league": [
+      {
+        "league": "ipl",
+        "rows": 44392,
+        "accuracy": 0.5731663362768067,
+        "balanced_accuracy": 0.5756750202744215,
+        "macro_f1": 0.5730411940910605,
+        "roc_auc": 0.6101004869360003,
+        "up_rate_actual": 0.5412686970625338,
+        "up_rate_pred": 0.47585150477563526
+      },
+      {
+        "league": "psl",
+        "rows": 12081,
+        "accuracy": 0.5923350716000331,
+        "balanced_accuracy": 0.580946370112687,
+        "macro_f1": 0.5728224732924323,
+        "roc_auc": 0.6397335362589669,
+        "up_rate_actual": 0.5323234831553679,
+        "up_rate_pred": 0.6814005463123913
+      }
+    ]
+  },
+  "delta_model": {
+    "overall": {
+      "rows": 56473,
+      "mae": 0.0747250561390239,
+      "rmse": 0.10564343454007988,
+      "actual_delta_mean": 0.0071656304502051155,
+      "pred_delta_mean": -0.0022477890581568127,
+      "sign_accuracy": 0.514529066987764
+    },
+    "by_league": [
+      {
+        "league": "ipl",
+        "rows": 44392,
+        "mae": 0.07531474898441379,
+        "rmse": 0.1054997546953039,
+        "actual_delta_mean": 0.007143053917328618,
+        "pred_delta_mean": -0.004901077273302203,
+        "sign_accuracy": 0.5043701567850063
+      },
+      {
+        "league": "psl",
+        "rows": 12081,
+        "mae": 0.07255821193800173,
+        "rmse": 0.10616972054988263,
+        "actual_delta_mean": 0.007248588603292894,
+        "pred_delta_mean": 0.007501798761289769,
+        "sign_accuracy": 0.5518582898766659
+      }
+    ]
+  },
+  "interval_model": {
+    "overall": {
+      "rows": 56473,
+      "coverage_90": 0.8934889239105414,
+      "avg_width": 0.2865734741284054,
+      "lower_mean": -0.14772818867256482,
+      "upper_mean": 0.1388452854558406
+    },
+    "by_league": [
+      {
+        "league": "ipl",
+        "rows": 44392,
+        "coverage_90": 0.8924581005586593,
+        "avg_width": 0.28720898344906987,
+        "lower_mean": -0.14934570988637952,
+        "upper_mean": 0.13786327356269032
+      },
+      {
+        "league": "psl",
+        "rows": 12081,
+        "coverage_90": 0.8972767155036835,
+        "avg_width": 0.28423827590284984,
+        "lower_mean": -0.14178455803572476,
+        "upper_mean": 0.14245371786712507
+      }
+    ]
+  },
+  "delta_candidates": {
+    "raw_delta": {
+      "overall": {
+        "rows": 56473,
+        "mae": 0.0751182981753909,
+        "rmse": 0.10583008456432522,
+        "actual_delta_mean": 0.0071656304502051155,
+        "pred_delta_mean": -0.0024132048711180687,
+        "sign_accuracy": 0.5047544844438936
+      },
+      "by_league": [
+        {
+          "league": "ipl",
+          "rows": 44392,
+          "mae": 0.07559236260460268,
+          "rmse": 0.10566996960024341,
+          "actual_delta_mean": 0.007143053917328618,
+          "pred_delta_mean": -0.005172873381525278,
+          "sign_accuracy": 0.4954496305640656
+        },
+        {
+          "league": "psl",
+          "rows": 12081,
+          "mae": 0.07337633408785099,
+          "rmse": 0.10641636284146797,
+          "actual_delta_mean": 0.007248588603292894,
+          "pred_delta_mean": 0.007727278862148523,
+          "sign_accuracy": 0.5389454515354689
+        }
+      ]
+    },
+    "residual_delta": {
+      "overall": {
+        "rows": 56473,
+        "mae": 0.0747250561390239,
+        "rmse": 0.10564343454007988,
+        "actual_delta_mean": 0.0071656304502051155,
+        "pred_delta_mean": -0.0022477890581568127,
+        "sign_accuracy": 0.514529066987764
+      },
+      "by_league": [
+        {
+          "league": "ipl",
+          "rows": 44392,
+          "mae": 0.07531474898441379,
+          "rmse": 0.1054997546953039,
+          "actual_delta_mean": 0.007143053917328618,
+          "pred_delta_mean": -0.004901077273302203,
+          "sign_accuracy": 0.5043701567850063
+        },
+        {
+          "league": "psl",
+          "rows": 12081,
+          "mae": 0.07255821193800173,
+          "rmse": 0.10616972054988263,
+          "actual_delta_mean": 0.007248588603292894,
+          "pred_delta_mean": 0.007501798761289769,
+          "sign_accuracy": 0.5518582898766659
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "direction_lift_vs_momentum_accuracy": 0.04862500664034142,
+    "direction_lift_vs_naive_accuracy": 0.03791192251164277,
+    "delta_mae_improvement_vs_momentum": 0.029443217521101545,
+    "delta_mae_improvement_vs_zero": -0.0014367684983851436,
+    "delta_sign_lift_vs_momentum": -0.014112938926566732,
+    "selected_delta_mode": "residual_delta"
+  }
+}

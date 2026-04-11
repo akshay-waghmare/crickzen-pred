@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Tuple
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, mean_absolute_error, mean_squared_error, roc_auc_score
 from xgboost import XGBClassifier, XGBRegressor
 
@@ -88,6 +89,57 @@ def _delta_metrics(y_true: pd.Series, y_pred: np.ndarray) -> Dict[str, Any]:
     }
 
 
+def _interval_metrics(y_true: pd.Series, lower: np.ndarray, upper: np.ndarray) -> Dict[str, Any]:
+    ordered_lower = np.minimum(lower, upper)
+    ordered_upper = np.maximum(lower, upper)
+    coverage = ((y_true >= ordered_lower) & (y_true <= ordered_upper)).mean()
+    width = np.mean(ordered_upper - ordered_lower)
+    return {
+        'rows': int(len(y_true)),
+        'coverage_90': float(coverage),
+        'avg_width': float(width),
+        'lower_mean': float(np.mean(ordered_lower)),
+        'upper_mean': float(np.mean(ordered_upper)),
+    }
+
+
+def _conformal_quantile(scores: np.ndarray, alpha: float) -> float:
+    if len(scores) == 0:
+        return 0.0
+    sorted_scores = np.sort(np.asarray(scores, dtype=float))
+    rank = int(np.ceil((len(sorted_scores) + 1) * (1.0 - alpha))) - 1
+    rank = min(max(rank, 0), len(sorted_scores) - 1)
+    return float(sorted_scores[rank])
+
+
+def _phase_conditioned_conformal_adjustments(
+    calibration_df: pd.DataFrame,
+    lower: np.ndarray,
+    upper: np.ndarray,
+    alpha: float,
+) -> Dict[str, float]:
+    ordered_lower = np.minimum(lower, upper)
+    ordered_upper = np.maximum(lower, upper)
+    truth = calibration_df['ml_delta_12'].to_numpy()
+    scores = np.maximum(
+        np.maximum(ordered_lower - truth, truth - ordered_upper),
+        0.0,
+    )
+
+    adjustments = {'overall': _conformal_quantile(scores, alpha)}
+    if 'phase' not in calibration_df.columns:
+        return adjustments
+
+    phase_series = calibration_df['phase'].fillna('unknown').astype(str)
+    for phase_name in sorted(phase_series.unique()):
+        mask = phase_series == phase_name
+        if int(mask.sum()) < 100:
+            continue
+        adjustments[phase_name] = _conformal_quantile(scores[mask.to_numpy()], alpha)
+
+    return adjustments
+
+
 def _direction_slice_metrics(df: pd.DataFrame) -> Dict[str, Any]:
     rows = []
     for league, league_df in df.groupby('league'):
@@ -106,6 +158,33 @@ def _delta_slice_metrics(df: pd.DataFrame) -> Dict[str, Any]:
         'overall': _delta_metrics(df['ml_delta_12'], df['pred_delta']),
         'by_league': rows,
     }
+
+
+def _interval_slice_metrics(df: pd.DataFrame) -> Dict[str, Any]:
+    rows = []
+    for league, league_df in df.groupby('league'):
+        rows.append({'league': league, **_interval_metrics(league_df['ml_delta_12'], league_df['pred_delta_lower'], league_df['pred_delta_upper'])})
+    return {
+        'overall': _interval_metrics(df['ml_delta_12'], df['pred_delta_lower'], df['pred_delta_upper']),
+        'by_league': rows,
+    }
+
+
+def _apply_phase_adjustments(df: pd.DataFrame, lower: np.ndarray, upper: np.ndarray, adjustments: Dict[str, float]) -> Tuple[np.ndarray, np.ndarray]:
+    ordered_lower = np.minimum(lower, upper).astype(float)
+    ordered_upper = np.maximum(lower, upper).astype(float)
+    default_adjustment = float(adjustments.get('overall', 0.0))
+    widened_lower = ordered_lower.copy()
+    widened_upper = ordered_upper.copy()
+
+    phase_series = df['phase'].fillna('unknown').astype(str) if 'phase' in df.columns else pd.Series(['unknown'] * len(df), index=df.index)
+    for phase_name in phase_series.unique():
+        mask = (phase_series == phase_name).to_numpy()
+        adjustment = float(adjustments.get(phase_name, default_adjustment))
+        widened_lower[mask] = ordered_lower[mask] - adjustment
+        widened_upper[mask] = ordered_upper[mask] + adjustment
+
+    return widened_lower, widened_upper
 
 
 def _baseline_metrics(df: pd.DataFrame) -> Dict[str, Any]:
@@ -208,6 +287,71 @@ def _train_delta_candidates(
     }
 
 
+def _make_quantile_regressor(quantile: float, random_state: int) -> HistGradientBoostingRegressor:
+    return HistGradientBoostingRegressor(
+        loss='quantile',
+        quantile=quantile,
+        max_depth=5,
+        learning_rate=0.05,
+        max_iter=200,
+        min_samples_leaf=50,
+        l2_regularization=0.1,
+        random_state=random_state,
+    )
+
+
+def _train_interval_models(
+    X_interval_train: pd.DataFrame,
+    X_interval_calibration: pd.DataFrame,
+    X_holdout: pd.DataFrame,
+    interval_train_df: pd.DataFrame,
+    interval_calibration_df: pd.DataFrame,
+    holdout_df: pd.DataFrame,
+    selected_delta_mode: str,
+    random_state: int,
+    alpha: float = 0.1,
+) -> Tuple[Dict[str, Any], pd.DataFrame]:
+    target_column = 'residual_delta_12' if selected_delta_mode == 'residual_delta' else 'ml_delta_12'
+    lower_model = _make_quantile_regressor(0.05, random_state)
+    upper_model = _make_quantile_regressor(0.95, random_state)
+    lower_model.fit(X_interval_train, interval_train_df[target_column])
+    upper_model.fit(X_interval_train, interval_train_df[target_column])
+
+    calibration_lower = lower_model.predict(X_interval_calibration)
+    calibration_upper = upper_model.predict(X_interval_calibration)
+    if selected_delta_mode == 'residual_delta':
+        calibration_baseline = interval_calibration_df['momentum_baseline_12'].to_numpy()
+        calibration_lower = calibration_baseline + calibration_lower
+        calibration_upper = calibration_baseline + calibration_upper
+    conformal_adjustments = _phase_conditioned_conformal_adjustments(
+        interval_calibration_df,
+        calibration_lower,
+        calibration_upper,
+        alpha,
+    )
+
+    lower_pred = lower_model.predict(X_holdout)
+    upper_pred = upper_model.predict(X_holdout)
+    if selected_delta_mode == 'residual_delta':
+        baseline = holdout_df['momentum_baseline_12'].to_numpy()
+        lower_pred = baseline + lower_pred
+        upper_pred = baseline + upper_pred
+
+    interval_frame = holdout_df.copy()
+    widened_lower, widened_upper = _apply_phase_adjustments(holdout_df, lower_pred, upper_pred, conformal_adjustments)
+    interval_frame['pred_delta_lower'] = widened_lower
+    interval_frame['pred_delta_upper'] = widened_upper
+
+    return {
+        'lower_model': lower_model,
+        'upper_model': upper_model,
+        'target_column': target_column,
+        'alpha': alpha,
+        'conformal_adjustments': conformal_adjustments,
+        'calibration_rows': int(len(interval_calibration_df)),
+    }, interval_frame
+
+
 def save_odm_artifacts(
     output_dir: Path,
     models: Dict[str, Any],
@@ -220,6 +364,8 @@ def save_odm_artifacts(
     joblib.dump(models, output_dir / 'champion_model.joblib')
     joblib.dump(models['direction_model'], output_dir / 'direction_model.joblib')
     joblib.dump(models['delta_model'], output_dir / 'delta_model.joblib')
+    joblib.dump(models['delta_interval_lower_model'], output_dir / 'delta_interval_lower_model.joblib')
+    joblib.dump(models['delta_interval_upper_model'], output_dir / 'delta_interval_upper_model.joblib')
     with open(output_dir / 'feature_columns.json', 'w', encoding='utf-8') as handle:
         json.dump(feature_columns, handle, indent=2)
     with open(output_dir / 'metrics.json', 'w', encoding='utf-8') as handle:
@@ -278,9 +424,17 @@ def train_odm(
     if train_df.empty or holdout_df.empty:
         raise ValueError('ODM split failed: empty train or holdout set')
 
+    interval_calibration_mask = _build_holdout_mask(train_df, holdout_frac=0.15)
+    interval_train_df = train_df.loc[~interval_calibration_mask].copy()
+    interval_calibration_df = train_df.loc[interval_calibration_mask].copy()
+    if interval_train_df.empty or interval_calibration_df.empty:
+        raise ValueError('ODM interval split failed: empty train or calibration set')
+
     X_all, feature_columns = _prepare_features(df)
     X_train = X_all.loc[train_df.index]
     X_holdout = X_all.loc[holdout_df.index]
+    X_interval_train = X_all.loc[interval_train_df.index]
+    X_interval_calibration = X_all.loc[interval_calibration_df.index]
 
     direction_model = XGBClassifier(
         n_estimators=300,
@@ -302,10 +456,21 @@ def train_odm(
     )
     delta_pred = chosen_delta['prediction_frame']['pred_delta'].to_numpy()
     direction_frame, delta_frame = _build_prediction_frames(holdout_df, direction_prob, delta_pred)
+    interval_models, interval_frame = _train_interval_models(
+        X_interval_train,
+        X_interval_calibration,
+        X_holdout,
+        interval_train_df,
+        interval_calibration_df,
+        holdout_df,
+        selected_delta_mode=chosen_delta['mode'],
+        random_state=random_state,
+    )
 
     metrics = {
         'direction_model': _direction_slice_metrics(direction_frame),
         'delta_model': _delta_slice_metrics(delta_frame),
+        'interval_model': _interval_slice_metrics(interval_frame),
         'delta_candidates': candidate_delta_metrics,
     }
     baseline_metrics = _baseline_metrics(holdout_df)
@@ -317,20 +482,32 @@ def train_odm(
         'holdout_frac': holdout_frac,
         'random_state': random_state,
         'train_rows': int(len(train_df)),
+        'interval_train_rows': int(len(interval_train_df)),
+        'interval_calibration_rows': int(len(interval_calibration_df)),
         'holdout_rows': int(len(holdout_df)),
         'train_matches': int(train_df['match_id'].nunique()),
+        'interval_train_matches': int(interval_train_df['match_id'].nunique()),
+        'interval_calibration_matches': int(interval_calibration_df['match_id'].nunique()),
         'holdout_matches': int(holdout_df['match_id'].nunique()),
         'feature_count': len(feature_columns),
         'model_types': {
             'direction_model': 'xgboost_classifier_on_direction',
             'delta_model': chosen_delta['target_description'],
+            'interval_model': f"hist_gradient_boosting_quantiles_on_{interval_models['target_column']}_with_phase_conditioned_split_conformal_adjustment",
         },
         'selected_delta_mode': chosen_delta['mode'],
+        'interval_alpha': interval_models['alpha'],
+        'interval_conformal_adjustments': interval_models['conformal_adjustments'],
     }
 
     save_odm_artifacts(
         output_dir,
-        {'direction_model': direction_model, 'delta_model': chosen_delta['model']},
+        {
+            'direction_model': direction_model,
+            'delta_model': chosen_delta['model'],
+            'delta_interval_lower_model': interval_models['lower_model'],
+            'delta_interval_upper_model': interval_models['upper_model'],
+        },
         feature_columns,
         metrics,
         baseline_metrics,
@@ -368,9 +545,22 @@ def evaluate_odm(input_file: Path, model_dir: Path, holdout_frac: float = 0.2) -
         delta_pred = models['delta_model'].predict(X_holdout)
     direction_frame, delta_frame = _build_prediction_frames(holdout_df, direction_prob, delta_pred)
 
+    lower_pred = models['delta_interval_lower_model'].predict(X_holdout)
+    upper_pred = models['delta_interval_upper_model'].predict(X_holdout)
+    if selected_delta_mode == 'residual_delta':
+        baseline = holdout_df['momentum_baseline_12'].to_numpy()
+        lower_pred = baseline + lower_pred
+        upper_pred = baseline + upper_pred
+    conformal_adjustments = training_manifest.get('interval_conformal_adjustments', {'overall': 0.0})
+    interval_frame = holdout_df.copy()
+    widened_lower, widened_upper = _apply_phase_adjustments(holdout_df, lower_pred, upper_pred, conformal_adjustments)
+    interval_frame['pred_delta_lower'] = widened_lower
+    interval_frame['pred_delta_upper'] = widened_upper
+
     metrics = {
         'direction_model': _direction_slice_metrics(direction_frame),
         'delta_model': _delta_slice_metrics(delta_frame),
+        'interval_model': _interval_slice_metrics(interval_frame),
     }
     baseline_metrics = _baseline_metrics(holdout_df)
     metrics['comparison'] = _build_comparison(metrics, baseline_metrics)

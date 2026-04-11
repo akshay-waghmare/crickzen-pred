@@ -1,0 +1,27 @@
+{
+  "input_file": "data\\odm_v1\\training.parquet",
+  "holdout_frac": 0.2,
+  "random_state": 42,
+  "train_rows": 221549,
+  "interval_train_rows": 187585,
+  "interval_calibration_rows": 33964,
+  "holdout_rows": 56473,
+  "train_matches": 1168,
+  "interval_train_matches": 992,
+  "interval_calibration_matches": 176,
+  "holdout_matches": 294,
+  "feature_count": 90,
+  "model_types": {
+    "direction_model": "xgboost_classifier_on_direction",
+    "delta_model": "xgboost_regressor_on_residual_delta_12_plus_momentum_baseline",
+    "interval_model": "hist_gradient_boosting_quantiles_on_residual_delta_12_with_phase_conditioned_split_conformal_adjustment"
+  },
+  "selected_delta_mode": "residual_delta",
+  "interval_alpha": 0.1,
+  "interval_conformal_adjustments": {
+    "overall": 0.00581598330578284,
+    "death": 0.0032253147324141362,
+    "middle": 0.0073785744400425846,
+    "powerplay": 0.0038842999591984506
+  }
+}

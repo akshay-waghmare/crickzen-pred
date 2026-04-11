@@ -241,6 +241,8 @@ class CrexLivePredictor:
                 league = (self.league or '').lower()
                 if league in ('ipl', 'indian_premier_league'):
                     resolved = InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL.get(candidate.upper())
+                elif league in ('psl', 'pakistan_super_league'):
+                    resolved = InMemoryFeatureStore.TEAM_ABBREVIATIONS_PSL.get(candidate.upper())
                 else:
                     resolved = InMemoryFeatureStore.TEAM_ABBREVIATIONS.get(candidate.upper())
             if isinstance(resolved, str) and resolved.strip():
@@ -661,6 +663,8 @@ class CrexLivePredictor:
                 full_name = feature_store._resolve_team_abbrev(team_abbrev)
             elif team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL:
                 full_name = InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL[team_abbrev.upper()]
+            elif team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS_PSL:
+                full_name = InMemoryFeatureStore.TEAM_ABBREVIATIONS_PSL[team_abbrev.upper()]
             elif team_abbrev.upper() in InMemoryFeatureStore.TEAM_ABBREVIATIONS:
                 full_name = InMemoryFeatureStore.TEAM_ABBREVIATIONS[team_abbrev.upper()]
             
@@ -958,6 +962,11 @@ class CrexLivePredictor:
                         r'(Dubai International Cricket Stadium)',
                         r'(Zayed Cricket Stadium[\w\s,]*)',
                         r'(Sharjah Cricket Stadium)',
+                        # PSL venues
+                        r'(Rawalpindi Cricket Stadium[\w\s,]*)',
+                        r'(Gaddafi Stadium[\w\s,]*)',
+                        r'(National Stadium[\w\s,]*)',
+                        r'(Multan Cricket Stadium[\w\s,]*)',
                         # Generic patterns (last)
                         r'([\w\s]+Cricket Ground)',
                         r'([\w\s]+Cricket Stadium)',
@@ -1712,12 +1721,9 @@ class CrexLivePredictor:
                 ball = 0
             
             # Build MatchState for predictor using its schema
-            # Use generic venue name if not extracted from page (avoids "Unknown" warning)
-            venue_name = self.match_state.venue
-            if not venue_name or venue_name.strip() == "":
-                # Use a generic but valid venue name that won't trigger warnings
-                # The predictor will use default venue stats + CREX live venue stats override
-                venue_name = "International Cricket Stadium"
+            # Keep venue blank if it was not extracted. The feature store can then fall back
+            # to CREX live venue stats directly without fuzzy-matching a generic placeholder.
+            venue_name = (self.match_state.venue or "").strip()
                 
             pred_state = PredictorMatchState(
                 match_id="live_match",  # Required field

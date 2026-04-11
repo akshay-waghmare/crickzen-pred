@@ -1,0 +1,28 @@
+{
+  "naive_direction": {
+    "rows": 56473,
+    "accuracy": 0.5393550900430294,
+    "balanced_accuracy": 0.5,
+    "macro_f1": 0.35037730640040493,
+    "up_rate_pred": 1.0
+  },
+  "momentum_direction": {
+    "rows": 56473,
+    "accuracy": 0.5286420059143307,
+    "balanced_accuracy": 0.5257639065886412,
+    "macro_f1": 0.5257605229189319,
+    "roc_auc_like": 0.5269379253425763,
+    "up_rate_pred": 0.5385936642289235
+  },
+  "zero_delta": {
+    "rows": 56473,
+    "mae": 0.07328828764063876,
+    "rmse": 0.10538431301277072
+  },
+  "momentum_delta": {
+    "rows": 56473,
+    "mae": 0.10416827366012545,
+    "rmse": 0.1460010032535948,
+    "sign_accuracy": 0.5286420059143307
+  }
+}

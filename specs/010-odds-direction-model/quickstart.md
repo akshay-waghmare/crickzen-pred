@@ -56,12 +56,14 @@ Expected outputs:
 1. `models/odm_v1/champion_model.joblib`
 2. `models/odm_v1/direction_model.joblib`
 3. `models/odm_v1/delta_model.joblib`
-4. `models/odm_v1/feature_columns.json`
-5. `models/odm_v1/metrics.json`
-6. `models/odm_v1/baseline_metrics.json`
-7. `models/odm_v1/training_manifest.json`
-8. `models/odm_v1/direction_feature_importance.csv`
-9. `models/odm_v1/delta_feature_importance.csv`
+4. `models/odm_v1/delta_interval_lower_model.joblib`
+5. `models/odm_v1/delta_interval_upper_model.joblib`
+6. `models/odm_v1/feature_columns.json`
+7. `models/odm_v1/metrics.json`
+8. `models/odm_v1/baseline_metrics.json`
+9. `models/odm_v1/training_manifest.json`
+10. `models/odm_v1/direction_feature_importance.csv`
+11. `models/odm_v1/delta_feature_importance.csv`
 
 Current checked result on this branch:
 
@@ -70,6 +72,7 @@ Current checked result on this branch:
 3. Feature importance is saved separately for direction and delta.
 4. The bundle keeps direction and magnitude concerns separate.
 5. The current selected delta mode is `residual_delta` (predict residual, then add momentum baseline back).
+6. Interval bounds are trained as lower and upper quantile models, then widened with phase-conditioned split-conformal adjustments saved in `training_manifest.json`.
 
 ## Step 4: Evaluate against baselines
 
@@ -83,8 +86,9 @@ Minimum go/no-go checks:
 
 1. Direction accuracy beats the momentum baseline.
 2. Delta MAE beats the momentum baseline and the zero-delta baseline.
-3. Per-league holdout metrics are not collapsing in IPL or PSL.
-4. Dataset validation still passes:
+3. Interval coverage is acceptably close to nominal 90% without exploding interval width.
+4. Per-league holdout metrics are not collapsing in IPL or PSL.
+5. Dataset validation still passes:
 
 ```powershell
 python scripts/validation/validate_odm_dataset.py data/odm_v1/training.parquet
@@ -96,10 +100,13 @@ Current branch status:
 2. Selected delta mode: `residual_delta`
 3. Delta MAE: `0.0747` vs momentum `0.1042` → pass
 4. Delta MAE: `0.0747` vs zero-delta `0.0733` → still failing, delta path needs more work before live use
+5. Interval coverage: `0.8935` for the nominal 90% band → acceptable first pass after conformal calibration
+6. Interval average width: `0.2866`
+7. Saved conformal adjustments: `overall=0.005816`, `powerplay=0.003884`, `middle=0.007379`, `death=0.003225`
 
 ## Step 5: Wire into live predictor
 
-Basic training artifacts now exist, but live ODM inference is still not wired. Phase 5 integration remains pending.
+Basic training artifacts now exist and live ODM inference is now wired in advisory-only mode.
 
 ```powershell
 python -m src.bbl_pipeline.inference.crex_live_predictor \
@@ -111,11 +118,12 @@ python -m src.bbl_pipeline.inference.crex_live_predictor \
   --odm-model-dir models/odm_v1
 ```
 
-Expected runtime behavior after later phases:
+Expected runtime behavior:
 
 1. ODM returns `warming_up` until 12 historical ML probabilities exist.
-2. After warm-up, live JSON includes direction, central delta, interval, and momentum comparison.
-3. Core ML probability output remains unchanged.
+2. After warm-up, live JSON includes an `odm` payload with direction, confidence, and a 90% interval for the next 12-ball delta.
+3. The central delta point estimate is explicitly flagged as experimental and not for primary decision use.
+4. Core ML probability output remains unchanged.
 
 ## Step 6: Replay smoke test on recorded states
 
