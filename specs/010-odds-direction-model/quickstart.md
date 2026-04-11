@@ -43,7 +43,7 @@ Expected outputs:
 3. `data/odm_v1/reports/by_league.csv`
 4. `data/odm_v1/reports/by_league_innings_phase.csv`
 
-## Step 3: Train the first ODM direction model
+## Step 3: Train the ODM direction and delta bundle
 
 ```powershell
 bbl-pipeline train-odm \
@@ -54,17 +54,21 @@ bbl-pipeline train-odm \
 Expected outputs:
 
 1. `models/odm_v1/champion_model.joblib`
-2. `models/odm_v1/feature_columns.json`
-3. `models/odm_v1/metrics.json`
-4. `models/odm_v1/baseline_metrics.json`
-5. `models/odm_v1/training_manifest.json`
+2. `models/odm_v1/direction_model.joblib`
+3. `models/odm_v1/delta_model.joblib`
+4. `models/odm_v1/feature_columns.json`
+5. `models/odm_v1/metrics.json`
+6. `models/odm_v1/baseline_metrics.json`
+7. `models/odm_v1/training_manifest.json`
+8. `models/odm_v1/direction_feature_importance.csv`
+9. `models/odm_v1/delta_feature_importance.csv`
 
 Current checked result on this branch:
 
-1. Holdout accuracy: `0.6178`
-2. Momentum baseline accuracy: `0.5286`
-3. Lift vs momentum: `+0.0891`
-4. Holdout ROC AUC: `0.6580`
+1. Direction model is evaluated directly against the momentum direction baseline.
+2. Delta model is evaluated directly against zero-delta and momentum-delta baselines.
+3. Feature importance is saved separately for direction and delta.
+4. The bundle keeps direction and magnitude concerns separate.
 
 ## Step 4: Evaluate against baselines
 
@@ -76,9 +80,9 @@ bbl-pipeline evaluate-odm \
 
 Minimum go/no-go checks:
 
-1. Holdout accuracy beats the momentum baseline.
-2. Lift vs momentum is positive by a practical margin.
-3. Per-league holdout accuracy is not collapsing in IPL or PSL.
+1. Direction accuracy beats the momentum baseline.
+2. Delta MAE beats the momentum baseline and the zero-delta baseline.
+3. Per-league holdout metrics are not collapsing in IPL or PSL.
 4. Dataset validation still passes:
 
 ```powershell
