@@ -318,6 +318,80 @@ def process(input_dir, output_dir, feature_store_dir, league):
         logger.error("Processing failed", error=str(e))
         raise click.ClickException(str(e))
 
+
+@main.command(name='export-odm-base')
+@click.option('--league', required=True, type=str, help='League slug, e.g. ipl or psl')
+@click.option('--input-dir', type=click.Path(exists=True), help='Override raw parquet input dir')
+@click.option('--output-dir', type=click.Path(), required=True, help='Directory to save ODM base parquet')
+def export_odm_base(league, input_dir, output_dir):
+    """Export sequence-preserving ODM base data from ingested raw parquet."""
+    from bbl_pipeline.data.processor import export_odm_base_data
+
+    league = league.lower()
+    default_inputs = {
+        'ipl': Path('data/ipl_raw/matches'),
+        'psl': Path('data/psl_raw/matches'),
+    }
+
+    input_path = Path(input_dir) if input_dir else default_inputs.get(league)
+    if input_path is None:
+        raise click.ClickException(f"No default ODM raw path configured for league '{league}'. Pass --input-dir.")
+    if not input_path.exists():
+        raise click.ClickException(f"Input dir does not exist: {input_path}")
+
+    output_path = Path(output_dir) / f'{league}_odm_base.parquet'
+    try:
+        df = export_odm_base_data(input_path, output_path, league=league)
+        click.echo(
+            f"Exported {len(df):,} ODM base rows across {df['match_id'].nunique():,} matches -> {output_path}"
+        )
+    except Exception as e:
+        logger.error("ODM base export failed", error=str(e), league=league)
+        raise click.ClickException(str(e))
+
+
+@main.command(name='build-odm-dataset')
+@click.option('--league', 'leagues', multiple=True, required=True, help='League slug(s), e.g. --league ipl --league psl')
+@click.option('--base-dir', type=click.Path(exists=True), default='data/odm_v1', show_default=True, help='Directory containing *_odm_base.parquet files')
+@click.option('--features-root', type=click.Path(exists=True), default='data', show_default=True, help='Root containing <league>_features_v1/training.parquet')
+@click.option('--global-model-dir', type=click.Path(exists=True), required=True, help='Directory containing champion_model.joblib')
+@click.option('--output-file', type=click.Path(), required=True, help='Path to save ODM training dataset parquet')
+@click.option('--report-dir', type=click.Path(), help='Optional directory for baseline report artifacts')
+@click.option('--horizon-balls', type=int, default=12, show_default=True, help='Prediction horizon in legal balls')
+def build_odm_dataset(leagues, base_dir, features_root, global_model_dir, output_file, report_dir, horizon_balls):
+    """Build the ODM training dataset from base exports plus feature parquet."""
+    from bbl_pipeline.training.odm_dataset import build_odm_training_dataset
+    from bbl_pipeline.training.odm_evaluation import write_baseline_report
+
+    output_path = Path(output_file)
+    report_path = Path(report_dir) if report_dir else None
+
+    try:
+        dataset, baseline_report = build_odm_training_dataset(
+            leagues=[league.lower() for league in leagues],
+            base_dir=Path(base_dir),
+            features_root=Path(features_root),
+            model_path=Path(global_model_dir) / 'champion_model.joblib',
+            horizon_balls=horizon_balls,
+        )
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        dataset.to_parquet(output_path, index=False)
+        if report_path:
+            write_baseline_report(baseline_report, report_path)
+
+        click.echo(f"Built ODM dataset: {len(dataset):,} rows -> {output_path}")
+        click.echo(
+            "Momentum baseline accuracy: "
+            f"{baseline_report['overall']['momentum_direction_accuracy']:.4f} | "
+            "Zero-delta MAE: "
+            f"{baseline_report['overall']['zero_delta_mae']:.4f} | "
+            "Momentum MAE: "
+            f"{baseline_report['overall']['momentum_mae']:.4f}"
+        )
+    except Exception as e:
+        logger.error("ODM dataset build failed", error=str(e), leagues=list(leagues))
+        raise click.ClickException(str(e))
+
 @main.command()
 @click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to training dataset (parquet)')
 @click.option('--output-dir', type=click.Path(), required=True, help='Directory to save model artifacts')
@@ -1099,7 +1173,7 @@ def generate_oof(input_file, model_dir, n_splits, target_col, total_overs):
 @main.command()
 @click.option('--source-dir', type=click.Path(exists=True), default='recently_played_30_male',
               help='Source directory containing recently played JSON files (default: recently_played_30_male)')
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'odi', 'odm_male', 'odm_female', 'all']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'odi', 'odm_male', 'odm_female', 'all']), required=True,
               help='League to extract matches for')
 @click.option('--dry-run', is_flag=True, help='Show which files would be copied without actually copying')
 @click.pass_context  
@@ -1128,6 +1202,8 @@ def update_matches(ctx, source_dir, league, dry_run):
         'bpl': ['Bangladesh Premier League', 'BPL'],
         'ssm': ['Super Smash'],
         'wpl': ['Women\'s Premier League', 'WPL'],
+        'ipl': ['Indian Premier League', 'IPL'],
+        'psl': ['Pakistan Super League', 'PSL'],
         'odm_male': ['Royal London One-Day Cup', 'Marsh One-Day Cup', 'One-Day Cup', 'Ford Trophy'],
         'odm_female': ['Rachael Heyhoe Flint Trophy', 'ECB Women\'s One-Day Cup'],
     }
@@ -1140,6 +1216,8 @@ def update_matches(ctx, source_dir, league, dry_run):
         'bpl': 'bpl_male_json',
         'ssm': 'ssm_male_json',
         'wpl': 'wpl_female_json',
+        'ipl': 'ipl_male_json',
+        'psl': 'psl_male_json',
         'odm_male': 'data/odm_male_json',
         'odm_female': 'data/odm_female_json',
     }
@@ -1213,7 +1291,7 @@ def update_matches(ctx, source_dir, league, dry_run):
 
 
 @main.command()
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'odi', 'odi_female', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_male', 't20i_female']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'odi', 'odi_female', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_male', 't20i_female']), required=True,
               help='League to retrain model for')
 @click.option('--version', type=str, required=True,
               help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
@@ -1287,6 +1365,22 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/wpl_features',
             'feature_store_dir': 'data/wpl_feature_store',
             'model_prefix': 'wpl',
+            'format_type': 't20',
+        },
+        'ipl': {
+            'json_dir': 'ipl_male_json',
+            'raw_dir': 'data/ipl_raw',
+            'features_dir': 'data/ipl_features',
+            'feature_store_dir': 'data/ipl_feature_store',
+            'model_prefix': 'ipl',
+            'format_type': 't20',
+        },
+        'psl': {
+            'json_dir': 'psl_male_json',
+            'raw_dir': 'data/psl_raw',
+            'features_dir': 'data/psl_features',
+            'feature_store_dir': 'data/psl_feature_store',
+            'model_prefix': 'psl',
             'format_type': 't20',
         },
         't20_male': {

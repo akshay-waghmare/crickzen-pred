@@ -1,0 +1,133 @@
+openapi: 3.1.0
+info:
+  title: Odds Direction Model Internal Inference Contract
+  version: 1.0.0
+  description: |
+    Internal contract for exposing ODM predictions from the live predictor stack.
+    This is a wrapper contract around the in-process Python predictor, not a commitment
+    to deploy a separate network service in V1.
+paths:
+  /v1/odm/predict:
+    post:
+      summary: Predict next-12-ball movement of model win probability
+      operationId: predictOddsDirection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - league
+                - horizon_balls
+                - recent_ml_probs
+                - features
+              properties:
+                league:
+                  type: string
+                  example: ipl
+                horizon_balls:
+                  type: integer
+                  const: 12
+                recent_ml_probs:
+                  type: array
+                  minItems: 0
+                  maxItems: 12
+                  items:
+                    type: number
+                    format: float
+                  description: Most recent ML probabilities in chronological order.
+                features:
+                  type: object
+                  required:
+                    - innings
+                    - over_number
+                    - ball_in_over
+                    - resource_win_prob
+                    - score_vs_par
+                    - pressure_index
+                    - run_rate_diff
+                    - acceleration_potential
+                    - runs_last_12
+                    - runs_last_18
+                    - wickets_last_12
+                  properties:
+                    innings:
+                      type: integer
+                      enum: [1, 2]
+                    over_number:
+                      type: integer
+                    ball_in_over:
+                      type: integer
+                    resource_win_prob:
+                      type: number
+                      format: float
+                    score_vs_par:
+                      type: number
+                      format: float
+                    pressure_index:
+                      type: number
+                      format: float
+                    run_rate_diff:
+                      type: number
+                      format: float
+                    acceleration_potential:
+                      type: number
+                      format: float
+                    runs_last_12:
+                      type: number
+                      format: float
+                    runs_last_18:
+                      type: number
+                      format: float
+                    wickets_last_12:
+                      type: number
+                      format: float
+      responses:
+        '200':
+          description: ODM response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - horizon_balls
+                properties:
+                  status:
+                    type: string
+                    enum: [ready, warming_up, unavailable]
+                  direction:
+                    type: string
+                    enum: [UP, DOWN]
+                    nullable: true
+                  delta_mean:
+                    type: number
+                    format: float
+                    nullable: true
+                  delta_ci_lower:
+                    type: number
+                    format: float
+                    nullable: true
+                  delta_ci_upper:
+                    type: number
+                    format: float
+                    nullable: true
+                  momentum_baseline:
+                    type: number
+                    format: float
+                    nullable: true
+                  edge_vs_momentum:
+                    type: number
+                    format: float
+                    nullable: true
+                  confidence:
+                    type: string
+                    enum: [LOW, MEDIUM, HIGH]
+                    nullable: true
+                  horizon_balls:
+                    type: integer
+                    const: 12
+                  message:
+                    type: string
+                    nullable: true

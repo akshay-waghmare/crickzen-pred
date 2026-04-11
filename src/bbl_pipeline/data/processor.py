@@ -8,6 +8,15 @@ from ..features.format_config import FormatConfig
 
 logger = structlog.get_logger()
 
+
+ODM_BASE_COLUMNS = [
+    'league', 'match_id', 'date', 'season', 'innings', 'over', 'ball',
+    'is_super_over',
+    'venue_id', 'batting_team_id', 'bowling_team_id', 'batting_team', 'winner',
+    'batter_id', 'bowler_id', 'non_striker_id',
+    'runs_batter', 'runs_extras', 'runs_total', 'wicket_type', 'player_out_id',
+]
+
 def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
                      format_config: Optional[FormatConfig] = None):
     """
@@ -1201,3 +1210,40 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     logger.info(f"Saved team ratings for {len(df_team_stats)} teams")
 
     logger.info("Processing complete")
+
+
+def export_odm_base_data(input_dir: Path, output_file: Path, league: Optional[str] = None) -> pd.DataFrame:
+    """Export a sequence-preserving legal-ball dataset for ODM training."""
+    logger.info("Starting ODM base export", input_dir=str(input_dir), output_file=str(output_file))
+
+    df = pd.read_parquet(input_dir)
+
+    if 'league' not in df.columns or df['league'].isna().all():
+        if not league:
+            raise ValueError("League must be provided when source data does not contain a usable 'league' column")
+        df['league'] = league
+
+    missing = [col for col in ODM_BASE_COLUMNS if col not in df.columns]
+    if missing:
+        raise ValueError(f"Missing ODM base columns: {missing}")
+
+    df = df[ODM_BASE_COLUMNS].copy()
+
+    key_cols = ['league', 'match_id', 'innings', 'over', 'ball']
+    original_len = len(df)
+    df = df.drop_duplicates(subset=key_cols, keep='first')
+    if len(df) != original_len:
+        logger.warning("Dropped duplicate ODM base rows", removed=original_len - len(df))
+
+    df = df.sort_values(key_cols).reset_index(drop=True)
+
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(output_file, index=False)
+
+    logger.info(
+        "ODM base export complete",
+        rows=len(df),
+        matches=int(df['match_id'].nunique()),
+        output_file=str(output_file),
+    )
+    return df
