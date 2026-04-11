@@ -69,6 +69,7 @@ Current checked result on this branch:
 2. Delta model is evaluated directly against zero-delta and momentum-delta baselines.
 3. Feature importance is saved separately for direction and delta.
 4. The bundle keeps direction and magnitude concerns separate.
+5. The current selected delta mode is `residual_delta` (predict residual, then add momentum baseline back).
 
 ## Step 4: Evaluate against baselines
 
@@ -88,6 +89,13 @@ Minimum go/no-go checks:
 ```powershell
 python scripts/validation/validate_odm_dataset.py data/odm_v1/training.parquet
 ```
+
+Current branch status:
+
+1. Direction accuracy: `0.5773` vs momentum `0.5286` → pass
+2. Selected delta mode: `residual_delta`
+3. Delta MAE: `0.0747` vs momentum `0.1042` → pass
+4. Delta MAE: `0.0747` vs zero-delta `0.0733` → still failing, delta path needs more work before live use
 
 ## Step 5: Wire into live predictor
 

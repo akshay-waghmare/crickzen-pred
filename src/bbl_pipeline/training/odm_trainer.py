@@ -151,6 +151,63 @@ def _save_importance(output_dir: Path, filename: str, feature_columns: List[str]
     importance.to_csv(output_dir / filename, index=False)
 
 
+def _make_delta_regressor(random_state: int) -> XGBRegressor:
+    return XGBRegressor(
+        n_estimators=300,
+        max_depth=5,
+        learning_rate=0.05,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        min_child_weight=5,
+        reg_lambda=1.0,
+        objective='reg:squarederror',
+        eval_metric='rmse',
+        random_state=random_state,
+    )
+
+
+def _train_delta_candidates(
+    X_train: pd.DataFrame,
+    X_holdout: pd.DataFrame,
+    train_df: pd.DataFrame,
+    holdout_df: pd.DataFrame,
+    random_state: int,
+) -> Tuple[Dict[str, Any], Dict[str, pd.DataFrame]]:
+    raw_model = _make_delta_regressor(random_state)
+    raw_model.fit(X_train, train_df['ml_delta_12'])
+    raw_pred = raw_model.predict(X_holdout)
+    _, raw_frame = _build_prediction_frames(holdout_df, np.full(len(holdout_df), 0.5), raw_pred)
+    raw_metrics = _delta_slice_metrics(raw_frame)
+
+    residual_model = _make_delta_regressor(random_state)
+    residual_model.fit(X_train, train_df['residual_delta_12'])
+    residual_component = residual_model.predict(X_holdout)
+    residual_pred = holdout_df['momentum_baseline_12'].to_numpy() + residual_component
+    _, residual_frame = _build_prediction_frames(holdout_df, np.full(len(holdout_df), 0.5), residual_pred)
+    residual_metrics = _delta_slice_metrics(residual_frame)
+
+    candidates = {
+        'raw_delta': {
+            'model': raw_model,
+            'prediction_frame': raw_frame,
+            'metrics': raw_metrics,
+            'target_description': 'xgboost_regressor_on_ml_delta_12',
+        },
+        'residual_delta': {
+            'model': residual_model,
+            'prediction_frame': residual_frame,
+            'metrics': residual_metrics,
+            'target_description': 'xgboost_regressor_on_residual_delta_12_plus_momentum_baseline',
+        },
+    }
+    chosen_name = min(candidates, key=lambda name: candidates[name]['metrics']['overall']['mae'])
+    chosen = candidates[chosen_name]
+    chosen['mode'] = chosen_name
+    return chosen, {name: payload['prediction_frame'] for name, payload in candidates.items()}, {
+        name: payload['metrics'] for name, payload in candidates.items()
+    }
+
+
 def save_odm_artifacts(
     output_dir: Path,
     models: Dict[str, Any],
@@ -237,32 +294,23 @@ def train_odm(
         eval_metric='logloss',
         random_state=random_state,
     )
-    delta_model = XGBRegressor(
-        n_estimators=300,
-        max_depth=5,
-        learning_rate=0.05,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        min_child_weight=5,
-        reg_lambda=1.0,
-        objective='reg:squarederror',
-        eval_metric='rmse',
-        random_state=random_state,
-    )
-
     direction_model.fit(X_train, train_df['direction'])
-    delta_model.fit(X_train, train_df['ml_delta_12'])
 
     direction_prob = direction_model.predict_proba(X_holdout)[:, 1]
-    delta_pred = delta_model.predict(X_holdout)
+    chosen_delta, _candidate_frames, candidate_delta_metrics = _train_delta_candidates(
+        X_train, X_holdout, train_df, holdout_df, random_state
+    )
+    delta_pred = chosen_delta['prediction_frame']['pred_delta'].to_numpy()
     direction_frame, delta_frame = _build_prediction_frames(holdout_df, direction_prob, delta_pred)
 
     metrics = {
         'direction_model': _direction_slice_metrics(direction_frame),
         'delta_model': _delta_slice_metrics(delta_frame),
+        'delta_candidates': candidate_delta_metrics,
     }
     baseline_metrics = _baseline_metrics(holdout_df)
     metrics['comparison'] = _build_comparison(metrics, baseline_metrics)
+    metrics['comparison']['selected_delta_mode'] = chosen_delta['mode']
 
     training_manifest = {
         'input_file': str(input_file),
@@ -275,13 +323,14 @@ def train_odm(
         'feature_count': len(feature_columns),
         'model_types': {
             'direction_model': 'xgboost_classifier_on_direction',
-            'delta_model': 'xgboost_regressor_on_ml_delta_12',
+            'delta_model': chosen_delta['target_description'],
         },
+        'selected_delta_mode': chosen_delta['mode'],
     }
 
     save_odm_artifacts(
         output_dir,
-        {'direction_model': direction_model, 'delta_model': delta_model},
+        {'direction_model': direction_model, 'delta_model': chosen_delta['model']},
         feature_columns,
         metrics,
         baseline_metrics,
@@ -311,7 +360,12 @@ def evaluate_odm(input_file: Path, model_dir: Path, holdout_frac: float = 0.2) -
     X_holdout = X_all.loc[holdout_df.index, feature_columns]
 
     direction_prob = models['direction_model'].predict_proba(X_holdout)[:, 1]
-    delta_pred = models['delta_model'].predict(X_holdout)
+    training_manifest = json.load(open(model_dir / 'training_manifest.json', 'r', encoding='utf-8'))
+    selected_delta_mode = training_manifest.get('selected_delta_mode', 'raw_delta')
+    if selected_delta_mode == 'residual_delta':
+        delta_pred = holdout_df['momentum_baseline_12'].to_numpy() + models['delta_model'].predict(X_holdout)
+    else:
+        delta_pred = models['delta_model'].predict(X_holdout)
     direction_frame, delta_frame = _build_prediction_frames(holdout_df, direction_prob, delta_pred)
 
     metrics = {
@@ -320,6 +374,7 @@ def evaluate_odm(input_file: Path, model_dir: Path, holdout_frac: float = 0.2) -
     }
     baseline_metrics = _baseline_metrics(holdout_df)
     metrics['comparison'] = _build_comparison(metrics, baseline_metrics)
+    metrics['comparison']['selected_delta_mode'] = selected_delta_mode
     return {
         'metrics': metrics,
         'baseline_metrics': baseline_metrics,
