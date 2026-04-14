@@ -1,7 +1,7 @@
 {
   "league": "ipl",
   "method": "temperature",
-  "fitted_at": "2026-04-04T15:55:27.129995",
+  "fitted_at": "2026-04-10T19:27:45.846867",
   "overall": {
     "brier_raw": 0.18312639882186174,
     "brier_calibrated": 0.18295743572166143,

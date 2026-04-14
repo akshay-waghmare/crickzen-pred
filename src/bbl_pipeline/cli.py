@@ -405,6 +405,7 @@ def train_odm_command(input_file, output_dir, holdout_frac):
         result = train_odm(Path(input_file), Path(output_dir), holdout_frac=holdout_frac)
         direction = result['metrics']['direction_model']['overall']
         delta = result['metrics']['delta_model']['overall']
+        interval = result['metrics']['interval_model']['overall']
         comparison = result['metrics']['comparison']
         momentum_direction = result['baseline_metrics']['momentum_direction']
         momentum_delta = result['baseline_metrics']['momentum_delta']
@@ -414,6 +415,8 @@ def train_odm_command(input_file, output_dir, holdout_frac):
         click.echo(f"Delta MAE:            {delta['mae']:.4f}")
         click.echo(f"Momentum delta MAE:   {momentum_delta['mae']:.4f}")
         click.echo(f"MAE gain vs momentum: {comparison['delta_mae_improvement_vs_momentum']:+.4f}")
+        click.echo(f"Interval coverage:    {interval['coverage_90']:.4f}")
+        click.echo(f"Interval avg width:   {interval['avg_width']:.4f}")
         click.echo(f"Artifacts saved to {output_dir}")
     except Exception as e:
         logger.error("ODM training failed", error=str(e), input_file=input_file)
@@ -432,6 +435,7 @@ def evaluate_odm_command(input_file, model_dir, holdout_frac):
         result = evaluate_odm(Path(input_file), Path(model_dir), holdout_frac=holdout_frac)
         direction = result['metrics']['direction_model']['overall']
         delta = result['metrics']['delta_model']['overall']
+        interval = result['metrics']['interval_model']['overall']
         comparison = result['metrics']['comparison']
         momentum_direction = result['baseline_metrics']['momentum_direction']
         momentum_delta = result['baseline_metrics']['momentum_delta']
@@ -442,6 +446,8 @@ def evaluate_odm_command(input_file, model_dir, holdout_frac):
         click.echo(f"Delta MAE:            {delta['mae']:.4f}")
         click.echo(f"Momentum delta MAE:   {momentum_delta['mae']:.4f}")
         click.echo(f"MAE gain vs momentum: {comparison['delta_mae_improvement_vs_momentum']:+.4f}")
+        click.echo(f"Interval coverage:    {interval['coverage_90']:.4f}")
+        click.echo(f"Interval avg width:   {interval['avg_width']:.4f}")
     except Exception as e:
         logger.error("ODM evaluation failed", error=str(e), input_file=input_file, model_dir=model_dir)
         raise click.ClickException(str(e))
@@ -496,6 +502,28 @@ def train(ctx, input_file, output_dir, calibration):
     # Save artifacts
     model_path = output_path / "champion_model.joblib"
     joblib.dump(final_model, model_path)
+
+    # T020: Dump feature_importance.csv at training time
+    try:
+        underlying = final_model
+        # Unwrap CalibratedModel if needed
+        if hasattr(final_model, 'base_model'):
+            underlying = final_model.base_model
+        if hasattr(underlying, 'get_feature_importance'):
+            fi_df = underlying.get_feature_importance()
+        elif hasattr(underlying, 'feature_importances_') and hasattr(underlying, 'selected_features_'):
+            fi_df = pd.DataFrame({
+                'feature': underlying.selected_features_,
+                'importance': underlying.feature_importances_,
+            }).sort_values('importance', ascending=False)
+        else:
+            fi_df = None
+        if fi_df is not None and not fi_df.empty:
+            fi_path = output_path / "feature_importance.csv"
+            fi_df.to_csv(fi_path, index=False)
+            logger.info("Feature importance written", path=str(fi_path), n_features=len(fi_df))
+    except Exception as fi_err:
+        logger.warning("Could not dump feature importance", error=str(fi_err))
     
     # Save metadata
     # Convert numpy types to python types for JSON serialization
@@ -513,7 +541,36 @@ def train(ctx, input_file, output_dir, calibration):
     meta_path = output_path / "champion_metadata.json"
     with open(meta_path, 'w') as f:
         json.dump(champion_meta, f, indent=2, default=convert_types)
-        
+
+    # T022: Write data_version.json — SHA-256 of input parquet for reproducibility
+    import hashlib
+    import datetime
+    sha256 = hashlib.sha256()
+    with open(input_path, 'rb') as fh:
+        for chunk in iter(lambda: fh.read(65536), b''):
+            sha256.update(chunk)
+    dataset_hash = sha256.hexdigest()
+    date_range = ""
+    if 'match_date' in df.columns:
+        dates = pd.to_datetime(df['match_date'], errors='coerce').dropna()
+        if not dates.empty:
+            date_range = f"{dates.min().year}-{dates.max().year}"
+    data_version = {
+        "dataset_hash": dataset_hash,
+        "source_files": [str(input_path.resolve())],
+        "date_range": date_range,
+        "row_count": int(len(df)),
+        "created": datetime.datetime.utcnow().isoformat() + "Z",
+    }
+    # Embed hash into champion_meta and resave
+    champion_meta["data_version_hash"] = dataset_hash
+    with open(meta_path, 'w') as f:
+        json.dump(champion_meta, f, indent=2, default=convert_types)
+    dv_path = output_path / "data_version.json"
+    with open(dv_path, 'w') as f:
+        json.dump(data_version, f, indent=2)
+    logger.info("Data version written", hash=dataset_hash[:12], rows=len(df))
+
     logger.info("Training complete", output_dir=str(output_path))
 
 @main.command()
@@ -526,11 +583,12 @@ def train(ctx, input_file, output_dir, calibration):
 @click.option('--batsman1', default="Unknown", help="Name of striker")
 @click.option('--batsman2', default="Unknown", help="Name of non-striker")
 @click.option('--bowler', default="Unknown", help="Name of bowler")
-def predict(model_dir, venue, batting, bowling, score, over, batsman1, batsman2, bowler):
+@click.option('--debug', is_flag=True, default=False, help="T020: Print full feature vector + per-feature contributions")
+def predict(model_dir, venue, batting, bowling, score, over, batsman1, batsman2, bowler, debug):
     """Predict win probability."""
     from bbl_pipeline.inference.predictor import Predictor
     from bbl_pipeline.inference.schema import MatchState
-    
+
     # Parse score
     try:
         if '/' in score:
@@ -540,32 +598,37 @@ def predict(model_dir, venue, batting, bowling, score, over, batsman1, batsman2,
             wickets = 0
     except ValueError:
         raise click.BadParameter("Score must be in format runs/wickets (e.g. 120/3) or runs (e.g. 120)")
-        
+
     # Parse over
     ov = int(over)
     ball = int(round((over - ov) * 10))
-    if ball > 6: # Allow extras?
-        pass 
-    
+    if ball > 6:
+        pass
+
     state = MatchState(
         match_id="cli_prediction",
         venue=venue,
         batting_team=batting,
         bowling_team=bowling,
-        innings=1, # Default to 1
+        innings=1,
         over=ov,
         ball=ball,
         current_score=runs,
         wickets_lost=wickets,
-        batsman_1=batsman1, 
+        batsman_1=batsman1,
         batsman_2=batsman2,
         bowler=bowler
     )
-    
+
     try:
         predictor = Predictor.load(model_dir)
         prob = predictor.predict(state)
         click.echo(f"Win Probability for {batting}: {prob:.2%}")
+        if debug:
+            import json as _json
+            explanation = predictor.explain(state)
+            click.echo("\n--- DEBUG: Feature Vector + Contributions ---")
+            click.echo(_json.dumps(explanation, indent=2, default=str))
     except Exception as e:
         logger.error(f"Prediction failed: {e}")
         click.echo(f"Error: {e}")
@@ -573,57 +636,65 @@ def predict(model_dir, venue, batting, bowling, score, over, batsman1, batsman2,
 @main.command()
 @click.option('--model-dir', type=click.Path(exists=True), required=True)
 @click.option('--test-data', type=click.Path(exists=True), required=True)
-def evaluate(model_dir, test_data):
-    """Evaluate model on hold-out test set."""
+@click.option('--drift-window', type=int, default=50, show_default=True,
+              help='Rolling window size (number of matches) for drift monitoring')
+@click.option('--drift-threshold', type=float, default=0.02, show_default=True,
+              help='Alert if rolling Brier degrades more than this vs overall holdout Brier')
+def evaluate(model_dir, test_data, drift_window, drift_threshold):
+    """Evaluate model on hold-out test set. Writes rolling_drift.csv and segment_metrics.csv."""
     from bbl_pipeline.inference.predictor import Predictor
-    from bbl_pipeline.inference.schema import MatchState
-    from bbl_pipeline.training.evaluation import expected_calibration_error
+    from bbl_pipeline.training.evaluation import expected_calibration_error, compute_rolling_drift, compute_segment_metrics
     from sklearn.metrics import brier_score_loss, log_loss, roc_auc_score
-    
+
     logger.info("Loading model and test data...")
     predictor = Predictor.load(model_dir)
     df = pd.read_parquet(test_data)
-    
+
     target_col = 'is_winner'
     if target_col not in df.columns:
         raise ValueError(f"Target column '{target_col}' not found.")
-    
-    y_true = df[target_col]
+
+    y_true = df[target_col].values
     X = df.drop(columns=[target_col])
-    
-    # Predict
-    # Predictor expects MatchState, but here we have a DataFrame.
-    # We can use the underlying model directly if we hydrate features manually?
-    # Or we construct MatchState for each row? (Slow)
-    # Or we assume X is already features?
-    
-    # If X is raw data, we need hydration.
-    # Predictor._hydrate_features takes MatchState.
-    # We should probably expose a batch prediction method in Predictor that takes DataFrame?
-    # Or assume X is already hydrated features matching training schema?
-    
-    # If 'test-data' is the output of feature engineering, it has features.
-    # But Predictor uses FeatureStore.
-    
-    # If we are evaluating the *model artifact* (which is CalibratedModel), we can just use model.predict_proba(X).
-    # Assuming X has the right columns.
-    
+
     try:
-        # We access the underlying model directly for batch evaluation
-        # This assumes X columns match what the model expects.
         y_prob = predictor.model.predict_proba(X)[:, 1]
-        
+
         brier = brier_score_loss(y_true, y_prob)
         ll = log_loss(y_true, y_prob)
         auc = roc_auc_score(y_true, y_prob)
         ece = expected_calibration_error(y_true, y_prob)
-        
-        click.echo(f"Evaluation Results:")
-        click.echo(f"Brier Score: {brier:.4f}")
-        click.echo(f"Log Loss:    {ll:.4f}")
-        click.echo(f"AUC:         {auc:.4f}")
-        click.echo(f"ECE:         {ece:.4f}")
-        
+
+        click.echo("Evaluation Results:")
+        click.echo(f"  Brier Score: {brier:.4f}")
+        click.echo(f"  Log Loss:    {ll:.4f}")
+        click.echo(f"  AUC:         {auc:.4f}")
+        click.echo(f"  ECE:         {ece:.4f}")
+
+        out_path = Path(model_dir)
+
+        # T019: Rolling drift analysis
+        drift_col = 'match_date' if 'match_date' in df.columns else ('match_id' if 'match_id' in df.columns else None)
+        if drift_col:
+            drift_df = compute_rolling_drift(
+                df=df.assign(_y_true=y_true, _y_prob=y_prob),
+                match_col=drift_col,
+                window=drift_window,
+                overall_brier=brier,
+                drift_threshold=drift_threshold,
+            )
+            drift_path = out_path / "rolling_drift.csv"
+            drift_df.to_csv(drift_path, index=False)
+            click.echo(f"  Rolling drift written → {drift_path}")
+        else:
+            click.echo("  Skipping rolling drift: no match_date or match_id column found.")
+
+        # T016: Segment breakdown
+        seg_df = compute_segment_metrics(df=df.assign(_y_true=y_true, _y_prob=y_prob))
+        seg_path = out_path / "segment_metrics.csv"
+        seg_df.to_csv(seg_path, index=False)
+        click.echo(f"  Segment metrics written → {seg_path}")
+
     except Exception as e:
         logger.error(f"Evaluation failed: {e}")
         click.echo(f"Error: {e}")

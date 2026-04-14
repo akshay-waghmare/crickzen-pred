@@ -31,10 +31,39 @@
 ## Phase 5: Evaluation (US3)
 **Goal**: Evaluate model performance and generate reports.
 - [x] T016 [US3] Implement comprehensive evaluation metrics (ECE, Brier, LogLoss) in `src/bbl_pipeline/training/evaluation.py`
+  - Global metrics written to `metrics.json`
+  - **Segment breakdown** written to `segment_metrics.csv`: rows keyed by (innings, phase, wickets_bucket, rrr_bucket); columns: Brier, LogLoss, ECE, N samples
+    - `innings`: 1 or 2
+    - `phase`: powerplay / middle / death
+    - `wickets_bucket`: 0-2 / 3-5 / 6-10
+    - `rrr_bucket`: <7 / 7-12 / >12 (second innings only)
+  - Global Brier can mask phase-specific weakness; segment breakdown is the primary diagnostic tool
 - [x] T017 [US3] Implement `evaluate` CLI command in `src/bbl_pipeline/cli.py`
 
 ## Phase 6: Polish
 - [x] T018 Update documentation and quickstart guides
+
+## Phase 7: Guardrails (Retroactive improvements)
+
+- [x] T022 **Data versioning** — Write `data_version.json` during `train` CLI command
+  - Compute SHA-256 of the input parquet file(s)
+  - Write to model output dir: `{"dataset_hash": "<sha256>", "source_files": [...], "date_range": "...", "row_count": N}`
+  - `champion.json` includes `data_version_hash` field linking to the exact data used
+
+- [x] T019 **Drift monitoring** — Add rolling Brier/LogLoss window (last 50 matches) to `src/bbl_pipeline/training/evaluation.py`
+  - Compute rolling metric alongside overall holdout metric in `evaluate` CLI command
+  - Write `rolling_drift.csv` (columns: `match_date`, `rolling_brier_50`, `rolling_logloss_50`) to model output dir
+  - Alert (log WARNING) if rolling Brier degrades > 0.02 vs training-set Brier — signals season/pitch/scoring drift requiring retrain
+
+- [x] T020 **Feature importance + SHAP hooks** — Add to `src/bbl_pipeline/training/trainer.py` and `src/bbl_pipeline/inference/predictor.py`
+  - At training time: dump `feature_importance.csv` (XGBoost `feature_importances_`, LogReg coefficients) to model output dir
+  - In `Predictor`: add `explain(match_state) -> dict` method that returns per-feature contributions using XGBoost's `predict(output_margin=True)` + manual SHAP if shap is installed
+  - In debug mode (`--debug` flag on `predict` CLI): attach full feature snapshot to prediction JSON output
+
+- [x] T021 **Inference latency test** — Add to `tests/inference/test_predictor.py`
+  - Time 100 sequential `Predictor.predict()` calls on a realistic MatchState
+  - Assert p50 latency < 50ms and p99 latency < 100ms
+  - Run as part of CI to catch regressions when new features are added
 
 ## Dependencies
 - US1 (Training) must complete before US2 (Inference) and US3 (Evaluation).

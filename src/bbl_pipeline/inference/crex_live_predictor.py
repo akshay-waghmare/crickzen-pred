@@ -117,6 +117,7 @@ class CrexLivePredictor:
     def __init__(self, match_url: str, model_dir: str, headless: bool = True,
                  feature_store_dir: str = None, output_json: str = None,
                  live_match_json: str = None, venue: str = None, league: str = None,
+                 odm_model_dir: str = None,
                  use_ml_model: bool = False, record_states: bool = False, states_dir: str = None,
                  total_overs: int = None, revised_target: int = None, mc_only: bool = False):
         self.original_match_url = match_url
@@ -131,6 +132,10 @@ class CrexLivePredictor:
         self.output_json = output_json  # Path for JSON output (for Streamlit)
         self.venue_override = venue
         self.mc_only = mc_only  # Force MC-only mode even for 20-over matches
+
+        league_code = (league or "").lower()
+        default_odm_model_dir = "models/odm_v1" if league_code in {"ipl", "psl"} and not mc_only else None
+        self.odm_model_dir = odm_model_dir or default_odm_model_dir
 
         # Reduced-over support
         self._cli_total_overs = total_overs  # CLI override (None = auto-detect or default 20)
@@ -177,7 +182,18 @@ class CrexLivePredictor:
         # Try to load the prediction model
         self.model = None
         self._load_model()
-        
+
+        # ODM (Odds Direction Model) advisory
+        from bbl_pipeline.inference.odds_direction_model import OddsDirectionModel
+
+        self.odm_model = OddsDirectionModel.load(self.odm_model_dir)
+        self.last_odm_prediction = {
+            "status": "unavailable",
+            "reason": "ODM model not configured.",
+        }
+        if self.odm_model_dir:
+            print(f"[INFO] ODM advisory model: {self.odm_model.status}")
+
         # Initialize match state logger if recording enabled
         self.match_state_logger = None
         if self.record_states:
@@ -1974,6 +1990,86 @@ class CrexLivePredictor:
                     print(f"[WARN] Logger finalize/flush failed: {e}")
             await self.stop()
     
+    def _build_live_feature_snapshot(self) -> tuple:
+        """Build the current predictor feature snapshot for JSON/debug/ODM use."""
+        over = int(self.match_state.overs)
+        ball = int(round((self.match_state.overs - over) * 10))
+        if ball >= 6:
+            ball = 0
+
+        if not self.predictor:
+            return over, ball, {}
+
+        try:
+            scraped_data = {
+                'innings_num': 2 if self.match_state.is_second_innings else 1,
+                'over_number': over,
+                'ball_number': ball,
+                'total_score': self.match_state.total_runs,
+                'total_wickets': self.match_state.wickets,
+                'current_batsman': self.match_state.batsman1_name,
+                'non_striker': self.match_state.batsman2_name,
+                'batting_team': self.match_state.batting_team,
+                'bowling_team': self.match_state.bowling_team,
+                'venue': self.match_state.venue,
+                'target_score': self.match_state.target,
+                'runs_needed': (self.match_state.target - self.match_state.total_runs) if self.match_state.target else 0,
+            }
+            feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
+            features = {
+                key: (float(value) if isinstance(value, (int, float)) else value)
+                for key, value in feat_df.iloc[0].to_dict().items()
+            }
+            return over, ball, features
+        except Exception as e:
+            logger.warning(f"Could not build live feature snapshot: {e}")
+            return over, ball, {}
+
+    def _update_odm_prediction(self, features: Dict[str, Any], over: int, ball: int) -> None:
+        """Update ODM advisory output from current raw ML probability and distinct-ball history."""
+        if not self.odm_model_dir:
+            self.last_odm_prediction = {
+                'status': 'unavailable',
+                'reason': 'ODM model not configured.',
+            }
+            return
+
+        if not self.predictor:
+            self.last_odm_prediction = {
+                'status': 'unavailable',
+                'reason': 'ODM advisory requires the main ML predictor to be active.',
+            }
+            return
+
+        if not features:
+            self.last_odm_prediction = {
+                'status': 'unavailable',
+                'reason': 'Live ODM features are unavailable for the current state.',
+            }
+            return
+
+        try:
+            self.last_odm_prediction = self.odm_model.predict(
+                live_features=features,
+                predictor=self.predictor,
+                batting_team=self.match_state.batting_team,
+                bowling_team=self.match_state.bowling_team,
+                venue=self.match_state.venue or "Unknown",
+                league=self.league,
+                innings=2 if self.match_state.is_second_innings else 1,
+                over=over,
+                ball=ball,
+                target_score=self.match_state.target,
+                current_ml_prob=getattr(self, 'last_raw_prob', None),
+                history=self._prediction_history,
+            )
+        except Exception as e:
+            logger.warning(f"ODM advisory update failed: {e}")
+            self.last_odm_prediction = {
+                'status': 'error',
+                'reason': str(e),
+            }
+
     def _display_state(self, win_prob: Optional[float]):
         """Display current match state and prediction."""
         state = self.match_state
@@ -1994,7 +2090,14 @@ class CrexLivePredictor:
             # Show both teams' probabilities
             bowling_prob = 1 - win_prob
             display += f" | {state.batting_team}: {win_prob*100:.1f}% [{bar}] {state.bowling_team}: {bowling_prob*100:.1f}%"
-            
+
+            over, ball, live_features = self._build_live_feature_snapshot()
+            self._update_odm_prediction(live_features, over, ball)
+            if self.last_odm_prediction.get('status') == 'ready':
+                odm_direction = str(self.last_odm_prediction.get('direction', '')).upper()
+                odm_confidence = float(self.last_odm_prediction.get('direction_confidence', 0.0)) * 100.0
+                display += f" | ODM {odm_direction} {odm_confidence:.0f}%"
+
             # Track prediction history
             self._prediction_history.append({
                 "overs": state.overs,
@@ -2159,6 +2262,7 @@ class CrexLivePredictor:
                 "league": self.league,  # League code if --league was specified
                 "league_calibrated_prob": win_prob if self.league else None,  # Final league-calibrated prob
                 "features": features,
+                "odm": self.last_odm_prediction,
                 "history": self._prediction_history[-50:],  # Last 50 data points
                 # Market odds from CREX
                 "market_fav_team": state.market_fav_team,
@@ -2222,6 +2326,7 @@ class CrexLivePredictor:
                         "scraped_data": scraped_data,
                         "ball_history": ball_history,
                         "features": features,
+                        "odm": self.last_odm_prediction,
                         "bat_win_prob": win_prob,
                         "bowl_win_prob": 1 - win_prob,
                         "history": self._prediction_history[-200:],
@@ -2275,6 +2380,11 @@ async def main():
         help="League code for league-specific calibration (e.g., 'ssm', 'bbl', 'sa20')",
     )
     parser.add_argument(
+        "--odm-model-dir",
+        default=None,
+        help="Optional ODM advisory model directory for direction and interval output.",
+    )
+    parser.add_argument(
         "--use-ml-model",
         action="store_true",
         default=False,
@@ -2324,6 +2434,7 @@ async def main():
         live_match_json=args.live_match_json,
         venue=args.venue,
         league=args.league,
+        odm_model_dir=args.odm_model_dir,
         use_ml_model=args.use_ml_model,
         record_states=args.record_states,
         states_dir=args.states_dir,

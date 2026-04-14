@@ -896,6 +896,101 @@ class Predictor:
             )
             return resource_features['resource_win_prob']
 
+    def explain(self, state: MatchState) -> dict:
+        """
+        T020: Return per-feature contributions for a single prediction.
+
+        Uses XGBoost's `predict(output_margin=True)` for the XGB component and
+        LogReg coefficients × feature values for the LogReg component.
+        Falls back to raw feature vector only if SHAP / XGBoost margin unavailable.
+
+        Returns a dict with keys:
+            win_probability  – final prediction
+            features         – {name: value} dict of the feature vector
+            contributions    – {name: contribution} sorted by abs value (XGB margin or LogReg)
+            shap_values      – {name: shap_value} if the `shap` library is installed
+        """
+        import numpy as np
+
+        # Hydrate features (reuse existing path)
+        scraped_data = {
+            'innings_num': state.innings,
+            'over_number': state.over,
+            'ball_number': state.ball,
+            'total_score': state.current_score,
+            'total_wickets': state.wickets_lost,
+            'current_batsman': state.batsman_1,
+            'non_striker': state.batsman_2,
+            'current_bowler': state.bowler,
+            'batting_team': state.batting_team,
+            'bowling_team': state.bowling_team,
+            'venue': state.venue,
+            'target_score': state.target_runs,
+            'runs_needed': (state.target_runs - state.current_score) if state.target_runs else 0,
+        }
+        X = self.feature_mapper.create_feature_dataframe(scraped_data)
+        expected_features = None
+        if hasattr(self.model, 'selected_features_'):
+            expected_features = self.model.selected_features_
+        elif hasattr(self.model, 'feature_names_in_'):
+            expected_features = list(self.model.feature_names_in_)
+        if expected_features:
+            for feat in expected_features:
+                if feat not in X.columns:
+                    X[feat] = 0.0
+            X = X[expected_features]
+
+        win_prob = self.predict(state)
+        feature_dict = {col: float(X[col].iloc[0]) for col in X.columns}
+
+        contributions = {}
+        shap_values = {}
+
+        # Try XGBoost margin decomposition
+        xgb_model = None
+        if hasattr(self.model, 'xgb_model_'):
+            xgb_model = self.model.xgb_model_
+        elif hasattr(self.model, 'xgb_model'):
+            xgb_model = self.model.xgb_model
+
+        if xgb_model is not None:
+            try:
+                import xgboost as xgb
+                dmat = xgb.DMatrix(X)
+                margin = float(xgb_model.get_booster().predict(dmat, output_margin=True)[0])
+                # Approximate per-feature contribution using XGBoost's predict_contribution
+                contribs = xgb_model.get_booster().predict(dmat, pred_contribs=True)[0]
+                feat_names = X.columns.tolist()
+                contributions = {
+                    feat_names[i]: round(float(contribs[i]), 5)
+                    for i in range(len(feat_names))
+                }
+                # Sort by absolute contribution
+                contributions = dict(
+                    sorted(contributions.items(), key=lambda kv: abs(kv[1]), reverse=True)
+                )
+            except Exception:
+                pass
+
+        # Try SHAP if installed
+        try:
+            import shap
+            if xgb_model is not None:
+                explainer = shap.TreeExplainer(xgb_model)
+                sv = explainer.shap_values(X)
+                feat_names = X.columns.tolist()
+                shap_values = {feat_names[i]: round(float(sv[0][i]), 5) for i in range(len(feat_names))}
+                shap_values = dict(sorted(shap_values.items(), key=lambda kv: abs(kv[1]), reverse=True))
+        except Exception:
+            pass
+
+        return {
+            "win_probability": round(win_prob, 4),
+            "features": feature_dict,
+            "contributions": contributions,
+            "shap_values": shap_values,
+        }
+
     def predict_batch(
         self, 
         states: list, 

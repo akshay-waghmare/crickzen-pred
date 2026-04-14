@@ -101,54 +101,66 @@ def main() -> None:
     print(f"[ODM-BRIDGE] Writing enriched state to {output_json}")
     print(f"[ODM-BRIDGE] Model status: {model.status}")
 
+    consecutive_errors = 0
     while True:
-        live = _load_json(input_json)
-        if not live or not isinstance(live.get("features"), dict):
-            time.sleep(args.poll_interval)
-            continue
+        try:
+            live = _load_json(input_json)
+            if not live or not isinstance(live.get("features"), dict):
+                time.sleep(args.poll_interval)
+                continue
 
-        history = _load_history(history_json)
-        history = _append_distinct_snapshot(history, live)
-        _save_history(history_json, history)
+            history = _load_history(history_json)
+            history = _append_distinct_snapshot(history, live)
+            _save_history(history_json, history)
 
-        row = model._build_feature_row(
-            live_features=live["features"],
-            predictor=predictor,
-            batting_team=live.get("batting_team", ""),
-            venue=live.get("venue") or "Unknown",
-            league=live.get("league") or args.league,
-            innings=2 if live.get("is_second_innings") else 1,
-            over=int(live.get("over", 0) or 0),
-            ball=int(live.get("ball", 0) or 0),
-            target_score=live.get("target"),
-            current_ml_prob=float(live.get("raw_win_prob", live.get("bat_win_prob", 0.0)) or 0.0),
-            history=history,
-        )
-        missing = [column for column in (model.feature_columns or []) if column not in row]
+            row = model._build_feature_row(
+                live_features=live["features"],
+                predictor=predictor,
+                batting_team=live.get("batting_team", ""),
+                venue=live.get("venue") or "Unknown",
+                league=live.get("league") or args.league,
+                innings=2 if live.get("is_second_innings") else 1,
+                over=int(live.get("over", 0) or 0),
+                ball=int(live.get("ball", 0) or 0),
+                target_score=live.get("target"),
+                current_ml_prob=float(live.get("raw_win_prob", live.get("bat_win_prob", 0.0)) or 0.0),
+                history=history,
+            )
+            missing = [column for column in (model.feature_columns or []) if column not in row]
 
-        odm = model.predict(
-            live_features=live["features"],
-            predictor=predictor,
-            batting_team=live.get("batting_team", ""),
-            bowling_team=live.get("bowling_team", ""),
-            venue=live.get("venue") or "Unknown",
-            league=live.get("league") or args.league,
-            innings=2 if live.get("is_second_innings") else 1,
-            over=int(live.get("over", 0) or 0),
-            ball=int(live.get("ball", 0) or 0),
-            target_score=live.get("target"),
-            current_ml_prob=float(live.get("raw_win_prob", live.get("bat_win_prob", 0.0)) or 0.0),
-            history=history,
-        )
+            odm = model.predict(
+                live_features=live["features"],
+                predictor=predictor,
+                batting_team=live.get("batting_team", ""),
+                bowling_team=live.get("bowling_team", ""),
+                venue=live.get("venue") or "Unknown",
+                league=live.get("league") or args.league,
+                innings=2 if live.get("is_second_innings") else 1,
+                over=int(live.get("over", 0) or 0),
+                ball=int(live.get("ball", 0) or 0),
+                target_score=live.get("target"),
+                current_ml_prob=float(live.get("raw_win_prob", live.get("bat_win_prob", 0.0)) or 0.0),
+                history=history,
+            )
 
-        live["odm"] = odm
-        live["odm_feature_audit"] = {
-            "feature_count": len(model.feature_columns or []),
-            "missing_count": len(missing),
-            "missing_columns": missing,
-            "history_points": len(history),
-        }
-        _write_json(output_json, live)
+            live["odm"] = odm
+            live["odm_feature_audit"] = {
+                "feature_count": len(model.feature_columns or []),
+                "missing_count": len(missing),
+                "missing_columns": missing,
+                "history_points": len(history),
+            }
+            _write_json(output_json, live)
+            consecutive_errors = 0
+        except KeyboardInterrupt:
+            print("[ODM-BRIDGE] Interrupted — shutting down.")
+            break
+        except Exception as exc:
+            consecutive_errors += 1
+            print(f"[ODM-BRIDGE] Error ({consecutive_errors}): {exc}")
+            if consecutive_errors >= 30:
+                print("[ODM-BRIDGE] Too many consecutive errors — exiting.")
+                break
         time.sleep(args.poll_interval)
 
 

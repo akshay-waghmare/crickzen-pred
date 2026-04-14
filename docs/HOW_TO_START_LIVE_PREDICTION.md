@@ -113,6 +113,7 @@ python scripts/launcher.py
 Features:
 - Paste any CREX URL and select the league
 - Auto-configures model, feature store, and output paths
+- IPL and PSL ML+MC slots also launch the ODM mirror sidecar and write per-slot `*_live_ml_odm_#.json` feeds
 - Starts predictor + Streamlit with one click
 - Record states enabled by default
 - Shows live process status and log output
@@ -163,6 +164,49 @@ The IPL live flow needed extra repository support because several assumptions in
 5. **Streamlit needed explicit IPL feed support**
    - IPL live JSON feeds are `data/ipl_live_ml.json` and `data/ipl_live_mc.json`
    - These should be exposed directly in the Streamlit dropdown/backend controls so the dashboard opens the correct feed by default
+
+### PSL-specific naming pitfall
+
+The PSL live flow has a similar issue, but the mismatch is between CREX short codes and the historical PSL feature-store team names:
+
+1. **CREX may expose short PSL codes like `ISU` and `RWP`**
+   - These need league-specific resolution when `--league psl` is active
+   - In this repository, `RWP` must resolve to **Rawalpindiz** because that is the canonical PSL team name stored in the generated feature store
+
+2. **PSL should use its own generated feature store**
+   - Use `data/psl_feature_store_v1` for PSL live runs
+   - This keeps team and venue lookups aligned with the PSL training parquet and the PSL league calibrator
+
+3. **PSL also needs dedicated simulation/calibration artifacts**
+   - `data/phase_distributions_psl.json`
+   - `models/t20_male_v2/league_calibrators/psl/league_calibrator.pkl`
+
+### PSL artifact generation workflow
+
+If the PSL calibrator or phase distributions are missing, regenerate them from the PSL historical JSON archive:
+
+```bash
+python -m src.bbl_pipeline.cli ingest \
+  --input-dir "C:\Users\ADMINS\Downloads\psl_json" \
+  --output-dir data/psl_raw
+
+python -m src.bbl_pipeline.cli process \
+  --input-dir data/psl_raw/matches \
+  --output-dir data/psl_features_v1 \
+  --feature-store-dir data/psl_feature_store_v1 \
+  --league psl
+
+python scripts/analysis/extract_phase_distributions.py \
+  --json-dir "C:\Users\ADMINS\Downloads\psl_json" \
+  --league psl \
+  --output data/phase_distributions_psl.json
+
+python -m src.bbl_pipeline.cli calibrate-league \
+  --global-model models/t20_male_v2 \
+  --input-file data/psl_features_v1/training.parquet \
+  --league psl \
+  --method temperature
+```
 
 ### IPL artifact generation workflow
 
