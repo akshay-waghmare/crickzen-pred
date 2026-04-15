@@ -23,8 +23,7 @@ def index():
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
     settings = get_settings()
-    return templates.TemplateResponse("login.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "login.html", {
         "settings": settings,
     })
 
@@ -32,8 +31,7 @@ def login_page(request: Request):
 @router.get("/dashboard", response_class=HTMLResponse)
 def dashboard_page(request: Request):
     settings = get_settings()
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "dashboard.html", {
         "settings": settings,
         "poll_interval_ms": settings.POLL_INTERVAL_MS,
     })
@@ -42,7 +40,6 @@ def dashboard_page(request: Request):
 @router.get("/admin", response_class=HTMLResponse)
 def admin_page(request: Request):
     settings = get_settings()
-    return templates.TemplateResponse("admin.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "admin.html", {
         "settings": settings,
     })
