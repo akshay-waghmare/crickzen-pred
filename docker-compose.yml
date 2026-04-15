@@ -38,6 +38,25 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # ── Cloudflare Quick Tunnels ────────────────────────────────────────────────
+  # Exposes the local dashboard (8080) and Streamlit (8501) via trycloudflare.com
+  # Public URLs are printed in container logs on startup.
+  cloudflared-dashboard:
+    image: cloudflare/cloudflared:latest
+    container_name: crickenzen-tunnel-dashboard
+    command: tunnel --no-autoupdate --url http://host.docker.internal:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  cloudflared-streamlit:
+    image: cloudflare/cloudflared:latest
+    container_name: crickenzen-tunnel-streamlit
+    command: tunnel --no-autoupdate --url http://host.docker.internal:8501
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
 volumes:
   caddy_data:
   caddy_config:
