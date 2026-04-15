@@ -1,0 +1,34 @@
+<nav class="bg-gray-800 border-b border-gray-700 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/dashboard" class="flex items-center space-x-2">
+        <span class="text-2xl">🏏</span>
+        <span class="text-xl font-bold text-brand-500">CrickenZen</span>
+      </a>
+
+      <!-- Nav links -->
+      <div class="flex items-center space-x-4">
+        <template x-if="isLoggedIn">
+          <div class="flex items-center space-x-4">
+            <a href="/dashboard" class="text-gray-300 hover:text-white transition-colors">Dashboard</a>
+            <template x-if="isAdmin">
+              <a href="/admin" class="text-gray-300 hover:text-white transition-colors">Admin</a>
+            </template>
+            <span class="text-gray-500">|</span>
+            <span class="text-sm text-gray-400" x-text="user?.email"></span>
+            <span class="text-xs px-2 py-0.5 rounded-full"
+                  :class="user?.plan === 'admin' ? 'bg-purple-600' : user?.plan === 'monthly' ? 'bg-brand-600' : 'bg-gray-600'"
+                  x-text="user?.plan"></span>
+            <button @click="logout()" class="text-sm text-red-400 hover:text-red-300 transition-colors">
+              Logout
+            </button>
+          </div>
+        </template>
+        <template x-if="!isLoggedIn">
+          <a href="/login" class="btn-primary text-sm">Login</a>
+        </template>
+      </div>
+    </div>
+  </div>
+</nav>

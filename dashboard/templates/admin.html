@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Admin — CrickenZen{% endblock %}
+
+{% block content %}
+<div x-data="adminPage()" x-init="init()">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Subscriber Management</h1>
+    <button @click="showAdd = !showAdd" class="btn-primary text-sm">
+      + Add Subscriber
+    </button>
+  </div>
+
+  <!-- Add subscriber form -->
+  <div x-show="showAdd" x-transition class="card mb-6">
+    <h2 class="text-lg font-semibold mb-4">New Subscriber</h2>
+    <form @submit.prevent="addSubscriber()" class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+        <input type="email" x-model="newEmail" required class="input-field w-full" />
+      </div>
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+        <input type="password" x-model="newPassword" required minlength="8" class="input-field w-full" />
+      </div>
+      <div class="w-40">
+        <label class="block text-sm font-medium text-gray-300 mb-1">Plan</label>
+        <select x-model="newPlan" class="input-field w-full">
+          <option value="free">Free</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary" :disabled="addingUser">
+        <span x-show="!addingUser">Create</span>
+        <span x-show="addingUser">Creating...</span>
+      </button>
+    </form>
+    <template x-if="addError">
+      <p class="text-red-400 text-sm mt-2" x-text="addError"></p>
+    </template>
+  </div>
+
+  <!-- Subscribers table -->
+  <div class="card overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-gray-400 border-b border-gray-700">
+          <th class="pb-3 pr-4">Email</th>
+          <th class="pb-3 pr-4">Plan</th>
+          <th class="pb-3 pr-4">Status</th>
+          <th class="pb-3 pr-4">Created</th>
+          <th class="pb-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="sub in subscribers" :key="sub.id">
+          <tr class="border-b border-gray-700/50">
+            <td class="py-3 pr-4" x-text="sub.email"></td>
+            <td class="py-3 pr-4">
+              <span class="text-xs px-2 py-0.5 rounded-full"
+                    :class="sub.plan === 'admin' ? 'bg-purple-600' : sub.plan === 'monthly' ? 'bg-brand-600' : sub.plan === 'yearly' ? 'bg-blue-600' : 'bg-gray-600'"
+                    x-text="sub.plan"></span>
+            </td>
+            <td class="py-3 pr-4">
+              <span :class="sub.is_active ? 'text-green-400' : 'text-red-400'"
+                    x-text="sub.is_active ? 'Active' : 'Suspended'"></span>
+            </td>
+            <td class="py-3 pr-4 text-gray-400" x-text="new Date(sub.created_at).toLocaleDateString()"></td>
+            <td class="py-3">
+              <button x-show="sub.is_active"
+                      @click="suspendUser(sub.id)"
+                      class="text-xs text-red-400 hover:text-red-300">Suspend</button>
+              <button x-show="!sub.is_active"
+                      @click="reactivateUser(sub.id)"
+                      class="text-xs text-green-400 hover:text-green-300">Reactivate</button>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+    <div x-show="subscribers.length === 0" class="text-center py-8 text-gray-500">
+      No subscribers yet
+    </div>
+  </div>
+
+  <!-- System Stats -->
+  <div class="card mt-6">
+    <h2 class="text-lg font-semibold mb-4">System Status</h2>
+    <div class="grid grid-cols-3 gap-4 text-center">
+      <div class="bg-gray-700/50 rounded-lg p-4">
+        <div class="text-2xl font-bold text-brand-500" x-text="subscribers.length"></div>
+        <div class="text-sm text-gray-400">Total Subscribers</div>
+      </div>
+      <div class="bg-gray-700/50 rounded-lg p-4">
+        <div class="text-2xl font-bold text-green-400" x-text="subscribers.filter(s => s.is_active).length"></div>
+        <div class="text-sm text-gray-400">Active</div>
+      </div>
+      <div class="bg-gray-700/50 rounded-lg p-4">
+        <div class="text-2xl font-bold text-red-400" x-text="subscribers.filter(s => !s.is_active).length"></div>
+        <div class="text-sm text-gray-400">Suspended</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function adminPage() {
+  return {
+    subscribers: [],
+    showAdd: false,
+    newEmail: '',
+    newPassword: '',
+    newPlan: 'monthly',
+    addingUser: false,
+    addError: null,
+
+    async init() {
+      await this.loadSubscribers();
+    },
+
+    async loadSubscribers() {
+      const token = localStorage.getItem('cz_token');
+      try {
+        this.subscribers = await czFetch('/admin/subscribers', { token });
+      } catch (e) {
+        console.error('Failed to load subscribers', e);
+      }
+    },
+
+    async addSubscriber() {
+      this.addingUser = true;
+      this.addError = null;
+      const token = localStorage.getItem('cz_token');
+      try {
+        await czFetch('/admin/subscribers', {
+          method: 'POST',
+          token,
+          body: { email: this.newEmail, password: this.newPassword, plan: this.newPlan },
+        });
+        this.newEmail = '';
+        this.newPassword = '';
+        this.showAdd = false;
+        await this.loadSubscribers();
+      } catch (e) {
+        this.addError = e.message || 'Failed to create subscriber';
+      } finally {
+        this.addingUser = false;
+      }
+    },
+
+    async suspendUser(userId) {
+      const token = localStorage.getItem('cz_token');
+      try {
+        await czFetch(`/admin/subscribers/${userId}/suspend`, { method: 'PATCH', token });
+        await this.loadSubscribers();
+      } catch {}
+    },
+
+    async reactivateUser(userId) {
+      const token = localStorage.getItem('cz_token');
+      try {
+        await czFetch(`/admin/subscribers/${userId}/reactivate`, { method: 'PATCH', token });
+        await this.loadSubscribers();
+      } catch {}
+    },
+  };
+}
+</script>
+{% endblock %}

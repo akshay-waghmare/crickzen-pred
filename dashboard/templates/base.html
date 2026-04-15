@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}CrickenZen{% endblock %}</title>
+
+  <!-- Tailwind (built CSS, fallback to CDN for dev) -->
+  <link rel="stylesheet" href="/static/css/app.css"
+        onerror="this.onerror=null; const s=document.createElement('script'); s.src='https://cdn.tailwindcss.com'; document.head.appendChild(s);" />
+
+  <!-- htmx for live updates -->
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <!-- htmx SSE extension -->
+  <script src="https://unpkg.com/htmx-ext-sse@2.2.2/sse.js" defer></script>
+  <!-- Alpine.js for lightweight reactivity -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+
+  <style>
+    [x-cloak] { display: none !important; }
+    /* Probability gauge */
+    .gauge-fill { transition: width 0.8s ease-in-out; }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+
+<body class="h-full bg-gray-900 text-gray-100" x-data="app()" x-cloak>
+  <!-- Navigation -->
+  {% include "partials/nav.html" %}
+
+  <!-- Flash messages -->
+  <template x-if="flash">
+    <div class="max-w-7xl mx-auto px-4 mt-4">
+      <div class="rounded-lg p-4 text-sm"
+           :class="flashType === 'error' ? 'bg-red-900/50 text-red-200 border border-red-700' : 'bg-green-900/50 text-green-200 border border-green-700'">
+        <span x-text="flash"></span>
+        <button @click="flash = null" class="float-right text-gray-400 hover:text-white">&times;</button>
+      </div>
+    </div>
+  </template>
+
+  <!-- Main content -->
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Dashboard JS -->
+  <script src="/static/js/dashboard.js"></script>
+  {% block scripts %}{% endblock %}
+
+  <script>
+    function app() {
+      return {
+        flash: null,
+        flashType: 'info',
+        user: null,
+        token: localStorage.getItem('cz_token'),
+        refreshToken: localStorage.getItem('cz_refresh'),
+
+        async init() {
+          if (this.token) {
+            try {
+              const resp = await czFetch('/auth/me', { token: this.token });
+              this.user = resp;
+            } catch {
+              this.token = null;
+              localStorage.removeItem('cz_token');
+            }
+          }
+        },
+
+        get isLoggedIn() { return !!this.token && !!this.user; },
+        get isAdmin() { return this.user && this.user.email === '{{ settings.ADMIN_EMAIL if settings else "" }}'; },
+
+        showFlash(msg, type = 'info') {
+          this.flash = msg;
+          this.flashType = type;
+          setTimeout(() => this.flash = null, 5000);
+        },
+
+        async logout() {
+          try {
+            await czFetch('/auth/logout', {
+              method: 'POST',
+              token: this.token,
+              body: { refresh_token: this.refreshToken },
+            });
+          } catch {}
+          localStorage.removeItem('cz_token');
+          localStorage.removeItem('cz_refresh');
+          window.location.href = '/login';
+        },
+      };
+    }
+  </script>
+</body>
+</html>

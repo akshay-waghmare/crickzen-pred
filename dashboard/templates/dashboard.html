@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — CrickenZen{% endblock %}
+
+{% block content %}
+<div x-data="dashboardPage()" x-init="init()">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Live Predictions</h1>
+      <p class="text-gray-400 text-sm mt-1">
+        Real-time ball-by-ball win probability
+        <span class="text-gray-500">• Refreshing every {{ poll_interval_ms // 1000 }}s</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Start Match Form -->
+  <div class="card mb-6">
+    <h2 class="text-lg font-semibold mb-4">Start a New Prediction</h2>
+    <form @submit.prevent="startMatch()" class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[300px]">
+        <label class="block text-sm font-medium text-gray-300 mb-1">CREX Match URL</label>
+        <input type="url" x-model="newMatchUrl" required
+               @input.debounce.500ms="autoDetectLeague()"
+               class="input-field w-full"
+               placeholder="https://crex.live/scoreboard/..." />
+      </div>
+      <div class="w-48">
+        <label class="block text-sm font-medium text-gray-300 mb-1">League</label>
+        <select x-model="newMatchLeague" class="input-field w-full">
+          <option value="">Auto-detect</option>
+          <template x-for="league in leagues" :key="league.key">
+            <option :value="league.key" x-text="league.key"></option>
+          </template>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary" :disabled="startingMatch">
+        <span x-show="!startingMatch">▶ Start Prediction</span>
+        <span x-show="startingMatch">Starting...</span>
+      </button>
+    </form>
+    <template x-if="startError">
+      <p class="text-red-400 text-sm mt-2" x-text="startError"></p>
+    </template>
+  </div>
+
+  <!-- Active Matches Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <template x-for="match in matches" :key="match.id">
+      <div class="card relative">
+        <!-- League badge & status -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-600" x-text="match.league"></span>
+            <span class="text-xs px-2 py-0.5 rounded-full"
+                  :class="match.status === 'running' ? 'bg-green-600' : match.status === 'error' ? 'bg-red-600' : 'bg-gray-600'"
+                  x-text="match.status"></span>
+          </div>
+          <button @click="stopMatch(match.id)" class="text-red-400 hover:text-red-300 text-sm"
+                  x-show="match.status === 'running'">
+            ⏹ Stop
+          </button>
+        </div>
+
+        <!-- Match state (populated by polling) -->
+        <div x-show="match.state">
+          <!-- Teams & Score -->
+          <div class="text-center mb-4">
+            <div class="text-lg font-bold" x-text="match.state?.batting_team + ' vs ' + match.state?.bowling_team"></div>
+            <div class="text-3xl font-bold mt-2">
+              <span x-text="match.state?.score || 0"></span>/<span x-text="match.state?.wickets || 0"></span>
+              <span class="text-lg text-gray-400 ml-2">(<span x-text="match.state?.overs || '0.0'"></span> ov)</span>
+            </div>
+            <div x-show="match.state?.target" class="text-sm text-gray-400 mt-1">
+              Target: <span x-text="match.state?.target"></span>
+              • RRR: <span x-text="(match.state?.required_run_rate || 0).toFixed(2)"></span>
+            </div>
+          </div>
+
+          <!-- Win Probability Gauge -->
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-1">
+              <span x-text="match.state?.batting_team" class="font-medium"></span>
+              <span x-text="match.state?.bowling_team" class="font-medium"></span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-6 overflow-hidden flex">
+              <div class="gauge-fill bg-brand-500 h-full flex items-center justify-center text-xs font-bold"
+                   :style="'width: ' + ((match.state?.bat_win_prob || 0.5) * 100) + '%'">
+                <span x-text="((match.state?.bat_win_prob || 0.5) * 100).toFixed(1) + '%'"></span>
+              </div>
+              <div class="gauge-fill bg-red-500 h-full flex items-center justify-center text-xs font-bold flex-1">
+                <span x-text="((match.state?.bowl_win_prob || 0.5) * 100).toFixed(1) + '%'"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Metrics -->
+          <div class="grid grid-cols-3 gap-2 text-center text-sm">
+            <div class="bg-gray-700/50 rounded-lg p-2">
+              <div class="text-gray-400">CRR</div>
+              <div class="font-bold" x-text="(match.state?.current_run_rate || 0).toFixed(2)"></div>
+            </div>
+            <div class="bg-gray-700/50 rounded-lg p-2">
+              <div class="text-gray-400">Phase</div>
+              <div class="font-bold" x-text="getPhase(match.state?.overs)"></div>
+            </div>
+            <div class="bg-gray-700/50 rounded-lg p-2">
+              <div class="text-gray-400">Innings</div>
+              <div class="font-bold" x-text="match.state?.is_second_innings ? '2nd' : '1st'"></div>
+            </div>
+          </div>
+
+          <!-- Batsmen & Bowler -->
+          <div class="mt-4 text-xs text-gray-400 space-y-1">
+            <div x-show="match.state?.batsman1_name">
+              🏏 <span x-text="match.state?.batsman1_name"></span>
+              <span x-text="match.state?.batsman1_runs + '(' + match.state?.batsman1_balls + ')'"></span>
+              •
+              <span x-text="match.state?.batsman2_name"></span>
+              <span x-text="match.state?.batsman2_runs + '(' + match.state?.batsman2_balls + ')'"></span>
+            </div>
+            <div x-show="match.state?.bowler1_name">
+              ⚾ <span x-text="match.state?.bowler1_name"></span>
+              <span x-text="match.state?.bowler1_overs + '-' + match.state?.bowler1_runs + '-' + match.state?.bowler1_wickets"></span>
+            </div>
+          </div>
+
+          <!-- Monte Carlo -->
+          <div x-show="match.state?.monte_carlo?.available" class="mt-4 border-t border-gray-700 pt-3">
+            <div class="text-xs text-gray-400 mb-1">Monte Carlo Forecast</div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-gray-700/30 rounded p-2" x-show="match.state?.monte_carlo?.simulation_1over">
+                <span class="text-gray-500">1 over:</span>
+                <span class="font-bold" x-text="((match.state?.monte_carlo?.simulation_1over?.mean_prob || 0) * 100).toFixed(1) + '%'"></span>
+              </div>
+              <div class="bg-gray-700/30 rounded p-2" x-show="match.state?.monte_carlo?.simulation_5over">
+                <span class="text-gray-500">5 over:</span>
+                <span class="font-bold" x-text="((match.state?.monte_carlo?.simulation_5over?.mean_prob || 0) * 100).toFixed(1) + '%'"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timestamp -->
+          <div class="text-right text-xs text-gray-500 mt-3" x-text="'Updated: ' + formatTime(match.state?.timestamp)"></div>
+        </div>
+
+        <!-- Loading state -->
+        <div x-show="!match.state && match.status === 'running'" class="text-center py-8">
+          <div class="animate-pulse text-gray-400">
+            <p class="text-lg">⏳ Waiting for first ball...</p>
+            <p class="text-sm mt-2">The predictor is connecting to the live match</p>
+          </div>
+        </div>
+
+        <!-- Finished/Error state -->
+        <div x-show="match.status === 'finished' || match.status === 'error'" class="text-center py-4">
+          <span class="text-gray-500" x-text="match.status === 'error' ? '❌ Prediction errored' : '✅ Match ended'"></span>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <!-- Empty state -->
+  <div x-show="matches.length === 0" class="text-center py-16">
+    <div class="text-6xl mb-4">🏏</div>
+    <h2 class="text-xl font-bold text-gray-400">No Active Predictions</h2>
+    <p class="text-gray-500 mt-2">Paste a CREX match URL above to start predicting</p>
+  </div>
+</div>
+
+<script>
+function dashboardPage() {
+  return {
+    matches: [],
+    leagues: [],
+    newMatchUrl: '',
+    newMatchLeague: '',
+    startingMatch: false,
+    startError: null,
+    pollTimers: {},
+
+    async init() {
+      // Load leagues
+      try {
+        this.leagues = await czFetch('/api/matches/leagues');
+      } catch {}
+
+      // Load existing matches
+      await this.refreshMatches();
+
+      // Poll for match list updates every 10s
+      setInterval(() => this.refreshMatches(), 10000);
+    },
+
+    async refreshMatches() {
+      const token = localStorage.getItem('cz_token');
+      if (!token) return;
+      try {
+        const summaries = await czFetch('/api/matches', { token });
+        // Merge with existing state data
+        for (const s of summaries) {
+          const existing = this.matches.find(m => m.id === s.id);
+          if (existing) {
+            existing.status = s.status;
+          } else {
+            this.matches.push({ ...s, state: null });
+            this.startPolling(s.id);
+          }
+        }
+        // Remove matches no longer in list
+        this.matches = this.matches.filter(m =>
+          summaries.some(s => s.id === m.id) || m.status === 'running'
+        );
+      } catch {}
+    },
+
+    startPolling(matchId) {
+      if (this.pollTimers[matchId]) return;
+      const poll = async () => {
+        const token = localStorage.getItem('cz_token');
+        if (!token) return;
+        try {
+          const resp = await czFetch(`/api/matches/${matchId}/state`, { token });
+          const match = this.matches.find(m => m.id === matchId);
+          if (match) {
+            match.state = resp.state;
+            match.status = resp.status;
+            if (resp.status !== 'running') {
+              clearInterval(this.pollTimers[matchId]);
+              delete this.pollTimers[matchId];
+            }
+          }
+        } catch {}
+      };
+      poll();
+      this.pollTimers[matchId] = setInterval(poll, {{ poll_interval_ms }});
+    },
+
+    async autoDetectLeague() {
+      if (!this.newMatchUrl) return;
+      try {
+        const resp = await czFetch(`/api/matches/detect-league?url=${encodeURIComponent(this.newMatchUrl)}`);
+        if (resp.league) this.newMatchLeague = resp.league;
+      } catch {}
+    },
+
+    async startMatch() {
+      this.startingMatch = true;
+      this.startError = null;
+      const token = localStorage.getItem('cz_token');
+      try {
+        const match = await czFetch('/api/matches/start', {
+          method: 'POST',
+          token,
+          body: {
+            match_url: this.newMatchUrl,
+            league: this.newMatchLeague || null,
+          },
+        });
+        this.matches.push({ ...match, state: null });
+        this.startPolling(match.id);
+        this.newMatchUrl = '';
+        this.newMatchLeague = '';
+      } catch (e) {
+        this.startError = e.message || 'Failed to start prediction';
+      } finally {
+        this.startingMatch = false;
+      }
+    },
+
+    async stopMatch(matchId) {
+      const token = localStorage.getItem('cz_token');
+      try {
+        await czFetch(`/api/matches/${matchId}/stop`, { method: 'DELETE', token });
+        const match = this.matches.find(m => m.id === matchId);
+        if (match) match.status = 'stopped';
+        if (this.pollTimers[matchId]) {
+          clearInterval(this.pollTimers[matchId]);
+          delete this.pollTimers[matchId];
+        }
+      } catch {}
+    },
+
+    getPhase(overs) {
+      if (!overs) return '-';
+      const o = parseFloat(overs);
+      if (o <= 6) return 'PP';
+      if (o <= 15) return 'Middle';
+      return 'Death';
+    },
+
+    formatTime(ts) {
+      if (!ts) return '';
+      try {
+        return new Date(ts).toLocaleTimeString();
+      } catch { return ts; }
+    },
+  };
+}
+</script>
+{% endblock %}

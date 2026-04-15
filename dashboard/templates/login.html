@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Login — CrickenZen{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center" x-data="loginPage()">
+  <div class="card w-full max-w-md">
+    <div class="text-center mb-6">
+      <span class="text-4xl">🏏</span>
+      <h1 class="text-2xl font-bold mt-2">CrickenZen</h1>
+      <p class="text-gray-400 mt-1">Real-time cricket win probability predictions</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="flex border-b border-gray-700 mb-6">
+      <button @click="tab = 'login'"
+              :class="tab === 'login' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-400 hover:text-gray-200'"
+              class="flex-1 py-2 text-center font-medium border-b-2 transition-colors">
+        Login
+      </button>
+      <button @click="tab = 'register'"
+              :class="tab === 'register' ? 'border-brand-500 text-brand-500' : 'border-transparent text-gray-400 hover:text-gray-200'"
+              class="flex-1 py-2 text-center font-medium border-b-2 transition-colors">
+        Register
+      </button>
+    </div>
+
+    <!-- Error message -->
+    <template x-if="error">
+      <div class="bg-red-900/50 border border-red-700 text-red-200 rounded-lg p-3 mb-4 text-sm" x-text="error"></div>
+    </template>
+
+    <!-- Login form -->
+    <form x-show="tab === 'login'" @submit.prevent="doLogin()">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+          <input type="email" x-model="email" required class="input-field w-full" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+          <input type="password" x-model="password" required class="input-field w-full" placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn-primary w-full" :disabled="loading">
+          <span x-show="!loading">Sign In</span>
+          <span x-show="loading">Signing in...</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Register form -->
+    <form x-show="tab === 'register'" @submit.prevent="doRegister()">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+          <input type="email" x-model="email" required class="input-field w-full" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+          <input type="password" x-model="password" required minlength="8" class="input-field w-full" placeholder="At least 8 characters" />
+        </div>
+        <button type="submit" class="btn-primary w-full" :disabled="loading">
+          <span x-show="!loading">Create Account</span>
+          <span x-show="loading">Creating...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function loginPage() {
+  return {
+    tab: 'login',
+    email: '',
+    password: '',
+    error: null,
+    loading: false,
+
+    async doLogin() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const data = await czFetch('/auth/login', {
+          method: 'POST',
+          body: { email: this.email, password: this.password },
+        });
+        localStorage.setItem('cz_token', data.access_token);
+        localStorage.setItem('cz_refresh', data.refresh_token);
+        window.location.href = '/dashboard';
+      } catch (e) {
+        this.error = e.message || 'Login failed';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async doRegister() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const data = await czFetch('/auth/register', {
+          method: 'POST',
+          body: { email: this.email, password: this.password },
+        });
+        localStorage.setItem('cz_token', data.access_token);
+        localStorage.setItem('cz_refresh', data.refresh_token);
+        window.location.href = '/dashboard';
+      } catch (e) {
+        this.error = e.message || 'Registration failed';
+      } finally {
+        this.loading = false;
+      }
+    },
+  };
+}
+</script>
+{% endblock %}
