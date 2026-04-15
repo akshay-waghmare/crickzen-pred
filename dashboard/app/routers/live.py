@@ -22,6 +22,69 @@ router = APIRouter(prefix="/api/matches", tags=["Live Predictions"])
 
 
 # ---------------------------------------------------------------------------
+# Blend logic
+# ---------------------------------------------------------------------------
+
+def _blend_weights(over: int, is_second_innings: bool) -> tuple[float, float]:
+    """Return (ml_weight, mc_weight) for the given match situation.
+
+    1st innings:
+        overs 1-15  → 10% ML + 90% MC
+        overs 15-20 → 50% ML + 50% MC
+
+    2nd innings:
+        overs 1-2   → 10% ML + 90% MC
+        overs 3-16  → 70% ML + 30% MC
+        overs 16-20 → 50% ML + 50% MC  (death)
+    """
+    if not is_second_innings:
+        if over <= 15:
+            return 0.10, 0.90
+        return 0.50, 0.50
+    else:
+        if over <= 2:
+            return 0.10, 0.90
+        if over <= 16:
+            return 0.70, 0.30
+        return 0.50, 0.50
+
+
+def _enrich_state(state: dict) -> dict:
+    """Inject blended_prob and blend metadata into a live state dict."""
+    if not state:
+        return state
+
+    ml_prob = float(state.get("league_calibrated_prob") or state.get("bat_win_prob") or 0.0)
+    mc = state.get("monte_carlo") or {}
+    mc_available = bool(mc.get("available"))
+    mc_prob = float((mc.get("simulation_6ball") or {}).get("mean_prob") or 0.0) if mc_available else None
+
+    over = int(state.get("over") or 0)
+    is_second = bool(state.get("is_second_innings"))
+
+    ml_w, mc_w = _blend_weights(over, is_second)
+
+    if mc_available and mc_prob is not None:
+        blended = ml_w * ml_prob + mc_w * mc_prob
+    else:
+        # MC not available — fall back to pure ML
+        blended = ml_prob
+        ml_w, mc_w = 1.0, 0.0
+
+    state["blend"] = {
+        "blended_prob": round(blended, 4),
+        "ml_prob": round(ml_prob, 4),
+        "mc_prob": round(mc_prob, 4) if mc_prob is not None else None,
+        "mc_available": mc_available,
+        "ml_weight": ml_w,
+        "mc_weight": mc_w,
+        "over": over,
+        "is_second_innings": is_second,
+    }
+    return state
+
+
+# ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
 
@@ -126,7 +189,7 @@ def get_match_state(
     if pred is None:
         raise HTTPException(status_code=404, detail="Prediction not found")
 
-    state = pred.read_state()
+    state = _enrich_state(pred.read_state())
     return MatchStateResponse(
         prediction_id=prediction_id,
         status=pred.status if pred.is_alive else ("finished" if pred.status != "error" else "error"),
@@ -163,7 +226,7 @@ async def stream_match(
     async def event_generator():
         last_timestamp = None
         while True:
-            state = pred.read_state()
+            state = _enrich_state(pred.read_state())
             if state:
                 ts = state.get("timestamp")
                 if ts != last_timestamp:
