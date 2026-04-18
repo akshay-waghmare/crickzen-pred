@@ -213,3 +213,92 @@ python scripts/validate_platt_oos.py
 - `models/ipl_holdout_pre2026/oos_platt_calibrators.pkl` — 8 phase Platt calibrators trained on 2023-2025 OOF
 - `models/t20_male_v2/league_calibrators/ipl/league_calibrator.pkl` (phase Platt, 2026-04-18)
 - `data/ipl_feature_store_v2/` (14 canonical teams, deduped)
+
+---
+
+## Monte Carlo Simulation Contribution Test (2026-04-19)
+
+### Does MC Simulation Add Value Over Market?
+
+The MC engine simulates ball-by-ball outcomes using phase-specific run distributions
+and evaluates terminal states via `resource_win_prob` (DLS-like formula). This is
+fundamentally different from the ML model (feature-based XGBLogRegEnsemble). We tested
+whether MC provides independent signal that helps when blended with market odds.
+
+**Test setup:**
+- 410 scorable observations (100 inn2 obs skipped — no target available)
+- MC: 1000 simulations, horizon=6, resource_win_prob evaluation (no ML model)
+- MC Calibrator: `InningsMCCalibrators` (Platt scaling, trained on IPL v2 data)
+- All predictions are P(team1 wins) to align with market and actuals
+
+### Overall Results
+
+| Method | Brier | LogLoss | vs Market |
+|--------|-------|---------|-----------|
+| **Market** | **0.1632** | **0.4867** | baseline |
+| MC Raw | 0.1791 | 0.5155 | +9.7% worse |
+| MC Calibrated | 0.1861 | 0.5397 | +14.1% worse |
+| ML Holdout+Platt | 0.1848 | 0.5337 | +13.3% worse |
+
+> MC Calibrator actually hurts — raw MC is closer to market. The calibrator was trained on
+> IPL v2 data (which includes 2026), suggesting miscalibration or overfitting.
+
+### Blending Results
+
+| Blend | Optimal Weights | Blend Brier | vs Market |
+|-------|----------------|-------------|-----------|
+| MC Raw + Market | 3.4% MC, 96.6% market | 0.1631 | -0.01% |
+| MC Cal + Market | 0% MC, 100% market | 0.1632 | +0.00% |
+| MC + ML + Market (triple) | 0% MC, 2.1% ML, 97.9% market | 0.1631 | -0.01% |
+
+> The optimizer converges to near-100% market weight in all blends.
+
+### Phase Breakdown: MC vs Market
+
+| Phase | N | MC Brier | Market Brier | MC Advantage | Blend α | Blend Brier |
+|-------|---|----------|-------------|-------------|---------|-------------|
+| Inn1 death | 53 | 0.2150 | 0.1686 | +27.5% | 0.00 | 0.1686 |
+| Inn1 middle | 92 | 0.2267 | 0.1982 | +14.4% | 0.00 | 0.1982 |
+| Inn1 PP | 56 | 0.2305 | 0.2097 | +9.9% | 0.00 | 0.2097 |
+| Inn2 PP | 66 | 0.1881 | 0.1448 | +29.9% | 0.00 | 0.1448 |
+| Inn2 middle | 99 | 0.1441 | 0.1270 | +13.5% | 0.10 | 0.1268 |
+| **Inn2 death** | **44** | **0.1017** | **0.1329** | **-23.5%** ✅ | **1.00** | **0.1017** |
+
+> **MC beats market ONLY in innings 2 death overs** (last 5 overs of a chase),
+> where the match outcome becomes increasingly deterministic — few balls remain,
+> and MC simulation converges to correct mathematical probabilities.
+
+### Why MC Wins in Inn2 Death
+
+In the death overs of a chase (overs 16-20), match outcomes are nearly deterministic:
+- Few balls remaining → small outcome space → simulation is very accurate
+- Market may lag or overshoot due to human reaction time and sentiment
+- MC directly computes the probability from possible run/wicket paths
+- With 30 or fewer balls, the simulation essentially becomes exact combinatorial calculation
+
+### MC Uncertainty Analysis
+
+| Segment | Obs | MC Brier | Market Brier |
+|---------|-----|----------|-------------|
+| Low MC uncertainty (std ≤ 0.036) | 205 | 0.1364 | 0.1183 |
+| High MC uncertainty (std > 0.036) | 205 | 0.2359 | 0.2080 |
+| MC-Market agree (diff ≤ 0.104) | 205 | 0.1729 | 0.1610 |
+| MC-Market disagree (diff > 0.104) | 205 | 0.1993 | 0.1653 |
+
+> When MC disagrees with market, market is MORE accurate — disagreement signals
+> MC error, not market inefficiency.
+
+### Conclusion
+
+**MC simulation does NOT add meaningful independent signal** to beat the market:
+1. MC overall Brier (0.1791) is 9.7% worse than market (0.1632)
+2. Blending MC + market yields negligible improvement (-0.01%)
+3. Triple blend (MC + ML + market) also stays at ~100% market weight
+4. MC uncertainty and disagreement metrics do NOT predict market inefficiency
+5. **Exception:** Inn2 death overs — MC is 23.5% better (but n=44, needs more data)
+
+**Reproduce:**
+```bash
+python scripts/test_mc_contribution.py
+# Output: data/ipl_mc_contribution_test.parquet
+```
