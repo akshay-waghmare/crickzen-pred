@@ -120,6 +120,11 @@ BALL_STATE_SCHEMA = pa.schema([
     ('total_overs', pa.int16()),         # Total overs per innings (default 20)
     ('revised_target', pa.int16()),      # DLS revised target (nullable)
     
+    # Ensemble blending
+    ('ensemble_prob', pa.float32()),     # Blended model+market probability (nullable)
+    ('ensemble_alpha', pa.float32()),    # Blending weight used (nullable)
+    ('ensemble_source', pa.string()),    # "ensemble" or "model_only" (nullable)
+    
     # Versioning
     ('model_version', pa.string()),
     ('feature_store_version', pa.string()),

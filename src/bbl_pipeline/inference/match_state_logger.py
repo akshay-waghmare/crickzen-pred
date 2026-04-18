@@ -327,6 +327,9 @@ class MatchStateLogger:
         features_dict: Dict[str, Any],
         predictor: Any,  # Predictor instance with calibration attributes
         market_odds: Dict[str, Any],
+        ensemble_prob: Optional[float] = None,
+        ensemble_alpha: Optional[float] = None,
+        ensemble_source: Optional[str] = None,
     ) -> None:
         """
         Record one ball state to buffer.
@@ -336,6 +339,9 @@ class MatchStateLogger:
         - features_dict: all computed features from RealTimeFeatureMapper
         - predictor: calibration chain attributes (last_raw_prob, last_calibrated_*, etc.)
         - market_odds: CREX odds dict (market_fav_team, back_odds, fav_prob, etc.)
+        - ensemble_prob: blended model+market probability (optional)
+        - ensemble_alpha: blending weight used (optional)
+        - ensemble_source: "ensemble" or "model_only" (optional)
         
         Computes:
         - model_prob_delta and market_prob_delta from previous ball
@@ -350,6 +356,9 @@ class MatchStateLogger:
             features_dict: Feature values dict
             predictor: Predictor instance
             market_odds: Market odds dict from CREX
+            ensemble_prob: Blended probability (optional)
+            ensemble_alpha: Alpha weight used (optional)
+            ensemble_source: Source label (optional)
         """
         try:
             # Deduplicate: skip if match state hasn't changed since last record
@@ -544,6 +553,11 @@ class MatchStateLogger:
                 # Team strength tier
                 'batting_team_tier': batting_team_tier,
                 'bowling_team_tier': bowling_team_tier,
+                
+                # Ensemble blending
+                'ensemble_prob': ensemble_prob,
+                'ensemble_alpha': ensemble_alpha,
+                'ensemble_source': ensemble_source,
                 
                 # Versioning
                 'model_version': self.model_version,

@@ -15,7 +15,7 @@ import structlog
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
 
 # Force UTF-8 stdout on Windows to avoid charmap encoding crashes with emoji
 if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
@@ -106,6 +106,63 @@ class MatchState:
     market_back_odds: str = ""
     market_lay_odds: str = ""
     market_fav_prob: float = 0.0  # Implied probability from back odds
+
+
+def blend_predictions(
+    model_prob: float,
+    market_prob: Optional[float],
+    market_age_seconds: Optional[float],
+    alpha: float,
+    staleness_threshold: float = 60.0,
+) -> Tuple[float, str]:
+    """Blend model and market predictions with graceful fallback.
+
+    Args:
+        model_prob: Model-predicted win probability for batting team.
+        market_prob: Market-implied win probability (None if unavailable).
+        market_age_seconds: Seconds since last market update (None if unknown).
+        alpha: Blending weight — 1.0 = pure model, 0.0 = pure market.
+        staleness_threshold: Maximum acceptable market age in seconds.
+
+    Returns:
+        (blended_probability, source) where source is "ensemble" or "model_only".
+    """
+    try:
+        import math as _math
+        # Validate model_prob
+        if model_prob is None or not isinstance(model_prob, (int, float)):
+            return (0.5, "model_only")
+        if _math.isnan(float(model_prob)):
+            return (0.5, "model_only")
+        model_prob = max(0.001, min(0.999, float(model_prob)))
+
+        # Check market data availability
+        if market_prob is None:
+            return (model_prob, "model_only")
+        if not isinstance(market_prob, (int, float)):
+            return (model_prob, "model_only")
+        market_prob = float(market_prob)
+        if _math.isnan(market_prob) or market_prob < 0 or market_prob > 1:
+            return (model_prob, "model_only")
+
+        # Check staleness
+        if market_age_seconds is None:
+            return (model_prob, "model_only")
+        if not isinstance(market_age_seconds, (int, float)):
+            return (model_prob, "model_only")
+        if float(market_age_seconds) > staleness_threshold:
+            return (model_prob, "model_only")
+
+        # Blend
+        ensemble = alpha * model_prob + (1 - alpha) * market_prob
+        ensemble = max(0.001, min(0.999, ensemble))
+        return (ensemble, "ensemble")
+    except Exception:
+        # FR-012: never raise
+        try:
+            return (max(0.001, min(0.999, float(model_prob))), "model_only")
+        except Exception:
+            return (0.5, "model_only")
 
 
 class CrexLivePredictor:
@@ -2091,6 +2148,35 @@ class CrexLivePredictor:
             bowling_prob = 1 - win_prob
             display += f" | {state.batting_team}: {win_prob*100:.1f}% [{bar}] {state.bowling_team}: {bowling_prob*100:.1f}%"
 
+            # Ensemble blending with market odds
+            market_batting_prob = None
+            if state.market_fav_prob and state.market_fav_team:
+                if self.match_state_logger:
+                    market_batting_prob, _ = self.match_state_logger._map_market_probs(
+                        state.market_fav_team, state.market_fav_prob,
+                        state.batting_team, state.bowling_team,
+                    )
+                elif state.market_fav_team.upper() == state.batting_team.upper():
+                    market_batting_prob = state.market_fav_prob
+                elif state.market_fav_team.upper() == state.bowling_team.upper():
+                    market_batting_prob = 1.0 - state.market_fav_prob
+
+            market_age = getattr(self, '_last_market_age_seconds', None)
+            ensemble_alpha = getattr(self, 'ensemble_alpha', 0.7)
+            ensemble_prob, ensemble_source = blend_predictions(
+                model_prob=win_prob,
+                market_prob=market_batting_prob,
+                market_age_seconds=market_age,
+                alpha=ensemble_alpha,
+            )
+            # Store for JSON / logger consumption
+            self._last_ensemble_prob = ensemble_prob
+            self._last_ensemble_source = ensemble_source
+            self._last_ensemble_alpha = ensemble_alpha
+
+            if ensemble_source == "ensemble":
+                display += f" | Ens: {ensemble_prob*100:.1f}%"
+
             over, ball, live_features = self._build_live_feature_snapshot()
             self._update_odm_prediction(live_features, over, ball)
             if self.last_odm_prediction.get('status') == 'ready':
@@ -2162,6 +2248,9 @@ class CrexLivePredictor:
                         features_dict=features,
                         predictor=self.predictor,
                         market_odds=market_odds,
+                        ensemble_prob=getattr(self, '_last_ensemble_prob', None),
+                        ensemble_alpha=getattr(self, '_last_ensemble_alpha', None),
+                        ensemble_source=getattr(self, '_last_ensemble_source', None),
                     )
                 except Exception as e:
                     pass  # Logging errors are already handled in logger
@@ -2269,6 +2358,10 @@ class CrexLivePredictor:
                 "market_back_odds": state.market_back_odds,
                 "market_lay_odds": state.market_lay_odds,
                 "market_fav_prob": state.market_fav_prob,
+                # Ensemble blending
+                "ensemble_prob": getattr(self, '_last_ensemble_prob', None),
+                "ensemble_source": getattr(self, '_last_ensemble_source', None),
+                "ensemble_alpha": getattr(self, '_last_ensemble_alpha', None),
                 # Monte Carlo simulation results (uses league-calibrated win_prob for betting edge)
                 "monte_carlo": self._run_monte_carlo_simulation(model_prob=win_prob, use_ml_model=self.use_ml_model),
                 # Reduced-over / DLS / ODI fields
