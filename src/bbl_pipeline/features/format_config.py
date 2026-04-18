@@ -125,6 +125,9 @@ class FormatConfig:
     pressure_rrr_min: float
     pressure_rrr_max: float
 
+    # --- Final-over lookup (optional, None = use sigmoid fallback) ----------
+    final_over_lookup: Optional[Dict[int, Dict[int, float]]] = None
+
     # ── Validation ──────────────────────────────────────────────────────────
 
     def __post_init__(self) -> None:
@@ -323,12 +326,17 @@ class FormatConfig:
 
         The IPL uses the same 20-over match structure as the default T20
         preset, but its first-innings scoring environment is materially higher.
-        These overrides are derived from the historical IPL raw match dataset
-        currently stored in ``data/ipl_raw/matches``.
+        The final-over lookup table is derived from 273,503 IPL training rows
+        via ``scripts/derive_ipl_improvements.py``.
+
+        Penalties and midpoint are kept at T20 base values because the global
+        model was trained on those features; changing them without retraining
+        causes a distribution shift that hurts predictions.
         """
         base = cls.t20()
         return replace(
             base,
+            # IPL scoring environment (from training data averages)
             par_score=173.45,
             league_avg_score=167.28,
             bat_first_win_rate=0.4581,
@@ -337,6 +345,31 @@ class FormatConfig:
                 "middle": 7.51,
                 "death": 9.02,
                 "final": 10.68,
+            },
+            # IPL final-over empirical lookup (runs_needed -> {wickets_in_hand -> p})
+            # Validated: Brier 0.0973 -> 0.0632 on final-over states (-35%)
+            final_over_lookup={
+                0:  {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 1.0},
+                1:  {0: 0.0, 1: 0.90, 2: 0.90, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 1.0},
+                2:  {0: 0.0, 1: 0.20, 2: 0.90, 3: 0.92, 4: 0.92, 5: 1.0, 6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 1.0},
+                3:  {0: 0.0, 1: 0.20, 2: 0.79, 3: 0.85, 4: 0.89, 5: 1.0, 6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 1.0},
+                4:  {0: 0.0, 1: 0.20, 2: 0.58, 3: 0.71, 4: 0.88, 5: 0.88, 6: 0.96, 7: 0.96, 8: 0.96, 9: 0.96, 10: 0.97},
+                5:  {0: 0.0, 1: 0.19, 2: 0.58, 3: 0.58, 4: 0.78, 5: 0.82, 6: 0.96, 7: 0.96, 8: 0.96, 9: 0.96, 10: 0.96},
+                6:  {0: 0.0, 1: 0.19, 2: 0.30, 3: 0.53, 4: 0.65, 5: 0.65, 6: 0.77, 7: 0.86, 8: 0.86, 9: 0.88, 10: 0.88},
+                7:  {0: 0.0, 1: 0.19, 2: 0.30, 3: 0.53, 4: 0.65, 5: 0.65, 6: 0.73, 7: 0.80, 8: 0.80, 9: 0.80, 10: 0.80},
+                8:  {0: 0.0, 1: 0.10, 2: 0.30, 3: 0.42, 4: 0.65, 5: 0.65, 6: 0.68, 7: 0.80, 8: 0.80, 9: 0.80, 10: 0.80},
+                9:  {0: 0.0, 1: 0.10, 2: 0.20, 3: 0.32, 4: 0.36, 5: 0.54, 6: 0.54, 7: 0.79, 8: 0.79, 9: 0.79, 10: 0.79},
+                10: {0: 0.0, 1: 0.10, 2: 0.20, 3: 0.32, 4: 0.36, 5: 0.54, 6: 0.54, 7: 0.72, 8: 0.72, 9: 0.72, 10: 0.72},
+                11: {0: 0.0, 1: 0.08, 2: 0.08, 3: 0.11, 4: 0.31, 5: 0.46, 6: 0.50, 7: 0.72, 8: 0.72, 9: 0.72, 10: 0.72},
+                12: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.11, 4: 0.24, 5: 0.46, 6: 0.46, 7: 0.63, 8: 0.63, 9: 0.63, 10: 0.63},
+                13: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.11, 4: 0.11, 5: 0.27, 6: 0.40, 7: 0.40, 8: 0.40, 9: 0.40, 10: 0.40},
+                14: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.09, 4: 0.10, 5: 0.27, 6: 0.40, 7: 0.40, 8: 0.40, 9: 0.40, 10: 0.40},
+                15: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.09, 4: 0.10, 5: 0.22, 6: 0.30, 7: 0.30, 8: 0.30, 9: 0.30, 10: 0.30},
+                16: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.09, 4: 0.10, 5: 0.20, 6: 0.25, 7: 0.25, 8: 0.25, 9: 0.25, 10: 0.25},
+                17: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.09, 4: 0.10, 5: 0.19, 6: 0.19, 7: 0.19, 8: 0.19, 9: 0.19, 10: 0.19},
+                18: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.05, 4: 0.07, 5: 0.19, 6: 0.19, 7: 0.19, 8: 0.19, 9: 0.19, 10: 0.19},
+                19: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.04, 5: 0.09, 6: 0.19, 7: 0.19, 8: 0.19, 9: 0.19, 10: 0.19},
+                20: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.04, 5: 0.07, 6: 0.19, 7: 0.19, 8: 0.19, 9: 0.19, 10: 0.19},
             },
         )
 

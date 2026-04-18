@@ -880,6 +880,18 @@ class ResourceFeatureCalculator:
         # -------------------------------------
         # END-GAME SPECIAL CASE: Last 2 overs
         # -------------------------------------
+        # Use empirical final-over lookup if available (balls <= 6)
+        if (
+            balls_remaining > 0
+            and balls_remaining <= 6
+            and self.config.final_over_lookup is not None
+        ):
+            runs_needed_key = min(int(runs_required), 20)
+            wickets_in_hand = max(0, 10 - actual_wickets_lost)
+            lookup = self.config.final_over_lookup
+            if runs_needed_key in lookup and wickets_in_hand in lookup[runs_needed_key]:
+                return float(max(0.02, min(0.98, lookup[runs_needed_key][wickets_in_hand])))
+
         if balls_remaining > 0 and balls_remaining <= self.config.endgame_balls and runs_required <= balls_remaining * 2:
             # Use runs per ball needed vs typical death over scoring (~1.5 rpb)
             runs_per_ball_needed = runs_required / balls_remaining
