@@ -191,6 +191,52 @@ class MatchStateLogger:
             "UGANDA": "UGA",
         }
 
+        # Franchise alias map: code → full name (bidirectional)
+        franchise_map = {
+            # IPL
+            "MI": "MUMBAI INDIANS", "CSK": "CHENNAI SUPER KINGS",
+            "RCB": "ROYAL CHALLENGERS BENGALURU", "DC": "DELHI CAPITALS",
+            "KKR": "KOLKATA KNIGHT RIDERS", "PBKS": "PUNJAB KINGS",
+            "RR": "RAJASTHAN ROYALS", "SRH": "SUNRISERS HYDERABAD",
+            "GT": "GUJARAT TITANS", "LSG": "LUCKNOW SUPER GIANTS",
+            # BBL
+            "SS": "SYDNEY SIXERS", "ST": "SYDNEY THUNDER",
+            "PS": "PERTH SCORCHERS", "MS": "MELBOURNE STARS",
+            "MR": "MELBOURNE RENEGADES", "BH": "BRISBANE HEAT",
+            "HH": "HOBART HURRICANES", "AS": "ADELAIDE STRIKERS",
+            # SA20
+            "MICT": "MI CAPE TOWN", "SEC": "SUNRISERS EASTERN CAPE",
+            "JSK": "JOBURG SUPER KINGS", "PR": "PAARL ROYALS",
+            "DSG": "DURBAN SUPER GIANTS", "PC": "PRETORIA CAPITALS",
+            # PSL
+            "IU": "ISLAMABAD UNITED", "KK": "KARACHI KINGS",
+            "LQ": "LAHORE QALANDARS", "MS2": "MULTAN SULTANS",
+            "PZ": "PESHAWAR ZALMI", "QG": "QUETTA GLADIATORS",
+            # ILT20
+            "ADKR": "ABU DHABI KNIGHT RIDERS", "DP": "DUBAI CAPITALS",
+            "GG": "GULF GIANTS", "DW": "DESERT VIPERS",
+            "SH": "SHARJAH WARRIORZ", "MICT2": "MI EMIRATES",
+            # WPL
+            "RCBW": "ROYAL CHALLENGERS BENGALURU W",
+            "DCW": "DELHI CAPITALS W", "MIW": "MUMBAI INDIANS W",
+            "GGW": "GUJARAT GIANTS W", "UPWW": "UP WARRIORZ W",
+        }
+        # Build reverse map: full name → code
+        reverse_franchise = {}
+        for code, full in franchise_map.items():
+            reverse_franchise["".join(c for c in full if c.isalnum())] = code
+
+        # Check if input matches a franchise code
+        if upper in franchise_map:
+            full_name = franchise_map[upper]
+            full_compact = "".join(c for c in full_name if c.isalnum())
+            aliases.update({upper, full_name, full_compact})
+
+        # Check if input matches a franchise full name
+        if compact in reverse_franchise:
+            code = reverse_franchise[compact]
+            aliases.update({code, franchise_map[code], compact})
+
         for country_name, code in country_code_map.items():
             if country_name in compact:
                 aliases.update({code, f"{code}W"})

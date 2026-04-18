@@ -678,6 +678,7 @@ class Predictor:
             # Store all probability types for external access
             self.last_raw_prob = raw_prob
             self.last_smoothed_prob = raw_prob
+            self.last_league_calibrated = None  # Set later if league calibrator is applied
             self.last_calibrated_prob = raw_prob
             self.last_calibrated_combined = raw_prob  # For comparison when using innings-specific
             self.last_calibrated_phase = raw_prob  # For innings×phase specific
@@ -882,6 +883,7 @@ class Predictor:
                         if debug:
                             print(f"[LEAGUE] League ({league_name}, Platt): {pre_league_prob:.1%} -> {prob:.1%}")
             
+            self.last_league_calibrated = float(prob) if self.league_calibrator else None
             return float(prob)
         except Exception as e:
             logger.error(f"Prediction failed: {e}")
