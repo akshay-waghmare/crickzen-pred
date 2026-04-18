@@ -855,14 +855,33 @@ class Predictor:
                 innings_key = f'innings_{state.innings}'
                 league_name = self.league_calibrator.get('league', 'unknown').upper()
                 
-                if calibrators and innings_key in calibrators:
-                    # New format: TemperatureScaler/PlattScaler objects in calibrators dict
+                # Determine phase for phase-specific lookup
+                phase_key = None
+                if self.league_calibrator.get('phase_specific'):
+                    over = state.over
+                    if over <= 6:
+                        phase = 'powerplay'
+                    elif over <= 15:
+                        phase = 'middle'
+                    else:
+                        phase = 'death'
+                    phase_key = f'inn{state.innings}_{phase}'
+                
+                # Priority: phase-specific > innings-specific > legacy format
+                scaler = None
+                cal_label = None
+                if calibrators and phase_key and phase_key in calibrators:
+                    scaler = calibrators[phase_key]
+                    cal_label = phase_key
+                elif calibrators and innings_key in calibrators:
                     scaler = calibrators[innings_key]
-                    if hasattr(scaler, 'predict'):
-                        import numpy as np
-                        prob = _coerce_probability_scalar(scaler.predict(np.array([[prob]])))
-                        if debug:
-                            print(f"[LEAGUE] League ({league_name}): {pre_league_prob:.1%} -> {prob:.1%}")
+                    cal_label = innings_key
+                
+                if scaler is not None and hasattr(scaler, 'predict'):
+                    import numpy as np
+                    prob = _coerce_probability_scalar(scaler.predict(np.array([[prob]])))
+                    if debug:
+                        print(f"[LEAGUE] League ({league_name}, {cal_label}): {pre_league_prob:.1%} -> {prob:.1%}")
                 elif method == 'temperature':
                     # Legacy format: T1/T2 keys
                     T = self.league_calibrator.get('T1' if state.innings == 1 else 'T2', 1.0)
@@ -1510,26 +1529,38 @@ class Predictor:
         if self.league_calibrator:
             method = self.league_calibrator.get('method', 'temperature')
             calibrators = self.league_calibrator.get('calibrators', {})
+            is_phase_specific = self.league_calibrator.get('phase_specific', False)
             
-            for inn in [1, 2]:
-                mask = innings_arr == inn
-                if not np.any(mask):
-                    continue
+            # Phase-specific Platt: apply per innings×phase segment
+            if is_phase_specific and calibrators:
+                for inn in [1, 2]:
+                    for phase, over_range in [('powerplay', (1, 6)), ('middle', (7, 15)), ('death', (16, 20))]:
+                        phase_key = f'inn{inn}_{phase}'
+                        innings_key = f'innings_{inn}'
+                        mask = (innings_arr == inn) & (current_over_1based >= over_range[0]) & (current_over_1based <= over_range[1])
+                        if not np.any(mask):
+                            continue
+                        scaler = calibrators.get(phase_key) or calibrators.get(innings_key)
+                        if scaler is not None and hasattr(scaler, 'predict'):
+                            calibrated[mask] = scaler.predict(calibrated[mask].reshape(-1, 1)).flatten()
+            else:
+                for inn in [1, 2]:
+                    mask = innings_arr == inn
+                    if not np.any(mask):
+                        continue
                     
-                innings_key = f'innings_{inn}'
-                
-                if calibrators and innings_key in calibrators:
-                    scaler = calibrators[innings_key]
-                    if hasattr(scaler, 'predict'):
-                        calibrated[mask] = scaler.predict(calibrated[mask].reshape(-1, 1)).flatten()
-                elif method == 'temperature':
-                    T = self.league_calibrator.get(f'T{inn}', 1.0)
-                    if T and T != 1.0:
-                        # Vectorized temperature scaling
-                        p = calibrated[mask]
-                        # Avoid log(0) and log(inf)
-                        p = np.clip(p, 0.001, 0.999)
-                        logit = np.log(p / (1 - p))
-                        calibrated[mask] = 1.0 / (1.0 + np.exp(-logit / T))
+                    innings_key = f'innings_{inn}'
+                    
+                    if calibrators and innings_key in calibrators:
+                        scaler = calibrators[innings_key]
+                        if hasattr(scaler, 'predict'):
+                            calibrated[mask] = scaler.predict(calibrated[mask].reshape(-1, 1)).flatten()
+                    elif method == 'temperature':
+                        T = self.league_calibrator.get(f'T{inn}', 1.0)
+                        if T and T != 1.0:
+                            p = calibrated[mask]
+                            p = np.clip(p, 0.001, 0.999)
+                            logit = np.log(p / (1 - p))
+                            calibrated[mask] = 1.0 / (1.0 + np.exp(-logit / T))
         
         return calibrated
