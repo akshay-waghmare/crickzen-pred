@@ -326,12 +326,8 @@ class FormatConfig:
 
         The IPL uses the same 20-over match structure as the default T20
         preset, but its first-innings scoring environment is materially higher.
-        The final-over lookup table is derived from 273,503 IPL training rows
-        via ``scripts/derive_ipl_improvements.py``.
-
-        Penalties and midpoint are kept at T20 base values because the global
-        model was trained on those features; changing them without retraining
-        causes a distribution shift that hurts predictions.
+        Wicket penalties, final-over lookup, and scoring midpoint are derived
+        from 273,503 IPL training rows via ``scripts/derive_ipl_improvements.py``.
         """
         base = cls.t20()
         return replace(
@@ -345,6 +341,48 @@ class FormatConfig:
                 "middle": 7.51,
                 "death": 9.02,
                 "final": 10.68,
+            },
+            # IPL-specific first-innings scoring midpoint (from EDA: par_score ~173.45)
+            first_innings_score_midpoint=173.0,
+            first_innings_score_beta=0.04,
+            # IPL-specific first-innings penalties (derived from 141K 1st-innings rows)
+            first_innings_wicket_penalty_3d={
+                "powerplay": {
+                    "well_ahead":  {0: 1.00, 1: 0.51, 2: 0.51, 3: 0.51, 4: 0.48, 5: 0.00, 6: 0.00, 7: 0.00, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "ahead":       {0: 1.00, 1: 0.42, 2: 0.42, 3: 0.33, 4: 0.33, 5: 0.00, 6: 0.00, 7: 0.00, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "par":         {0: 1.00, 1: 0.43, 2: 0.36, 3: 0.32, 4: 0.00, 5: 0.00, 6: 0.00, 7: 0.00, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "behind":      {0: 1.00, 1: 0.39, 2: 0.35, 3: 0.21, 4: 0.12, 5: 0.00, 6: 0.00, 7: 0.00, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "well_behind": {0: 1.00, 1: 0.39, 2: 0.34, 3: 0.21, 4: 0.12, 5: 0.12, 6: 0.00, 7: 0.00, 8: 0.00, 9: 0.00, 10: 0.00},
+                },
+                "middle": {
+                    "well_ahead":  {0: 1.00, 1: 0.64, 2: 0.64, 3: 0.60, 4: 0.60, 5: 0.41, 6: 0.32, 7: 0.00, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "ahead":       {0: 1.00, 1: 0.56, 2: 0.51, 3: 0.51, 4: 0.44, 5: 0.41, 6: 0.29, 7: 0.18, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "par":         {0: 1.00, 1: 0.50, 2: 0.43, 3: 0.42, 4: 0.32, 5: 0.32, 6: 0.32, 7: 0.18, 8: 0.18, 9: 0.00, 10: 0.00},
+                    "behind":      {0: 1.00, 1: 0.50, 2: 0.44, 3: 0.37, 4: 0.23, 5: 0.23, 6: 0.13, 7: 0.00, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "well_behind": {0: 1.00, 1: 0.44, 2: 0.32, 3: 0.32, 4: 0.15, 5: 0.15, 6: 0.05, 7: 0.00, 8: 0.00, 9: 0.00, 10: 0.00},
+                },
+                "death": {
+                    "well_ahead":  {0: 1.00, 1: 0.81, 2: 0.81, 3: 0.81, 4: 0.78, 5: 0.78, 6: 0.78, 7: 0.78, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "ahead":       {0: 1.00, 1: 0.76, 2: 0.76, 3: 0.76, 4: 0.72, 5: 0.72, 6: 0.59, 7: 0.59, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "par":         {0: 1.00, 1: 0.61, 2: 0.49, 3: 0.49, 4: 0.49, 5: 0.49, 6: 0.49, 7: 0.49, 8: 0.05, 9: 0.00, 10: 0.00},
+                    "behind":      {0: 1.00, 1: 0.53, 2: 0.53, 3: 0.50, 4: 0.45, 5: 0.44, 6: 0.35, 7: 0.14, 8: 0.05, 9: 0.04, 10: 0.00},
+                    "well_behind": {0: 1.00, 1: 0.32, 2: 0.32, 3: 0.32, 4: 0.32, 5: 0.29, 6: 0.24, 7: 0.14, 8: 0.04, 9: 0.04, 10: 0.00},
+                },
+                "final": {
+                    "well_ahead":  {0: 1.00, 1: 1.00, 2: 0.92, 3: 0.92, 4: 0.90, 5: 0.90, 6: 0.65, 7: 0.65, 8: 0.00, 9: 0.00, 10: 0.00},
+                    "ahead":       {0: 1.00, 1: 1.00, 2: 0.92, 3: 0.92, 4: 0.92, 5: 0.92, 6: 0.65, 7: 0.65, 8: 0.65, 9: 0.65, 10: 0.00},
+                    "par":         {0: 1.00, 1: 0.72, 2: 0.72, 3: 0.72, 4: 0.72, 5: 0.72, 6: 0.72, 7: 0.70, 8: 0.67, 9: 0.46, 10: 0.00},
+                    "behind":      {0: 1.00, 1: 0.97, 2: 0.55, 3: 0.55, 4: 0.55, 5: 0.55, 6: 0.55, 7: 0.55, 8: 0.55, 9: 0.46, 10: 0.00},
+                    "well_behind": {0: 1.00, 1: 0.40, 2: 0.40, 3: 0.40, 4: 0.40, 5: 0.39, 6: 0.38, 7: 0.31, 8: 0.21, 9: 0.20, 10: 0.00},
+                },
+            },
+            # IPL-specific chase penalties (derived from 132K 2nd-innings rows)
+            chase_wicket_penalty_2d={
+                "very_easy":   {0: 1.00, 1: 1.00, 2: 0.99, 3: 0.99, 4: 0.97, 5: 0.84, 6: 0.72, 7: 0.53, 8: 0.23, 9: 0.23, 10: 0.00},
+                "easy":        {0: 1.00, 1: 0.96, 2: 0.96, 3: 0.96, 4: 0.96, 5: 0.96, 6: 0.95, 7: 0.79, 8: 0.42, 9: 0.42, 10: 0.00},
+                "comfortable": {0: 1.00, 1: 0.78, 2: 0.77, 3: 0.77, 4: 0.77, 5: 0.77, 6: 0.77, 7: 0.74, 8: 0.45, 9: 0.45, 10: 0.00},
+                "tough":       {0: 1.00, 1: 0.59, 2: 0.50, 3: 0.50, 4: 0.49, 5: 0.45, 6: 0.41, 7: 0.22, 8: 0.22, 9: 0.00, 10: 0.00},
+                "desperate":   {0: 1.00, 1: 0.38, 2: 0.26, 3: 0.24, 4: 0.20, 5: 0.15, 6: 0.09, 7: 0.04, 8: 0.02, 9: 0.00, 10: 0.00},
             },
             # IPL final-over empirical lookup (runs_needed -> {wickets_in_hand -> p})
             # Validated: Brier 0.0973 -> 0.0632 on final-over states (-35%)

@@ -385,6 +385,19 @@ class ResourceFeatureCalculator:
         },
     }
     
+    def _get_venue_adjusted_midpoint(self, venue_avg_score: float = None) -> float:
+        """Return venue-adjusted first-innings score midpoint.
+
+        Formula: ``league_midpoint + 0.7 * (venue_avg - league_avg)``
+
+        If *venue_avg_score* is ``None`` (unknown venue), the unadjusted
+        league midpoint is returned.
+        """
+        midpoint = self.config.first_innings_score_midpoint
+        if venue_avg_score is not None:
+            midpoint = midpoint + 0.7 * (venue_avg_score - self.config.league_avg_score)
+        return midpoint
+
     def get_first_innings_phase(self, overs_bowled: float) -> str:
         """Get the phase name for first innings based on overs bowled."""
         phase_names = self.config.phase_names
@@ -738,7 +751,8 @@ class ResourceFeatureCalculator:
         required_run_rate: float,
         current_score: float = 0,
         balls_remaining: int = None,
-        wickets_lost: int = None
+        wickets_lost: int = None,
+        venue_avg_score: float = None
     ) -> float:
         """
         Returns a data-calibrated win probability estimate.
@@ -763,6 +777,8 @@ class ResourceFeatureCalculator:
             current_score: Current score
             balls_remaining: Actual balls remaining in innings (for endgame logic)
             wickets_lost: Number of wickets fallen (0-9)
+            venue_avg_score: Average first-innings score at this venue (optional).
+                If provided, the SQI contextual par is venue-adjusted.
             
         Returns:
             Win probability estimate (0.001 to 0.999)
@@ -816,12 +832,9 @@ class ResourceFeatureCalculator:
             # SQI = (adjusted_score - contextual_par) / phase_std_dev
             # A z-score telling us how far above/below par we are
             
-            # Improvement: Contextual par blends venue avg with league avg
-            # If venue_avg_score is available (passed via expected_final_score context),
-            # use 60% venue + 40% league. Otherwise, fallback to league avg.
-            # For now, we use league avg as venue data isn't passed to this method
-            # TODO: Pass venue_avg_score when available for cross-venue calibration
-            contextual_par = self.LEAGUE_AVG_SCORE
+            # Improvement: Contextual par uses venue-adjusted midpoint when
+            # venue data is available; otherwise falls back to league avg.
+            contextual_par = self._get_venue_adjusted_midpoint(venue_avg_score)
             
             # Phase-dependent standard deviation (EDA: variance INCREASES with overs)
             # Powerplay: std=15 (projections are assumptions)
