@@ -858,10 +858,10 @@ class Predictor:
                 # Determine phase for phase-specific lookup
                 phase_key = None
                 if self.league_calibrator.get('phase_specific'):
-                    over = state.over
-                    if over <= 6:
+                    over_1based = state.over + 1
+                    if over_1based <= 6:
                         phase = 'powerplay'
-                    elif over <= 15:
+                    elif over_1based <= 15:
                         phase = 'middle'
                     else:
                         phase = 'death'

@@ -186,6 +186,11 @@ class LeagueCalibrator:
         """
         Apply league calibration to raw predictions.
         
+        Routing priority (when phase_specific=True):
+            1. Phase-specific calibrator (e.g. inn1_powerplay)
+            2. Innings-level calibrator (e.g. innings_1)
+            3. Identity fallback (return raw probability)
+        
         Args:
             df: DataFrame with 'innings' (and optionally 'phase') columns
             raw_probs: Raw predictions from global model
@@ -196,20 +201,42 @@ class LeagueCalibrator:
         if not self.fitted:
             raise RuntimeError("Calibrator not fitted. Call fit() first.")
             
-        calibrated = np.zeros_like(raw_probs)
+        calibrated = raw_probs.copy()
         
-        if self.innings_specific:
+        if self.innings_specific and self.phase_specific and 'phase' in df.columns:
+            # Phase-specific routing (batched by unique innings×phase)
+            for innings in [1, 2]:
+                for phase in df['phase'].dropna().unique():
+                    mask = (df['innings'] == innings) & (df['phase'] == phase)
+                    if not mask.any():
+                        continue
+                    
+                    phase_key = f"inn{innings}_{phase}"
+                    innings_key = f"innings_{innings}"
+                    
+                    if phase_key in self.calibrators:
+                        calibrated[mask] = self.calibrators[phase_key].predict(raw_probs[mask])
+                    elif innings_key in self.calibrators:
+                        calibrated[mask] = self.calibrators[innings_key].predict(raw_probs[mask])
+                    # else: identity fallback (raw_probs already copied)
+                
+                # Handle rows with this innings but missing phase
+                no_phase_mask = (df['innings'] == innings) & (df['phase'].isna())
+                if no_phase_mask.any():
+                    innings_key = f"innings_{innings}"
+                    if innings_key in self.calibrators:
+                        calibrated[no_phase_mask] = self.calibrators[innings_key].predict(
+                            raw_probs[no_phase_mask]
+                        )
+        elif self.innings_specific:
             for innings in [1, 2]:
                 mask = df['innings'] == innings
-                if mask.sum() == 0:
+                if not mask.any():
                     continue
                     
                 cal_key = f'innings_{innings}'
                 if cal_key in self.calibrators:
                     calibrated[mask] = self.calibrators[cal_key].predict(raw_probs[mask])
-                else:
-                    # Fallback to raw
-                    calibrated[mask] = raw_probs[mask]
         else:
             calibrated = self.calibrators['global'].predict(raw_probs)
             
