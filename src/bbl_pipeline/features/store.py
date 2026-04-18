@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import structlog
 import difflib
+import yaml
 
 logger = structlog.get_logger()
 
@@ -364,6 +365,11 @@ class InMemoryFeatureStore:
                     
                 self._team_stats = df_team.to_dict(orient='index')
                 self._team_names_lower = {k.lower(): k for k in self._team_stats.keys()}
+                
+                # Load entity_registry.yaml aliases so old team names
+                # (e.g. "Royal Challengers Bengaluru", "Delhi Daredevils")
+                # resolve to canonical entries in the feature store.
+                self._load_entity_registry_aliases()
             except Exception as e:
                 logger.error(f"Error loading team stats: {e}")
         
@@ -583,8 +589,8 @@ class InMemoryFeatureStore:
         'DC':   'Delhi Capitals',
         'MI':   'Mumbai Indians',
         'CSK':  'Chennai Super Kings',
-        'RCB':  'Royal Challengers Bengaluru',
-        'RCBB': 'Royal Challengers Bengaluru',   # alternate seen on some platforms
+        'RCB':  'Royal Challengers Bangalore',
+        'RCBB': 'Royal Challengers Bangalore',
         'PBKS': 'Punjab Kings',
         'PK':   'Punjab Kings',
         'RR':   'Rajasthan Royals',
@@ -612,6 +618,33 @@ class InMemoryFeatureStore:
         'HYK': 'Hyderabad Kingsmen',
         'HK': 'Hyderabad Kingsmen',
     }
+
+    def _load_entity_registry_aliases(self) -> None:
+        """Load team aliases from config/entity_registry.yaml.
+        
+        For each team entry, the first alias is canonical. All other aliases
+        are mapped to the canonical name via _team_names_lower (case-insensitive)
+        and TEAM_ALIASES (exact match chain for _resolve_team_alias).
+        """
+        registry_path = Path(__file__).resolve().parents[3] / "config" / "entity_registry.yaml"
+        if not registry_path.exists():
+            return
+        try:
+            with open(registry_path) as f:
+                registry = yaml.safe_load(f) or {}
+            teams_section = registry.get("teams", {})
+            for _key, aliases in teams_section.items():
+                if not aliases or len(aliases) < 2:
+                    continue
+                canonical = aliases[0]
+                if canonical not in self._team_stats:
+                    continue
+                for alias in aliases[1:]:
+                    if alias != canonical and alias not in self._team_stats:
+                        self._team_names_lower[alias.lower()] = canonical
+                        self.TEAM_ALIASES[alias] = canonical
+        except Exception as e:
+            logger.warning(f"Could not load entity_registry.yaml aliases: {e}")
 
     def _resolve_team_abbrev(self, team_name: str) -> str:
         code = team_name.upper()
@@ -745,7 +778,7 @@ class InMemoryFeatureStore:
         'Chennai Super Kings':          {'win_rate': 0.59, 'matches': 100, 'avg_score': 172, 'bat_first_wr': 0.58, 'bowl_first_wr': 0.60},
         'Mumbai Indians':               {'win_rate': 0.57, 'matches': 100, 'avg_score': 171, 'bat_first_wr': 0.55, 'bowl_first_wr': 0.59},
         'Kolkata Knight Riders':        {'win_rate': 0.54, 'matches': 100, 'avg_score': 166, 'bat_first_wr': 0.53, 'bowl_first_wr': 0.55},
-        'Royal Challengers Bengaluru':  {'win_rate': 0.47, 'matches': 100, 'avg_score': 168, 'bat_first_wr': 0.46, 'bowl_first_wr': 0.48},
+        'Royal Challengers Bangalore':  {'win_rate': 0.47, 'matches': 100, 'avg_score': 168, 'bat_first_wr': 0.46, 'bowl_first_wr': 0.48},
         'Sunrisers Hyderabad':          {'win_rate': 0.53, 'matches': 100, 'avg_score': 162, 'bat_first_wr': 0.52, 'bowl_first_wr': 0.54},
         'Delhi Capitals':               {'win_rate': 0.50, 'matches': 100, 'avg_score': 164, 'bat_first_wr': 0.49, 'bowl_first_wr': 0.51},
         'Punjab Kings':                 {'win_rate': 0.47, 'matches': 100, 'avg_score': 165, 'bat_first_wr': 0.46, 'bowl_first_wr': 0.48},
