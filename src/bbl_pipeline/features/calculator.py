@@ -893,7 +893,14 @@ class ResourceFeatureCalculator:
                 return float(max(0.02, min(0.98, lookup[runs_needed_key][wickets_in_hand])))
 
         if balls_remaining > 0 and balls_remaining <= self.config.endgame_balls and runs_required <= balls_remaining * 2:
-            # Use runs per ball needed vs typical death over scoring (~1.5 rpb)
+            # Final over (<=6 balls): use empirical lookup table
+            if balls_remaining <= 6:
+                from .win_prob_lookup_tables import get_final_over_win_prob
+                wickets_in_hand = 10 - actual_wickets_lost
+                lookup_prob = get_final_over_win_prob(int(runs_required), wickets_in_hand)
+                return float(max(0.05, min(0.95, lookup_prob)))
+
+            # Existing sigmoid for overs 18-19 (balls > 6)
             runs_per_ball_needed = runs_required / balls_remaining
             # Logistic centered at 1.5 rpb
             endgame_prob = 1.0 / (1.0 + np.exp(4 * (runs_per_ball_needed - 1.5)))

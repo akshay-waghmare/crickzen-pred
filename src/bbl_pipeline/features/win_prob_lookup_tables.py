@@ -21,6 +21,129 @@ from pathlib import Path
 import json
 
 
+# ---------------------------------------------------------------------------
+# Final-over empirical win-probability lookup (IPL-derived)
+# Dimensions: runs_needed (0-25) × wickets_in_hand (0-10)
+# Source: data/ipl_final_over_lookup.json
+# ---------------------------------------------------------------------------
+FINAL_OVER_WIN_PROB: Dict[int, Dict[int, float]] = {
+    0:  {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 1.0},
+    1:  {0: 0.0, 1: 0.2935, 2: 0.6038, 3: 0.927, 4: 0.9447, 5: 0.9589, 6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 1.0},
+    2:  {0: 0.0, 1: 0.2786, 2: 0.5778, 3: 0.927, 4: 0.927, 5: 0.937, 6: 0.9529, 7: 0.9655, 8: 0.9752, 9: 0.9825, 10: 0.9879},
+    3:  {0: 0.0, 1: 0.2596, 2: 0.5432, 3: 0.8484, 4: 0.8785, 5: 0.9047, 6: 0.9268, 7: 0.9449, 8: 0.9594, 9: 0.9706, 10: 0.9792},
+    4:  {0: 0.0, 1: 0.2362, 2: 0.4992, 3: 0.7878, 4: 0.8246, 5: 0.8581, 6: 0.8878, 7: 0.9131, 8: 0.9341, 9: 0.9511, 10: 0.9644},
+    5:  {0: 0.0, 1: 0.2089, 2: 0.4458, 3: 0.7114, 4: 0.7536, 5: 0.7941, 6: 0.8317, 7: 0.8655, 8: 0.8949, 9: 0.9197, 10: 0.9399},
+    6:  {0: 0.0, 1: 0.179, 2: 0.3849, 3: 0.6206, 4: 0.6655, 5: 0.7109, 6: 0.7555, 7: 0.7977, 8: 0.8364, 9: 0.8708, 10: 0.9002},
+    7:  {0: 0.0, 1: 0.1482, 2: 0.3203, 3: 0.5205, 4: 0.5641, 5: 0.6106, 6: 0.6588, 7: 0.7072, 8: 0.7544, 9: 0.7987, 10: 0.8389},
+    8:  {0: 0.0, 1: 0.1187, 2: 0.2567, 3: 0.4187, 4: 0.4571, 5: 0.5, 6: 0.5469, 7: 0.5968, 8: 0.6484, 9: 0.7001, 10: 0.7503},
+    9:  {0: 0.0, 1: 0.0922, 2: 0.1985, 3: 0.3234, 4: 0.3539, 5: 0.5, 6: 0.5, 7: 0.5, 8: 0.5255, 9: 0.5788, 10: 0.6341},
+    10: {0: 0.0, 1: 0.0696, 2: 0.1487, 3: 0.2409, 4: 0.2627, 5: 0.2891, 6: 0.3204, 7: 0.3571, 8: 0.3994, 9: 0.4472, 10: 0.5},
+    11: {0: 0.0, 1: 0.0514, 2: 0.1085, 3: 0.1085, 4: 0.1882, 5: 0.2059, 6: 0.2276, 7: 0.2539, 8: 0.2854, 9: 0.3226, 10: 0.3659},
+    12: {0: 0.0, 1: 0.0373, 2: 0.0775, 3: 0.0775, 4: 0.131, 5: 0.1419, 6: 0.1555, 7: 0.1725, 8: 0.1934, 9: 0.2189, 10: 0.2497},
+    13: {0: 0.0, 1: 0.0267, 2: 0.0545, 3: 0.0545, 4: 0.0545, 5: 0.0953, 6: 0.1032, 7: 0.1132, 8: 0.1259, 9: 0.1416, 10: 0.1611},
+    14: {0: 0.0, 1: 0.0189, 2: 0.0379, 3: 0.0379, 4: 0.0379, 5: 0.063, 6: 0.0671, 7: 0.0726, 8: 0.0796, 9: 0.0885, 10: 0.0998},
+    15: {0: 0.0, 1: 0.0133, 2: 0.0262, 3: 0.0262, 4: 0.0262, 5: 0.0411, 6: 0.043, 7: 0.0457, 8: 0.0494, 9: 0.0541, 10: 0.0601},
+    16: {0: 0.0, 1: 0.0093, 2: 0.0179, 3: 0.0179, 4: 0.0179, 5: 0.0266, 6: 0.0273, 7: 0.0285, 8: 0.0302, 9: 0.0325, 10: 0.0356},
+    17: {0: 0.0, 1: 0.0065, 2: 0.0123, 3: 0.0123, 4: 0.0123, 5: 0.0171, 6: 0.0173, 7: 0.0177, 8: 0.0184, 9: 0.0194, 10: 0.0208},
+    18: {0: 0.0, 1: 0.0045, 2: 0.0083, 3: 0.0083, 4: 0.0083, 5: 0.011, 6: 0.011, 7: 0.011, 8: 0.0111, 9: 0.0115, 10: 0.0121},
+    19: {0: 0.0, 1: 0.0031, 2: 0.0057, 3: 0.0057, 4: 0.0057, 5: 0.007, 6: 0.007, 7: 0.007, 8: 0.007, 9: 0.007, 10: 0.007},
+    20: {0: 0.0, 1: 0.0022, 2: 0.0039, 3: 0.0039, 4: 0.0039, 5: 0.0045, 6: 0.0045, 7: 0.0045, 8: 0.0045, 9: 0.0045, 10: 0.0045},
+    21: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0026, 4: 0.0026, 5: 0.0029, 6: 0.0029, 7: 0.0029, 8: 0.0029, 9: 0.0029, 10: 0.0029},
+    22: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0018, 4: 0.0018, 5: 0.0018, 6: 0.0018, 7: 0.0018, 8: 0.0018, 9: 0.0018, 10: 0.0018},
+    23: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0012, 4: 0.0012, 5: 0.0012, 6: 0.0012, 7: 0.0012, 8: 0.0012, 9: 0.0012, 10: 0.0012},
+    24: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0008, 4: 0.0008, 5: 0.0008, 6: 0.0008, 7: 0.0008, 8: 0.0008, 9: 0.0008, 10: 0.0008},
+    25: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0006, 4: 0.0006, 5: 0.0006, 6: 0.0006, 7: 0.0006, 8: 0.0006, 9: 0.0006, 10: 0.0006},
+}
+
+
+def get_final_over_win_prob(
+    runs_needed: int,
+    wickets_in_hand: int,
+    lookup_table: Dict[int, Dict[int, float]] = None,
+) -> float:
+    """Return chasing-team win probability for the final over from an empirical lookup.
+
+    Contract:
+        1. runs_needed <= 0  → 1.0 (already won)
+        2. wickets_in_hand <= 0 → 0.0 (all out)
+        3. Direct table hit → return value
+        4. runs_needed > max key → 0.01 (near-impossible)
+        5. Missing cell → interpolate from nearest keys, preserving monotonicity
+        6. Result clamped to [0.0, 1.0]
+    """
+    if runs_needed <= 0:
+        return 1.0
+    if wickets_in_hand <= 0:
+        return 0.0
+
+    table = lookup_table if lookup_table is not None else FINAL_OVER_WIN_PROB
+
+    # Direct hit
+    if runs_needed in table and wickets_in_hand in table[runs_needed]:
+        return float(max(0.0, min(1.0, table[runs_needed][wickets_in_hand])))
+
+    # Beyond maximum runs row → near-impossible
+    max_runs_key = max(table.keys())
+    if runs_needed > max_runs_key:
+        return 0.01
+
+    # Interpolate from nearest cells
+    all_runs = sorted(table.keys())
+    all_wkts = sorted({w for row in table.values() for w in row.keys()})
+
+    # Find bracketing runs keys
+    lower_r = max((r for r in all_runs if r <= runs_needed), default=all_runs[0])
+    upper_r = min((r for r in all_runs if r >= runs_needed), default=all_runs[-1])
+
+    # Find bracketing wicket keys
+    lower_w = max((w for w in all_wkts if w <= wickets_in_hand), default=all_wkts[0])
+    upper_w = min((w for w in all_wkts if w >= wickets_in_hand), default=all_wkts[-1])
+
+    def _safe_get(r: int, w: int) -> Optional[float]:
+        return table.get(r, {}).get(w)
+
+    # Gather corner values for bilinear interpolation
+    v_ll = _safe_get(lower_r, lower_w)
+    v_lu = _safe_get(lower_r, upper_w)
+    v_ul = _safe_get(upper_r, lower_w)
+    v_uu = _safe_get(upper_r, upper_w)
+
+    corners = [v for v in (v_ll, v_lu, v_ul, v_uu) if v is not None]
+    if not corners:
+        return 0.01
+
+    # If the bracket collapses on one axis, do linear interpolation on the other
+    if lower_r == upper_r and lower_w == upper_w:
+        result = corners[0]
+    elif lower_r == upper_r:
+        # Interpolate along wickets only
+        if v_ll is not None and v_lu is not None and upper_w != lower_w:
+            t = (wickets_in_hand - lower_w) / (upper_w - lower_w)
+            result = v_ll + t * (v_lu - v_ll)
+        else:
+            result = sum(corners) / len(corners)
+    elif lower_w == upper_w:
+        # Interpolate along runs only
+        if v_ll is not None and v_ul is not None and upper_r != lower_r:
+            t = (runs_needed - lower_r) / (upper_r - lower_r)
+            result = v_ll + t * (v_ul - v_ll)
+        else:
+            result = sum(corners) / len(corners)
+    else:
+        # Bilinear interpolation
+        t_r = (runs_needed - lower_r) / (upper_r - lower_r)
+        t_w = (wickets_in_hand - lower_w) / (upper_w - lower_w)
+        nones = [v_ll, v_lu, v_ul, v_uu]
+        if all(v is not None for v in nones):
+            top = v_ll * (1 - t_w) + v_lu * t_w
+            bot = v_ul * (1 - t_w) + v_uu * t_w
+            result = top * (1 - t_r) + bot * t_r
+        else:
+            result = sum(corners) / len(corners)
+
+    return float(max(0.0, min(1.0, result)))
+
+
 class WinProbabilityLookupTables:
     """
     Pre-computed win probability lookup tables for T20 cricket.
