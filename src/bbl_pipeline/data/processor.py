@@ -17,6 +17,31 @@ ODM_BASE_COLUMNS = [
     'runs_batter', 'runs_extras', 'runs_total', 'wicket_type', 'player_out_id',
 ]
 
+# Historical team name → canonical name mapping for franchise renames.
+# Applied during feature processing so all seasons use the current name.
+TEAM_CANONICAL_NAMES = {
+    # IPL renames
+    'Royal Challengers Bangalore': 'Royal Challengers Bengaluru',
+    'Delhi Daredevils': 'Delhi Capitals',
+    'Kings XI Punjab': 'Punjab Kings',
+    'Rising Pune Supergiant': 'Rising Pune Supergiants',
+    'Deccan Chargers': 'Sunrisers Hyderabad',
+    # BBL renames
+    'Brisbane Heat': 'Brisbane Heat',
+    # Add more as needed
+}
+
+
+def _apply_team_canonical_names(df: pd.DataFrame) -> pd.DataFrame:
+    """Replace historical team names with canonical names in team/winner columns."""
+    if not TEAM_CANONICAL_NAMES:
+        return df
+    for col in ['batting_team', 'bowling_team', 'winner']:
+        if col in df.columns:
+            df[col] = df[col].replace(TEAM_CANONICAL_NAMES)
+    return df
+
+
 def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
                      format_config: Optional[FormatConfig] = None):
     """
@@ -58,6 +83,9 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     # Ensure bowling_team column exists (it might be named bowling_team_id in raw data)
     if 'bowling_team' not in df.columns and 'bowling_team_id' in df.columns:
         df['bowling_team'] = df['bowling_team_id']
+    
+    # Canonicalize historical team names (e.g. Delhi Daredevils → Delhi Capitals)
+    df = _apply_team_canonical_names(df)
     
     # Remove duplicate rows - raw data often has each ball duplicated
     dup_cols = ['match_id', 'innings', 'over', 'ball']
@@ -1217,6 +1245,7 @@ def export_odm_base_data(input_dir: Path, output_file: Path, league: Optional[st
     logger.info("Starting ODM base export", input_dir=str(input_dir), output_file=str(output_file))
 
     df = pd.read_parquet(input_dir)
+    df = _apply_team_canonical_names(df)
 
     if 'league' not in df.columns or df['league'].isna().all():
         if not league:
