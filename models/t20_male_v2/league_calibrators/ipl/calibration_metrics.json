@@ -3,53 +3,53 @@
   "method": "platt",
   "phase_specific": true,
   "trained_on": "calibrated_probs",
-  "fitted_at": "2026-04-18T19:57:55.427267",
+  "fitted_at": "2026-04-18T20:50:07.023203",
   "overall": {
-    "brier_before_league_cal": 0.18301557797306311,
-    "brier_after_league_cal": 0.18128637615617174,
-    "improvement_pct": 0.9448385957319339,
-    "samples": 273503
+    "brier_before_league_cal": 0.1846668256953587,
+    "brier_after_league_cal": 0.1816983543663977,
+    "improvement_pct": 1.607474064593517,
+    "samples": 278954
   },
   "segments": {
     "innings_1": {
-      "brier_before": 0.22153964076094657,
-      "brier_after": 0.218826867160309,
-      "samples": 141496
+      "brier_before": 0.2210074129941552,
+      "brier_after": 0.2204221036433122,
+      "samples": 144340
     },
     "innings_2": {
-      "brier_before": 0.14172230725079568,
-      "brier_after": 0.14123302969971843,
-      "samples": 132007
+      "brier_before": 0.14570059357456674,
+      "brier_after": 0.14220769515705833,
+      "samples": 134614
     },
     "inn1_powerplay": {
-      "brier_before": 0.24199078868126472,
-      "brier_after": 0.23708477942518338,
-      "samples": 42653
+      "brier_before": 0.238576335318083,
+      "brier_after": 0.2363831824200672,
+      "samples": 43521
     },
     "inn1_middle": {
-      "brier_before": 0.21722327602496094,
-      "brier_after": 0.21472001101465762,
-      "samples": 63482
+      "brier_before": 0.21883228595067697,
+      "brier_after": 0.21551141691264167,
+      "samples": 64750
     },
     "inn1_death": {
-      "brier_before": 0.20462011512322445,
-      "brier_after": 0.20362278568455802,
-      "samples": 35361
+      "brier_before": 0.20371340449947986,
+      "brier_after": 0.20340273928204597,
+      "samples": 36069
     },
     "inn2_powerplay": {
-      "brier_before": 0.17994956769754494,
-      "brier_after": 0.17948871411304118,
-      "samples": 42656
+      "brier_before": 0.18450484226792585,
+      "brier_after": 0.18136993962994646,
+      "samples": 43516
     },
     "inn2_middle": {
-      "brier_before": 0.13996266767032586,
-      "brier_after": 0.13926293017014174,
-      "samples": 62042
+      "brier_before": 0.14467734674661326,
+      "brier_after": 0.13911800300481245,
+      "samples": 63298
     },
     "inn2_death": {
-      "brier_before": 0.08600988780061354,
-      "brier_after": 0.08577422367619195,
-      "samples": 27309
+      "brier_before": 0.08728921917081094,
+      "brier_after": 0.08663909951177433,
+      "samples": 27800
     }
   }
 }

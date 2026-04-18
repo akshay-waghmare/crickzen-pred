@@ -21,6 +21,25 @@ teams:
     - "Sunrisers Eastern Cape"
     - "SEC"
 
+  # IPL Teams — Canonical franchise mappings (R-003)
+  RCB:
+    - "Royal Challengers Bangalore"
+    - "Royal Challengers Bengaluru"
+    - "RCB"
+  DC:
+    - "Delhi Capitals"
+    - "Delhi Daredevils"
+    - "DC"
+  PBKS:
+    - "Punjab Kings"
+    - "Kings XI Punjab"
+    - "PBKS"
+    - "KXIP"
+  RPS:
+    - "Rising Pune Supergiants"
+    - "Rising Pune Supergiant"
+    - "RPS"
+
 venues:
   # SA20 Venues
   "Kingsmead":
