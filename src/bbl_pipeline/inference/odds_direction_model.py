@@ -272,6 +272,19 @@ class OddsDirectionModel:
         ordered_lower = min(interval_lower, interval_upper) - adjustment
         ordered_upper = max(interval_lower, interval_upper) + adjustment
 
+        # Coherence gate: when direction confidence is weak but the interval
+        # is entirely one-sided, expand the interval to include zero so the
+        # band doesn't contradict the uncertain direction signal.
+        coherence_threshold = 0.60
+        interval_coherent = True
+        if direction_confidence < coherence_threshold:
+            if ordered_lower > 0:
+                ordered_lower = min(ordered_lower, -ordered_lower)
+                interval_coherent = False
+            elif ordered_upper < 0:
+                ordered_upper = max(ordered_upper, -ordered_upper)
+                interval_coherent = False
+
         return {
             'status': 'ready',
             'mode': 'advisory_only',
@@ -287,6 +300,7 @@ class OddsDirectionModel:
                 'lower_90': ordered_lower,
                 'upper_90': ordered_upper,
                 'conformal_adjustment': adjustment,
+                'interval_coherent': interval_coherent,
             },
             'advisory': {
                 'direction_signal': direction_label,
@@ -294,6 +308,7 @@ class OddsDirectionModel:
                 'use_interval': True,
                 'use_point_estimate': False,
                 'point_estimate_note': 'Central delta estimate remains experimental and should not be treated as a primary decision signal.',
+                'coherence_note': None if interval_coherent else 'Interval widened to include zero because direction confidence is below threshold.',
             },
             'history_points': len(deduped_history),
             'batting_team': batting_team,
