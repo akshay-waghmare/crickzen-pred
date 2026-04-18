@@ -56,7 +56,7 @@ LEAGUE_CONFIGS: dict[str, dict] = {
     "IPL": {
         "league": "ipl",
         "model_dir": "models/t20_male_v2",
-        "feature_store_dir": "data/ipl_feature_store_v1",
+        "feature_store_dir": "data/ipl_feature_store_v2",
     },
     "PSL": {
         "league": "psl",

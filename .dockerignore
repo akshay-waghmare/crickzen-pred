@@ -1,0 +1,50 @@
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+
+# Data (large files - mount as volumes in production)
+data/
+*.parquet
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Tests
+tests/
+coverage/
+
+# Documentation
+docs/
+specs/
+*.md
+
+# Temporary files
+temp_*.py
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db

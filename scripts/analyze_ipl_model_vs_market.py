@@ -37,7 +37,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 BETX21_DIR = Path(r"C:\Users\ADMINS\Documents\projects\betx21.live\ipl_matches_download")
 MODEL_DIR = PROJECT_ROOT / "models" / "t20_male_v2"
-FEATURE_STORE_DIR = PROJECT_ROOT / "data" / "ipl_feature_store_v1"
+FEATURE_STORE_DIR = PROJECT_ROOT / "data" / "ipl_feature_store_v2"
 OUTPUT_DIR = PROJECT_ROOT / "data"
 
 IPL_MATCHES = {

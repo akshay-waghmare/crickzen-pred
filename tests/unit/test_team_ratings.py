@@ -6,7 +6,7 @@ import yaml
 from pathlib import Path
 
 
-PARQUET_PATH = Path("data/ipl_feature_store_v1/team_ratings.parquet")
+PARQUET_PATH = Path("data/ipl_feature_store_v2/team_ratings.parquet")
 REGISTRY_PATH = Path("config/entity_registry.yaml")
 
 EXPECTED_SCHEMA = [

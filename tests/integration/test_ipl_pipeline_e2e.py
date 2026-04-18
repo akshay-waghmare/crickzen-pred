@@ -29,7 +29,7 @@ from bbl_pipeline.inference.crex_live_predictor import blend_predictions
 # Paths
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-IPL_FEATURE_STORE = PROJECT_ROOT / "data" / "ipl_feature_store_v1"
+IPL_FEATURE_STORE = PROJECT_ROOT / "data" / "ipl_feature_store_v2"
 
 
 # ---------------------------------------------------------------------------

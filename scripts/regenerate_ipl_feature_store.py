@@ -14,7 +14,7 @@ import pandas as pd
 import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-INPUT_PATH = PROJECT_ROOT / "data" / "ipl_feature_store_v1" / "team_ratings.parquet"
+INPUT_PATH = PROJECT_ROOT / "data" / "ipl_feature_store_v2" / "team_ratings.parquet"
 REGISTRY_PATH = PROJECT_ROOT / "config" / "entity_registry.yaml"
 OUTPUT_PATH = INPUT_PATH  # overwrite in place
 

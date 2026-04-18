@@ -220,7 +220,7 @@ python -m src.bbl_pipeline.cli ingest \
 python -m src.bbl_pipeline.cli process \
   --input-dir data/ipl_raw/matches \
   --output-dir data/ipl_features_v1 \
-  --feature-store-dir data/ipl_feature_store_v1 \
+  --feature-store-dir data/ipl_feature_store_v2 \
   --league ipl
 
 python scripts/analysis/extract_phase_distributions.py \
