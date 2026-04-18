@@ -142,18 +142,74 @@ This ensemble achieves **lower Brier than either source alone** in innings 2.
 
 ---
 
+## ⚠️ True Out-of-Sample Validation (2026-04-19)
+
+The results above used the IPL v2 model which was **trained on 2026 data** (data leakage).
+To validate properly, we trained a **holdout model on 2007-2025 only**, fitted Platt
+calibrators on 2023-2025 OOF predictions, then tested on the same 2026 live data.
+
+### Methodology
+1. **Holdout model:** Trained on 273,503 rows from 1,146 IPL matches (2007-2025)
+2. **Platt calibrators:** Fitted on 5-fold match-level OOF predictions from 2023-2025 (51,555 rows, 214 matches)
+3. **Test set:** 510 live observations from 16 IPL 2026 matches (completely unseen by model AND calibrators)
+
+### Overall Results
+
+| Source | Brier | vs Market | LogLoss | vs Market |
+|--------|-------|-----------|---------|-----------|
+| **Market (exchange)** | **0.1546** | — | **0.4711** | — |
+| Holdout Model (raw) | 0.1990 | +28.7% | 0.5677 | +20.5% |
+| Holdout + Historical Platt | 0.1878 | +21.5% | 0.5450 | +15.7% |
+
+**Verdict: MARKET WINS decisively on truly out-of-sample data.**
+
+### Phase Breakdown (Brier Score)
+
+| Phase | N | Market | Holdout+Platt | Gap |
+|-------|---|--------|---------------|-----|
+| Inn1 Powerplay | 46 | 0.2052 | 0.2364 | +15.2% |
+| Inn1 Middle | 102 | 0.2013 | 0.2642 | +31.2% |
+| Inn1 Death | 53 | 0.1686 | 0.2399 | +42.3% |
+| **Inn1 Total** | 201 | **0.1936** | **0.2514** | **+29.9%** |
+| Inn2 Powerplay | 80 | 0.1594 | 0.1789 | +12.2% |
+| Inn2 Middle | 160 | 0.1223 | 0.1351 | +10.5% |
+| Inn2 Death | 69 | 0.1102 | 0.1352 | +22.6% |
+| **Inn2 Total** | 309 | **0.1292** | **0.1464** | **+13.3%** |
+
+### Key Findings
+
+1. **The market is better everywhere.** No phase shows model beating market on OOS data.
+2. **Platt helps** — reduces raw gap from +28.7% to +21.5% — but not enough.
+3. **Ensemble alpha = 0.000** — optimal blend is 100% market, 0% model.
+4. **Inn2 death blending** shows -0.4% improvement (α=0.115) — the only segment where model adds marginal value.
+5. **Previous "model beats market" findings were invalid** — caused by model being trained on 2026 data (the test set).
+
+### What This Means
+
+- The model's structural cricket logic (resources, projections, DLS) is real and valuable for **standalone prediction**
+- But **exchange markets aggregate thousands of informed bettors** who have the same structural knowledge PLUS live context (pitch behavior, dew, momentum, injury info)
+- For live IPL prediction, the model serves as a **useful reference** but should not override market prices
+- The ensemble analysis from earlier sections is **directionally informative** but the magnitudes are overstated due to the data leakage
+
+---
+
 ## Reproducibility
 
 ```bash
-# Re-run the comparison with current model artifacts
+# ORIGINAL analysis (IPL v2 model — includes 2026 data in training)
 python scripts/rescore_ipl_v2.py
+# Output: data/ipl_model_vs_market_v2.parquet
 
-# Output: data/ipl_model_vs_market_v2.parquet (510 rows)
-# Columns: event_id, innings, over, phase, actual_t1_wins,
-#           market_p_t1, ipl_v2_p_t1, global_v2_p_t1
+# TRUE OUT-OF-SAMPLE validation (holdout model — excludes 2026)
+python scripts/validate_platt_oos.py
+# Output: data/ipl_oos_validation_2026.parquet
+#         data/ipl_oos_validation_summary.json
+#         models/ipl_holdout_pre2026/ (holdout model + calibrators)
 ```
 
 **Model artifacts used:**
-- `models/ipl_v2/champion_model.joblib` (OOF Brier 0.1817)
+- `models/ipl_v2/champion_model.joblib` (OOF Brier 0.1817) — original analysis
+- `models/ipl_holdout_pre2026/champion_model.joblib` — OOS validation
+- `models/ipl_holdout_pre2026/oos_platt_calibrators.pkl` — 8 phase Platt calibrators trained on 2023-2025 OOF
 - `models/t20_male_v2/league_calibrators/ipl/league_calibrator.pkl` (phase Platt, 2026-04-18)
 - `data/ipl_feature_store_v2/` (14 canonical teams, deduped)
