@@ -28,6 +28,40 @@ from datetime import datetime
 logger = structlog.get_logger()
 
 
+class LogitBiasScaler:
+    """
+    Logit-space additive bias calibrator.
+    Applies a fixed offset in logit space: calibrated_p = sigmoid(logit(p) + bias)
+    
+    Learned from market-model differences:
+        bias = mean(logit(market) - logit(model)) per segment
+    
+    Advantages over additive probability bias:
+        - Respects [0,1] probability bounds naturally
+        - Handles asymmetry near 0 and 1 correctly
+        - More stable for large biases (e.g., inn1_death = -0.16)
+    """
+    def __init__(self, bias: float = 0.0):
+        self.bias = bias
+    
+    def fit(self, model_probs: np.ndarray, market_probs: np.ndarray) -> 'LogitBiasScaler':
+        """Compute logit-space bias from model-market pairs."""
+        model_probs = np.clip(model_probs, 1e-7, 1 - 1e-7)
+        market_probs = np.clip(market_probs, 1e-7, 1 - 1e-7)
+        model_logits = np.log(model_probs / (1 - model_probs))
+        market_logits = np.log(market_probs / (1 - market_probs))
+        self.bias = float(np.mean(market_logits - model_logits))
+        return self
+    
+    def predict(self, probs: np.ndarray) -> np.ndarray:
+        """Apply logit-space bias correction."""
+        probs = np.atleast_1d(np.asarray(probs, dtype=float))
+        probs = np.clip(probs, 1e-7, 1 - 1e-7)
+        logits = np.log(probs / (1 - probs))
+        corrected = 1 / (1 + np.exp(-(logits + self.bias)))
+        return corrected
+
+
 class TemperatureScaler:
     """
     Temperature scaling calibrator.
