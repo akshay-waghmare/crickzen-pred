@@ -137,6 +137,18 @@ class Predictor:
         self.resource_calculator = ResourceFeatureCalculator(config=self.format_config)
         # Use RealTimeFeatureMapper for proper feature generation
         self.feature_mapper = RealTimeFeatureMapper(feature_store, global_stats, format_config=self.format_config)
+        
+        # Innings transition smoothing: store inn1 final probability as prior for inn2 start
+        self._inn1_final_prob = None  # P(batting_team wins) at end of innings 1
+        self._inn1_batting_team = None  # Which team was batting in innings 1
+        self.INNINGS_TRANSITION_OVERS = 6  # Blend inn1 prior over this many inn2 overs
+        self.last_transition_alpha = None  # For debug/logging access
+    
+    def reset_innings_prior(self):
+        """Reset the inn1 prior (call when starting a new match)."""
+        self._inn1_final_prob = None
+        self._inn1_batting_team = None
+        self.last_transition_alpha = None
 
     @classmethod
     def load(cls, model_dir: str | Path, feature_store_dir: str | Path = None, league: str = None):
@@ -903,6 +915,30 @@ class Predictor:
                             print(f"[LEAGUE] League ({league_name}, Platt): {pre_league_prob:.1%} -> {prob:.1%}")
             
             self.last_league_calibrated = float(prob) if self.league_calibrator else None
+            
+            # === INNINGS TRANSITION SMOOTHING ===
+            # Store inn1 final probability for use as inn2 prior
+            self.last_transition_alpha = None
+            if state.innings == 1:
+                self._inn1_final_prob = float(prob)
+                self._inn1_batting_team = state.batting_team
+            elif state.innings == 2 and self._inn1_final_prob is not None:
+                overs_bowled = state.over + state.ball / 6.0
+                if overs_bowled < self.INNINGS_TRANSITION_OVERS:
+                    # Inn2 batting team is inn1 bowling team, so prior = 1 - inn1_prob
+                    if self._inn1_batting_team == state.batting_team:
+                        inn1_prior = self._inn1_final_prob
+                    else:
+                        inn1_prior = 1.0 - self._inn1_final_prob
+                    
+                    alpha = max(0.0, 1.0 - overs_bowled / self.INNINGS_TRANSITION_OVERS)
+                    pre_blend = prob
+                    prob = alpha * inn1_prior + (1.0 - alpha) * prob
+                    self.last_transition_alpha = alpha
+                    if debug:
+                        print(f"[TRANSITION] Inn1 prior: {inn1_prior:.1%}, alpha: {alpha:.2f}, "
+                              f"model: {pre_blend:.1%} -> blended: {prob:.1%}")
+            
             return float(prob)
         except Exception as e:
             logger.error(f"Prediction failed: {e}")
