@@ -48,7 +48,7 @@ def brier(p, y):
 def main():
     parser = argparse.ArgumentParser(description='Train IPL logit-bias calibrator from market data')
     parser.add_argument('--model-dir', default='models/t20_male_v2', help='Model directory')
-    parser.add_argument('--market-data', default='data/ipl_model_vs_market.parquet', help='Market data file')
+    parser.add_argument('--market-data', default='data/ipl_model_vs_market_v3.parquet', help='Market data file')
     parser.add_argument('--features-dir', default='data/ipl_features_v3', help='Features directory')
     parser.add_argument('--dry-run', action='store_true', help='Print biases without saving')
     args = parser.parse_args()
@@ -139,31 +139,59 @@ def main():
         date=('raw_date', 'first'),
         batting_team=('raw_batting_team', 'first'),
     ).reset_index()
-    test_po['match_key'] = (
-        test_po['date'] + '_' + test_po['batting_team'] + '_' +
-        test_po['raw_innings'].astype(str) + '_' +
-        (test_po['raw_over'] + 1).astype(str)
-    )
 
-    obs['match_key'] = (
-        obs['date'] + '_' + obs['batting_team'] + '_' +
-        obs['innings'].astype(str) + '_' + obs['over'].astype(str)
-    )
-    merged = obs.merge(test_po[['match_key', 'cal_prob']], on='match_key', how='inner')
+    # Support both v2 (old) and v3 (corrected Cricsheet-first) market data formats
+    is_v3 = 'market_p_inn1' in obs.columns
 
-    # IMPORTANT: Compute everything in P(batting_team) space because
-    # the predictor applies biases to P(batting_team wins), NOT P(team1 wins).
-    # Model already outputs P(batting_team) - just convert market + actual to match.
-    merged['bat_is_t1'] = merged['batting_team'] == merged['team1']
-    merged['market_p_bat'] = merged['market_p_t1'].copy()
-    merged.loc[~merged['bat_is_t1'], 'market_p_bat'] = 1.0 - merged.loc[~merged['bat_is_t1'], 'market_p_bat']
-    merged['actual_bat_wins'] = merged['actual_t1_wins'].copy()
-    merged.loc[~merged['bat_is_t1'], 'actual_bat_wins'] = 1.0 - merged.loc[~merged['bat_is_t1'], 'actual_bat_wins']
+    if is_v3:
+        # v3 format: match_id is Cricsheet ID, merge directly
+        # over is 1-indexed, innings is 1/2
+        test_po['merge_key'] = (
+            test_po['match_id'].astype(str) + '_' +
+            test_po['raw_innings'].astype(str) + '_' +
+            (test_po['raw_over'] + 1).astype(str)
+        )
+        obs['merge_key'] = (
+            obs['match_id'].astype(str) + '_' +
+            obs['innings'].astype(str) + '_' +
+            obs['over'].astype(str)
+        )
+        merged = obs.merge(test_po[['merge_key', 'cal_prob']], on='merge_key', how='inner')
+
+        # Convert market_p_inn1 to P(batting_team)
+        # In inn1, batting_team IS inn1_team, so market_p_bat = market_p_inn1
+        # In inn2, batting_team IS inn2_team, so market_p_bat = 1 - market_p_inn1
+        merged['market_p_bat'] = merged['market_p_inn1'].copy()
+        merged.loc[merged['innings'] == 2, 'market_p_bat'] = (
+            1.0 - merged.loc[merged['innings'] == 2, 'market_p_inn1']
+        )
+        merged['actual_bat_wins'] = merged['actual_inn1_wins'].copy()
+        merged.loc[merged['innings'] == 2, 'actual_bat_wins'] = (
+            1.0 - merged.loc[merged['innings'] == 2, 'actual_inn1_wins']
+        )
+    else:
+        # Legacy v2 format: merge by date + batting_team + innings + over
+        test_po['merge_key'] = (
+            test_po['date'] + '_' + test_po['batting_team'] + '_' +
+            test_po['raw_innings'].astype(str) + '_' +
+            (test_po['raw_over'] + 1).astype(str)
+        )
+        obs['merge_key'] = (
+            obs['date'] + '_' + obs['batting_team'] + '_' +
+            obs['innings'].astype(str) + '_' + obs['over'].astype(str)
+        )
+        merged = obs.merge(test_po[['merge_key', 'cal_prob']], on='merge_key', how='inner')
+
+        merged['bat_is_t1'] = merged['batting_team'] == merged['team1']
+        merged['market_p_bat'] = merged['market_p_t1'].copy()
+        merged.loc[~merged['bat_is_t1'], 'market_p_bat'] = 1.0 - merged.loc[~merged['bat_is_t1'], 'market_p_bat']
+        merged['actual_bat_wins'] = merged['actual_t1_wins'].copy()
+        merged.loc[~merged['bat_is_t1'], 'actual_bat_wins'] = 1.0 - merged.loc[~merged['bat_is_t1'], 'actual_bat_wins']
 
     merged['phase'] = merged['over'].apply(assign_phase)
     n_matched = len(merged)
     n_matches = merged['event_id'].nunique()
-    print(f"  Matched: {n_matched} obs from {n_matches} matches")
+    print(f"  Matched: {n_matched} obs from {n_matches} matches (format={'v3' if is_v3 else 'v2'})")
 
     actual = merged['actual_bat_wins'].values
     market = merged['market_p_bat'].values
