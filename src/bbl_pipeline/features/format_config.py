@@ -336,6 +336,11 @@ class FormatConfig:
             par_score=173.45,
             league_avg_score=167.28,
             bat_first_win_rate=0.4581,
+            # IPL chase sigmoid: flatter than default T20 (0.70 from ILT20).
+            # Empirically fitted on 1169 IPL matches: IPL teams accelerate
+            # late in chases better than ILT20, so the steeper default
+            # overestimates easy chases and underestimates hard ones.
+            rrr_beta=0.57,
             expected_run_rates={
                 "powerplay": 7.53,
                 "middle": 7.51,

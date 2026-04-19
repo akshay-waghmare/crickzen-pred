@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-18",
+  "last_updated": "2026-04-19",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -807,19 +807,19 @@
       }
     },
     "IPL": {
-      "path": "models/ipl_v2",
-      "version": "v2",
+      "path": "models/ipl_v3",
+      "version": "v3",
       "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1817, ECE: 0.0000)",
       "training": {
         "samples": 278954,
-        "date": "2026-04-18",
-        "brier_score": 0.1817057364768029
+        "date": "2026-04-19",
+        "brier_score": 0.1817153726463826
       },
       "calibrator": {},
       "feature_store": {
-        "path": "data/ipl_feature_store_v2",
-        "version": "v2",
-        "generated_date": "2026-04-18",
+        "path": "data/ipl_feature_store_v3",
+        "version": "v3",
+        "generated_date": "2026-04-19",
         "training_data_samples": 278954
       }
     }
