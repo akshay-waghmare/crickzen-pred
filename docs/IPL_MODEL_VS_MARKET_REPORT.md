@@ -302,3 +302,93 @@ In the death overs of a chase (overs 16-20), match outcomes are nearly determini
 python scripts/test_mc_contribution.py
 # Output: data/ipl_mc_contribution_test.parquet
 ```
+
+---
+
+## LogitBias Calibration + Transition Smoothing (2026-04-19)
+
+### ⚠️ Critical Data Bug Fix
+
+Previous analyses used betx21 `s1`/`s2` fields as batting order, but these are always
+team1/team2 scores regardless of who batted first. This caused misaligned innings data
+that inflated model performance. **All results below use Cricsheet-first ground truth.**
+
+See commit `a6dc45b` for the corrected analysis script.
+
+### Corrected Approach: LogitBias Phase Calibration
+
+Instead of Platt scaling (which overfits with small data), we use **logit-space additive
+bias correction** learned from market-model differences per phase×innings segment:
+
+```
+calibrated_p = sigmoid(logit(model_p) + bias)
+bias = mean(logit(market) - logit(model))  per segment
+```
+
+**Data:** 12 IPL 2026 matches, 432 over-level observations (correctly aligned via Cricsheet)
+
+### Bias Values (Production Calibrator)
+
+| Segment | Bias | Direction | Interpretation |
+|---------|-----:|-----------|---------------|
+| inn1_pp | -0.37 | DOWN | Model over-predicts inn1 batting team in PP |
+| inn1_mid | -0.23 | DOWN | Same in middle overs |
+| inn1_death | -0.84 | DOWN | Strong correction in death overs |
+| inn2_pp | +0.27 | UP | Model under-predicts inn2 batting team in PP |
+| inn2_mid | +0.38 | UP | Same in middle overs |
+| inn2_death | -0.97 | DOWN | Model over-predicts chasers in death |
+| innings_1 | -0.42 | DOWN | Fallback |
+| innings_2 | +0.09 | UP | Fallback |
+
+### Performance (Cumulative Calibration Chain)
+
+| Stage | Brier | vs Market | Improvement |
+|-------|-------|-----------|-------------|
+| Market (exchange mid-price) | 0.1446 | baseline | — |
+| Raw model (no calibration) | 0.1571 | +8.7% | — |
+| + Per-over isotonic | ~0.1520 | +5.1% | — |
+| + LogitBias correction | 0.1480 | +2.4% | Gap closed 72.8% |
+| + Transition smoothing (6 overs) | **0.1454** | **+0.5%** | Gap closed 93.6% |
+
+### Innings Transition Smoothing
+
+At innings break, model probability jumps ~66pp (e.g., 89% → 23%). We blend last inn1
+probability as a decaying prior over the first 6 inn2 overs:
+
+```
+alpha = max(0, 1 - overs_bowled / 6)
+blended = alpha × inn1_prior + (1 - alpha) × model_prob
+```
+
+**Inn2 Powerplay per-over improvement:**
+
+| Over | Before | After | Change |
+|------|--------|-------|--------|
+| 1 | 0.1517 | 0.1184 | **−22%** |
+| 2 | 0.1413 | 0.1148 | **−19%** |
+| 3 | 0.1355 | 0.1168 | **−14%** |
+| 4 | 0.1382 | 0.1201 | **−13%** |
+| 5 | 0.1240 | 0.1172 | **−5%** |
+
+### Known Limitations
+
+1. **Inn2 Death** — bias of -0.97 is too aggressive, makes predictions worse vs market
+2. **Small sample** — 12 matches / 432 obs. Re-run after 20+ matches for stability.
+3. **blend(8) matches market exactly** (0.1446) but has worse ECE in early overs
+
+### Reproduce
+
+```bash
+# Step 1: Build aligned market dataset (Cricsheet-first)
+python scripts/ipl_oos_bias_analysis.py
+# Output: data/ipl_model_vs_market_v3.parquet
+
+# Step 2: Train logit-bias calibrator
+python scripts/train_ipl_logit_bias.py
+# Output: models/t20_male_v2/league_calibrators/ipl/league_calibrator.pkl
+
+# Step 3: Validate transition smoothing
+python scripts/validate_transition_smoothing.py
+
+# See docs/MARKET_BIAS_CALIBRATION_GUIDE.md for adapting to other leagues
+```
