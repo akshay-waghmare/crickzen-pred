@@ -2,9 +2,11 @@
 Train IPL Logit-Bias League Calibrator from Market Data
 
 Computes logit-space bias correction per phase×innings segment using
-recorded market odds vs model predictions on IPL 2026 matches.
+recorded market odds vs PRODUCTION model predictions on IPL 2026 matches.
 
-Saves as a standard league_calibrator.pkl compatible with Predictor.load().
+IMPORTANT: Uses the actual production model (t20_male_v2) with its full
+calibration chain (per-over isotonic) to ensure biases match what the
+predictor outputs before league calibration.
 
 Usage:
     python scripts/train_ipl_logit_bias.py
@@ -59,8 +61,27 @@ def main():
     obs = pd.read_parquet(args.market_data)
     print(f"  Market observations: {len(obs)} from {obs['event_id'].nunique()} matches")
 
-    # ── Load features + raw to get holdout model predictions ──
-    print("Loading features and training holdout model...")
+    # ── Load PRODUCTION model and its calibrators ──
+    print(f"Loading production model from {model_dir}...")
+    prod_model = joblib.load(model_dir / 'champion_model.joblib')
+    # Patch sklearn 1.7→1.8 SimpleImputer compatibility
+    from bbl_pipeline.inference.predictor import _restore_simple_imputer_compatibility
+    _restore_simple_imputer_compatibility(prod_model)
+    print(f"  Model features: {len(prod_model.selected_features_)}")
+
+    # Load isotonic calibrators (same chain as predictor uses)
+    cal_path = model_dir / 'isotonic_calibrator.pkl'
+    per_over_calibrators = {}
+    phase_calibrators = {}
+    if cal_path.exists():
+        cal_data = joblib.load(cal_path)
+        per_over_calibrators = cal_data.get('per_over_calibrators', {})
+        phase_calibrators = cal_data.get('phase_calibrators', {})
+        print(f"  Per-over calibrators: {len(per_over_calibrators)}")
+        print(f"  Phase calibrators: {len(phase_calibrators)}")
+
+    # ── Load features + raw metadata ──
+    print("Loading features...")
     raw = pd.read_parquet('data/ipl_raw/matches')
     raw = raw.drop_duplicates(subset=['match_id', 'innings', 'over', 'ball'], keep='first')
     raw = raw.sort_values(['match_id', 'innings', 'over', 'ball']).reset_index(drop=True)
@@ -75,21 +96,45 @@ def main():
     train_full['raw_date'] = pd.to_datetime(raw['date']).dt.strftime('%Y-%m-%d').values
     train_full['raw_batting_team'] = raw['batting_team'].map(lambda x: TEAM_ALIASES.get(x, x)).values
 
-    mask_pre2026 = train_full['season'] != '2026'
+    # ── Score ALL data with production model ──
     meta_cols = ['is_winner', 'season', 'match_id', 'raw_innings', 'raw_over', 'raw_date', 'raw_batting_team']
     feature_cols = [c for c in train_full.columns if c not in meta_cols]
+    avail = [c for c in prod_model.selected_features_ if c in feature_cols]
+    print(f"  Scoring with {len(avail)} features (of {len(prod_model.selected_features_)} selected)")
 
-    from bbl_pipeline.training.trainer import XGBLogRegEnsemble
-    model = XGBLogRegEnsemble()
-    model.fit(train_full[mask_pre2026][feature_cols], train_full[mask_pre2026]['is_winner'])
-    print(f"  Trained with {len(model.selected_features_)} features on {mask_pre2026.sum()} rows")
+    # Get 2026 season data
+    mask_2026 = train_full['season'] == '2026'
+    test_2026 = train_full[mask_2026].copy()
+    print(f"  2026 rows: {len(test_2026)}")
 
-    # ── Score 2026 and match to market ──
-    test_2026 = train_full[~mask_pre2026].copy()
-    test_2026['v2_raw'] = model.predict_proba(test_2026[feature_cols])[:, 1]
+    # Score with production model → P(batting_team wins) = raw_prob
+    raw_probs = prod_model.predict_proba(test_2026[feature_cols])[:, 1]
+    test_2026['raw_prob'] = raw_probs
 
+    # Apply per-over isotonic calibration (same chain as predictor lines 792-799)
+    def calibrate_row(row):
+        p = row['raw_prob']
+        inn = int(row['raw_innings'])
+        over_1based = int(row['raw_over']) + 1
+        # Per-over first (same priority as predictor)
+        over_key = f'inn{inn}_over{over_1based}'
+        if over_key in per_over_calibrators:
+            return float(per_over_calibrators[over_key].predict([p])[0])
+        # Phase fallback
+        if over_1based <= 6: phase = 'powerplay'
+        elif over_1based <= 15: phase = 'middle'
+        else: phase = 'death'
+        phase_key = f'inn{inn}_{phase}'
+        if phase_key in phase_calibrators:
+            return float(phase_calibrators[phase_key].predict([p])[0])
+        return p
+
+    test_2026['cal_prob'] = test_2026.apply(calibrate_row, axis=1)
+    print(f"  Calibrated {len(test_2026)} rows through production isotonic chain")
+
+    # ── Aggregate to per-over and match to market ──
     test_po = test_2026.groupby(['match_id', 'raw_innings', 'raw_over']).agg(
-        v2_raw=('v2_raw', 'last'),
+        cal_prob=('cal_prob', 'last'),  # last ball of over = final calibrated prob
         is_winner=('is_winner', 'first'),
         date=('raw_date', 'first'),
         batting_team=('raw_batting_team', 'first'),
@@ -104,24 +149,30 @@ def main():
         obs['date'] + '_' + obs['batting_team'] + '_' +
         obs['innings'].astype(str) + '_' + obs['over'].astype(str)
     )
-    merged = obs.merge(test_po[['match_key', 'v2_raw']], on='match_key', how='inner')
+    merged = obs.merge(test_po[['match_key', 'cal_prob']], on='match_key', how='inner')
 
-    # Flip inn2 (model predicts P(batting_team), market has P(team1))
+    # IMPORTANT: Compute everything in P(batting_team) space because
+    # the predictor applies biases to P(batting_team wins), NOT P(team1 wins).
+    # Model already outputs P(batting_team) - just convert market + actual to match.
     merged['bat_is_t1'] = merged['batting_team'] == merged['team1']
-    merged.loc[~merged['bat_is_t1'], 'v2_raw'] = 1.0 - merged.loc[~merged['bat_is_t1'], 'v2_raw']
+    merged['market_p_bat'] = merged['market_p_t1'].copy()
+    merged.loc[~merged['bat_is_t1'], 'market_p_bat'] = 1.0 - merged.loc[~merged['bat_is_t1'], 'market_p_bat']
+    merged['actual_bat_wins'] = merged['actual_t1_wins'].copy()
+    merged.loc[~merged['bat_is_t1'], 'actual_bat_wins'] = 1.0 - merged.loc[~merged['bat_is_t1'], 'actual_bat_wins']
 
     merged['phase'] = merged['over'].apply(assign_phase)
     n_matched = len(merged)
     n_matches = merged['event_id'].nunique()
     print(f"  Matched: {n_matched} obs from {n_matches} matches")
 
-    actual = merged['actual_t1_wins'].values
-    market = merged['market_p_t1'].values
-    model_p = merged['v2_raw'].values
+    actual = merged['actual_bat_wins'].values
+    market = merged['market_p_bat'].values
+    model_p = merged['cal_prob'].values   # production model calibrated P(batting_team)
 
-    # ── Compute logit biases per segment ──
+    # ── Compute logit biases per segment (in P(batting_team) space) ──
     print(f"\n{'='*70}")
-    print(f"  LOGIT-SPACE BIAS CORRECTION (6 segments)")
+    print(f"  LOGIT-SPACE BIAS CORRECTION (P(batting_team) space)")
+    print(f"  Using PRODUCTION model {model_dir} + isotonic calibration")
     print(f"{'='*70}")
 
     calibrators = {}
@@ -143,7 +194,7 @@ def main():
             scaler.fit(seg_model, seg_market)
             calibrators[key] = scaler
 
-            # Metrics
+            # Metrics (Brier is space-invariant: (p-y)^2 == ((1-p)-(1-y))^2)
             cal_probs = scaler.predict(seg_model)
             b_before = brier(seg_model, seg_actual)
             b_after = brier(cal_probs, seg_actual)
@@ -158,8 +209,11 @@ def main():
             }
 
             direction = "SHIFT UP" if scaler.bias > 0 else "SHIFT DOWN"
+            avg_model = seg_model.mean()
+            avg_market = seg_market.mean()
             print(f"  {key:20s} n={mask.sum():3d}  bias={scaler.bias:+.4f} ({direction})")
             print(f"    {'':20s} raw={b_before:.4f}  cal={b_after:.4f}  mkt={b_market:.4f}")
+            print(f"    {'':20s} avg_model={avg_model:.3f}  avg_market={avg_market:.3f}")
 
     # Also add innings-level calibrators as fallback
     for inn in [1, 2]:
