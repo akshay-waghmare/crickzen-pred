@@ -1215,7 +1215,10 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     output_dir.mkdir(parents=True, exist_ok=True)
     feature_store_dir.mkdir(parents=True, exist_ok=True)
     
-    training_data = df[feature_cols].copy()
+    # Include metadata columns for analysis (not used by model)
+    metadata_cols = ['match_id', 'season', 'over', 'ball', 'batting_team', 'bowling_team', 'winner']
+    all_cols = feature_cols + [c for c in metadata_cols if c in df.columns and c not in feature_cols]
+    training_data = df[all_cols].copy()
     training_path = output_dir / "training.parquet"
     logger.info(f"Saving training data to {training_path}")
     training_data.to_parquet(training_path)

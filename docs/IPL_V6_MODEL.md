@@ -50,27 +50,35 @@ These features inject **pre-chase prior information** so the model doesn't start
 
 ## OOS Results (True Holdout: train pre-2026, test 2026)
 
+*Note: Metrics recomputed with aligned metadata (processor now includes match_id/season in training.parquet).*
+
 ### v5 → v6 Improvement (ALL 23 matches, P(batting_team))
 
 | Segment | N | v5 Brier | v6 Brier | Change |
 |---------|:-:|:--------:|:--------:|:------:|
-| **OVERALL** | 870 | 0.1442 | 0.1397 | **-3.1%** ✅ |
-| Inn1 | 450 | 0.1865 | 0.1869 | +0.2% |
-| **Inn2** | 420 | 0.0988 | 0.0891 | **-9.8%** ✅ |
-| **Inn2 PP** | 161 | 0.1419 | 0.1283 | **-9.6%** ✅ |
-| **Inn2 MID** | 199 | 0.0741 | 0.0658 | **-11.1%** ✅ |
-| Inn2 DEA | 60 | 0.0651 | 0.0609 | -6.5% ✅ |
+| **OVERALL** | 870 | 0.1199 | 0.1129 | **-5.8%** ✅ |
+| Inn1 | 450 | 0.1690 | 0.1627 | -3.7% ✅ |
+| &nbsp; Inn1 PP | 138 | 0.1848 | 0.1811 | -2.0% |
+| &nbsp; Inn1 MID | 203 | 0.1599 | 0.1537 | -3.8% ✅ |
+| &nbsp; Inn1 DEA | 109 | 0.1661 | 0.1560 | -6.1% ✅ |
+| **Inn2** | 420 | 0.0672 | 0.0595 | **-11.5%** ✅ |
+| &nbsp; Inn2 PP | 138 | 0.1023 | 0.0969 | -5.2% ✅ |
+| &nbsp; Inn2 MID | 201 | 0.0517 | 0.0419 | **-19.1%** ✅ |
+| &nbsp; Inn2 DEA | 81 | 0.0459 | 0.0395 | -14.0% ✅ |
 
 ### vs Market (12 matches with Betfair odds, P(inn1_team))
 
 | Segment | N | Market | v6 | vs Market |
 |---------|:-:|:------:|:--:|:---------:|
-| **OVERALL** | 377 | 0.1552 | 0.1522 | **-1.9%** ✅ |
-| Inn1 | 167 | 0.2242 | 0.2264 | +1.0% |
-| **Inn2** | 210 | 0.1004 | 0.0933 | **-7.0%** ✅ |
-| Inn2 PP | 72 | 0.1195 | 0.1281 | +7.2% |
-| **Inn2 MID** | 103 | 0.0796 | 0.0795 | **-0.1%** ✅ |
-| **Inn2 DEA** | 35 | 0.1223 | 0.0624 | **-49.0%** ✅ |
+| **OVERALL** | 394 | 0.1540 | 0.1282 | **-16.7%** ✅ |
+| Inn1 | 176 | 0.2214 | 0.2093 | -5.4% ✅ |
+| &nbsp; Inn1 PP | 54 | 0.2087 | 0.2199 | +5.4% |
+| &nbsp; Inn1 MID | 79 | 0.2267 | 0.2065 | -8.9% ✅ |
+| &nbsp; Inn1 DEA | 43 | 0.2274 | 0.2013 | -11.5% ✅ |
+| **Inn2** | 218 | 0.0996 | 0.0627 | **-37.0%** ✅ |
+| &nbsp; Inn2 PP | 72 | 0.1195 | 0.0961 | **-19.5%** ✅ |
+| &nbsp; Inn2 MID | 104 | 0.0794 | 0.0458 | **-42.3%** ✅ |
+| &nbsp; Inn2 DEA | 42 | 0.1154 | 0.0470 | **-59.2%** ✅ |
 
 ### Inn2 PP Gap Progression
 
@@ -78,9 +86,10 @@ These features inject **pre-chase prior information** so the model doesn't start
 |---------|:-----------------:|------------|
 | v4 (baseline) | +33.5% | No carryover features |
 | v5 | +17.5% | + target_above_par, inn1_defendability |
-| **v6** | **+7.2%** | + venue_chase, toss, inn1 momentum/wickets/PP |
+| **v6** | **-19.5%** | + venue_chase, toss, inn1 momentum/wickets/PP |
 
-The inn2 PP gap has been reduced by **78%** (from +33.5% to +7.2%).
+v6 now **beats market in every segment except Inn1 PP** (+5.4%).
+Inn2 PP flipped from +33.5% worse to **-19.5% better** than market.
 
 ---
 
