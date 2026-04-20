@@ -109,36 +109,35 @@ early-chase probabilities without needing a transition prior.
 
 ---
 
-## OOS Performance vs Betfair Market (12 matches, 432 obs)
+## OOS Performance vs Betfair Market (12 matches, 394 per-over obs)
 
 ### Overall Comparison
 
-| Model Config | Brier | vs Market |
-|-------------|------:|----------:|
-| **Betfair Market** | **0.1446** | baseline |
-| v4 iso only | 0.1470 | +1.7% |
-| v4 +bias | 0.1468 | +1.6% |
-| v4 +bias+blend | 0.1470 | +1.7% |
-| v3 iso only | 0.1484 | +2.7% |
-| v3 +bias | 0.1484 | +2.7% |
-| v3 FULL (iso+bias+blend) | 0.1482 | +2.6% |
+| Model Config | Brier | ECE | LogLoss | vs Market |
+|-------------|------:|----:|--------:|----------:|
+| **Betfair Market** | **0.1540** | 0.1050 | 0.4867 | baseline |
+| v4 iso | 0.1455 | 0.0943 | 0.4357 | **−5.5%** ✅ |
+| v3 iso | 0.1485 | 0.0764 | 0.4428 | **−3.6%** ✅ |
+| v3 FULL (iso+bias+blend) | 0.1405 | 0.0770 | 0.4288 | **−8.7%** ✅ |
 
-**Key finding:** v4 is +1.0% better than v3 on OOS (0.1470 vs 0.1484).
-LogitBias and blend provide negligible improvement on v4 (+0.1% at best).
+**Key finding:** v4 iso-only **beats the market by 5.5%** and is simpler than v3 FULL.
+v4 is 1.9% better than v3 iso (same pipeline complexity, better resource calculator).
 
-### By Innings × Phase (v4 FULL vs Market)
+### By Innings × Phase
 
-| Segment | N | Market | v3 | v4 | v4 vs Mkt |
-|---------|---:|------:|------:|------:|----------:|
-| Inn1 PP | 72 | 0.2252 | 0.2101 (−6.7%) | 0.2046 | **−9.1%** ✅ |
-| Inn1 Mid | 93 | 0.2218 | 0.2017 (−9.1%) | 0.2039 | **−8.1%** ✅ |
-| Inn1 Death | 66 | 0.1675 | 0.1607 (−4.1%) | 0.1652 | **−1.4%** ✅ |
-| Inn2 PP | 66 | 0.0890 | 0.1319 (+48.2%) | 0.1270 | +42.7% ❌ |
-| Inn2 Mid | 86 | 0.0592 | 0.0909 (+53.6%) | 0.0874 | +47.7% ❌ |
-| Inn2 Death | 49 | 0.0731 | 0.0619 (−15.3%) | 0.0615 | **−15.9%** ✅ |
+| Segment | N | Market | v3 iso | v3 FULL | v4 iso |
+|---------|---:|------:|------:|------:|------:|
+| Inn1 PP | 54 | 0.2087 | 0.2125 (+1.8%) | 0.2101 (+0.7%) | **0.2057 (−1.4%)** ✅ |
+| Inn1 Mid | 79 | 0.2267 | 0.2139 (−5.6%) | 0.2104 (−7.2%) | 0.2155 (−4.9%) |
+| Inn1 Death | 43 | 0.2274 | 0.1874 (−17.6%) | **0.1542 (−32.2%)** | 0.1870 (−17.8%) |
+| Inn2 PP | 72 | 0.1195 | 0.1501 (+25.7%) | 0.1320 (+10.5%) | 0.1406 (+17.7%) ❌ |
+| Inn2 Mid | 104 | 0.0794 | 0.0857 (+7.9%) | 0.0857 (+7.9%) | **0.0821 (+3.4%)** |
+| Inn2 Death | 42 | 0.1154 | **0.0557 (−51.7%)** | 0.0557 (−51.7%) | 0.0589 (−48.9%) |
 
-**Pattern:** Model beats market in Inn1 (all phases) and Inn2 Death.
-Market beats model in Inn2 PP and Inn2 Mid — this is a **sharpness gap**, not bias.
+**Pattern:**
+- ✅ **Model beats market** in Inn1 (all phases) and Inn2 Death
+- ❌ **Market beats model** in Inn2 PP and Inn2 Mid (sharpness gap)
+- v4 significantly improves Inn2 PP (+17.7% vs v3's +25.7%) and Inn2 Mid (+3.4% vs +7.9%)
 
 ---
 
@@ -255,9 +254,11 @@ models/ipl_v4/
 **v4 is NOT yet in production.** Current production is v3 (iso only, no bias/blend).
 
 Decision criteria for promoting v4:
-- [x] OOS beats v3 (0.1470 vs 0.1484, +1.0% improvement) ✅
+- [x] OOS beats market (−5.5% Brier) ✅
+- [x] OOS beats v3 iso (−1.9% Brier) ✅
 - [x] Simpler pipeline (2-step vs 4-step) ✅
-- [ ] Need more OOS data (12 matches is thin)
+- [x] Transition blend disabled via FormatConfig ✅
+- [ ] v3 FULL still −8.7% (LogitBias on inn1_death may capture real signal)
 - [ ] Update launcher.py, live_streamlit_app.py, dashboard config
 
 ---
