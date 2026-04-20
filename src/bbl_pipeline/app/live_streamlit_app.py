@@ -465,7 +465,7 @@ PREDICTOR_CONFIGS = {
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",
         "mc_only": False,
-        "model_dir": "models/ipl_v3",
+        "model_dir": "models/ipl_v6",
         "odm_model_dir": "models/odm_v1",
         "feature_store_dir": "data/ipl_feature_store_v3",
         "league": "ipl",
@@ -474,7 +474,7 @@ PREDICTOR_CONFIGS = {
     "IPL MC-only": {
         "output_json": "data/ipl_live_mc.json",
         "mc_only": True,
-        "model_dir": "models/ipl_v3",
+        "model_dir": "models/ipl_v6",
         "feature_store_dir": "data/ipl_feature_store_v3",
         "league": "ipl",
         "states_dir": "data/match_states/ipl",

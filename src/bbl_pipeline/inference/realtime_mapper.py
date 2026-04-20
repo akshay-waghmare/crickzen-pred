@@ -428,6 +428,54 @@ class RealTimeFeatureMapper:
         # Resources remaining (for both innings)
         resources_remaining = resource_features.get('resource_pct', 100) / 100
         
+        # --- Inn1 Carryover Features (v6+) ---
+        # These bridge the innings transition by carrying inn1 context into inn2.
+        first_innings_score = scraped_data.get('first_innings_score')
+        
+        # venue_chase_success: fraction of chases won at this venue
+        venue_chase_success = 1.0 - venue_bat_first_win_rate
+        
+        # target_above_par: how far inn1 score is above/below venue average
+        if innings == 2 and first_innings_score is not None:
+            target_above_par = first_innings_score - venue_avg_score
+        else:
+            target_above_par = 0.0
+        
+        # batting_won_toss: whether current batting team won the toss
+        toss_winner = scraped_data.get('toss_winner')
+        if toss_winner:
+            batting_won_toss = int(batting_team == toss_winner)
+        else:
+            batting_won_toss = 0.5  # Unknown toss → neutral
+        
+        # Inn1 stats from crex live predictor (or defaults matching training)
+        if innings == 2:
+            inn1_wickets_lost = scraped_data.get('inn1_wickets_lost')
+            inn1_wickets_lost = float(inn1_wickets_lost) if inn1_wickets_lost is not None else 5.0
+            
+            inn1_pp_runs = scraped_data.get('inn1_pp_runs')
+            inn1_pp_runs = float(inn1_pp_runs) if inn1_pp_runs is not None else 45.0
+            
+            inn1_death_rr = scraped_data.get('inn1_death_rr')
+            inn1_death_rr = float(inn1_death_rr) if inn1_death_rr is not None else 9.0
+        else:
+            inn1_wickets_lost = 5.0   # Default for inn1 (matches training)
+            inn1_pp_runs = 45.0
+            inn1_death_rr = 9.0
+        
+        # inn1_defendability: resource_win_prob at end of inn1
+        if innings == 2 and first_innings_score is not None:
+            inn1_wkts_for_defend = int(inn1_wickets_lost) if inn1_wickets_lost != 5.0 else 5
+            defend_features = self.resource_calculator.calculate_all_features(
+                innings=1, over=19, ball=5,
+                current_score=first_innings_score,
+                wickets_lost=inn1_wkts_for_defend,
+                target_runs=None
+            )
+            inn1_defendability = defend_features.get('resource_win_prob', 0.5)
+        else:
+            inn1_defendability = 0.5
+        
         # --- Construct Feature DataFrame ---
         features = {
             # Top 25 Features
@@ -471,6 +519,15 @@ class RealTimeFeatureMapper:
             'wickets_last_30': wickets_last_30,
             'crr_times_res': crr_times_res,
             'resources_remaining': resources_remaining,
+            
+            # Inn1 carryover features (v6+)
+            'venue_chase_success': venue_chase_success,
+            'target_above_par': target_above_par,
+            'batting_won_toss': batting_won_toss,
+            'inn1_wickets_lost': inn1_wickets_lost,
+            'inn1_pp_runs': inn1_pp_runs,
+            'inn1_death_rr': inn1_death_rr,
+            'inn1_defendability': inn1_defendability,
             
             # Extra features (kept for completeness)
             'innings': innings,

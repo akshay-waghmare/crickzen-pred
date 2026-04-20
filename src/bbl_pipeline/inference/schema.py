@@ -25,6 +25,15 @@ class MatchState:
     first_innings_score: Optional[int] = None  # Score of first innings (for 2nd innings context)
     total_overs: int = 20  # Match format total overs (20 for T20, 50 for ODI)
     
+    # Toss info (for batting_won_toss feature)
+    toss_winner: Optional[str] = None
+    toss_decision: Optional[str] = None
+    
+    # Inn1 carryover stats (computed by live predictor, used for inn2 prior features)
+    inn1_wickets_lost: Optional[int] = None
+    inn1_pp_runs: Optional[float] = None
+    inn1_death_rr: Optional[float] = None
+    
     def get_overs_bowled(self) -> float:
         """Return overs bowled as a float (e.g., 5.3 = 5 overs 3 balls)."""
         return self.over + (self.ball / 6.0)

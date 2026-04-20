@@ -1814,6 +1814,9 @@ class CrexLivePredictor:
                 target_runs=self.match_state.target,
                 first_innings_score=self.match_state.target - 1 if self.match_state.target else None,
                 total_overs=self.format_config.total_overs,
+                toss_winner=self.match_state.toss_winner or None,
+                toss_decision=self.match_state.toss_decision or None,
+                **self._compute_inn1_carryover_stats(),
             )
             
             # Convert ball history to mapper format for rolling stats
@@ -1849,6 +1852,50 @@ class CrexLivePredictor:
             import traceback
             traceback.print_exc()
             return None
+    
+    def _compute_inn1_carryover_stats(self) -> dict:
+        """Compute innings 1 carryover stats from ball history for v6+ features.
+        
+        Returns dict with inn1_wickets_lost, inn1_pp_runs, inn1_death_rr 
+        suitable for unpacking into PredictorMatchState kwargs.
+        """
+        result = {}
+        
+        if not self.match_state.is_second_innings:
+            return result
+        
+        balls = list(self.match_state.balls_data)
+        if not balls:
+            return result
+        
+        # Find innings boundary (same logic as _build_ball_history_for_mapper)
+        innings_start_idx = 0
+        for i, ball in enumerate(balls):
+            if i > 0:
+                prev_ball = balls[i - 1]
+                if prev_ball.over_number >= 15 and ball.over_number <= 5:
+                    innings_start_idx = i
+                    break
+        
+        inn1_balls = balls[:innings_start_idx] if innings_start_idx > 0 else []
+        if not inn1_balls:
+            return result
+        
+        # Wickets lost in inn1
+        inn1_wickets = sum(1 for b in inn1_balls if b.is_wicket)
+        result['inn1_wickets_lost'] = inn1_wickets
+        
+        # PP runs (overs 0-5)
+        pp_runs = sum(b.runs for b in inn1_balls if b.over_number < 6)
+        result['inn1_pp_runs'] = float(pp_runs)
+        
+        # Death overs RR (overs 16-19)
+        death_balls = [b for b in inn1_balls if b.over_number >= 16]
+        if death_balls:
+            death_runs = sum(b.runs for b in death_balls)
+            result['inn1_death_rr'] = (death_runs / len(death_balls)) * 6
+        
+        return result
     
     def _build_ball_history_for_mapper(self) -> list:
         """

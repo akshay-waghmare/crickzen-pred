@@ -55,7 +55,7 @@ class Settings(BaseSettings):
 LEAGUE_CONFIGS: dict[str, dict] = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v3",
+        "model_dir": "models/ipl_v6",
         "feature_store_dir": "data/ipl_feature_store_v3",
     },
     "PSL": {

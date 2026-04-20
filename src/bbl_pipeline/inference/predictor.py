@@ -625,6 +625,13 @@ class Predictor:
             'target_score': state.target_runs,
             # Calculate runs_needed for 2nd innings
             'runs_needed': (state.target_runs - state.current_score) if state.target_runs else 0,
+            # Inn1 carryover and toss info (for v6+ features)
+            'first_innings_score': state.first_innings_score,
+            'toss_winner': getattr(state, 'toss_winner', None),
+            'toss_decision': getattr(state, 'toss_decision', None),
+            'inn1_wickets_lost': getattr(state, 'inn1_wickets_lost', None),
+            'inn1_pp_runs': getattr(state, 'inn1_pp_runs', None),
+            'inn1_death_rr': getattr(state, 'inn1_death_rr', None),
         }
         
         try:
