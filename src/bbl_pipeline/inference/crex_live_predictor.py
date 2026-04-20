@@ -228,6 +228,7 @@ class CrexLivePredictor:
         self._first_prediction = True  # Debug flag for first prediction
         self._prediction_history = []  # Track predictions over time
         self.local_storage = {}  # CREX localStorage for resolving team/player codes
+        self._inn1_cached_stats = {}  # Cache inn1 stats (PP runs, death RR, wickets) at innings break
         
         # Persist history to separate file for Streamlit page refresh resilience
         if output_json:
@@ -1896,44 +1897,156 @@ class CrexLivePredictor:
         
         Returns dict with inn1_wickets_lost, inn1_pp_runs, inn1_death_rr 
         suitable for unpacking into PredictorMatchState kwargs.
+        
+        Strategy:
+        1. During inn1: continuously cache stats from live ball data
+        2. During inn2: try ball history first, fall back to cached stats
         """
         result = {}
         
         if not self.match_state.is_second_innings:
+            # Still in inn1 — cache current stats from ball history for later use
+            self._cache_inn1_stats_from_balls()
             return result
         
+        # Inn2: try computing from ball history (has inn1 balls)
+        balls = list(self.match_state.balls_data)
+        if balls:
+            # Find innings boundary (same logic as _build_ball_history_for_mapper)
+            innings_start_idx = 0
+            for i, ball in enumerate(balls):
+                if i > 0:
+                    prev_ball = balls[i - 1]
+                    if prev_ball.over_number >= 15 and ball.over_number <= 5:
+                        innings_start_idx = i
+                        break
+            
+            inn1_balls = balls[:innings_start_idx] if innings_start_idx > 0 else []
+            if inn1_balls:
+                inn1_wickets = sum(1 for b in inn1_balls if b.is_wicket)
+                result['inn1_wickets_lost'] = inn1_wickets
+                
+                pp_runs = sum(b.runs for b in inn1_balls if b.over_number < 6)
+                result['inn1_pp_runs'] = float(pp_runs)
+                
+                death_balls = [b for b in inn1_balls if b.over_number >= 16]
+                if death_balls:
+                    death_runs = sum(b.runs for b in death_balls)
+                    result['inn1_death_rr'] = (death_runs / len(death_balls)) * 6
+                
+                # Update cache with computed values
+                self._inn1_cached_stats.update(result)
+                logger.info(f"Inn1 carryover from ball history: {result}")
+                return result
+        
+        # Fallback 1: use cached stats from when inn1 was live
+        if self._inn1_cached_stats:
+            result.update(self._inn1_cached_stats)
+            logger.info(f"Inn1 carryover from cache: {result}")
+            return result
+        
+        # Fallback 2: try betx21 production recordings
+        betx21_stats = self._fetch_inn1_stats_from_betx21()
+        if betx21_stats:
+            self._inn1_cached_stats.update(betx21_stats)  # Cache for subsequent calls
+            result.update(betx21_stats)
+            logger.info(f"Inn1 carryover from betx21: {result}")
+            return result
+        
+        logger.warning("No inn1 ball history, cache, or betx21 data — using defaults")
+        return result
+
+    def _cache_inn1_stats_from_balls(self):
+        """Cache inn1 stats from current ball data (called during inn1)."""
         balls = list(self.match_state.balls_data)
         if not balls:
-            return result
+            return
         
-        # Find innings boundary (same logic as _build_ball_history_for_mapper)
-        innings_start_idx = 0
-        for i, ball in enumerate(balls):
-            if i > 0:
-                prev_ball = balls[i - 1]
-                if prev_ball.over_number >= 15 and ball.over_number <= 5:
-                    innings_start_idx = i
-                    break
+        wickets = sum(1 for b in balls if b.is_wicket)
+        self._inn1_cached_stats['inn1_wickets_lost'] = wickets
         
-        inn1_balls = balls[:innings_start_idx] if innings_start_idx > 0 else []
-        if not inn1_balls:
-            return result
+        pp_runs = sum(b.runs for b in balls if b.over_number < 6)
+        if any(b.over_number < 6 for b in balls):
+            self._inn1_cached_stats['inn1_pp_runs'] = float(pp_runs)
         
-        # Wickets lost in inn1
-        inn1_wickets = sum(1 for b in inn1_balls if b.is_wicket)
-        result['inn1_wickets_lost'] = inn1_wickets
-        
-        # PP runs (overs 0-5)
-        pp_runs = sum(b.runs for b in inn1_balls if b.over_number < 6)
-        result['inn1_pp_runs'] = float(pp_runs)
-        
-        # Death overs RR (overs 16-19)
-        death_balls = [b for b in inn1_balls if b.over_number >= 16]
+        death_balls = [b for b in balls if b.over_number >= 16]
         if death_balls:
             death_runs = sum(b.runs for b in death_balls)
-            result['inn1_death_rr'] = (death_runs / len(death_balls)) * 6
+            self._inn1_cached_stats['inn1_death_rr'] = (death_runs / len(death_balls)) * 6
+
+    def _fetch_inn1_stats_from_betx21(self) -> dict:
+        """Fallback: fetch inn1 stats from betx21 production score recordings.
         
-        return result
+        Uses SSH+SCP to download the scores file, then reconstructs inn1 stats
+        from score progression data. Only called when both ball history and cache
+        are empty (e.g., predictor started mid-inn2).
+        
+        Returns dict with inn1_pp_runs, inn1_death_rr, inn1_wickets_lost or empty dict.
+        """
+        try:
+            # scripts/ is at project root, one level above src/
+            project_root = str(Path(__file__).resolve().parents[3])
+            if project_root not in sys.path:
+                sys.path.insert(0, project_root)
+            from scripts.fetch_betx21_inn1_stats import (
+                list_matches, download_scores, load_scores, extract_inn1_stats
+            )
+        except ImportError:
+            logger.debug("betx21 fetch script not available")
+            return {}
+        
+        try:
+            today = datetime.utcnow().strftime("%Y-%m-%d")
+            
+            # Find matching match by team names
+            batting_team = self.match_state.batting_team or ""
+            bowling_team = self.match_state.bowling_team or ""
+            if not batting_team:
+                return {}
+            
+            logger.info(f"Trying betx21 fallback for {batting_team} vs {bowling_team}")
+            matches = list_matches(today)
+            
+            match_id = None
+            for m in matches:
+                t1_lower = m.get("t1", "").lower()
+                t2_lower = m.get("t2", "").lower()
+                bat_lower = batting_team.lower()
+                bowl_lower = bowling_team.lower()
+                # Match if either team name appears in either position
+                if (bat_lower in t1_lower or bat_lower in t2_lower or
+                    t1_lower in bat_lower or t2_lower in bat_lower or
+                    bowl_lower in t1_lower or bowl_lower in t2_lower or
+                    t1_lower in bowl_lower or t2_lower in bowl_lower):
+                    match_id = m["id"]
+                    logger.info(f"Found betx21 match: {m['t1']} vs {m['t2']} (id={match_id})")
+                    break
+            
+            if not match_id:
+                logger.debug(f"No betx21 match found for {batting_team} vs {bowling_team}")
+                return {}
+            
+            path = download_scores(match_id, today)
+            if not path:
+                return {}
+            
+            lines = load_scores(path)
+            stats = extract_inn1_stats(lines)
+            
+            if stats.get("data_quality") in ("full", "partial"):
+                result = {}
+                if "inn1_pp_runs" in stats:
+                    result["inn1_pp_runs"] = float(stats["inn1_pp_runs"])
+                if "inn1_death_rr" in stats:
+                    result["inn1_death_rr"] = float(stats["inn1_death_rr"])
+                if "inn1_wickets_lost" in stats:
+                    result["inn1_wickets_lost"] = int(stats["inn1_wickets_lost"])
+                return result
+            
+            return {}
+        except Exception as e:
+            logger.warning(f"betx21 fallback failed: {e}")
+            return {}
     
     def _build_ball_history_for_mapper(self) -> list:
         """

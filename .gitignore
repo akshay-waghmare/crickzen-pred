@@ -58,3 +58,5 @@ data/telegram_predictions.jsonl
 
 # Temporary debug scripts
 temp_*.py
+
+data/betx21_live/
