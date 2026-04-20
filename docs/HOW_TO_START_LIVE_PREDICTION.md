@@ -32,14 +32,23 @@ https://crex.com/cricket-live-score/csk-vs-pbks-7th-match-indian-premier-league-
 ### Step 2: Start the Predictor
 
 ```bash
+# IPL: Use ipl_v3 model (beats market by -2.7% Brier, vs global model's -0.1%)
 python -m src.bbl_pipeline.inference.crex_live_predictor \
   --match-url "CREX_URL" \
-  --model-dir models/t20_male_v2 \
-  --feature-store-dir data/bbl_feature_store_v2 \
+  --model-dir models/ipl_v3 \
+  --feature-store-dir data/ipl_feature_store_v3 \
   --league ipl \
   --output-json data/ipl_live_ml.json \
   --record-states \
   --states-dir data/match_states/ipl
+
+# Other T20 leagues: Use global model with --league flag
+python -m src.bbl_pipeline.inference.crex_live_predictor \
+  --match-url "CREX_URL" \
+  --model-dir models/t20_male_v2 \
+  --feature-store-dir data/t20_male_feature_store_v2 \
+  --league bbl \
+  --output-json data/live_state.json
 ```
 
 ### Step 3: Start the Streamlit Visualization (separate terminal)

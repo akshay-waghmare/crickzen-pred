@@ -809,13 +809,38 @@
     "IPL": {
       "path": "models/ipl_v3",
       "version": "v3",
-      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1817, ECE: 0.0000)",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration + LogitBias + Transition Blend. OOS: Brier 0.1407 (-2.7% vs market)",
       "training": {
         "samples": 278954,
         "date": "2026-04-19",
         "brier_score": 0.1817153726463826
       },
-      "calibrator": {},
+      "calibrator": {
+        "path": "models/ipl_v3/isotonic_calibrator.pkl",
+        "type": "per_over_brier_optimized",
+        "n_calibrators": 38
+      },
+      "league_calibrator": {
+        "path": "models/ipl_v3/league_calibrators/ipl/league_calibrator.pkl",
+        "method": "logit_bias",
+        "biases": {
+          "inn1_powerplay": 0.0645,
+          "inn1_middle": -0.3227,
+          "inn1_death": -0.6890,
+          "inn2_powerplay": 0.1022,
+          "innings_1": -0.2892
+        },
+        "notes": "inn2_mid/death/innings_2 removed — corrected resource calc makes them unnecessary"
+      },
+      "oos_metrics": {
+        "dataset": "12 IPL 2026 matches, 432 obs vs Betfair exchange",
+        "brier_overall": 0.1407,
+        "brier_vs_market": "-2.7%",
+        "brier_inn1": 0.1812,
+        "brier_inn2": 0.0941,
+        "brier_inn2_death": 0.0615,
+        "transition_blend_overs": 6
+      },
       "feature_store": {
         "path": "data/ipl_feature_store_v3",
         "version": "v3",

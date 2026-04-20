@@ -15,13 +15,13 @@ BBL, SA20, etc.) where betx21.live records market data.
 ### Architecture
 
 ```
-Global T20 Model (frozen)
+Model (league-specific or global)
     ↓
 Per-Over Isotonic Calibration (38 calibrators)
     ↓
 Phase Isotonic Calibration (6 calibrators, fallback)
     ↓
-League LogitBias Correction (6 phase + 2 innings fallback)  ← THIS GUIDE
+League LogitBias Correction (phase + innings fallback)  ← THIS GUIDE
     ↓
 Innings Transition Smoothing (blend inn1 prior for inn2 overs 1-6)
     ↓
@@ -30,13 +30,26 @@ Final P(batting_team wins)
 
 ### Results (IPL 2026, 12 matches, 432 observations)
 
+**Recommended: IPL v3 standalone model (ipl_v3 + ipl_iso + LogitBias + blend)**
+
 | Stage | Brier | vs Market |
 |-------|-------|-----------|
 | Market (exchange mid-price) | 0.1446 | baseline |
-| Raw model (no calibration) | 0.1571 | +8.7% |
-| + Per-over isotonic | ~0.1520 | +5.1% |
-| + LogitBias correction | 0.1480 | +2.4% |
-| + Transition smoothing (6 overs) | **0.1454** | **+0.5%** |
+| IPL v3 raw | ~0.1530 | +5.8% |
+| + Per-over isotonic | 0.1484 | +2.7% |
+| + LogitBias correction | ~0.1430 | −1.1% |
+| + Transition smoothing (6 overs) | **0.1407** | **−2.7%** |
+
+**Note:** IPL v3 uses a corrected resource calculator (rrr_beta=0.57) which makes
+inn2 predictions better calibrated. As a result, inn2 LogitBias is minimal —
+only inn2_powerplay bias is applied; inn2_mid/death use raw isotonic output.
+
+Previous global model pipeline for reference:
+
+| Stage | Brier | vs Market |
+|-------|-------|-----------|
+| Global raw | 0.1571 | +8.7% |
+| + Global isotonic + LogitBias + blend | 0.1445 | −0.1% |
 
 ---
 
