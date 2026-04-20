@@ -127,6 +127,9 @@ class FormatConfig:
     pressure_rrr_min: float
     pressure_rrr_max: float
 
+    # --- Innings transition blend (0 = disabled) ----------------------------
+    transition_blend_overs: int = 6  # Blend inn1 prior over first N inn2 overs; 0 disables
+
     # --- Final-over lookup (optional, None = use sigmoid fallback) ----------
     final_over_lookup: Optional[Dict[int, Dict[int, float]]] = None
 
@@ -349,6 +352,7 @@ class FormatConfig:
             rrr_midpoint=8.56,             # IPL intercept (was 9.5)
             rrr_midpoint_slope=0.134,  # IPL-specific: midpoint increases per over
             chase_wicket_weight=0.0,   # IPL: wicket penalty HURTS Brier by +6.7%
+            transition_blend_overs=0,  # IPL v4: blend HURTS inn2 PP by +0.9%
             expected_run_rates={
                 "powerplay": 7.53,
                 "middle": 7.51,

@@ -141,7 +141,7 @@ class Predictor:
         # Innings transition smoothing: store inn1 final probability as prior for inn2 start
         self._inn1_final_prob = None  # P(batting_team wins) at end of innings 1
         self._inn1_batting_team = None  # Which team was batting in innings 1
-        self.INNINGS_TRANSITION_OVERS = 6  # Blend inn1 prior over this many inn2 overs
+        self.INNINGS_TRANSITION_OVERS = getattr(self.format_config, 'transition_blend_overs', 6)
         self.last_transition_alpha = None  # For debug/logging access
     
     def reset_innings_prior(self):
