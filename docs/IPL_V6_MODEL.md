@@ -125,9 +125,8 @@ Inn2 PP flipped from +33.5% worse to **-19.5% better** than market.
    and inn1 structure (wickets, death RR, PP runs) all provide real signal. Generic pitch
    proxies (dot%, boundary%) do not.
 
-2. **The inn2 PP gap is an information gap, not a model gap.** The remaining +7.2% likely
-   reflects market knowledge we can't extract from scoreboard (dew, pitch behavior under
-   lights, trader priors, intent signals).
+2. **v6 beats market in every segment except Inn1 PP.** The inn2 PP gap flipped from +33.5% (v4)
+   to -19.5% better than market. Overall model beats market by 16.7%.
 
 3. **180/3 ≠ 180/8.** Carrying `inn1_wickets_lost` lets the model distinguish between
    strong totals with resources preserved vs inflated/collapse totals.
@@ -137,6 +136,77 @@ Inn2 PP flipped from +33.5% worse to **-19.5% better** than market.
 
 5. **Venue chase history is very strong.** `venue_chase_success` at #5 is the single
    most impactful new feature. Some venues heavily favor chasing.
+
+6. **Isotonic calibration slightly hurts OOS.** Raw v6 Brier (0.1110) is 1.7% better than
+   calibrated (0.1129). The v5-era calibrators may need retraining for v6's feature set.
+
+---
+
+## ⚠️ Data Alignment Bug & Fix (CRITICAL for Future Analysis)
+
+### The Problem
+
+`training.parquet` rows are **NOT position-aligned** with raw parquet files (`data/ipl_raw/matches/`).
+The processor (`processor.py`) reorders rows during feature computation via `groupby()`, `merge()`, and
+sort operations. This means you **cannot** join metadata from raw parquet onto training features by
+row index/position.
+
+### What Went Wrong
+
+Earlier OOS analysis attempted to align training.parquet with raw parquet by row position to get
+`match_id`, `season`, `batting_team`, and `winner` columns. This produced ~50% mismatch rate
+(essentially random alignment), leading to:
+
+| Metric | Misaligned (WRONG) | Aligned (CORRECT) |
+|--------|:------------------:|:------------------:|
+| v6 Overall vs Market | -1.9% | **-16.7%** |
+| v6 Inn2 PP vs Market | +7.2% | **-19.5%** |
+| v5→v6 Overall | -3.1% | **-5.8%** |
+
+The misaligned data severely understated model performance and made it look like Inn2 PP was still
+worse than market when in reality v6 already beats it.
+
+### The Fix
+
+**processor.py** (line ~1218) now includes 7 metadata columns in training.parquet output:
+```python
+metadata_cols = ['match_id', 'season', 'over', 'ball', 'batting_team', 'bowling_team', 'winner']
+all_cols = feature_cols + [c for c in metadata_cols if c in df.columns and c not in feature_cols]
+training_data = df[all_cols].copy()
+```
+
+The model (`XGBLogRegEnsemble`) ignores non-feature columns automatically via its internal
+`TOP_FEATURES` list, so this change is backward-compatible.
+
+### Rules for Future OOS Analysis
+
+1. **NEVER** align training.parquet with raw parquet by row position
+2. **ALWAYS** use the metadata columns embedded in training.parquet
+3. **ALWAYS** verify alignment: check `is_winner == (batting_team == winner)` — mismatch should be 0
+4. **ALWAYS** verify `winner` is consistent within each `match_id`
+5. After re-processing features, check that metadata columns are present (65 cols, not 58)
+
+### Verification Checklist (run before trusting any OOS metric)
+
+```python
+# 1. Metadata present
+assert all(c in df.columns for c in ['match_id', 'season', 'batting_team', 'winner'])
+
+# 2. Alignment: is_winner matches batting_team == winner
+check = (df['is_winner'] == (df['batting_team'] == df['winner']).astype(int))
+assert check.all(), f"Alignment broken: {(~check).sum()} mismatches"
+
+# 3. Winner consistent per match
+assert df.groupby('match_id')['winner'].nunique().eq(1).all()
+```
+
+### P(batting_team) vs P(inn1_team) Conversion
+
+The model outputs `P(batting_team wins)`. For market comparison (which uses P(inn1_team)):
+- **Innings 1:** `P(inn1) = P(batting)` (batting team IS the inn1 team)
+- **Innings 2:** `P(inn1) = 1 - P(batting)` (batting team is the chasing/inn2 team)
+
+Ground truth for market comparison: `inn1_wins = (winner == inn1_team)`
 
 ---
 
@@ -160,8 +230,11 @@ models/ipl_v6/
 1. **Collect more OOS data** — 12 matches with market is thin. Full IPL 2026 (~60 matches)
    will give much more reliable per-segment conclusions.
 
-2. **Inn2 PP specialist model** — A dedicated model for overs 1-3 of chase using
-   primarily prior features with small live update. Could close remaining gap.
+2. **Re-train isotonic calibrators for v6** — Raw model outperforms calibrated by 1.7%.
+   The current calibrators were inherited from v5's feature distribution. Refit with v6 OOF.
 
-3. **Inn1 closing probability** — Use the full model's calibrated prediction at inn1 end
-   (not just resource_win_prob) as the prior. Requires stacking/OOF approach.
+3. **Inn1 PP gap** — The only segment where v6 loses to market (+5.4%). Could benefit
+   from stronger early-innings features (e.g., team depth indices, pre-match priors).
+
+4. **Inn1 closing probability as chase prior** — Use the full model's calibrated prediction
+   at inn1 end as a feature. Requires stacking/OOF approach to avoid leakage.
