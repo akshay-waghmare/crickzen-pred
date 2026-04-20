@@ -117,6 +117,12 @@ Both new features rank in the top 8 — they carry genuine signal.
 
 ## Investigation Log: What Was Tried and What Didn't Work
 
+### ❌ Inn1 Pitch Proxy Features (Team-Adjusted)
+- Added inn1_dots, inn1_boundaries, inn1_runs_per_wkt scaled by batting team win rate
+- Idea: strong team with high dot% = genuinely tough pitch; weak team = just poor batting
+- Holdout result: +0.6% worse overall, +4.8% worse inn2 mid
+- Scoreboard-derived features have hit diminishing returns for IPL
+
 ### ❌ MC Predictor for Inn2 PP
 - Monte Carlo simulation is +13% worse than ML across all inn2 PP overs
 - Even 10% MC + 90% ML blend hurts (+0.6%)
@@ -152,6 +158,8 @@ Both new features rank in the top 8 — they carry genuine signal.
 5. **Don't train on all data for OOS validation.** True holdout (train pre-2026, test 2026) gives much more conservative (and realistic) results than train-on-all.
 
 6. **12 matches is thin.** Many per-over comparisons have only 12 observations. Need 50+ matches for reliable per-over conclusions.
+
+7. **Don't add more scoreboard-derived pitch features.** Even team-strength-adjusted pitch proxies (dot%, boundary%, RPW) add noise. XGBoost already extracts available scoreboard signal. The remaining inn2 PP gap vs market is an *information* gap (dew, pitch behavior, intent signals) not a *feature engineering* gap.
 
 ---
 
