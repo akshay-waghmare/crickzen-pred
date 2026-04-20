@@ -366,6 +366,185 @@ print(inn2[['inn1_wickets_lost', 'inn1_pp_runs', 'inn1_death_rr',
 
 ---
 
+## Inn1 Ball-History Loss Bug & betx21 Fallback (2026-04-20)
+
+### The Problem
+
+During live inference, three inn1 carryover features (`inn1_pp_runs`, `inn1_death_rr`,
+`inn1_wickets_lost`) depend on ball-by-ball data from the first innings. However:
+
+1. **CREX API only provides current innings balls** — when inn2 starts, the `rb` (recent balls)
+   field only contains the last ~6-8 inn2 balls, not the full inn1 history.
+2. **Predictor restarts lose all state** — if the process is restarted mid-inn2,
+   `balls_data` starts empty and inn1 data cannot be recovered from CREX.
+
+**Impact measured on GT vs MI (2026-04-20):**
+
+| Feature | Default | Actual (betx21) | Error |
+|---------|:-------:|:----------------:|:-----:|
+| `inn1_pp_runs` | 45.0 | **46.0** | +2% (negligible) |
+| `inn1_death_rr` | 9.0 | **15.4** | **-72%** ⚠️ |
+| `inn1_wickets_lost` | 5.0 | **5.0** | 0% (lucky) |
+
+The death-over run rate was **72% wrong** with defaults — MI scored at 15.4 RPO in the death
+but the model assumed 9.0 RPO. This significantly underestimates the total's quality and
+the difficulty of the chase.
+
+### Three-Tier Fallback Chain
+
+```
+crex_live_predictor._compute_inn1_carryover_stats()
+│
+├─ 1. Ball History (best)
+│     Parse balls_data for innings==1 entries
+│     ✅ Exact values from CREX ball-by-ball scrape
+│     ❌ Only works if predictor ran continuously through inn1
+│
+├─ 2. Instance Cache (good)
+│     _inn1_cached_stats dict, updated each poll during inn1
+│     ✅ Survives innings break within same process
+│     ❌ Lost on process restart
+│
+└─ 3. betx21 Production Download (fallback)
+      SSH to prod server, download score progression, reconstruct
+      ✅ Always available (betx21 records all IPL matches)
+      ✅ Over-level granularity sufficient for PP/death stats
+      ⚠️ Adds ~3-5s latency on first call (SSH + SCP)
+      ⚠️ Requires SSH key (~/.ssh/id_server_wc)
+```
+
+### betx21 Data Architecture
+
+The `betx21.live` project runs on production (`204.12.199.137`) and records all IPL match data:
+
+```
+/home/administrator/betx21.live/data/recordings/
+└── YYYY-MM-DD/
+    ├── {eventId}_odds.jsonl.gz      # Betting odds ticks
+    ├── {eventId}_scores.jsonl.gz    # Ball-by-ball score updates
+    └── {eventId}_sessions.jsonl.gz  # Session/fancy market data
+```
+
+**Score record format** (gzip JSONL):
+```json
+{
+  "t": 1713626400000,
+  "ev": 35503673,
+  "t1": "Gujarat Titans",
+  "s1": "199/5 (20.0)",
+  "t2": "Mumbai Indians",
+  "s2": "43/3 (5.1)",
+  "b": ["0", "1", "4", "W", "0", "2"]
+}
+```
+
+**Key details:**
+- `s1`/`s2` are NOT batting order — `t1`/`t2` are fixed per match, detect who batted first by which score grows
+- `b` field is "recent balls" (max ~8), NOT full ball history — useless for reconstruction
+- Score ticks: ~170-320 per match, enough for over-level granularity
+- Live recordings may have truncated gzip — handled with `EOFError` fallback
+
+### Inn1 Stats Reconstruction
+
+From betx21 score progression:
+- **`inn1_pp_runs`**: Score at first tick where overs ≥ 6.0
+- **`inn1_death_rr`**: `(final_runs - runs_at_over_16) / (final_overs - 16.0) * 6`
+- **`inn1_wickets_lost`**: Wickets from final inn1 score string (e.g., "199/5" → 5)
+
+### Team Matching (CREX → betx21)
+
+CREX provides team names; betx21 uses numeric event IDs. Matching is done by:
+1. SSH to list today's files: `ls /home/administrator/betx21.live/data/recordings/YYYY-MM-DD/`
+2. Download each `_scores.jsonl.gz` candidate
+3. Compare `t1`/`t2` names against CREX team names (case-insensitive substring match)
+
+### Standalone Script
+
+`scripts/fetch_betx21_inn1_stats.py` provides CLI access to betx21 data:
+
+```bash
+# List all matches for a date
+python scripts/fetch_betx21_inn1_stats.py --list --date 2026-04-20
+
+# Get inn1 stats for a specific match
+python scripts/fetch_betx21_inn1_stats.py --match-id 35503673
+
+# JSON output for programmatic use
+python scripts/fetch_betx21_inn1_stats.py --match-id 35503673 --json
+
+# Use already-downloaded file
+python scripts/fetch_betx21_inn1_stats.py --local-file data/betx21_live/2026-04-20/35503673_scores.jsonl.gz
+```
+
+### SSH Configuration
+
+```
+Host: 204.12.199.137
+User: administrator
+Key:  ~/.ssh/id_server_wc
+SSH:  "C:\Program Files\Git\usr\bin\ssh.exe"  (Windows)
+SCP:  "C:\Program Files\Git\usr\bin\scp.exe"  (Windows)
+```
+
+### Files Changed
+
+| Commit | File | Change |
+|--------|------|--------|
+| `6568bba` | `crex_live_predictor.py` | Toss abbreviation → full name resolution, carryover fields in all scraped_data |
+| `7774034` | `crex_live_predictor.py` | Inn1 caching + betx21 fallback chain (~200 lines) |
+| `7774034` | `scripts/fetch_betx21_inn1_stats.py` | Standalone betx21 data fetcher (354 lines) |
+| `7774034` | `.gitignore` | Added `data/betx21_live/` |
+
+---
+
+## Live Verification Results (GT vs MI, 2026-04-20)
+
+### Match Details
+- **Gujarat Titans vs Mumbai Indians**, IPL 2026 Match 30
+- **Venue:** Narendra Modi Stadium, Ahmedabad
+- **MI batted first:** 199/5 (20.0 overs)
+- **GT chasing:** 200 target
+- **CREX URL:** `crex.com/cricket-live-score/gt-vs-mi-30th-match-indian-premier-league-2026-match-updates-118B`
+
+### Verified Behaviors
+
+| Check | Status | Notes |
+|-------|:------:|-------|
+| Model loads 32 features | ✅ | `Loaded model: ensemble` |
+| Per-over isotonic calibrators | ✅ | 38 calibrators + 6 phase fallback |
+| Venue resolves | ✅ | Narendra Modi Stadium |
+| Team stats load | ✅ | Both GT and MI found in feature store |
+| Inn1: defaults used (correct) | ✅ | inn1_pp_runs=45, inn1_death_rr=9.0 (constant during inn1) |
+| Inn2: betx21 fallback triggered | ✅ | SSH download, team match by name |
+| Inn2: real values populated | ✅ | pp_runs=46, death_rr=15.4, wickets=5 |
+| Predictions reasonable | ✅ | GT 23.1% at 45/3 (5.4 ov) |
+| Calibration chain active | ✅ | Raw → Phase → PerOver |
+| JSON output updates | ✅ | `data/ipl_live_ml.json` every ~15s |
+| Streamlit reads JSON | ✅ | Dashboard live at :8501 |
+
+### Feature Values During Inn2 (at 45/3, 5.4 overs)
+
+| Feature | Value | Source |
+|---------|:-----:|--------|
+| `venue_chase_success` | 0.40 | Feature store (venue stats) |
+| `target_above_par` | 13.0 | 200 - 187 (venue avg) |
+| `batting_won_toss` | 0.50 | Default (toss parse failed) |
+| `inn1_wickets_lost` | 5.0 | **betx21 fallback** |
+| `inn1_pp_runs` | 46.0 | **betx21 fallback** |
+| `inn1_death_rr` | 15.4 | **betx21 fallback** |
+| `inn1_defendability` | 0.6242 | Resource calculator |
+
+### Known Issues
+
+1. **`batting_won_toss = 0.5`** — Toss text not parsed from CREX info page.
+   Regex pattern `r'([A-Z0-9\-]+)\s+opt\s+to\s+(Bat|Bowl)'` not matching page format
+   during inn2. Low impact (~1.4% feature importance).
+
+2. **No league calibrator** — `models/ipl_v6/league_calibrators/ipl/league_calibrator.pkl`
+   not found. Expected — v6 is IPL-specific, no additional league calibration needed.
+
+---
+
 ## Next Steps
 
 1. **Collect more OOS data** — 12 matches with market is thin. Full IPL 2026 (~60 matches)
@@ -379,3 +558,9 @@ print(inn2[['inn1_wickets_lost', 'inn1_pp_runs', 'inn1_death_rr',
 
 4. **Monitor v6 in production** — Compare live predictions against Betfair odds to validate
    OOS metrics hold on new data. Check for any venue/team coverage gaps in feature store.
+
+5. **Fix toss parsing** — Debug CREX info page format to reliably extract toss winner.
+   Consider adding betx21 toss data as an alternative source.
+
+6. **Pre-fetch optimization** — Trigger betx21 download proactively on innings change
+   detection instead of waiting for first inn2 poll. Would eliminate 3-5s latency.
