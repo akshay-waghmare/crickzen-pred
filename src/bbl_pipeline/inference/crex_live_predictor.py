@@ -1814,7 +1814,7 @@ class CrexLivePredictor:
                 target_runs=self.match_state.target,
                 first_innings_score=self.match_state.target - 1 if self.match_state.target else None,
                 total_overs=self.format_config.total_overs,
-                toss_winner=self.match_state.toss_winner or None,
+                toss_winner=self._resolve_toss_winner_full_name() or None,
                 toss_decision=self.match_state.toss_decision or None,
                 **self._compute_inn1_carryover_stats(),
             )
@@ -1853,6 +1853,44 @@ class CrexLivePredictor:
             traceback.print_exc()
             return None
     
+    def _resolve_toss_winner_full_name(self) -> str:
+        """Resolve CREX toss abbreviation (e.g. 'GT') to full team name using toss_decision.
+        
+        In inn1: toss chose 'bat' → they are batting_team; 'bowl' → bowling_team.
+        In inn2: teams swap, so logic reverses.
+        """
+        abbr = self.match_state.toss_winner
+        if not abbr:
+            return ""
+        bat = self.match_state.batting_team or ""
+        bowl = self.match_state.bowling_team or ""
+        # If already a full name, return as-is
+        if abbr == bat or abbr == bowl:
+            return abbr
+        decision = (self.match_state.toss_decision or "").lower()
+        if not decision or not bat:
+            return abbr
+        if self.match_state.is_second_innings:
+            # Inn2: batting now = bowled inn1, bowling now = batted inn1
+            return bowl if decision == "bat" else bat
+        else:
+            # Inn1: batting now = chose to bat, bowling now = chose to bowl
+            return bat if decision == "bat" else bowl
+
+    def _get_carryover_scraped_fields(self) -> dict:
+        """Return toss + inn1 carryover fields for scraped_data dicts used in feature snapshots."""
+        fields: dict = {}
+        toss_full = self._resolve_toss_winner_full_name()
+        if toss_full:
+            fields['toss_winner'] = toss_full
+        if self.match_state.toss_decision:
+            fields['toss_decision'] = self.match_state.toss_decision
+        if self.match_state.target:
+            fields['first_innings_score'] = self.match_state.target - 1
+        carryover = self._compute_inn1_carryover_stats()
+        fields.update(carryover)
+        return fields
+
     def _compute_inn1_carryover_stats(self) -> dict:
         """Compute innings 1 carryover stats from ball history for v6+ features.
         
@@ -2118,6 +2156,7 @@ class CrexLivePredictor:
                 'venue': self.match_state.venue,
                 'target_score': self.match_state.target,
                 'runs_needed': (self.match_state.target - self.match_state.total_runs) if self.match_state.target else 0,
+                **self._get_carryover_scraped_fields(),
             }
             feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
             features = {
@@ -2272,7 +2311,8 @@ class CrexLivePredictor:
                         'bowling_team': state.bowling_team,
                         'venue': state.venue,
                         'target_score': state.target,
-                        'runs_needed': (state.target - state.total_runs) if state.target else 0
+                        'runs_needed': (state.target - state.total_runs) if state.target else 0,
+                        **self._get_carryover_scraped_fields(),
                     }
                     
                     feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
@@ -2352,7 +2392,8 @@ class CrexLivePredictor:
                         'bowling_team': state.bowling_team,
                         'venue': state.venue,
                         'target_score': state.target,
-                        'runs_needed': (state.target - state.total_runs) if state.target else 0
+                        'runs_needed': (state.target - state.total_runs) if state.target else 0,
+                        **self._get_carryover_scraped_fields(),
                     }
                     ball_history = self._build_ball_history_for_mapper()
 
