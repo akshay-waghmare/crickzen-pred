@@ -107,6 +107,8 @@ class FormatConfig:
     # --- Chase parameters ---------------------------------------------------
     rrr_midpoint: float
     rrr_beta: float
+    rrr_midpoint_slope: float  # per-over midpoint shift: midpoint(over) = rrr_midpoint + slope * over_0idx
+    chase_wicket_weight: float  # scales wicket_mult: 0.0=disabled, 1.0=full penalty
 
     # --- SQI / confidence ---------------------------------------------------
     sqi_beta: float
@@ -301,6 +303,8 @@ class FormatConfig:
             # Chase parameters
             rrr_midpoint=9.5,
             rrr_beta=0.7,
+            rrr_midpoint_slope=0.0,      # 0 = fixed midpoint (backward compatible)
+            chase_wicket_weight=1.0,      # 1.0 = full wicket penalty (backward compatible)
 
             # SQI / confidence
             sqi_beta=0.75,
@@ -336,11 +340,15 @@ class FormatConfig:
             par_score=173.45,
             league_avg_score=167.28,
             bat_first_win_rate=0.4581,
-            # IPL chase sigmoid: flatter than default T20 (0.70 from ILT20).
-            # Empirically fitted on 1169 IPL matches: IPL teams accelerate
-            # late in chases better than ILT20, so the steeper default
-            # overestimates easy chases and underestimates hard ones.
-            rrr_beta=0.57,
+            # IPL chase sigmoid: per-over adaptive midpoint.
+            # Fitted on 20,451 per-over observations (1169 IPL matches):
+            #   midpoint(over) = 8.56 + 0.134 * over_0idx
+            # Death overs get higher midpoint (IPL teams sustain higher RRR),
+            # reducing inn2 resource_win_prob ECE from 0.1075 to 0.0123 (-89%).
+            rrr_beta=0.598,
+            rrr_midpoint=8.56,             # IPL intercept (was 9.5)
+            rrr_midpoint_slope=0.134,  # IPL-specific: midpoint increases per over
+            chase_wicket_weight=0.0,   # IPL: wicket penalty HURTS Brier by +6.7%
             expected_run_rates={
                 "powerplay": 7.53,
                 "middle": 7.51,
@@ -527,6 +535,8 @@ class FormatConfig:
             wicket_penalty=base.wicket_penalty,
             rrr_midpoint=base.rrr_midpoint,
             rrr_beta=base.rrr_beta,
+            rrr_midpoint_slope=base.rrr_midpoint_slope,
+            chase_wicket_weight=base.chase_wicket_weight,
             sqi_beta=base.sqi_beta,
             sqi_shift=base.sqi_shift,
             confidence_full_overs=confidence_full,
@@ -690,6 +700,8 @@ class FormatConfig:
             # Chase parameters
             rrr_midpoint=5.5,
             rrr_beta=0.75,
+            rrr_midpoint_slope=0.0,
+            chase_wicket_weight=1.0,
 
             # SQI / confidence
             sqi_beta=0.45,
@@ -843,6 +855,8 @@ class FormatConfig:
             # Chase parameters
             rrr_midpoint=5.0,
             rrr_beta=0.95,
+            rrr_midpoint_slope=0.0,
+            chase_wicket_weight=1.0,
 
             # SQI / confidence
             sqi_beta=0.50,

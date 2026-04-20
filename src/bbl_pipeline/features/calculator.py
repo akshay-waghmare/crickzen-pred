@@ -55,6 +55,8 @@ class ResourceFeatureCalculator:
 
         self.RRR_BETA = config.rrr_beta
         self.RRR_MIDPOINT = config.rrr_midpoint
+        self.RRR_MIDPOINT_SLOPE = config.rrr_midpoint_slope
+        self.CHASE_WICKET_WEIGHT = config.chase_wicket_weight
 
         self.WICKET_PENALTY = config.wicket_penalty
 
@@ -926,6 +928,7 @@ class ResourceFeatureCalculator:
             wicket_mult = self.get_dynamic_wicket_penalty(
                 actual_wickets_lost, effective_crr, effective_rrr
             )
+            wicket_mult = 1.0 + self.CHASE_WICKET_WEIGHT * (wicket_mult - 1.0)
             
             return float(max(0.05, min(0.95, endgame_prob * wicket_mult)))
 
@@ -950,10 +953,11 @@ class ResourceFeatureCalculator:
             effective_rrr = 50.0  # Effectively impossible
         
         # Base probability from RRR using logistic function
-        # Calibrated from ILT20 EDA: beta=0.7, mu=9.5
-        # At RRR=7: ~80%, RRR=9.5: ~50%, RRR=12: ~20%
-        # Clip exponent to prevent overflow (exp argument range: -700 to 700)
-        exponent = self.RRR_BETA * (effective_rrr - self.RRR_MIDPOINT)
+        # Per-over adaptive midpoint: midpoint shifts up in later overs
+        # (IPL teams sustain higher RRR in death overs)
+        overs_bowled = self.TOTAL_OVERS - overs_remaining
+        effective_midpoint = self.RRR_MIDPOINT + self.RRR_MIDPOINT_SLOPE * overs_bowled
+        exponent = self.RRR_BETA * (effective_rrr - effective_midpoint)
         exponent = np.clip(exponent, -700, 700)
         base_prob = 1.0 / (1.0 + np.exp(exponent))
         
@@ -961,21 +965,22 @@ class ResourceFeatureCalculator:
         # WICKET PENALTY (Dynamic 2D - Chase Difficulty Aware)
         # -------------------------------------
         # Uses CRR/RRR ratio to determine chase ease, then applies
-        # appropriate wicket penalty from empirically-calibrated 2D table
+        # appropriate wicket penalty from empirically-calibrated 2D table.
+        # chase_wicket_weight scales the effect: 0.0 disables (IPL), 1.0 full.
         wicket_mult = self.get_dynamic_wicket_penalty(
             actual_wickets_lost, current_run_rate, effective_rrr
         )
+        wicket_mult = 1.0 + self.CHASE_WICKET_WEIGHT * (wicket_mult - 1.0)
         
         # -------------------------------------
         # CURRENT RUN RATE ADJUSTMENT
         # -------------------------------------
         # If batting above required rate, slight boost; below, slight penalty
-        # Effect is muted early in innings (CRR volatile)
-        overs_bowled = self.TOTAL_OVERS - overs_remaining
-        overs_weight = min(1.0, overs_bowled / 10.0)  # Full weight after 10 overs
-        
+        # Effect is muted early in innings (CRR volatile).
+        # Also scaled by chase_wicket_weight (same control knob).
         rate_factor = 1.0
-        if required_run_rate > 0 and current_run_rate > 0:
+        if self.CHASE_WICKET_WEIGHT > 0 and required_run_rate > 0 and current_run_rate > 0:
+            overs_weight = min(1.0, overs_bowled / 10.0)
             rate_ratio = current_run_rate / required_run_rate
             # Bound the impact: between 0.90 and 1.10 multiplier
             raw_rate_factor = min(1.10, max(0.90, rate_ratio))
