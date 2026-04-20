@@ -1,10 +1,11 @@
 """
 Compare Global T20 model vs IPL v3 standalone — Full Pipeline Analysis
 
-Compares 3 pipelines on 2026 IPL OOS data (12 matches, 432 obs) vs Betfair exchange:
+Compares 4 pipelines on 2026 IPL OOS data (12 matches, 432 obs) vs Betfair exchange:
   A) Global FULL = t20_male_v2 + global_iso + global_LogitBias + blend(6)
   B) IPL v3 +iso = ipl_v3 + ipl_iso only (no bias, no blend)
-  C) IPL v3 FULL = ipl_v3 + ipl_iso + ipl_LogitBias + blend(6)  [RECOMMENDED]
+  C) IPL v3 FULL = ipl_v3 + ipl_iso + ipl_LogitBias + blend(6)
+  D) IPL v3 FULL+T = ipl_v3 + ipl_iso + phase-T + ipl_LogitBias + blend(6)  [RECOMMENDED]
 
 Usage:
     python scripts/compare_global_vs_ipl.py
@@ -69,6 +70,23 @@ def apply_bias(p, inn, over_0, bias_cals):
         return p
     result = scaler.predict(np.array([[p]]))
     return float(np.asarray(result).flat[0])
+
+
+def temp_scale(p, T):
+    """Apply temperature scaling to probability. T<1 sharpens, T>1 softens."""
+    p = np.clip(p, 1e-6, 1 - 1e-6)
+    logit = np.log(p / (1 - p))
+    return float(1 / (1 + np.exp(-logit / T)))
+
+
+def apply_phase_temp(p, inn, over_0, temp_scalers):
+    """Apply phase-specific temperature scaling."""
+    phase = 'powerplay' if over_0 < 6 else ('middle' if over_0 < 16 else 'death')
+    key = 'inn%d_%s' % (inn, phase)
+    T = temp_scalers.get(key)
+    if T is None or T == 1.0:
+        return p
+    return temp_scale(p, T)
 
 
 def apply_transition(df, prob_col, transition_overs=6):
@@ -153,11 +171,20 @@ f26_v3['i_iso'] = [ipl_iso_fn(p, i, o) for p, i, o
                    in zip(f26_v3['i_raw'], f26_v3['innings'], f26_v3['over'])]
 print('Pipeline B (IPL v3 +iso) scored')
 
-# ── Pipeline C: IPL v3 FULL (recommended) ──
+# ── Pipeline C: IPL v3 FULL (iso + bias + blend) ──
 f26_v3['i_bias'] = [apply_bias(p, i, o, ipl_bias) for p, i, o
                     in zip(f26_v3['i_iso'], f26_v3['innings'], f26_v3['over'])]
 f26_v3['i_blend6'] = apply_transition(f26_v3, 'i_bias', 6)
 print('Pipeline C (IPL v3 FULL) scored')
+
+# ── Pipeline D: IPL v3 FULL+T (iso + temp + bias + blend) ──
+ipl_temp_scalers = ipl_league.get('temperature_scalers', {})
+f26_v3['i_temped'] = [apply_phase_temp(p, i, o, ipl_temp_scalers) for p, i, o
+                      in zip(f26_v3['i_iso'], f26_v3['innings'], f26_v3['over'])]
+f26_v3['i_temped_bias'] = [apply_bias(p, i, o, ipl_bias) for p, i, o
+                           in zip(f26_v3['i_temped'], f26_v3['innings'], f26_v3['over'])]
+f26_v3['i_temped_blend6'] = apply_transition(f26_v3, 'i_temped_bias', 6)
+print('Pipeline D (IPL v3 FULL+T) scored')
 
 # Merge with market
 market = pd.read_parquet('data/ipl_model_vs_market_v3.parquet')
@@ -175,12 +202,12 @@ mi = f26_v3_last.merge(market, left_on=['match_id', 'innings', 'over_1idx'],
 # Convert to P(inn1) space
 for col in ['g_raw', 'g_iso', 'g_bias', 'g_blend6']:
     mg[col + '_pi1'] = np.where(mg['innings'] == 1, mg[col], 1 - mg[col])
-for col in ['i_raw', 'i_iso', 'i_bias', 'i_blend6']:
+for col in ['i_raw', 'i_iso', 'i_bias', 'i_blend6', 'i_temped_bias', 'i_temped_blend6']:
     mi[col + '_pi1'] = np.where(mi['innings'] == 1, mi[col], 1 - mi[col])
 
 # Merge IPL v3 predictions into global df
 mg = mg.merge(mi[['match_id', 'innings', 'over_1idx',
-                   'i_iso_pi1', 'i_blend6_pi1']],
+                   'i_iso_pi1', 'i_blend6_pi1', 'i_temped_blend6_pi1']],
               on=['match_id', 'innings', 'over_1idx'], how='left')
 
 y = mg['actual_inn1_wins'].values.astype(float)
@@ -199,9 +226,10 @@ print(f'Merged: {len(mg)} obs, {n_matches} matches')
 print()
 print('=' * 100)
 print(f'COMPREHENSIVE MODEL COMPARISON — IPL 2026 OOS ({n_matches} matches, vs Betfair exchange)')
-print('  A) Global FULL = t20_male_v2 + global_iso + global_bias + blend(6)')
-print('  B) IPL v3 +iso = ipl_v3 + ipl_iso (standalone, no bias/blend)')
-print('  C) IPL v3 FULL = ipl_v3 + ipl_iso + ipl_bias + blend(6)  [RECOMMENDED]')
+print('  A) Global FULL  = t20_male_v2 + global_iso + global_bias + blend(6)')
+print('  B) IPL v3 +iso  = ipl_v3 + ipl_iso (standalone, no bias/blend)')
+print('  C) IPL v3 FULL  = ipl_v3 + ipl_iso + ipl_bias + blend(6)')
+print('  D) IPL v3 FULL+T = ipl_v3 + ipl_iso + phase_T + ipl_bias + blend(6)  [RECOMMENDED]')
 print('=' * 100)
 
 segments = [
@@ -217,9 +245,10 @@ segments = [
 ]
 
 pipelines = {
-    'A) G FULL':   mg['g_blend6_pi1'].values,
-    'B) IPL+iso':  mg['i_iso_pi1'].values,
-    'C) IPL FULL': mg['i_blend6_pi1'].values,
+    'A) G FULL':    mg['g_blend6_pi1'].values,
+    'B) IPL+iso':   mg['i_iso_pi1'].values,
+    'C) IPL FULL':  mg['i_blend6_pi1'].values,
+    'D) IPL FULL+T':mg['i_temped_blend6_pi1'].values,
 }
 
 for metric_name, metric_fn in [('BRIER SCORE', brier), ('LOG LOSS', logloss), ('ECE (10-bin)', ece)]:
@@ -259,6 +288,12 @@ print('── IPL v3 LogitBias Calibrator Details ──')
 for k, v in sorted(ipl_bias.items()):
     print('  %s: bias=%+.4f' % (k, v.bias))
 print('  (inn2_death, inn2_middle removed — overfitting on small samples)')
+
+print()
+print('── IPL v3 Phase Temperature Scalers ──')
+for k, v in sorted(ipl_temp_scalers.items()):
+    effect = 'sharpens' if v < 1 else ('softens' if v > 1 else 'no change')
+    print('  %s: T=%.2f (%s)' % (k, v, effect))
 
 print()
 print('── Global LogitBias Calibrator Details ──')

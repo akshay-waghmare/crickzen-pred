@@ -859,27 +859,41 @@ class Predictor:
                 # First innings: trust the calibrated model
                 prob = base_prob
             
-            # Apply league-specific calibrator if available (temperature/platt scaling)
+            # Apply league-specific calibrator if available
+            # Chain: temperature scaling (sharpness) → logit bias (shift) 
             pre_league_prob = prob  # Save for debug output
             if self.league_calibrator:
+                import numpy as np
                 method = self.league_calibrator.get('method', 'temperature')
                 calibrators = self.league_calibrator.get('calibrators', {})
+                temperature_scalers = self.league_calibrator.get('temperature_scalers', {})
                 innings_key = f'innings_{state.innings}'
                 league_name = self.league_calibrator.get('league', 'unknown').upper()
                 
                 # Determine phase for phase-specific lookup
                 phase_key = None
+                over_1based = state.over + 1
+                if over_1based <= 6:
+                    phase = 'powerplay'
+                elif over_1based <= 15:
+                    phase = 'middle'
+                else:
+                    phase = 'death'
                 if self.league_calibrator.get('phase_specific'):
-                    over_1based = state.over + 1
-                    if over_1based <= 6:
-                        phase = 'powerplay'
-                    elif over_1based <= 15:
-                        phase = 'middle'
-                    else:
-                        phase = 'death'
                     phase_key = f'inn{state.innings}_{phase}'
                 
-                # Priority: phase-specific > innings-specific > legacy format
+                # Step 1: Phase-specific temperature scaling (adjusts sharpness)
+                # T < 1 sharpens (more confident), T > 1 softens, T = 1 no change
+                temp_key = f'inn{state.innings}_{phase}'
+                T = temperature_scalers.get(temp_key, temperature_scalers.get(innings_key, None))
+                if T is not None and T != 1.0 and prob > 0.001 and prob < 0.999:
+                    pre_temp = prob
+                    logit = np.log(prob / (1 - prob))
+                    prob = float(1 / (1 + np.exp(-logit / T)))
+                    if debug:
+                        print(f"[LEAGUE] Temperature ({league_name}, {temp_key}, T={T:.2f}): {pre_temp:.1%} -> {prob:.1%}")
+                
+                # Step 2: LogitBias / scaler calibrators (adjusts mean/shift)
                 scaler = None
                 cal_label = None
                 if calibrators and phase_key and phase_key in calibrators:
@@ -890,15 +904,14 @@ class Predictor:
                     cal_label = innings_key
                 
                 if scaler is not None and hasattr(scaler, 'predict'):
-                    import numpy as np
+                    pre_bias = prob
                     prob = _coerce_probability_scalar(scaler.predict(np.array([[prob]])))
                     if debug:
-                        print(f"[LEAGUE] League ({league_name}, {cal_label}): {pre_league_prob:.1%} -> {prob:.1%}")
-                elif method == 'temperature':
-                    # Legacy format: T1/T2 keys
+                        print(f"[LEAGUE] LogitBias ({league_name}, {cal_label}): {pre_bias:.1%} -> {prob:.1%}")
+                elif method == 'temperature' and not temperature_scalers:
+                    # Legacy format: T1/T2 keys (only if no phase-specific T)
                     T = self.league_calibrator.get('T1' if state.innings == 1 else 'T2', 1.0)
                     if T and prob > 0.001 and prob < 0.999:
-                        import numpy as np
                         logit = np.log(prob / (1 - prob))
                         prob = 1 / (1 + np.exp(-logit / T))
                         if debug:
@@ -908,7 +921,6 @@ class Predictor:
                     a = self.league_calibrator.get('a1' if state.innings == 1 else 'a2', 1.0)
                     b = self.league_calibrator.get('b1' if state.innings == 1 else 'b2', 0.0)
                     if prob > 0.001 and prob < 0.999:
-                        import numpy as np
                         logit = np.log(prob / (1 - prob))
                         prob = 1 / (1 + np.exp(-(a * logit + b)))
                         if debug:
