@@ -1082,6 +1082,29 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     df['season_num'] = df['season_num'].fillna(7)  # Middle season
     df['season_year_norm'] = df['season_year_norm'].fillna(0.5)
 
+    # --- INN1 CARRYOVER FEATURES (bridge innings transition) ---
+    # These carry first-innings information into the second innings so the ML model
+    # doesn't lose context at the innings break.
+    print("Calculating innings carryover features...")
+
+    # inn1_defendability: The resource_win_prob at the last ball of inn1,
+    # carried forward to all inn2 balls. Tells the model how the SQI model
+    # rated the first innings total's defendability.
+    inn1_final_rwp = df[df.innings == 1].groupby('match_id')['resource_win_prob'].last()
+    df['inn1_defendability'] = df['match_id'].map(inn1_final_rwp)
+    df['inn1_defendability'] = np.where(df['innings'] == 2, df['inn1_defendability'], 0.5)
+    df['inn1_defendability'] = df['inn1_defendability'].fillna(0.5)
+
+    # target_above_par: How far the first innings score is above/below venue average.
+    # Positive = above-par target (harder chase), negative = below-par (easier chase).
+    # For inn1, set to 0 (no target yet).
+    df['target_above_par'] = np.where(
+        df['innings'] == 2,
+        df['first_innings_score'] - df['venue_avg_score'],
+        0.0
+    )
+    df['target_above_par'] = df['target_above_par'].fillna(0.0)
+
     # --- INTERACTION FEATURES ---
     print("Calculating interaction features...")
     df['crr_times_res'] = df['current_run_rate'] * df['resources_remaining']
@@ -1150,6 +1173,9 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         'projected_adjusted',
         'resource_team_adjusted',
         'run_rate_team_adj',
+        # Inn1 carryover (bridge innings transition)
+        'inn1_defendability',
+        'target_above_par',
         # Target
         'is_winner'
     ]
