@@ -1105,6 +1105,30 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     )
     df['target_above_par'] = df['target_above_par'].fillna(0.0)
 
+    # Inn1 detailed carryover: match context features carried into inn2
+    # These give the model a stronger pre-chase prior (180/3 ≠ 180/8).
+    inn1_data = df[df['innings'] == 1]
+
+    # Wickets lost in inn1 — how many resources were consumed to set the target
+    inn1_wkts = inn1_data.groupby('match_id')['wickets_lost'].last()
+    df['inn1_wickets_lost'] = df['match_id'].map(inn1_wkts)
+    df['inn1_wickets_lost'] = np.where(df['innings'] == 2, df['inn1_wickets_lost'], 5.0)
+    df['inn1_wickets_lost'] = df['inn1_wickets_lost'].fillna(5.0)
+
+    # Death overs run rate (overs 16-20) — finish momentum
+    inn1_death = inn1_data[inn1_data['over'] > 15]
+    death_rr = inn1_death.groupby('match_id')['runs_total'].mean() * 6  # per-ball avg × 6 = RR
+    df['inn1_death_rr'] = df['match_id'].map(death_rr)
+    df['inn1_death_rr'] = np.where(df['innings'] == 2, df['inn1_death_rr'], 9.0)
+    df['inn1_death_rr'] = df['inn1_death_rr'].fillna(9.0)
+
+    # PP runs in inn1 — pitch behavior clue for early chase
+    inn1_pp = inn1_data[inn1_data['over'] <= 6]
+    pp_runs = inn1_pp.groupby('match_id')['runs_total'].sum()
+    df['inn1_pp_runs'] = df['match_id'].map(pp_runs)
+    df['inn1_pp_runs'] = np.where(df['innings'] == 2, df['inn1_pp_runs'], 45.0)
+    df['inn1_pp_runs'] = df['inn1_pp_runs'].fillna(45.0)
+
     # --- INTERACTION FEATURES ---
     print("Calculating interaction features...")
     df['crr_times_res'] = df['current_run_rate'] * df['resources_remaining']
@@ -1176,6 +1200,13 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         # Inn1 carryover (bridge innings transition)
         'inn1_defendability',
         'target_above_par',
+        # Inn1 detailed carryover (pre-chase prior)
+        'inn1_wickets_lost',
+        'inn1_death_rr',
+        'inn1_pp_runs',
+        # Context features (toss + venue chase bias)
+        'venue_chase_success',
+        'batting_won_toss',
         # Target
         'is_winner'
     ]

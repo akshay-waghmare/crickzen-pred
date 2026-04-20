@@ -49,12 +49,16 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         'runs_last_12', 'runs_last_18', 'wickets_last_12',
         # Inn1 carryover features (bridge innings transition)
         'inn1_defendability', 'target_above_par',
+        # Inn1 detailed carryover (pre-chase prior)
+        'inn1_wickets_lost', 'inn1_death_rr', 'inn1_pp_runs',
+        # Context features (toss + venue chase bias)
+        'venue_chase_success', 'batting_won_toss',
     ]
     
     def __init__(
         self,
         xgb_weight: float = 0.5,
-        n_features: int = 27,
+        n_features: int = 32,
         xgb_params: Optional[Dict[str, Any]] = None,
         logreg_c: float = 0.01,
     ):
@@ -202,7 +206,7 @@ class Trainer:
 
         # Primary model: XGBLogRegEnsemble (Brier 0.1777)
         self.models = {
-            'ensemble': XGBLogRegEnsemble(xgb_weight=0.5, n_features=27),
+            'ensemble': XGBLogRegEnsemble(xgb_weight=0.5, n_features=32),
         }
         
         self.splitter = TimeSeriesCalibrationSplit(n_splits=5, calibration_size=0.30)
