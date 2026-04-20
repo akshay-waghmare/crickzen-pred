@@ -14,13 +14,14 @@
 Cricsheet JSON → Ingest → Process (v6 features) → Train → IPL v6 Model
                                                           │
                                                           ▼
-                                               Innings-Specific Isotonic
+                                               Per-Over Isotonic (38)
+                                               + Phase fallback (6)
                                                           │
                                                           ▼
                                                     Final Prediction
 ```
 
-**Pipeline:** `model → innings-specific isotonic` (32 features)
+**Pipeline:** `model → brier-optimized per-over isotonic (38 calibrators)` — 32 features, no league calibrator
 
 ---
 
@@ -138,7 +139,8 @@ Inn2 PP flipped from +33.5% worse to **-19.5% better** than market.
    most impactful new feature. Some venues heavily favor chasing.
 
 6. **Isotonic calibration slightly hurts OOS.** Raw v6 Brier (0.1110) is 1.7% better than
-   calibrated (0.1129). The v5-era calibrators may need retraining for v6's feature set.
+   calibrated (0.1129) on 23 OOS matches. OOF calibrators retrained for v6 (Brier-optimized:
+   0.1811). Small sample — monitor on more data.
 
 ---
 
@@ -225,16 +227,155 @@ models/ipl_v6/
 
 ---
 
+## Production Deployment (2026-04-20)
+
+### Configs Updated
+
+All three production entry points now point to `models/ipl_v6`:
+
+| File | Setting |
+|------|---------|
+| `scripts/launcher.py` | `LEAGUE_CONFIGS["IPL"]["model_dir"] = "models/ipl_v6"` |
+| `src/bbl_pipeline/app/live_streamlit_app.py` | `PREDICTOR_CONFIGS["IPL ML+MC"]["model_dir"] = "models/ipl_v6"` |
+| `dashboard/app/config.py` | `LEAGUE_CONFIGS["IPL"]["model_dir"] = "models/ipl_v6"` |
+
+### Calibration Chain
+
+```
+Raw model → Per-Over Isotonic (38 calibrators) → Final prediction
+            Phase fallback (6 calibrators) for over 1
+```
+
+**No league calibrator** — v6 is IPL-specific (trained on IPL data only).
+OOF ECE = 0.0000 across all segments with brier-optimized calibration.
+
+### OOF Calibration (5-fold CV, 278,954 samples)
+
+| Method | Brier | ECE | LogLoss |
+|--------|:-----:|:---:|:-------:|
+| **Brier-Optimized** | **0.1811** | 0.0000 | 0.5282 |
+| Innings×Phase | 0.1828 | 0.0000 | 0.5333 |
+| ECE-Optimized | 0.1834 | 0.0030 | 0.5352 |
+| Raw | 0.1843 | 0.0120 | 0.5387 |
+
+### Realtime Feature Pipeline
+
+Seven inn1 carryover features flow through:
+
+```
+CREX page → crex_live_predictor._compute_inn1_carryover_stats()
+                    │
+                    ▼
+            MatchState (toss_winner, toss_decision, inn1_wickets_lost,
+                        inn1_pp_runs, inn1_death_rr)
+                    │
+                    ▼
+            predictor.predict() → scraped_data dict
+                    │
+                    ▼
+            realtime_mapper.create_feature_dataframe()
+                    │
+                    ▼
+            7 features computed:
+              venue_chase_success   = 1 - venue_bat_first_win_rate
+              target_above_par      = first_innings_score - venue_avg_score
+              batting_won_toss      = int(batting_team == toss_winner)
+              inn1_wickets_lost     = from ball history (inn2) or default 5 (inn1)
+              inn1_pp_runs          = sum inn1 overs 0-5 runs (default 45)
+              inn1_death_rr         = per-ball avg × 6 for inn1 overs 16+ (default 9.0)
+              inn1_defendability    = resource_calculator at inn1 end state (default 0.5)
+```
+
+### Fallback Defaults
+
+If carryover data is unavailable (inn1, or toss parse failure):
+
+| Feature | Default | Rationale |
+|---------|:-------:|-----------|
+| venue_chase_success | from venue stats | Always available |
+| target_above_par | 0.0 | No target in inn1 |
+| batting_won_toss | 0.5 | Neutral if unknown |
+| inn1_wickets_lost | 5.0 | Training mean |
+| inn1_pp_runs | 45.0 | Conservative default |
+| inn1_death_rr | 9.0 | Training mean |
+| inn1_defendability | 0.5 | Neutral prior |
+
+### Backward Compatibility
+
+- All new MatchState fields are `Optional[...]` with `None` default
+- Non-IPL models (BBL, PSL, etc.) unaffected — they use 25-feature models that ignore extra features
+- v3 league calibrator (LogitBias) is NOT compatible with v6 — that's expected and correct
+
+---
+
+## Live Verification Checklist
+
+Run these checks with a real CREX match URL during a live IPL game:
+
+### 1. CLI Predictor
+```bash
+python -m src.bbl_pipeline.inference.crex_live_predictor \
+  --match-url "CREX_MATCH_URL" \
+  --model-dir models/ipl_v6 \
+  --feature-store-dir data/ipl_feature_store_v3 \
+  --league ipl \
+  --output-json data/ipl_live_ml.json \
+  --record-states
+```
+
+**Verify in output:**
+- [ ] Model loads: `Loaded model: ensemble` with 32 features
+- [ ] Calibrator loads: `n_phase_calibrators=6`, `feature_hash=af44ed1239a995f60695950e5739f04f`
+- [ ] No `League calibrator not found` warning (expected — no league cal for v6)
+- [ ] Venue resolves correctly
+- [ ] Team stats load for both IPL teams
+- [ ] Predictions are reasonable (0.1–0.9 range)
+- [ ] In inn2: carryover features show non-default values in logs
+- [ ] Match states recorded to `data/match_states/ipl/`
+
+### 2. Launcher Script
+```bash
+python scripts/launcher.py --league IPL --match-url "CREX_MATCH_URL"
+```
+
+**Verify:**
+- [ ] Picks up `models/ipl_v6` from LEAGUE_CONFIGS
+- [ ] Predictions update as match progresses
+
+### 3. Streamlit App
+```bash
+streamlit run src/bbl_pipeline/app/live_streamlit_app.py
+```
+
+**Verify:**
+- [ ] "IPL ML+MC" config shows in dropdown
+- [ ] Starts predictor with `models/ipl_v6`
+- [ ] Dashboard shows win probability graph
+
+### 4. Feature Verification (during inn2)
+Check the recorded states parquet for non-default carryover values:
+```python
+import pandas as pd
+df = pd.read_parquet("data/match_states/ipl/<match_id>.parquet")
+inn2 = df[df.innings == 2]
+# These should NOT be default values in inn2:
+print(inn2[['inn1_wickets_lost', 'inn1_pp_runs', 'inn1_death_rr',
+            'inn1_defendability', 'target_above_par', 'batting_won_toss',
+            'venue_chase_success']].describe())
+```
+
+---
+
 ## Next Steps
 
 1. **Collect more OOS data** — 12 matches with market is thin. Full IPL 2026 (~60 matches)
    will give much more reliable per-segment conclusions.
 
-2. **Re-train isotonic calibrators for v6** — Raw model outperforms calibrated by 1.7%.
-   The current calibrators were inherited from v5's feature distribution. Refit with v6 OOF.
-
-3. **Inn1 PP gap** — The only segment where v6 loses to market (+5.4%). Could benefit
+2. **Inn1 PP gap** — The only segment where v6 loses to market (+5.4%). Could benefit
    from stronger early-innings features (e.g., team depth indices, pre-match priors).
 
-4. **Inn1 closing probability as chase prior** — Use the full model's calibrated prediction
+3. **Inn1 closing probability as chase prior** — Use the full model's calibrated prediction
    at inn1 end as a feature. Requires stacking/OOF approach to avoid leakage.
+
+4. **Monitor v6 in production** — Compare live predictions against Betfair odds to validate
+   OOS metrics hold on new data. Check for any venue/team coverage gaps in feature store.
