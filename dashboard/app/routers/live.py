@@ -5,9 +5,10 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
@@ -84,6 +85,253 @@ def _enrich_state(state: dict) -> dict:
     return state
 
 
+def _read_json(path: Path) -> dict[str, Any] | None:
+    """Read a sidecar JSON file if it is present and complete."""
+    try:
+        if not path.exists() or path.stat().st_size == 0:
+            return None
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.debug("Failed to read live sidecar %s: %s", path, exc)
+        return None
+
+
+def _prediction_sidecar_paths(output_json_path: str) -> dict[str, Path]:
+    path = Path(output_json_path)
+    return {
+        "history": path.with_name(f"{path.stem}_history.json"),
+        "legacy_history": path.with_name("prediction_history.json"),
+        "livematch": path.with_name(f"{path.stem}_livematch.json"),
+    }
+
+
+def _as_float(value: Any, default: float | None = None) -> float | None:
+    try:
+        if value is None or value == "":
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _as_int(value: Any, default: int = 0) -> int:
+    try:
+        if value is None or value == "":
+            return default
+        return int(float(value))
+    except (TypeError, ValueError):
+        return default
+
+
+def _overs_to_balls(overs: float | None) -> int:
+    if overs is None:
+        return 0
+    whole_overs = int(overs)
+    balls = int(round((overs - whole_overs) * 10))
+    balls = max(0, min(5, balls))
+    return whole_overs * 6 + balls
+
+
+def _history_key(point: dict[str, Any]) -> tuple[int, float, int, int]:
+    return (
+        _as_int(point.get("innings"), 1),
+        round(_as_float(point.get("overs"), 0.0) or 0.0, 3),
+        _as_int(point.get("score")),
+        _as_int(point.get("wickets")),
+    )
+
+
+def _dedupe_history(history: list[dict[str, Any]], limit: int = 240) -> list[dict[str, Any]]:
+    """Keep the latest distinct score state for each innings/over/score/wicket point."""
+    deduped: list[dict[str, Any]] = []
+    seen: set[tuple[int, float, int, int]] = set()
+    for point in reversed(history or []):
+        if not isinstance(point, dict):
+            continue
+        key = _history_key(point)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(point)
+        if len(deduped) >= limit:
+            break
+    return list(reversed(deduped))
+
+
+def _merge_sidecar_state(state: dict[str, Any], output_json_path: str) -> dict[str, Any]:
+    """Merge predictor sidecars into the state returned by the dashboard API."""
+    paths = _prediction_sidecar_paths(output_json_path)
+
+    history_data = _read_json(paths["history"])
+    if history_data is None:
+        history_data = _read_json(paths["legacy_history"])
+    if history_data:
+        full_history = history_data.get("history") or []
+        if isinstance(full_history, list) and len(full_history) > len(state.get("history") or []):
+            state["history"] = full_history
+
+    livematch = _read_json(paths["livematch"])
+    if livematch:
+        live_state = livematch.get("state") or {}
+        if isinstance(live_state, dict):
+            for key, value in live_state.items():
+                if state.get(key) in (None, "", []):
+                    state[key] = value
+
+        for key in ("features", "pred_state", "scraped_data", "ball_history", "balls_data"):
+            value = livematch.get(key)
+            if value not in (None, "", []):
+                if key == "features" and isinstance(value, dict):
+                    merged_features = dict(value)
+                    merged_features.update(state.get("features") or {})
+                    state["features"] = merged_features
+                elif state.get(key) in (None, "", []):
+                    state[key] = value
+
+        live_history = livematch.get("history") or []
+        if isinstance(live_history, list) and len(live_history) > len(state.get("history") or []):
+            state["history"] = live_history
+
+    return state
+
+
+def _build_projection(state: dict[str, Any]) -> dict[str, Any]:
+    features = state.get("features") or {}
+    score = _as_float(state.get("score"), 0.0) or 0.0
+    wickets = _as_int(state.get("wickets"))
+    projected = _as_float(features.get("projected_score"), _as_float(features.get("expected_final_score"), score))
+
+    projection = {
+        "score": score,
+        "wickets": wickets,
+        "overs": _as_float(state.get("overs"), 0.0),
+        "target": _as_float(state.get("target")),
+        "projected_score": projected,
+        "expected_final_score": _as_float(features.get("expected_final_score"), projected),
+        "par_score": _as_float(features.get("par_score")),
+        "venue_avg_score": _as_float(features.get("venue_avg_score")),
+        "score_vs_par": _as_float(features.get("score_vs_par")),
+        "projected_vs_venue_avg": _as_float(features.get("projected_vs_venue_avg")),
+        "resource_win_prob": _as_float(features.get("resource_win_prob")),
+        "resources_remaining": _as_float(features.get("resources_remaining")),
+        "current_run_rate": _as_float(features.get("current_run_rate"), _as_float(state.get("current_run_rate"), 0.0)),
+        "required_run_rate": _as_float(features.get("required_run_rate"), _as_float(state.get("required_run_rate"), 0.0)),
+        "pressure_index": _as_float(features.get("pressure_index")),
+        "runs_required": None,
+        "balls_remaining": None,
+    }
+
+    target = projection["target"]
+    overs = projection["overs"] or 0.0
+    if target:
+        projection["runs_required"] = max(int(target - score), 0)
+    projection["balls_remaining"] = max(120 - _overs_to_balls(overs), 0)
+    return projection
+
+
+def _normalise_ball_commentary(balls: list[Any]) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for idx, ball in enumerate(balls or []):
+        if not isinstance(ball, dict):
+            continue
+        overs = _as_float(ball.get("overs") or ball.get("ball_number") or ball.get("over"))
+        runs = _as_int(ball.get("runs") or ball.get("runs_scored"))
+        is_wicket = bool(ball.get("is_wicket") or ball.get("wicket"))
+        text = ball.get("commentary") or ball.get("description") or ball.get("text")
+        if not text:
+            event = "Wicket" if is_wicket else ("Boundary" if runs == 4 else "Six" if runs == 6 else "Runs")
+            text = f"{event}: {runs} run{'s' if runs != 1 else ''}"
+        entries.append({
+            "id": str(ball.get("id") or f"ball-{idx}"),
+            "innings": _as_int(ball.get("innings"), 1),
+            "overs": overs,
+            "over": f"{overs:.1f}" if overs is not None else "",
+            "score": ball.get("score") or "",
+            "event": "Wicket" if is_wicket else ("Boundary" if runs == 4 else "Six" if runs == 6 else "Runs"),
+            "runs": runs,
+            "is_wicket": is_wicket,
+            "text": text,
+            "bat_prob": _as_float(ball.get("bat_prob") or ball.get("win_probability")),
+            "timestamp": ball.get("timestamp"),
+        })
+    return list(reversed(entries[-80:]))
+
+
+def _derive_commentary_from_history(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Create a readable timeline when CREX has not exposed ball text."""
+    points = _dedupe_history(history, limit=120)
+    entries: list[dict[str, Any]] = []
+    previous: dict[str, Any] | None = None
+    for point in points:
+        overs = _as_float(point.get("overs"), 0.0) or 0.0
+        score = _as_int(point.get("score"))
+        wickets = _as_int(point.get("wickets"))
+        innings = _as_int(point.get("innings"), 1)
+        batting_team = point.get("batting_team") or "Batting side"
+        bat_prob = _as_float(point.get("bat_prob") or point.get("bat_win_prob"))
+
+        if previous is None:
+            text = f"{batting_team} are {score}/{wickets} after {overs:.1f} overs."
+            event = "Update"
+            runs = 0
+            is_wicket = False
+        else:
+            runs = max(score - _as_int(previous.get("score")), 0)
+            wicket_delta = max(wickets - _as_int(previous.get("wickets")), 0)
+            if runs == 0 and wicket_delta == 0:
+                continue
+            is_wicket = wicket_delta > 0
+            if is_wicket:
+                event = "Wicket"
+                text = f"Wicket. {batting_team} move to {score}/{wickets}."
+            elif runs >= 6:
+                event = "Six"
+                text = f"Six-run swing. {batting_team} move to {score}/{wickets}."
+            elif runs == 4:
+                event = "Boundary"
+                text = f"Boundary. {batting_team} move to {score}/{wickets}."
+            else:
+                event = "Runs"
+                text = f"{runs} run{'s' if runs != 1 else ''}. {batting_team} move to {score}/{wickets}."
+
+        entries.append({
+            "id": f"{innings}-{overs:.1f}-{score}-{wickets}",
+            "innings": innings,
+            "overs": overs,
+            "over": f"{overs:.1f}",
+            "score": f"{score}/{wickets}",
+            "event": event,
+            "runs": runs,
+            "is_wicket": is_wicket,
+            "text": text,
+            "bat_prob": bat_prob,
+            "timestamp": point.get("timestamp"),
+        })
+        previous = point
+
+    return list(reversed(entries[-80:]))
+
+
+def _enrich_detail_state(state: dict[str, Any] | None, output_json_path: str | None = None) -> dict[str, Any] | None:
+    if not state:
+        return state
+
+    if output_json_path:
+        state = _merge_sidecar_state(state, output_json_path)
+
+    chart_history = _dedupe_history(state.get("history") or [])
+    state["chart_history"] = chart_history
+    state["projection"] = _build_projection(state)
+
+    balls = state.get("balls_data") or state.get("ball_history") or []
+    commentary = _normalise_ball_commentary(balls) if isinstance(balls, list) and balls else []
+    if not commentary:
+        commentary = _derive_commentary_from_history(chart_history)
+    state["commentary"] = commentary
+
+    return _enrich_state(state)
+
+
 # ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
@@ -96,6 +344,7 @@ class StartMatchRequest(BaseModel):
 
 class MatchSummary(BaseModel):
     id: str
+    user_id: str | None = None
     match_url: str
     league: str
     league_code: str
@@ -140,6 +389,7 @@ def start_match(
 
     return MatchSummary(
         id=pred.id,
+        user_id=pred.user_id,
         match_url=pred.match_url,
         league=pred.league_key,
         league_code=pred.league_code,
@@ -155,7 +405,7 @@ def list_matches(user: User = Depends(get_current_user)):
     preds = manager.list_predictions(user_id=user.id)
     return [
         MatchSummary(
-            id=p["id"], match_url=p["match_url"], league=p["league"],
+            id=p["id"], user_id=p["user_id"], match_url=p["match_url"], league=p["league"],
             league_code=p["league_code"], status=p["status"],
             created_at=p["created_at"],
         )
@@ -170,13 +420,32 @@ def list_all_matches(user: User = Depends(get_current_user)):
     preds = manager.list_predictions()
     return [
         MatchSummary(
-            id=p["id"], match_url=p["match_url"], league=p["league"],
+            id=p["id"], user_id=p["user_id"], match_url=p["match_url"], league=p["league"],
             league_code=p["league_code"], status=p["status"],
             created_at=p["created_at"],
         )
         for p in preds
         if p["status"] == "running"
     ]
+
+
+@router.get("/auto/status")
+def auto_scheduler_status(
+    request: Request,
+    user: User = Depends(get_current_user),
+):
+    """Return automatic prediction scheduler state."""
+    scheduler = getattr(request.app.state, "auto_scheduler", None)
+    if scheduler is None:
+        return {
+            "enabled": get_settings().AUTO_PREDICTIONS_ENABLED,
+            "running": False,
+            "last_checked_at": None,
+            "last_error": None,
+            "last_candidates": [],
+            "last_started": [],
+        }
+    return scheduler.status()
 
 
 @router.get("/{prediction_id}/state", response_model=MatchStateResponse)
@@ -189,7 +458,7 @@ def get_match_state(
     if pred is None:
         raise HTTPException(status_code=404, detail="Prediction not found")
 
-    state = _enrich_state(pred.read_state())
+    state = _enrich_detail_state(pred.read_state(), pred.output_json_path)
     return MatchStateResponse(
         prediction_id=prediction_id,
         status=pred.status if pred.is_alive else ("finished" if pred.status != "error" else "error"),
@@ -226,7 +495,7 @@ async def stream_match(
     async def event_generator():
         last_timestamp = None
         while True:
-            state = _enrich_state(pred.read_state())
+            state = _enrich_detail_state(pred.read_state(), pred.output_json_path)
             if state:
                 ts = state.get("timestamp")
                 if ts != last_timestamp:

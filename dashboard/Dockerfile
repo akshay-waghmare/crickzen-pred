@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Node deps + CSS build
-COPY package.json tailwind.config.js ./
+COPY package.json package-lock.json tailwind.config.js ./
 RUN npm ci
 COPY static/css/input.css static/css/input.css
 COPY templates/ templates/
@@ -28,10 +28,19 @@ RUN npx tailwindcss -i static/css/input.css -o static/css/app.css --minify
 FROM python:3.12-slim
 
 WORKDIR /app
+ENV PYTHONPATH=/app/src:/app
+
+# Runtime deps for healthcheck and Playwright/Chromium used by crex_live_predictor
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy Python packages
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN python -m playwright install --with-deps chromium
 
 # Copy built CSS
 COPY --from=builder /build/static/css/app.css static/css/app.css
@@ -47,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

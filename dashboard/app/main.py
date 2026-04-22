@@ -56,10 +56,30 @@ def create_app(
             purge_expired_tokens(session)
 
         purge_task = asyncio.create_task(periodic_token_purge())
+        auto_task: asyncio.Task | None = None
+        auto_scheduler = None
+        if settings.AUTO_PREDICTIONS_ENABLED:
+            from app.auto_scheduler import AutoPredictionScheduler
+            from app.prediction_manager import PredictionManager
+
+            auto_scheduler = AutoPredictionScheduler(PredictionManager.get_instance(), settings)
+            app.state.auto_scheduler = auto_scheduler
+            auto_task = asyncio.create_task(auto_scheduler.run_forever())
+        else:
+            app.state.auto_scheduler = None
         logger.info("CrickenZen Dashboard started — %s", settings.DOMAIN)
         yield
 
         # Shutdown
+        if auto_scheduler is not None:
+            auto_scheduler.stop()
+        if auto_task is not None:
+            auto_task.cancel()
+            try:
+                await auto_task
+            except asyncio.CancelledError:
+                pass
+
         purge_task.cancel()
         try:
             await purge_task

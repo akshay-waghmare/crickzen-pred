@@ -16,6 +16,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse, urlunparse
 
 from app.config import (
     LEAGUE_CONFIGS,
@@ -29,6 +30,13 @@ from app.config import (
 logger = logging.getLogger(__name__)
 
 WINDOWS_PROCESS_GROUP = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+
+
+def _normalize_match_url_key(url: str) -> str:
+    """Normalize enough to detect duplicate active predictions."""
+    parsed = urlparse((url or "").strip())
+    path = parsed.path.rstrip("/")
+    return urlunparse((parsed.scheme, parsed.netloc.lower(), path, "", "", "")).lower()
 
 
 class Prediction:
@@ -142,6 +150,10 @@ class PredictionManager:
         if not league_key or league_key not in LEAGUE_CONFIGS:
             raise ValueError(f"Unknown league for URL: {match_url}")
 
+        existing = self.find_active_by_url(match_url, league_key)
+        if existing is not None:
+            return existing
+
         # Enforce per-user limit
         user_matches = [p for p in self._predictions.values() if p.user_id == user_id and p.is_alive]
         if len(user_matches) >= settings.MAX_USER_MATCHES:
@@ -217,6 +229,18 @@ class PredictionManager:
 
     def get_prediction(self, prediction_id: str) -> Prediction | None:
         return self._predictions.get(prediction_id)
+
+    def find_active_by_url(self, match_url: str, league_key: str | None = None) -> Prediction | None:
+        """Return an active prediction for this CREX URL if one already exists."""
+        target = _normalize_match_url_key(match_url)
+        for pred in self._predictions.values():
+            if not pred.is_alive:
+                continue
+            if league_key and pred.league_key != league_key:
+                continue
+            if _normalize_match_url_key(pred.match_url) == target:
+                return pred
+        return None
 
     def get_state(self, prediction_id: str) -> dict[str, Any] | None:
         pred = self._predictions.get(prediction_id)

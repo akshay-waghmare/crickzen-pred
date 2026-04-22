@@ -32,23 +32,14 @@ https://crex.com/cricket-live-score/csk-vs-pbks-7th-match-indian-premier-league-
 ### Step 2: Start the Predictor
 
 ```bash
-# IPL: Use ipl_v3 model (beats market by -2.7% Brier, vs global model's -0.1%)
 python -m src.bbl_pipeline.inference.crex_live_predictor \
   --match-url "CREX_URL" \
-  --model-dir models/ipl_v3 \
+  --model-dir models/ipl_v6 \
   --feature-store-dir data/ipl_feature_store_v3 \
   --league ipl \
   --output-json data/ipl_live_ml.json \
   --record-states \
   --states-dir data/match_states/ipl
-
-# Other T20 leagues: Use global model with --league flag
-python -m src.bbl_pipeline.inference.crex_live_predictor \
-  --match-url "CREX_URL" \
-  --model-dir models/t20_male_v2 \
-  --feature-store-dir data/t20_male_feature_store_v2 \
-  --league bbl \
-  --output-json data/live_state.json
 ```
 
 ### Step 3: Start the Streamlit Visualization (separate terminal)
@@ -65,13 +56,74 @@ Open **http://localhost:8501** in your browser.
 
 | League | `--league` | `--model-dir` | `--feature-store-dir` | `--output-json` |
 |--------|-----------|---------------|----------------------|-----------------|
-| **IPL** | `ipl` | `models/t20_male_v2` | `data/bbl_feature_store_v2` | `data/ipl_live_ml.json` |
+| **IPL** | `ipl` | `models/ipl_v6` | `data/ipl_feature_store_v3` | `data/ipl_live_ml.json` |
 | **BBL** | `bbl` | `models/bbl_v12` | `data/bbl_feature_store_v2` | `data/bbl_live_ml.json` |
 | **SA20** | `sa20` | `models/t20_male_v2` | `data/bbl_feature_store_v2` | `data/sa20_live_ml.json` |
 | **ILT20** | `ilt20` | `models/ilt20_v5` | `data/ilt_feature_store_v3` | `data/ilt20_live_ml.json` |
 | **WPL** | `wpl` | `models/t20_male_v2` | `data/bbl_feature_store_v2` | `data/wpl_live_ml.json` |
 | **T20 WC** | `t20i_male` | `models/t20_international_male_v2` | `data/t20_international_male_feature_store_v2` | `data/wc_live_ml.json` |
 | **SSM** | `ssm` | `models/t20_male_v2` | `data/bbl_feature_store_v2` | `data/ssm_live_ml.json` |
+
+### Reproducible startup template (any league)
+
+```bash
+python -m src.bbl_pipeline.inference.crex_live_predictor \
+  --match-url "CREX_URL" \
+  --model-dir "MODEL_DIR" \
+  --feature-store-dir "FEATURE_STORE_DIR" \
+  --league "LEAGUE_CODE" \
+  --output-json "OUTPUT_JSON" \
+  --record-states \
+  --states-dir "STATES_DIR"
+```
+
+For IPL, substitute:
+- `MODEL_DIR=models/ipl_v6`
+- `FEATURE_STORE_DIR=data/ipl_feature_store_v3`
+- `LEAGUE_CODE=ipl`
+- `OUTPUT_JSON=data/ipl_live_ml.json`
+- `STATES_DIR=data/match_states/ipl`
+
+---
+
+## Clean restart (IPL, reproducible)
+
+Use this when predictions look stuck or stale.
+
+```powershell
+# 1) Stop existing live runtime processes
+Get-CimInstance Win32_Process |
+  Where-Object {
+    $_.Name -match '^python(\.exe)?$' -and
+    $_.CommandLine -match 'crex_live_predictor|odm_live_json_bridge|live_streamlit_app.py|scripts\\launcher.py'
+  } |
+  ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+
+# 2) Remove stale PID file (if present)
+if (Test-Path "data/.predictor_pids.json") { Remove-Item "data/.predictor_pids.json" -Force }
+
+# 3) Start fresh IPL predictor (v6)
+.\.venv\Scripts\python.exe -m src.bbl_pipeline.inference.crex_live_predictor \
+  --match-url "CREX_URL" \
+  --model-dir models/ipl_v6 \
+  --feature-store-dir data/ipl_feature_store_v3 \
+  --league ipl \
+  --output-json data/ipl_live_ml.json \
+  --record-states \
+  --states-dir data/match_states/ipl
+
+# 4) In a second terminal: start ODM mirror bridge for dashboard ML+MC
+.\.venv\Scripts\python.exe scripts\odm_live_json_bridge.py \
+  --input-json data/ipl_live_ml.json \
+  --output-json data/ipl_live_ml_odm.json \
+  --feature-store-dir data/ipl_feature_store_v3 \
+  --league ipl \
+  --odm-model-dir models/odm_v1 \
+  --poll-interval 2.0
+
+# 5) Optional: start dashboard
+.\.venv\Scripts\python.exe -m streamlit run src/bbl_pipeline/app/live_streamlit_app.py --server.port 8501
+```
 
 ### IPL-Specific Configuration
 
@@ -228,8 +280,8 @@ python -m src.bbl_pipeline.cli ingest \
 
 python -m src.bbl_pipeline.cli process \
   --input-dir data/ipl_raw/matches \
-  --output-dir data/ipl_features_v1 \
-  --feature-store-dir data/ipl_feature_store_v2 \
+  --output-dir data/ipl_features_v6 \
+  --feature-store-dir data/ipl_feature_store_v3 \
   --league ipl
 
 python scripts/analysis/extract_phase_distributions.py \
@@ -239,7 +291,7 @@ python scripts/analysis/extract_phase_distributions.py \
 
 python -m src.bbl_pipeline.cli calibrate-league \
   --global-model models/t20_male_v2 \
-  --input-file data/ipl_features_v1/training.parquet \
+  --input-file data/ipl_features_v6/training.parquet \
   --league ipl \
   --method temperature
 ```

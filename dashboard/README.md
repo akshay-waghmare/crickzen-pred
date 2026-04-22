@@ -61,6 +61,7 @@ The dashboard reads prediction state from JSON files written by `crex_live_predi
 - **JWT Authentication** — Secure login with access + refresh tokens
 - **Subscriber Management** — Admin can create, suspend, reactivate users
 - **Multi-Match Support** — Up to 6 concurrent predictions, 2 per user
+- **Automatic Match Startup** — Optional CREX discovery/direct URL scheduler for deployed runs
 - **Live Updates** — Polling every 3s for ball-by-ball win probability
 - **League Auto-Detection** — Paste a CREX URL and the league is auto-detected
 - **Session Capacity** — Configurable session cap (default: 50)
@@ -73,7 +74,7 @@ The dashboard reads prediction state from JSON files written by `crex_live_predi
 
 | League | Code | Model |
 |--------|------|-------|
-| Indian Premier League | `ipl` | t20_male_v2 |
+| Indian Premier League | `ipl` | ipl_v6 |
 | Pakistan Super League | `psl` | t20_male_v2 |
 | Big Bash League | `bbl` | bbl_v12 |
 | SA20 | `sa20` | t20_male_v2 |
@@ -107,6 +108,7 @@ The dashboard reads prediction state from JSON files written by `crex_live_predi
 | `GET`  | `/api/matches/{id}/stream` | SSE stream of match state |
 | `GET`  | `/api/matches/leagues` | Available leagues |
 | `GET`  | `/api/matches/detect-league` | Auto-detect league from URL |
+| `GET`  | `/api/matches/auto/status` | Auto scheduler status |
 
 ### Admin
 | Method | Path | Description |
@@ -139,7 +141,37 @@ The dashboard reads prediction state from JSON files written by `crex_live_predi
 | `SESSION_CAP` | ❌ | `50` | Max concurrent sessions |
 | `MAX_USER_MATCHES` | ❌ | `2` | Max predictions per user |
 | `MAX_TOTAL_MATCHES` | ❌ | `6` | Max system-wide predictions |
+| `AUTO_PREDICTIONS_ENABLED` | ❌ | `false` | Enable deployed auto-start scheduler |
+| `AUTO_LEAGUE_KEY` | ❌ | `IPL` | League to discover from CREX (`IPL`, `PSL`, etc.) |
+| `AUTO_MATCH_URLS` | ❌ | — | CREX URLs to auto-start directly, separated by spaces or commas |
+| `AUTO_DISCOVERY_URLS` | ❌ | — | Extra CREX pages to scan for match links |
+| `AUTO_DISCOVER_FROM_CREX` | ❌ | `true` | Scan configured/default CREX pages for league match links |
+| `AUTO_DISCOVERY_RENDER_JS` | ❌ | `true` | Use Playwright fallback when CREX links are client-rendered |
+| `AUTO_DISCOVERY_INTERVAL_SECONDS` | ❌ | `300` | Scheduler polling frequency |
+| `AUTO_START_NOT_BEFORE_LOCAL` | ❌ | `17:00` | Earliest local time for non-live discovered matches |
+| `AUTO_START_NOT_AFTER_LOCAL` | ❌ | `23:59` | Latest local time for non-live discovered matches |
+| `AUTO_TIMEZONE` | ❌ | `Asia/Kolkata` | Local timezone for auto-start window |
 | `REGISTRATION_OPEN` | ❌ | `true` | Allow self-registration |
+
+### Automatic CREX startup
+
+For IPL deployment, set:
+
+```env
+AUTO_PREDICTIONS_ENABLED=true
+AUTO_LEAGUE_KEY=IPL
+```
+
+The scheduler scans CREX's IPL 2026 series page and live-score pages. It starts live matches immediately, and starts scheduled discovered matches only inside the configured local evening window.
+
+For the current PSL test URL, set:
+
+```env
+AUTO_PREDICTIONS_ENABLED=true
+AUTO_MATCH_URLS=https://crex.com/cricket-live-score/lhq-vs-qtg-30th-match-pakistan-super-league-2026-match-updates-10XH
+```
+
+That URL is auto-detected as PSL and launches with `models/t20_male_v2` plus `data/psl_feature_store_v1`.
 
 ---
 

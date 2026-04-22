@@ -22,6 +22,7 @@ def settings():
         SESSION_CAP=50,
         MAX_USER_MATCHES=2,
         MAX_TOTAL_MATCHES=6,
+        AUTO_PREDICTIONS_ENABLED=False,
         REGISTRATION_OPEN=True,
     )
 

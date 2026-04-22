@@ -33,6 +33,18 @@ class Settings(BaseSettings):
     MAX_USER_MATCHES: int = 2
     MAX_TOTAL_MATCHES: int = 6
 
+    # Automatic match discovery/start
+    AUTO_PREDICTIONS_ENABLED: bool = False
+    AUTO_LEAGUE_KEY: str = "IPL"
+    AUTO_MATCH_URLS: str = ""
+    AUTO_DISCOVERY_URLS: str = ""
+    AUTO_DISCOVER_FROM_CREX: bool = True
+    AUTO_DISCOVERY_RENDER_JS: bool = True
+    AUTO_DISCOVERY_INTERVAL_SECONDS: int = 300
+    AUTO_START_NOT_BEFORE_LOCAL: str = "17:00"
+    AUTO_START_NOT_AFTER_LOCAL: str = "23:59"
+    AUTO_TIMEZONE: str = "Asia/Kolkata"
+
     # Registration
     REGISTRATION_OPEN: bool = True
 
@@ -57,11 +69,13 @@ LEAGUE_CONFIGS: dict[str, dict] = {
         "league": "ipl",
         "model_dir": "models/ipl_v6",
         "feature_store_dir": "data/ipl_feature_store_v3",
+        "series_url": "https://crex.com/series/indian-premier-league-2026-1PW",
     },
     "PSL": {
         "league": "psl",
         "model_dir": "models/t20_male_v2",
         "feature_store_dir": "data/psl_feature_store_v1",
+        "series_url": "https://crex.com/series/pakistan-super-league-2026-2BK",
     },
     "BBL": {
         "league": "bbl",

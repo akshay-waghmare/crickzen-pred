@@ -1,5 +1,9 @@
 # Quick Start Guide: Live Match Prediction
 
+> Note: This file is a legacy quick-start for older integrated scripts.
+> For current CREX live prediction workflows and reproducible restart steps,
+> use [HOW_TO_START_LIVE_PREDICTION.md](HOW_TO_START_LIVE_PREDICTION.md).
+
 Get up and running with live cricket match predictions in 5 minutes!
 
 ## 📋 Prerequisites Checklist

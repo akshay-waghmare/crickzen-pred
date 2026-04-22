@@ -1342,7 +1342,7 @@ def update_matches(ctx, source_dir, league, dry_run):
         'ssm': 'ssm_male_json',
         'wpl': 'wpl_female_json',
         'ipl': 'ipl_male_json',
-        'psl': 'psl_male_json',
+        'psl': 'psl_json',
         'odm_male': 'data/odm_male_json',
         'odm_female': 'data/odm_female_json',
     }
@@ -1501,7 +1501,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'format_type': 't20',
         },
         'psl': {
-            'json_dir': 'psl_male_json',
+            'json_dir': 'psl_json',
             'raw_dir': 'data/psl_raw',
             'features_dir': 'data/psl_features',
             'feature_store_dir': 'data/psl_feature_store',

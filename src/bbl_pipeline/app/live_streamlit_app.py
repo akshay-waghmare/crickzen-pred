@@ -483,7 +483,7 @@ PREDICTOR_CONFIGS = {
         "output_json": "data/psl_live_ml.json",
         "display_json": "data/psl_live_ml_odm.json",
         "mc_only": False,
-        "model_dir": "models/t20_male_v2",
+        "model_dir": "models/psl_v1",
         "odm_model_dir": "models/odm_v1",
         "feature_store_dir": "data/psl_feature_store_v1",
         "league": "psl",
@@ -492,7 +492,7 @@ PREDICTOR_CONFIGS = {
     "PSL MC-only": {
         "output_json": "data/psl_live_mc.json",
         "mc_only": True,
-        "model_dir": "models/t20_male_v2",
+        "model_dir": "models/psl_v1",
         "feature_store_dir": "data/psl_feature_store_v1",
         "league": "psl",
         "states_dir": "data/match_states/psl",
