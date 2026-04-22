@@ -555,6 +555,86 @@ class FormatConfig:
         )
 
     @classmethod
+    def psl(cls) -> "FormatConfig":
+        """Return a PSL-tuned T20 configuration.
+
+        Scoring constants are derived empirically from PSL historical match
+        data (338 matches, 74,695 training rows, 2017-2026) via
+        ``scripts/derive_psl_improvements.py``.
+        PSL par score (173.38) is materially higher than the generic T20
+        default (165.0), reflecting modern PSL scoring conditions.
+        """
+        base = cls.t20()
+        return replace(
+            base,
+            # PSL scoring environment (derived from 74,695 PSL training rows)
+            par_score=173.38,
+            league_avg_score=169.28,
+            bat_first_win_rate=0.4661,
+            # PSL chase sigmoid: per-over adaptive midpoint.
+            # Fitted on 5,757 per-over observations (331 PSL matches) via
+            # scripts/analyze_psl_resource_calculator.py:
+            #   midpoint(over) = 8.726 + 0.1772 * over_0idx
+            # Death overs get higher midpoint (PSL teams sustain high RRR in death),
+            # reducing inn2 resource_win_prob ECE from 0.0559 to 0.0109 (-80%).
+            # Death-phase Brier: 0.1402 → 0.1050 (-25%).
+            rrr_beta=0.646,
+            rrr_midpoint=8.726,
+            rrr_midpoint_slope=0.1772,
+            transition_blend_overs=0,  # PSL v4: blend redundant with adaptive midpoint + inn1 carryover
+            # chase_wicket_weight stays at default 1.0 — PSL v5 test showed disabling HURTS (+9.5% inn2 Brier)
+            expected_run_rates={
+                "powerplay": 7.20,
+                "middle":    7.77,
+                "death":     8.05,
+                "final":     8.54,
+            },
+            first_innings_score_midpoint=174.0,
+            first_innings_score_beta=0.040,
+            # PSL first-innings wicket penalties (derived from 38,687 inn1 rows)
+            first_innings_wicket_penalty_3d={
+                "powerplay": {
+                    "well_ahead":  {0: 1.00, 1: 1.00, 2: 1.00, 3: 0.64, 4: 0.52, 5: 0.40, 6: 0.28, 7: 0.16, 8: 0.04, 9: 0.01, 10: 0.01},
+                    "ahead":       {0: 1.00, 1: 0.87, 2: 0.87, 3: 0.64, 4: 0.52, 5: 0.40, 6: 0.28, 7: 0.16, 8: 0.04, 9: 0.01, 10: 0.01},
+                    "par":         {0: 1.00, 1: 0.94, 2: 0.87, 3: 0.47, 4: 0.47, 5: 0.40, 6: 0.28, 7: 0.16, 8: 0.04, 9: 0.01, 10: 0.01},
+                    "behind":      {0: 1.00, 1: 0.86, 2: 0.70, 3: 0.50, 4: 0.50, 5: 0.40, 6: 0.28, 7: 0.16, 8: 0.04, 9: 0.01, 10: 0.01},
+                    "well_behind": {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 0.36, 5: 0.36, 6: 0.28, 7: 0.16, 8: 0.04, 9: 0.01, 10: 0.01},
+                },
+                "middle": {
+                    "well_ahead":  {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 0.81, 5: 0.40, 6: 0.28, 7: 0.16, 8: 0.04, 9: 0.01, 10: 0.01},
+                    "ahead":       {0: 1.00, 1: 0.98, 2: 0.94, 3: 0.91, 4: 0.83, 5: 0.83, 6: 0.28, 7: 0.16, 8: 0.04, 9: 0.01, 10: 0.01},
+                    "par":         {0: 1.00, 1: 1.00, 2: 0.87, 3: 0.87, 4: 0.87, 5: 0.87, 6: 0.87, 7: 0.87, 8: 0.04, 9: 0.01, 10: 0.01},
+                    "behind":      {0: 1.00, 1: 0.49, 2: 0.45, 3: 0.45, 4: 0.35, 5: 0.35, 6: 0.01, 7: 0.01, 8: 0.01, 9: 0.01, 10: 0.01},
+                    "well_behind": {0: 1.00, 1: 0.01, 2: 0.01, 3: 0.01, 4: 0.01, 5: 0.01, 6: 0.01, 7: 0.01, 8: 0.01, 9: 0.01, 10: 0.01},
+                },
+                "death": {
+                    "well_ahead":  {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 1.00, 7: 0.44, 8: 0.36, 9: 0.28, 10: 0.01},
+                    "ahead":       {0: 1.00, 1: 0.76, 2: 0.76, 3: 0.76, 4: 0.72, 5: 0.72, 6: 0.59, 7: 0.59, 8: 0.01, 9: 0.01, 10: 0.01},
+                    "par":         {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 0.56, 7: 0.56, 8: 0.56, 9: 0.28, 10: 0.01},
+                    "behind":      {0: 1.00, 1: 0.53, 2: 0.53, 3: 0.50, 4: 0.45, 5: 0.44, 6: 0.35, 7: 0.14, 8: 0.05, 9: 0.04, 10: 0.01},
+                    "well_behind": {0: 1.00, 1: 0.92, 2: 0.32, 3: 0.32, 4: 0.29, 5: 0.24, 6: 0.14, 7: 0.14, 8: 0.14, 9: 0.14, 10: 0.01},
+                },
+                "final": {
+                    "well_ahead":  {0: 1.00, 1: 0.61, 2: 0.61, 3: 0.61, 4: 0.61, 5: 0.61, 6: 0.61, 7: 0.61, 8: 0.61, 9: 0.61, 10: 0.01},
+                    "ahead":       {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 1.00, 7: 0.81, 8: 0.71, 9: 0.28, 10: 0.01},
+                    "par":         {0: 1.00, 1: 0.92, 2: 0.92, 3: 0.92, 4: 0.92, 5: 0.92, 6: 0.84, 7: 0.84, 8: 0.84, 9: 0.84, 10: 0.01},
+                    "behind":      {0: 1.00, 1: 0.92, 2: 0.92, 3: 0.92, 4: 0.08, 5: 0.08, 6: 0.08, 7: 0.08, 8: 0.08, 9: 0.08, 10: 0.01},
+                    "well_behind": {0: 1.00, 1: 0.92, 2: 0.84, 3: 0.76, 4: 0.05, 5: 0.05, 6: 0.05, 7: 0.05, 8: 0.05, 9: 0.05, 10: 0.01},
+                },
+            },
+            # PSL chase penalties (derived from 36,008 inn2 rows)
+            chase_wicket_penalty_2d={
+                "very_easy":   {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 0.94, 6: 0.68, 7: 0.61, 8: 0.34, 9: 0.09, 10: 0.00},
+                "easy":        {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 1.00, 7: 0.95, 8: 0.37, 9: 0.37, 10: 0.00},
+                "comfortable": {0: 1.00, 1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 1.00, 6: 0.78, 7: 0.64, 8: 0.64, 9: 0.64, 10: 0.00},
+                "tough":       {0: 1.00, 1: 1.00, 2: 0.97, 3: 0.97, 4: 0.97, 5: 0.97, 6: 0.97, 7: 0.97, 8: 0.64, 9: 0.00, 10: 0.00},
+                "desperate":   {0: 1.00, 1: 0.73, 2: 0.69, 3: 0.58, 4: 0.41, 5: 0.36, 6: 0.08, 7: 0.08, 8: 0.05, 9: 0.00, 10: 0.00},
+            },
+            # NOTE: PSL final_over_lookup NOT added (331 matches = too sparse for
+            # reliable empirical final-over states; sigmoid fallback performs better)
+        )
+
+    @classmethod
     def odi(cls, gender: str = "male") -> FormatConfig:
         """Return ODI preset populated with empirical constants.
 
@@ -901,5 +981,7 @@ class FormatConfig:
             return cls.odi(gender=gender)
         if league == "ipl":
             return cls.ipl()
+        if league == "psl":
+            return cls.psl()
         # All other leagues are T20
         return cls.t20()

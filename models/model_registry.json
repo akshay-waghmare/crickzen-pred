@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-19",
+  "last_updated": "2026-04-22",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -826,11 +826,11 @@
         "biases": {
           "inn1_powerplay": 0.0645,
           "inn1_middle": -0.3227,
-          "inn1_death": -0.6890,
+          "inn1_death": -0.689,
           "inn2_powerplay": 0.1022,
           "innings_1": -0.2892
         },
-        "notes": "inn2_mid/death/innings_2 removed — corrected resource calc makes them unnecessary"
+        "notes": "inn2_mid/death/innings_2 removed \u00e2\u20ac\u201d corrected resource calc makes them unnecessary"
       },
       "oos_metrics": {
         "dataset": "12 IPL 2026 matches, 432 obs vs Betfair exchange",
@@ -846,6 +846,23 @@
         "version": "v3",
         "generated_date": "2026-04-19",
         "training_data_samples": 278954
+      }
+    },
+    "PSL": {
+      "path": "models/psl_v5",
+      "version": "v5",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1830, ECE: 0.0000)",
+      "training": {
+        "samples": 78040,
+        "date": "2026-04-22",
+        "brier_score": 0.1829952792159469
+      },
+      "calibrator": {},
+      "feature_store": {
+        "path": "data/psl_feature_store_v5",
+        "version": "v5",
+        "generated_date": "2026-04-22",
+        "training_data_samples": 78040
       }
     }
   },
