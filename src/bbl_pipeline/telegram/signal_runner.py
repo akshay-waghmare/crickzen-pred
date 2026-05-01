@@ -6,9 +6,11 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timezone
 import json
+import logging
 from pathlib import Path
+import sys
 import time
 from typing import Any
 
@@ -227,6 +229,14 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     if args.command == "watch":
+        logging.basicConfig(
+            stream=sys.stdout,
+            level=logging.INFO,
+            format="%(asctime)s [runner] %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%SZ",
+        )
+        log = logging.getLogger(__name__)
+        log.info("Watcher started — interval=%ss source_dir=%s", args.interval_seconds, source_dir or source_json)
         while True:
             try:
                 if source_dir:
@@ -235,9 +245,15 @@ def main(argv: list[str] | None = None) -> int:
                         runner.source_json = str(latest)
                 item = runner.scan_once()
                 if item is not None:
-                    print(json.dumps(item, indent=2))
+                    log.info("Queued draft phase=%s id=%s", item.get("phase"), item.get("queue_id"))
+                    print(json.dumps(item, indent=2), flush=True)
+                else:
+                    now_utc = datetime.now(timezone.utc).strftime("%H:%M:%SZ")
+                    log.info("scan ok — no new draft  [%s]", now_utc)
             except LiveStateError as e:
-                print(f"[watch] {e}")
+                log.warning("LiveStateError: %s", e)
+            except Exception as e:  # noqa: BLE001
+                log.error("Unexpected error: %s", e)
             if args.once:
                 return 0
             time.sleep(args.interval_seconds)
