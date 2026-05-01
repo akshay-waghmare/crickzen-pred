@@ -194,6 +194,7 @@ def main(argv: list[str] | None = None) -> int:
     watch_parser.add_argument("--queue-path", default=None, help="Review queue JSON path.")
     watch_parser.add_argument("--interval-seconds", type=float, default=15.0, help="Polling interval.")
     watch_parser.add_argument("--once", action="store_true", help="Scan once and exit.")
+    watch_parser.add_argument("--auto-approve", action="store_true", help="Post drafts automatically without human approval.")
 
     list_parser = subparsers.add_parser("list", help="List queued drafts.")
     list_parser.add_argument("--queue-path", default=None, help="Review queue JSON path.")
@@ -236,7 +237,8 @@ def main(argv: list[str] | None = None) -> int:
             datefmt="%Y-%m-%dT%H:%M:%SZ",
         )
         log = logging.getLogger(__name__)
-        log.info("Watcher started — interval=%ss source_dir=%s", args.interval_seconds, source_dir or source_json)
+        auto = getattr(args, "auto_approve", False)
+        log.info("Watcher started — interval=%ss source_dir=%s auto_approve=%s", args.interval_seconds, source_dir or source_json, auto)
         while True:
             try:
                 if source_dir:
@@ -245,8 +247,17 @@ def main(argv: list[str] | None = None) -> int:
                         runner.source_json = str(latest)
                 item = runner.scan_once()
                 if item is not None:
-                    log.info("Queued draft phase=%s id=%s", item.get("phase"), item.get("queue_id"))
-                    print(json.dumps(item, indent=2), flush=True)
+                    qid = item.get("queue_id")
+                    phase = item.get("phase")
+                    log.info("Queued draft phase=%s id=%s", phase, qid)
+                    if auto:
+                        try:
+                            result = runner.approve(qid, approval_note="auto-approved")
+                            log.info("Auto-posted phase=%s telegram_id=%s", phase, result.get("telegram_message_id"))
+                        except Exception as ae:  # noqa: BLE001
+                            log.error("Auto-approve failed phase=%s: %s", phase, ae)
+                    else:
+                        print(json.dumps(item, indent=2), flush=True)
                 else:
                     now_utc = datetime.now(timezone.utc).strftime("%H:%M:%SZ")
                     log.info("scan ok — no new draft  [%s]", now_utc)
