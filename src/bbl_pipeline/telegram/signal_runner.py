@@ -21,6 +21,7 @@ from bbl_pipeline.telegram.signal_publisher import PublicSignalPublisher
 from bbl_pipeline.telegram.signal_review_queue import SignalReviewQueue
 from bbl_pipeline.telegram.signals import (
     PHASE_CHASE_MIDPOINT,
+    PHASE_DEATH_OVERS,
     PHASE_FINAL_REVIEW,
     PHASE_INNINGS_BREAK,
     PHASE_MID_INNINGS,
@@ -53,10 +54,14 @@ def detect_current_phase(main_state: dict[str, Any], sidecar_state: dict[str, An
         return PHASE_FINAL_REVIEW, "match complete"
 
     if is_second_innings:
+        if balls_remaining is not None and balls_remaining <= 24:
+            return PHASE_DEATH_OVERS, "chase entered death overs"
         if balls_remaining is not None and balls_remaining <= 60:
             return PHASE_CHASE_MIDPOINT, "chase entered midpoint or later"
         return PHASE_INNINGS_BREAK, "second innings started"
 
+    if overs >= 16.0:
+        return PHASE_DEATH_OVERS, "first innings entered death overs"
     if overs >= 10.0:
         return PHASE_MID_INNINGS, "first innings reached 10 overs"
     if overs >= 6.0:
@@ -184,6 +189,13 @@ class SignalAutomationRunner:
         return False
 
 
+def should_auto_approve_phase(phase: str | None, auto_approve_enabled: bool) -> bool:
+    """Return whether a queued phase should be auto-posted."""
+    if not auto_approve_enabled:
+        return False
+    return phase not in {PHASE_FINAL_REVIEW}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Queue and approve Telegram public signal drafts from live predictor JSON.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -250,13 +262,15 @@ def main(argv: list[str] | None = None) -> int:
                     qid = item.get("queue_id")
                     phase = item.get("phase")
                     log.info("Queued draft phase=%s id=%s", phase, qid)
-                    if auto:
+                    if should_auto_approve_phase(phase, auto):
                         try:
                             result = runner.approve(qid, approval_note="auto-approved")
                             log.info("Auto-posted phase=%s telegram_id=%s", phase, result.get("telegram_message_id"))
                         except Exception as ae:  # noqa: BLE001
                             log.error("Auto-approve failed phase=%s: %s", phase, ae)
                     else:
+                        if auto:
+                            log.info("Queued phase=%s for manual approval", phase)
                         print(json.dumps(item, indent=2), flush=True)
                 else:
                     now_utc = datetime.now(timezone.utc).strftime("%H:%M:%SZ")

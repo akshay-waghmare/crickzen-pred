@@ -7,6 +7,7 @@ import pytest
 from bbl_pipeline.telegram.signals import (
     NOT_READY_TO_PUBLISH,
     PHASE_CHASE_MIDPOINT,
+    PHASE_DEATH_OVERS,
     PHASE_FINAL_REVIEW,
     PHASE_POWERPLAY,
     PHASE_PRE_MATCH,
@@ -148,6 +149,30 @@ class TestDraftSignal:
         assert draft.status == READY_TO_PUBLISH
         assert "Chase state: 67 from 42, 6 wickets left" in draft.message
         assert "Pressure read: The chase is still controlled but one wicket can flip the edge." in draft.message
+
+    def test_death_overs_update_formats_endgame_context(self):
+        snapshot = SignalSnapshot(
+            match="RR vs DC",
+            team_a="RR",
+            team_b="DC",
+            model_favorite="DC",
+            win_probability_pct=61,
+            source_timestamp=_fresh_timestamp(),
+            score="158/4",
+            overs="16.1",
+            runs_needed=18,
+            balls_remaining=23,
+            wickets_in_hand=6,
+            reason="The finish is now compressed into the final four overs.",
+            what_changed="Boundary pressure and wickets in hand are now the dominant inputs.",
+        )
+
+        draft = draft_signal(PHASE_DEATH_OVERS, snapshot, expected_match="RR vs DC", now=NOW)
+
+        assert draft.status == READY_TO_PUBLISH
+        assert "Death Overs Update" in draft.message
+        assert "Chase state: 18 from 23, 6 wickets left" in draft.message
+        assert "Current favorite: DC (61%)" in draft.message
 
     def test_fixture_mismatch_blocks_publish(self):
         snapshot = SignalSnapshot(

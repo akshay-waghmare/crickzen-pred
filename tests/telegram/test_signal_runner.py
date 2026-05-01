@@ -9,7 +9,11 @@ from unittest.mock import MagicMock
 from bbl_pipeline.telegram.bot_client import PostResult
 from bbl_pipeline.telegram.signal_publisher import PublicSignalPublisher
 from bbl_pipeline.telegram.signal_review_queue import SignalReviewQueue
-from bbl_pipeline.telegram.signal_runner import SignalAutomationRunner, detect_current_phase
+from bbl_pipeline.telegram.signal_runner import (
+    SignalAutomationRunner,
+    detect_current_phase,
+    should_auto_approve_phase,
+)
 from bbl_pipeline.telegram.storage import PredictionStorage
 
 
@@ -26,9 +30,18 @@ def test_detect_current_phase_progression():
     assert detect_current_phase({"score": 12, "overs": 1.5, "is_second_innings": False}, {"state": {"toss_winner": "DC", "toss_decision": "bowl"}})[0] == "toss"
     assert detect_current_phase({"score": 42, "overs": 6.0, "is_second_innings": False})[0] == "powerplay"
     assert detect_current_phase({"score": 78, "overs": 10.0, "is_second_innings": False})[0] == "mid_innings"
+    assert detect_current_phase({"score": 148, "overs": 16.1, "is_second_innings": False})[0] == "death_overs"
     assert detect_current_phase({"score": 0, "overs": 0.2, "target": 176, "is_second_innings": True})[0] == "innings_break"
     assert detect_current_phase({"score": 109, "overs": 13.0, "target": 176, "total_overs": 20, "is_second_innings": True})[0] == "chase_midpoint"
+    assert detect_current_phase({"score": 158, "overs": 16.1, "target": 176, "total_overs": 20, "is_second_innings": True})[0] == "death_overs"
     assert detect_current_phase({"score": 176, "overs": 19.2, "target": 176, "batting_team": "DC", "is_second_innings": True})[0] == "final_review"
+
+
+def test_should_auto_approve_phase_leaves_final_review_manual():
+    assert should_auto_approve_phase("innings_break", True) is True
+    assert should_auto_approve_phase("death_overs", True) is True
+    assert should_auto_approve_phase("final_review", True) is False
+    assert should_auto_approve_phase("final_review", False) is False
 
 
 def test_scan_once_queues_current_phase_and_approve_posts():

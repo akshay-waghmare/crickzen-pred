@@ -42,6 +42,7 @@ PUBLIC_SIGNAL_PHASES = [
     ("Toss", "toss"),
     ("Powerplay", "powerplay"),
     ("Mid-innings", "mid_innings"),
+    ("Death overs", "death_overs"),
     ("Innings break", "innings_break"),
     ("Chase midpoint", "chase_midpoint"),
     ("Final review", "final_review"),
@@ -724,6 +725,7 @@ def show_match_result_modal():
         
         # Show looked up data if available
         original_prediction = None
+        team_options = []
         if match_id:
             storage = get_storage()
             original_prediction = storage.find_prediction_by_match_id(match_id)

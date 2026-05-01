@@ -1,8 +1,8 @@
 #!/bin/bash
-# Start the IPL Telegram signal runner on production (auto-approve mode).
+# Start the IPL Telegram signal runner on production.
 #
 # Usage:
-#   ./scripts/start_ipl_signal_runner.sh              # auto-approve, continuous
+#   ./scripts/start_ipl_signal_runner.sh              # auto-approve except final review
 #   ./scripts/start_ipl_signal_runner.sh --once       # scan once and exit (dry-run)
 #   ./scripts/start_ipl_signal_runner.sh --no-auto    # manual approval via UI
 #

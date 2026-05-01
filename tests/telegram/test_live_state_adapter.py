@@ -12,6 +12,7 @@ from bbl_pipeline.telegram.live_state_adapter import (
 )
 from bbl_pipeline.telegram.signals import (
     PHASE_CHASE_MIDPOINT,
+    PHASE_DEATH_OVERS,
     PHASE_FINAL_REVIEW,
     PHASE_POWERPLAY,
     PHASE_PRE_MATCH,
@@ -168,6 +169,37 @@ def test_build_chase_snapshot_calculates_pressure_fields(tmp_path):
     assert snapshot.match == "RR vs DC"
     assert snapshot.runs_needed == 67
     assert snapshot.balls_remaining == 42
+    assert snapshot.wickets_in_hand == 6
+
+
+def test_build_death_overs_snapshot_for_late_chase(tmp_path):
+    main_path = tmp_path / "ipl_live_ml.json"
+    _write_json(
+        main_path,
+        {
+            "timestamp": "2026-05-01T22:25:00+05:30",
+            "batting_team": "DC",
+            "bowling_team": "RR",
+            "score": 158,
+            "wickets": 4,
+            "overs": 16.1,
+            "target": 176,
+            "total_overs": 20,
+            "is_second_innings": True,
+            "bat_win_prob": 0.61,
+            "bowl_win_prob": 0.39,
+            "history": [
+                {"innings": 1, "batting_team": "RR", "bowling_team": "DC", "win_probability": 0.53},
+                {"innings": 2, "batting_team": "DC", "bowling_team": "RR", "win_probability": 0.61},
+            ],
+        },
+    )
+
+    snapshot = build_signal_snapshot_from_json(main_path, PHASE_DEATH_OVERS)
+
+    assert snapshot.match == "RR vs DC"
+    assert snapshot.runs_needed == 18
+    assert snapshot.balls_remaining == 23
     assert snapshot.wickets_in_hand == 6
 
 

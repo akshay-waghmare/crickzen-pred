@@ -1,0 +1,33 @@
+app.crickzen.com {
+  encode zstd gzip
+
+  # Telegram operator UI (Streamlit, host port 8502)
+  handle /telegram* {
+    reverse_proxy 172.18.0.1:8502 {
+      header_up Host {host}
+      header_up X-Real-IP {remote}
+      header_up X-Forwarded-Proto {scheme}
+    }
+  }
+
+  handle {
+    reverse_proxy crickzen-dashboard:8000 {
+      header_up Host {host}
+      header_up X-Real-IP {remote}
+      header_up X-Forwarded-Proto {scheme}
+    }
+  }
+
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  }
+
+  log {
+    output file /data/app-crickzen-access.log
+    format json
+  }
+}

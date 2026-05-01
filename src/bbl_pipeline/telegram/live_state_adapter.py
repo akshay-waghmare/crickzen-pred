@@ -12,6 +12,7 @@ from typing import Any
 from bbl_pipeline.telegram.signals import (
     PHASE_CHASE_MIDPOINT,
     PHASE_FINAL_REVIEW,
+    PHASE_DEATH_OVERS,
     PHASE_INNINGS_BREAK,
     PHASE_MID_INNINGS,
     PHASE_POWERPLAY,
@@ -275,6 +276,8 @@ def _phase_reason(
         return "The first six overs have materially moved the live win probability."
     if phase == PHASE_MID_INNINGS:
         return "The current scoring pace and wickets profile are driving the model view."
+    if phase == PHASE_DEATH_OVERS:
+        return "The final overs now dominate the live edge through scoring pace, wickets, and chase pressure."
     if phase == PHASE_INNINGS_BREAK:
         return "The first innings total and chase setup now define the model edge."
     if phase == PHASE_CHASE_MIDPOINT:
@@ -297,6 +300,11 @@ def _what_changed(phase: str, main: dict[str, Any], favorite: str | None) -> str
         return f"Live state moved to {score} after {overs} overs, shifting the edge toward {favorite}."
     if phase == PHASE_MID_INNINGS:
         return f"At {score} after {overs} overs, the scoring pace and wickets profile shifted the balance."
+    if phase == PHASE_DEATH_OVERS:
+        if main.get("is_second_innings") and _safe_int(main.get('target')) is not None:
+            runs_needed = max(_safe_int(main.get('target'), 0) - _safe_int(main.get('score'), 0), 0)
+            return f"Late chase pressure is down to {runs_needed} needed with the finish compressed into the last overs."
+        return f"The innings has moved to {score} after {overs} overs, where death-overs scoring swings the edge quickly."
     if phase == PHASE_INNINGS_BREAK:
         return f"The innings closed at {score}, setting a defined chase target and new model base rate."
     if phase == PHASE_CHASE_MIDPOINT:

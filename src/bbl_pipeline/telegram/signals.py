@@ -20,6 +20,7 @@ PHASE_PRE_MATCH = "pre_match"
 PHASE_TOSS = "toss"
 PHASE_POWERPLAY = "powerplay"
 PHASE_MID_INNINGS = "mid_innings"
+PHASE_DEATH_OVERS = "death_overs"
 PHASE_INNINGS_BREAK = "innings_break"
 PHASE_CHASE_MIDPOINT = "chase_midpoint"
 PHASE_FINAL_REVIEW = "final_review"
@@ -333,6 +334,8 @@ def _format_phase_message(phase: str, snapshot: SignalSnapshot) -> str:
         return _format_powerplay(snapshot)
     if phase == PHASE_MID_INNINGS:
         return _format_mid_innings(snapshot)
+    if phase == PHASE_DEATH_OVERS:
+        return _format_death_overs(snapshot)
     if phase == PHASE_INNINGS_BREAK:
         return _format_innings_break(snapshot)
     if phase == PHASE_CHASE_MIDPOINT:
@@ -411,6 +414,30 @@ def _format_innings_break(snapshot: SignalSnapshot) -> str:
         f"Chase favorite: {snapshot.current_favorite()} ({snapshot.win_probability_pct}%)",
         f"Confidence: {confidence_label(snapshot.win_probability_pct)}",
         f"Read: {snapshot.reason or 'The chase setup now defines the model edge.'}",
+    ]
+    if snapshot.dashboard_url:
+        lines.extend(["", f"Track live probability: {snapshot.dashboard_url}"])
+    return "\n".join(lines)
+
+
+def _format_death_overs(snapshot: SignalSnapshot) -> str:
+    if snapshot.runs_needed is not None and snapshot.balls_remaining is not None:
+        context_line = (
+            f"Chase state: {snapshot.runs_needed} from {snapshot.balls_remaining}, "
+            f"{snapshot.wickets_in_hand} wickets left"
+        )
+        read_line = f"Pressure read: {snapshot.reason or 'The finish is now concentrated into the final overs.'}"
+    else:
+        context_line = f"Score: {snapshot.score or 'N/A'} after {snapshot.overs or '16'} overs"
+        read_line = f"Model read: {snapshot.reason or 'The death overs are now driving the model edge.'}"
+
+    lines = [
+        "Death Overs Update",
+        f"Match: {snapshot.resolved_match()}",
+        context_line,
+        f"Current favorite: {snapshot.current_favorite()} ({snapshot.win_probability_pct}%)",
+        read_line,
+        f"What changed: {snapshot.what_changed or snapshot.reason or 'Late-innings pressure is reshaping the edge.'}",
     ]
     if snapshot.dashboard_url:
         lines.extend(["", f"Track live probability: {snapshot.dashboard_url}"])
