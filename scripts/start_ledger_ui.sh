@@ -28,7 +28,8 @@ echo ""
 
 streamlit run src/bbl_pipeline/app/telegram_ledger_app.py \
   --server.port 8502 \
-  --server.address 127.0.0.1 \
+  --server.address 0.0.0.0 \
   --server.headless true \
+  --server.baseUrlPath telegram \
   --browser.gatherUsageStats false \
   2>&1 | tee -a logs/ledger_ui.log
