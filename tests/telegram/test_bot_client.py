@@ -63,7 +63,7 @@ class TestTelegramBotClient:
         assert client.config == config
         assert client._bot is None  # Lazy initialization
     
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_send_message_async_success(self, client):
         """Test successful async message sending."""
         mock_message = MagicMock()
@@ -80,7 +80,7 @@ class TestTelegramBotClient:
         assert result.message_id == 12345
         mock_bot.send_message.assert_called_once()
     
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_send_message_async_unauthorized(self, client):
         """Test handling of unauthorized error."""
         from telegram.error import Forbidden
@@ -95,7 +95,7 @@ class TestTelegramBotClient:
         assert result.error_type == "unauthorized"
         assert "not authorized" in result.error_message.lower()
     
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_send_message_async_network_error(self, client):
         """Test handling of network error."""
         from telegram.error import NetworkError
@@ -110,7 +110,7 @@ class TestTelegramBotClient:
         assert result.error_type == "network_error"
         assert "network" in result.error_message.lower()
     
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_send_message_async_bad_request(self, client):
         """Test handling of bad request error."""
         from telegram.error import BadRequest
@@ -124,7 +124,7 @@ class TestTelegramBotClient:
         assert result.success is False
         assert result.error_type == "bad_request"
     
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_test_connection_async_success(self, client):
         """Test successful connection test."""
         mock_user = MagicMock()
@@ -138,7 +138,7 @@ class TestTelegramBotClient:
         
         assert result is True
     
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_test_connection_async_failure(self, client):
         """Test failed connection test."""
         from telegram.error import TelegramError

@@ -17,7 +17,8 @@ def temp_storage():
     """Create a temporary storage instance."""
     with TemporaryDirectory() as tmpdir:
         storage_path = Path(tmpdir) / "test_predictions.jsonl"
-        yield PredictionStorage(storage_path)
+        tracker_path = Path(tmpdir) / "tracker.csv"
+        yield PredictionStorage(storage_path, tracker_path=tracker_path)
 
 
 @pytest.fixture
@@ -61,6 +62,7 @@ class TestPredictionStorage:
     def test_storage_creates_file(self, temp_storage):
         """Test that storage creates the file if it doesn't exist."""
         assert temp_storage.storage_path.exists()
+        assert temp_storage.tracker_path.exists()
     
     def test_append_record(self, temp_storage, sample_prediction):
         """Test appending a record to storage."""
@@ -188,3 +190,48 @@ class TestPredictionStorage:
         records = temp_storage.read_all_records()
         assert records[0]["team_a"] == "东京队"
         assert records[0]["team_b"] == "مومباي"
+
+    def test_upsert_tracker_row(self, temp_storage):
+        """Test creating and updating tracker rows."""
+        temp_storage.upsert_tracker_row(
+            {
+                "date": "2026-05-01",
+                "match": "RR vs DC",
+                "pre_match_favorite": "RR",
+                "final_result": "",
+                "confidence": "Medium (57%)",
+                "what_changed": "",
+            }
+        )
+        temp_storage.upsert_tracker_row(
+            {
+                "date": "2026-05-01",
+                "match": "RR vs DC",
+                "pre_match_favorite": "RR",
+                "final_result": "DC",
+                "confidence": "Medium (57%)",
+                "what_changed": "DC won the powerplay.",
+            }
+        )
+
+        rows = temp_storage.read_tracker_rows()
+        assert len(rows) == 1
+        assert rows[0]["final_result"] == "DC"
+        assert rows[0]["what_changed"] == "DC won the powerplay."
+
+    def test_find_tracker_row(self, temp_storage):
+        """Test finding tracker row by match."""
+        temp_storage.upsert_tracker_row(
+            {
+                "date": "2026-05-01",
+                "match": "RR vs DC",
+                "pre_match_favorite": "RR",
+                "final_result": "",
+                "confidence": "Medium (57%)",
+                "what_changed": "",
+            }
+        )
+
+        row = temp_storage.find_tracker_row("RR vs DC")
+        assert row is not None
+        assert row["pre_match_favorite"] == "RR"

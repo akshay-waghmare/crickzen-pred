@@ -23,6 +23,8 @@ class TestTelegramConfig:
         assert config.bot_token == "123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
         assert config.channel_id == "@test_channel"
         assert config.storage_path == "data/telegram_predictions.jsonl"
+        assert config.signal_source_json == "data/ipl_live_ml.json"
+        assert config.signal_queue_path == "data/telegram_signal_queue.json"
     
     def test_valid_numeric_channel_id(self):
         """Test config with numeric channel ID."""
@@ -40,6 +42,24 @@ class TestTelegramConfig:
             storage_path="custom/path.jsonl",
         )
         assert config.storage_path == "custom/path.jsonl"
+
+    def test_optional_public_dashboard_url(self):
+        """Test config with dashboard CTA URL."""
+        config = TelegramConfig(
+            bot_token="123456789:ABCdefGHIjklMNOpqrsTUVwxyz",
+            channel_id="@test_channel",
+            public_dashboard_base_url="https://app.crickzen.com/dashboard",
+        )
+        assert config.public_dashboard_base_url == "https://app.crickzen.com/dashboard"
+
+    def test_invalid_dashboard_url_raises_error(self):
+        """Test invalid dashboard URL validation."""
+        with pytest.raises(ConfigError, match="PUBLIC_DASHBOARD_BASE_URL"):
+            TelegramConfig(
+                bot_token="123456789:ABCdefGHIjklMNOpqrsTUVwxyz",
+                channel_id="@test_channel",
+                public_dashboard_base_url="app.crickzen.com/dashboard",
+            )
     
     def test_empty_token_raises_error(self):
         """Test that empty token raises ConfigError."""
@@ -91,11 +111,19 @@ class TestLoadConfig:
         "TELEGRAM_BOT_TOKEN": "123456789:ABCdefGHIjklMNOpqrsTUVwxyz",
         "TELEGRAM_CHANNEL_ID": "@test_channel",
         "TELEGRAM_STORAGE_PATH": "custom/storage.jsonl",
+        "TELEGRAM_SIGNAL_TRACKER_PATH": "custom/tracker.csv",
+        "PUBLIC_DASHBOARD_BASE_URL": "https://app.crickzen.com/dashboard",
+        "TELEGRAM_SIGNAL_SOURCE_JSON": "data/custom_live.json",
+        "TELEGRAM_SIGNAL_QUEUE_PATH": "data/custom_queue.json",
     })
     def test_load_config_with_custom_storage(self):
         """Test loading config with custom storage path."""
         config = load_config()
         assert config.storage_path == "custom/storage.jsonl"
+        assert config.signal_tracker_path == "custom/tracker.csv"
+        assert config.public_dashboard_base_url == "https://app.crickzen.com/dashboard"
+        assert config.signal_source_json == "data/custom_live.json"
+        assert config.signal_queue_path == "data/custom_queue.json"
     
     @patch.dict("os.environ", {}, clear=True)
     def test_load_config_missing_token_raises_error(self):
