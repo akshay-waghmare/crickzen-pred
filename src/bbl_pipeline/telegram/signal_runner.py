@@ -130,7 +130,11 @@ class SignalAutomationRunner:
         )
 
     def approve(self, queue_id: str, *, approval_note: str | None = None) -> dict[str, Any]:
-        """Publish a queued draft after human approval."""
+        """Publish a queued draft after human approval.
+
+        Posts the stored draft message verbatim — source checks (including
+        freshness) are NOT re-run, since the operator already reviewed them.
+        """
         if self.publisher is None:
             raise RuntimeError("Publisher is required for approval")
         item = self.queue.get_item(queue_id)
@@ -140,13 +144,19 @@ class SignalAutomationRunner:
             raise RuntimeError(f"Queue item is not pending: {queue_id}")
 
         snapshot = SignalSnapshot(**item["signal_snapshot"])
-        result = self.publisher.publish(
+        approved_message = item.get("draft_message", "")
+        if not approved_message:
+            raise RuntimeError("Queue item has no draft_message to post")
+
+        result = self.publisher.publish_approved(
             item["phase"],
             snapshot,
-            expected_match=item["match"],
+            approved_message,
+            source_checks=item.get("source_checks"),
         )
         if not result.success:
-            raise RuntimeError(result.post_result.error_message if result.post_result else "Draft was blocked")
+            error = result.post_result.error_message if result.post_result else "Telegram post failed"
+            raise RuntimeError(error)
 
         return self.queue.update_status(
             queue_id,

@@ -127,3 +127,69 @@ def test_scan_once_skips_duplicate_pending_phase():
         assert second is None
         queue = SignalReviewQueue(tmp / "queue.json")
         assert len(queue.list_items(status="pending")) == 1
+
+
+def test_approve_stale_draft_bypasses_freshness():
+    """Approval must succeed even when the snapshot timestamp is older than DEFAULT_FRESHNESS_MINUTES."""
+    from datetime import timedelta
+
+    with TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+        source_json = tmp / "ipl_live_ml.json"
+
+        # Timestamp 60 minutes old — well past the 20-min freshness window.
+        stale_ts = (datetime.now(timezone.utc) - timedelta(minutes=60)).isoformat()
+        _write_json(
+            source_json,
+            {
+                "timestamp": stale_ts,
+                "batting_team": "RR",
+                "bowling_team": "DC",
+                "score": 0,
+                "wickets": 0,
+                "overs": 0.0,
+                "is_second_innings": False,
+                "bat_win_prob": 0.87,
+                "bowl_win_prob": 0.13,
+                "history": [{"innings": 1, "batting_team": "RR", "bowling_team": "DC", "win_probability": 0.87}],
+            },
+        )
+        _write_json(tmp / "ipl_live_ml_livematch.json", {"state": {}})
+
+        storage = PredictionStorage(tmp / "records.jsonl", tracker_path=tmp / "tracker.csv")
+        client = MagicMock()
+        client.send_message.return_value = _success_post_result()
+        publisher = PublicSignalPublisher(client, storage, dashboard_base_url="https://app.crickzen.com")
+        runner = SignalAutomationRunner(
+            source_json=str(source_json),
+            queue_path=str(tmp / "queue.json"),
+            storage=storage,
+            publisher=publisher,
+            dashboard_url="https://app.crickzen.com",
+        )
+
+        # scan_once with stale timestamp: freshness check fails → NOT queued via normal path.
+        # We simulate an already-queued stale item by manually injecting it.
+        queue = SignalReviewQueue(tmp / "queue.json")
+        queue.enqueue(
+            phase="innings_break",
+            match="RR vs DC",
+            match_id="test_stale",
+            source_json=str(source_json),
+            signal_snapshot={"match": "RR vs DC", "model_favorite": "RR", "win_probability_pct": 87},
+            source_checks=[{"name": "freshness", "passed": True, "detail": "was fresh at queue time"}],
+            draft_message="Innings Break\nMatch: RR vs DC\nTarget: 226\nChase favorite: RR (87%)",
+            tracker_action="no action",
+            trigger_reason="second innings started",
+        )
+        pending = queue.list_items(status="pending")
+        assert len(pending) == 1
+
+        # Approve should succeed even though the snapshot timestamp is stale.
+        approved = runner.approve(pending[0]["queue_id"])
+        assert approved["status"] == "approved"
+        assert approved["telegram_message_id"] == 77
+        # Verify the exact stored draft_message was posted, not a re-generated one.
+        posted_text = client.send_message.call_args[0][0]
+        assert "Innings Break" in posted_text
+        assert "RR vs DC" in posted_text

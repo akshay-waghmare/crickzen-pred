@@ -12,9 +12,13 @@ from bbl_pipeline.telegram.bot_client import PostResult, TelegramBotClient
 from bbl_pipeline.telegram.signals import (
     PHASE_FINAL_REVIEW,
     PHASE_PRE_MATCH,
+    NOT_READY_TO_PUBLISH,
+    READY_TO_PUBLISH,
     AccuracyTrackerRow,
     SignalPostDraft,
     SignalSnapshot,
+    SourceCheck,
+    _tracker_action,
     build_accuracy_tracker_row,
     confidence_label,
     draft_signal,
@@ -112,6 +116,52 @@ class PublicSignalPublisher:
             post_result=post_result,
             tracker_row=tracker_row,
         )
+
+    def publish_approved(
+        self,
+        phase: str,
+        snapshot: SignalSnapshot,
+        approved_message: str,
+        *,
+        source_checks: list | None = None,
+        now: datetime | None = None,
+    ) -> SignalPublishResult:
+        """Post a human-approved draft message verbatim (bypasses freshness re-check).
+
+        Use this when the operator has already reviewed the queued draft.  The
+        ``approved_message`` is the exact text that was shown to the operator and
+        is posted as-is so that what-you-see == what-gets-sent.
+        """
+        prepared = self._prepare_snapshot(snapshot)
+        post_result = self.client.send_message(approved_message)
+        tracker_row = None
+        if post_result.success:
+            self.storage.append_record(
+                {
+                    "match_id": prepared.match_id or prepared.resolved_match(),
+                    "match": prepared.resolved_match(),
+                    "phase": phase,
+                    "post_type": "public_signal",
+                    "status": READY_TO_PUBLISH,
+                    "tracker_action": _tracker_action(phase),
+                    "message": approved_message,
+                    "source_checks": source_checks or [],
+                    "snapshot": asdict(prepared),
+                    "telegram_message_id": post_result.message_id,
+                    "telegram_timestamp": post_result.timestamp.isoformat() if post_result.timestamp else None,
+                    "approved_by": "operator",
+                }
+            )
+            tracker_row = self._apply_tracker_update(phase, prepared, now=now)
+
+        dummy_draft = SignalPostDraft(
+            status=READY_TO_PUBLISH if post_result.success else NOT_READY_TO_PUBLISH,
+            phase=phase,
+            source_checks=[SourceCheck(**c) if isinstance(c, dict) else c for c in (source_checks or [])],
+            message=approved_message,
+            tracker_action=_tracker_action(phase),
+        )
+        return SignalPublishResult(draft=dummy_draft, post_result=post_result, tracker_row=tracker_row)
 
     def _prepare_snapshot(self, snapshot: SignalSnapshot) -> SignalSnapshot:
         """Fill optional defaults before drafting or posting."""
