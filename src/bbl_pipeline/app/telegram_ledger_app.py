@@ -10,8 +10,14 @@ Usage:
 
 import streamlit as st
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any
+from pathlib import Path
+import sys
 import logging
+
+# Ensure this app imports the local repo package, not a sibling editable install.
+SRC_ROOT = Path(__file__).resolve().parents[2]
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +35,16 @@ st.set_page_config(
 LEAGUES = [
     "BBL", "SA20", "ILT20", "WPL", "SSM", "T20I", 
     "IPL", "PSL", "CPL", "BPL", "LPL", "WBBL", "Other"
+]
+
+PUBLIC_SIGNAL_PHASES = [
+    ("Pre-match", "pre_match"),
+    ("Toss", "toss"),
+    ("Powerplay", "powerplay"),
+    ("Mid-innings", "mid_innings"),
+    ("Innings break", "innings_break"),
+    ("Chase midpoint", "chase_midpoint"),
+    ("Final review", "final_review"),
 ]
 
 
@@ -58,9 +74,109 @@ def get_storage():
     if "prediction_storage" not in st.session_state:
         config = st.session_state.get("telegram_config")
         storage_path = config.storage_path if config else "data/telegram_predictions.jsonl"
-        st.session_state.prediction_storage = PredictionStorage(storage_path)
+        tracker_path = (
+            config.signal_tracker_path
+            if config else
+            "data/telegram_signal_accuracy_tracker.csv"
+        )
+        st.session_state.prediction_storage = PredictionStorage(
+            storage_path,
+            tracker_path=tracker_path,
+        )
     
     return st.session_state.prediction_storage
+
+
+def get_signal_publisher():
+    """Get a public signal publisher bound to the configured bot and storage."""
+    from bbl_pipeline.telegram.signal_publisher import PublicSignalPublisher
+
+    client = get_telegram_client()
+    if client is None:
+        return None
+
+    if "signal_publisher" not in st.session_state:
+        config = st.session_state.get("telegram_config")
+        storage = get_storage()
+        st.session_state.signal_publisher = PublicSignalPublisher(
+            client,
+            storage,
+            dashboard_base_url=(config.public_dashboard_base_url if config else None),
+        )
+    return st.session_state.signal_publisher
+
+
+def parse_optional_int(value: str):
+    """Parse an optional integer from a text input."""
+    text = (value or "").strip()
+    if not text:
+        return None
+    try:
+        return int(text)
+    except ValueError:
+        return None
+
+
+def _phase_default_values():
+    """Return default form values for the public signal form."""
+    return {
+        "match_id": "",
+        "match_title": "",
+        "team_a": "",
+        "team_b": "",
+        "source_timestamp": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "dashboard_url": "",
+        "model_favorite": "",
+        "pre_match_favorite": "",
+        "win_probability_pct": "",
+        "probability_delta_pct": "",
+        "reason": "",
+        "what_changed": "",
+        "caveat": "",
+        "score": "",
+        "overs": "",
+        "target": "",
+        "toss_winner": "",
+        "toss_decision": "",
+        "winner": "",
+        "runs_needed": "",
+        "balls_remaining": "",
+        "wickets_in_hand": "",
+        "review": "",
+    }
+
+
+def _snapshot_to_form_values(snapshot):
+    """Convert a SignalSnapshot into Streamlit form defaults."""
+    values = _phase_default_values()
+    values.update(
+        {
+            "match_id": snapshot.match_id or "",
+            "match_title": snapshot.match or "",
+            "team_a": snapshot.team_a or "",
+            "team_b": snapshot.team_b or "",
+            "source_timestamp": snapshot.source_timestamp or values["source_timestamp"],
+            "dashboard_url": snapshot.dashboard_url or "",
+            "model_favorite": snapshot.model_favorite or "",
+            "pre_match_favorite": snapshot.pre_match_favorite or "",
+            "win_probability_pct": str(snapshot.win_probability_pct) if snapshot.win_probability_pct is not None else "",
+            "probability_delta_pct": str(snapshot.probability_delta_pct) if snapshot.probability_delta_pct is not None else "",
+            "reason": snapshot.reason or "",
+            "what_changed": snapshot.what_changed or "",
+            "caveat": snapshot.caveat or "",
+            "score": snapshot.score or "",
+            "overs": snapshot.overs or "",
+            "target": str(snapshot.target) if snapshot.target is not None else "",
+            "toss_winner": snapshot.toss_winner or "",
+            "toss_decision": snapshot.toss_decision or "",
+            "winner": snapshot.winner or "",
+            "runs_needed": str(snapshot.runs_needed) if snapshot.runs_needed is not None else "",
+            "balls_remaining": str(snapshot.balls_remaining) if snapshot.balls_remaining is not None else "",
+            "wickets_in_hand": str(snapshot.wickets_in_hand) if snapshot.wickets_in_hand is not None else "",
+            "review": snapshot.review or "",
+        }
+    )
+    return values
 
 
 def calculate_edge(model_probability: float, market_odds: float) -> float:
@@ -68,6 +184,224 @@ def calculate_edge(model_probability: float, market_odds: float) -> float:
     implied_prob = 1.0 / market_odds
     model_prob = model_probability / 100.0
     return (model_prob - implied_prob) * 100
+
+
+@st.dialog("📡 Post Public Signal", width="large")
+def show_public_signal_modal():
+    """Modal dialog for public Telegram signal lifecycle posts."""
+    from bbl_pipeline.telegram.signals import SignalSnapshot
+    from bbl_pipeline.telegram.live_state_adapter import LiveStateError, build_signal_snapshot_from_json
+
+    st.markdown("Draft and publish public model signals with publish checks and tracker updates.")
+    publisher = get_signal_publisher()
+
+    phase_labels = [label for label, _ in PUBLIC_SIGNAL_PHASES]
+    phase_lookup = dict(PUBLIC_SIGNAL_PHASES)
+    default_timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    default_dashboard_url = ""
+    default_source_json = "data/ipl_live_ml.json"
+    config = st.session_state.get("telegram_config")
+    if config and config.public_dashboard_base_url:
+        default_dashboard_url = config.public_dashboard_base_url
+    if config and getattr(config, "signal_source_json", None):
+        default_source_json = config.signal_source_json
+
+    if "public_signal_form_values" not in st.session_state:
+        st.session_state.public_signal_form_values = _phase_default_values()
+        st.session_state.public_signal_form_values["dashboard_url"] = default_dashboard_url
+
+    st.markdown("**Live Prefill**")
+    load_col1, load_col2 = st.columns([4, 1])
+    with load_col1:
+        live_source_json = st.text_input(
+            "Live Predictor JSON",
+            key="public_signal_live_source_json",
+            value=st.session_state.get("public_signal_live_source_json", default_source_json),
+            help="Example: data/ipl_live_ml.json",
+        )
+    with load_col2:
+        st.write("")
+        st.write("")
+        load_live = st.button("Load Live Snapshot", use_container_width=True)
+
+    phase_for_prefill = phase_lookup.get(
+        st.session_state.get("public_signal_phase_label", phase_labels[0]),
+        "pre_match",
+    )
+    if load_live:
+        try:
+            snapshot = build_signal_snapshot_from_json(
+                live_source_json,
+                phase_for_prefill,
+                dashboard_url=default_dashboard_url or None,
+            )
+            prefill_values = _snapshot_to_form_values(snapshot)
+            tracker_row = get_storage().find_tracker_row(snapshot.match or "")
+            if tracker_row and tracker_row.get("pre_match_favorite"):
+                prefill_values["pre_match_favorite"] = tracker_row["pre_match_favorite"]
+            st.session_state.public_signal_form_values = prefill_values
+            st.session_state.public_signal_form_values["dashboard_url"] = (
+                st.session_state.public_signal_form_values["dashboard_url"] or default_dashboard_url
+            )
+            st.success(f"Loaded live snapshot from `{live_source_json}`")
+        except LiveStateError as e:
+            st.error(f"❌ Failed to load live snapshot: {e}")
+
+    with st.form("public_signal_form", clear_on_submit=False):
+        form_values = st.session_state.public_signal_form_values
+        col1, col2 = st.columns(2)
+
+        with col1:
+            phase_label = st.selectbox(
+                "Signal Phase *",
+                options=phase_labels,
+                key="public_signal_phase_label",
+            )
+            match_id = st.text_input("Match ID", placeholder="e.g., ipl-rr-vs-dc-2026-05-01", value=form_values["match_id"])
+            match_title = st.text_input("Match *", placeholder="e.g., RR vs DC", value=form_values["match_title"])
+            team_a = st.text_input("Team A", placeholder="e.g., RR", value=form_values["team_a"])
+            team_b = st.text_input("Team B", placeholder="e.g., DC", value=form_values["team_b"])
+            source_timestamp = st.text_input(
+                "Source Timestamp (UTC ISO) *",
+                value=form_values["source_timestamp"] or default_timestamp,
+                help="Freshness guardrail uses this timestamp.",
+            )
+            dashboard_url = st.text_input(
+                "Dashboard URL",
+                value=form_values["dashboard_url"] or default_dashboard_url,
+                help="Optional override. If blank, configured PUBLIC_DASHBOARD_BASE_URL is used.",
+            )
+
+        with col2:
+            model_favorite = st.text_input("Current Favorite", placeholder="e.g., RR", value=form_values["model_favorite"])
+            pre_match_favorite = st.text_input("Pre-match Favorite", placeholder="Needed for toss/final review when it changed", value=form_values["pre_match_favorite"])
+            win_probability_pct = st.text_input("Current Win Probability (%)", placeholder="e.g., 57", value=form_values["win_probability_pct"])
+            probability_delta_pct = st.text_input("Probability Delta (pts)", placeholder="e.g., -7", value=form_values["probability_delta_pct"])
+            reason = st.text_area("Reason / Read", placeholder="What is the model seeing right now?", value=form_values["reason"])
+            what_changed = st.text_area("What Changed", placeholder="What moved the game state or model edge?", value=form_values["what_changed"])
+            caveat = st.text_area("Caveat", placeholder="Optional caution for pre-match or live uncertainty", value=form_values["caveat"])
+
+        st.divider()
+        st.markdown("**Phase Context**")
+
+        ctx1, ctx2, ctx3 = st.columns(3)
+        with ctx1:
+            score = st.text_input("Score", placeholder="e.g., 42/2", value=form_values["score"])
+            overs = st.text_input("Overs", placeholder="e.g., 6 or 10.2", value=form_values["overs"])
+            target = st.text_input("Target", placeholder="e.g., 176", value=form_values["target"])
+        with ctx2:
+            toss_winner = st.text_input("Toss Winner", placeholder="e.g., DC", value=form_values["toss_winner"])
+            toss_decision = st.selectbox(
+                "Toss Decision",
+                options=["", "bat", "bowl"],
+                index=["", "bat", "bowl"].index(form_values["toss_decision"]) if form_values["toss_decision"] in {"", "bat", "bowl"} else 0,
+            )
+            winner = st.text_input("Winner", placeholder="Needed for final review", value=form_values["winner"])
+        with ctx3:
+            runs_needed = st.text_input("Runs Needed", placeholder="e.g., 67", value=form_values["runs_needed"])
+            balls_remaining = st.text_input("Balls Remaining", placeholder="e.g., 42", value=form_values["balls_remaining"])
+            wickets_in_hand = st.text_input("Wickets In Hand", placeholder="e.g., 6", value=form_values["wickets_in_hand"])
+            review = st.text_area("Final Review", placeholder="Brutally honest post-match review", value=form_values["review"])
+
+        phase = phase_lookup[phase_label]
+        snapshot = SignalSnapshot(
+            match_id=match_id.strip() or None,
+            match=match_title.strip() or None,
+            team_a=team_a.strip() or None,
+            team_b=team_b.strip() or None,
+            model_favorite=model_favorite.strip() or None,
+            pre_match_favorite=pre_match_favorite.strip() or None,
+            win_probability_pct=parse_optional_int(win_probability_pct),
+            source_timestamp=source_timestamp.strip() or None,
+            score=score.strip() or None,
+            overs=overs.strip() or None,
+            toss_winner=toss_winner.strip() or None,
+            toss_decision=toss_decision or None,
+            probability_delta_pct=parse_optional_int(probability_delta_pct),
+            reason=reason.strip() or None,
+            what_changed=what_changed.strip() or None,
+            caveat=caveat.strip() or None,
+            target=parse_optional_int(target),
+            runs_needed=parse_optional_int(runs_needed),
+            balls_remaining=parse_optional_int(balls_remaining),
+            wickets_in_hand=parse_optional_int(wickets_in_hand),
+            winner=winner.strip() or None,
+            review=review.strip() or None,
+            dashboard_url=dashboard_url.strip() or None,
+        )
+
+        preview_draft = None
+        if publisher is not None:
+            preview_draft = publisher.draft(
+                phase,
+                snapshot,
+                expected_match=match_title.strip() or None,
+            )
+
+        st.divider()
+        st.markdown("**Draft Preview**")
+        if preview_draft is None:
+            st.info("Telegram is not configured yet.")
+        else:
+            st.code(preview_draft.message, language=None)
+            status_text = "Ready" if preview_draft.publish_ready else "Blocked"
+            st.markdown(f"**Status:** {status_text} | **Tracker Action:** {preview_draft.tracker_action}")
+            for check in preview_draft.source_checks:
+                icon = "✅" if check.passed else "⚠️"
+                st.markdown(f"{icon} **{check.name}**: {check.detail}")
+
+        submitted = st.form_submit_button("🚀 Post Public Signal", type="primary", use_container_width=True)
+
+        if submitted:
+            st.session_state.public_signal_form_values = {
+                "match_id": match_id,
+                "match_title": match_title,
+                "team_a": team_a,
+                "team_b": team_b,
+                "source_timestamp": source_timestamp,
+                "dashboard_url": dashboard_url,
+                "model_favorite": model_favorite,
+                "pre_match_favorite": pre_match_favorite,
+                "win_probability_pct": win_probability_pct,
+                "probability_delta_pct": probability_delta_pct,
+                "reason": reason,
+                "what_changed": what_changed,
+                "caveat": caveat,
+                "score": score,
+                "overs": overs,
+                "target": target,
+                "toss_winner": toss_winner,
+                "toss_decision": toss_decision,
+                "winner": winner,
+                "runs_needed": runs_needed,
+                "balls_remaining": balls_remaining,
+                "wickets_in_hand": wickets_in_hand,
+                "review": review,
+            }
+            if publisher is None:
+                st.error("❌ Telegram not configured. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL_ID in .env")
+            elif preview_draft is None or not preview_draft.publish_ready:
+                st.error("❌ Signal is not ready to publish. Fix the failed checks shown above.")
+            else:
+                with st.spinner("Posting public signal to Telegram..."):
+                    result = publisher.publish(
+                        phase,
+                        snapshot,
+                        expected_match=match_title.strip() or None,
+                    )
+
+                if result.success:
+                    st.success(f"✅ Posted successfully! Message ID: {result.post_result.message_id}")
+                    if result.tracker_row is not None:
+                        st.info("Accuracy tracker updated.")
+                    st.balloons()
+                else:
+                    error_message = (
+                        result.post_result.error_message
+                        if result.post_result else
+                        "Signal was blocked by publish checks."
+                    )
+                    st.error(f"❌ Failed to post: {error_message}")
 
 
 # ============================================================================
@@ -497,6 +831,103 @@ def show_match_result_modal():
 
 
 # ============================================================================
+# SIGNAL QUEUE APPROVAL SECTION
+# ============================================================================
+
+def _show_signal_queue_section() -> None:
+    """Show pending signal drafts from the runner queue with approve/reject controls."""
+    from bbl_pipeline.telegram.config import is_configured, load_config
+    from bbl_pipeline.telegram.signal_review_queue import SignalReviewQueue
+    from bbl_pipeline.telegram.signal_runner import SignalAutomationRunner
+    from bbl_pipeline.telegram.signal_publisher import PublicSignalPublisher
+
+    st.markdown("### 🔔 Signal Queue")
+
+    if not is_configured():
+        st.info("Configure Telegram to use the signal queue.")
+        return
+
+    cfg = load_config()
+    queue = SignalReviewQueue(cfg.signal_queue_path)
+
+    col_r, col_s = st.columns([1, 7])
+    with col_r:
+        if st.button("🔄 Refresh", key="refresh_queue"):
+            st.rerun()
+
+    pending = queue.list_items(status="pending")
+
+    if not pending:
+        st.success("No pending signals — nothing awaiting approval.")
+        return
+
+    st.info(f"**{len(pending)} draft(s) waiting for your approval.** Review each and click Approve to post live.")
+
+    for item in pending:
+        queue_id = item["queue_id"]
+        phase = item.get("phase", "").replace("_", " ").title()
+        match = item.get("match") or item.get("match_id", "Unknown match")
+        draft_msg = item.get("draft_message", "")
+        created = (item.get("created_at_utc") or "")[:19].replace("T", " ")
+        checks = item.get("source_checks", [])
+        all_ok = all(c.get("passed") for c in checks)
+        trigger = item.get("trigger_reason", "")
+
+        header_icon = "✅" if all_ok else "⚠️"
+        with st.expander(f"{header_icon} **{phase}** — {match}  ·  {created} UTC", expanded=True):
+
+            # Source checks row
+            if checks:
+                check_cols = st.columns(len(checks))
+                for i, chk in enumerate(checks):
+                    with check_cols[i]:
+                        icon = "✅" if chk["passed"] else "❌"
+                        st.caption(f"{icon} {chk['name']}: {chk['detail']}")
+
+            st.caption(f"Trigger: {trigger}")
+            st.markdown("**Draft message:**")
+            st.code(draft_msg, language=None)
+
+            btn_approve, btn_reject, _ = st.columns([1, 1, 5])
+
+            with btn_approve:
+                if st.button("✅ Approve & Post", key=f"approve_{queue_id}", type="primary"):
+                    storage = get_storage()
+                    client = get_telegram_client()
+                    if client is None:
+                        st.error("Telegram not configured.")
+                    else:
+                        publisher = PublicSignalPublisher(
+                            client,
+                            storage,
+                            dashboard_base_url=cfg.public_dashboard_base_url,
+                        )
+                        runner = SignalAutomationRunner(
+                            source_json=cfg.signal_source_json,
+                            queue_path=cfg.signal_queue_path,
+                            storage=storage,
+                            publisher=publisher,
+                            dashboard_url=cfg.public_dashboard_base_url,
+                        )
+                        try:
+                            result = runner.approve(queue_id)
+                            tg_id = result.get("telegram_message_id")
+                            st.success(f"✅ Posted to Telegram! (message_id: {tg_id})")
+                            st.rerun()
+                        except Exception as exc:
+                            st.error(f"Failed to post: {exc}")
+
+            with btn_reject:
+                if st.button("❌ Reject", key=f"reject_{queue_id}"):
+                    queue.update_status(
+                        queue_id,
+                        status="rejected",
+                        approval_note="Rejected via operator UI",
+                    )
+                    st.rerun()
+
+
+# ============================================================================
 # MAIN APP
 # ============================================================================
 
@@ -504,7 +935,7 @@ def main():
     """Main application entry point."""
     st.title("📢 Telegram Prediction Ledger")
     st.markdown("""
-    Create immutable, timestamped prediction records on Telegram.
+    Create immutable, timestamped Telegram posts for both ledger entries and public model signals.
     All posts are permanent and cannot be edited or deleted.
     """)
     
@@ -519,6 +950,7 @@ def main():
         ```
         TELEGRAM_BOT_TOKEN=your_bot_token_here
         TELEGRAM_CHANNEL_ID=@your_channel_here
+        PUBLIC_DASHBOARD_BASE_URL=https://app.crickzen.com/dashboard
         ```
         
         See `config/.env.example` for a template.
@@ -527,9 +959,11 @@ def main():
         st.success("✅ Telegram configured")
     
     st.divider()
-    
+    _show_signal_queue_section()
+    st.divider()
+
     # Main action buttons
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         st.markdown("### 📋 Pre-Match")
@@ -548,6 +982,12 @@ def main():
         st.caption("Record match outcome and result")
         if st.button("Post Match Result", use_container_width=True):
             show_match_result_modal()
+
+    with col4:
+        st.markdown("### 📡 Public Signal")
+        st.caption("Post trust-building public lifecycle updates")
+        if st.button("Post Public Signal", use_container_width=True):
+            show_public_signal_modal()
     
     st.divider()
     
@@ -580,6 +1020,10 @@ def main():
                 result_text = "✓ Correct" if correct else "✗ Incorrect" if correct is False else "N/A"
                 title = f"Winner: {record.get('winning_team')}"
                 details = f"Model Call: {result_text}"
+            elif post_type == "public_signal":
+                icon = "📡"
+                title = f"{record.get('phase', 'signal')} | {record.get('match', match_id)}"
+                details = f"Status: {record.get('status')} | Tracker: {record.get('tracker_action')}"
             else:
                 icon = "❓"
                 title = "Unknown"
@@ -591,10 +1035,20 @@ def main():
                 st.markdown(f"**Posted:** {timestamp}")
                 if record.get("telegram_message_id"):
                     st.markdown(f"**Telegram ID:** {record.get('telegram_message_id')}")
+                if post_type == "public_signal":
+                    st.code(record.get("message", ""), language=None)
+
+    st.divider()
+    st.markdown("### 📊 Accuracy Tracker")
+    tracker_rows = storage.read_tracker_rows()
+    if not tracker_rows:
+        st.info("No accuracy tracker rows yet. A pre-match public signal opens a row and final review closes it.")
+    else:
+        st.dataframe(tracker_rows, use_container_width=True, hide_index=True)
     
     # Stats
     st.divider()
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
         st.metric("Total Posts", storage.count_records())
@@ -604,6 +1058,8 @@ def main():
         st.metric("Match Starts", storage.count_records(post_type="match_start"))
     with col4:
         st.metric("Results", storage.count_records(post_type="result"))
+    with col5:
+        st.metric("Public Signals", storage.count_records(post_type="public_signal"))
 
 
 if __name__ == "__main__":
