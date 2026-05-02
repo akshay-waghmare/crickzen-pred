@@ -67,6 +67,9 @@ class DummyFeatureStore:
     
     def get_venue_stats(self, venue: str) -> Dict[str, Any]:
         return {}
+
+    def get_team_stats(self, team_name: str) -> Dict[str, Any]:
+        return {}
     
     def load(self):
         pass
@@ -117,7 +120,7 @@ class Predictor:
     def __init__(self, model, feature_store: InMemoryFeatureStore, global_stats: Dict[str, float], 
                  calibrator=None, calibrator_inn1=None, calibrator_inn2=None, phase_calibrators=None, 
                  per_over_calibrators=None, calibrator_type='none', league_calibrator=None, model_dir: str = None,
-                 format_config: FormatConfig = None):
+                 format_config: FormatConfig = None, phase_target_calibrators=None):
         # Wrap ensemble model dict if needed
         if isinstance(model, dict) and 'xgb_model' in model:
             self.model = EnsembleModelWrapper(model)
@@ -132,6 +135,7 @@ class Predictor:
         self.calibrator_inn2 = calibrator_inn2  # Innings 2 calibrator
         self.phase_calibrators = phase_calibrators  # Innings×phase calibrators dict
         self.per_over_calibrators = per_over_calibrators  # Per-over (brier_optimized) calibrators dict
+        self.phase_target_calibrators = phase_target_calibrators  # Inn2 9-segment phase×target calibrators
         self.calibrator_type = calibrator_type  # 'innings_phase_specific', 'innings_specific', 'single', 'legacy', or 'none'
         self.league_calibrator = league_calibrator  # League-specific temperature/platt calibrator
         self.resource_calculator = ResourceFeatureCalculator(config=self.format_config)
@@ -143,12 +147,65 @@ class Predictor:
         self._inn1_batting_team = None  # Which team was batting in innings 1
         self.INNINGS_TRANSITION_OVERS = getattr(self.format_config, 'transition_blend_overs', 6)
         self.last_transition_alpha = None  # For debug/logging access
+        self.last_terminal_clamp = None  # Final deterministic inn2 terminal override, if any
+        self.last_calibrated_phase_target = None  # Phase×target calibrated probability
     
     def reset_innings_prior(self):
         """Reset the inn1 prior (call when starting a new match)."""
         self._inn1_final_prob = None
         self._inn1_batting_team = None
         self.last_transition_alpha = None
+        self.last_terminal_clamp = None
+
+    def _second_innings_terminal_clamp(self, state: MatchState) -> Optional[Dict[str, Any]]:
+        """Return deterministic batting-team win probability for decided chases."""
+        if state.innings != 2 or not state.target_runs:
+            return None
+
+        runs_needed = state.target_runs - state.current_score
+        balls_remaining = (self.format_config.total_overs - state.over) * 6 - state.ball
+
+        if runs_needed <= 0:
+            return {
+                "applied": True,
+                "reason": "chase_complete",
+                "probability": 1.0,
+                "runs_needed": int(runs_needed),
+                "balls_remaining": int(max(0, balls_remaining)),
+                "wickets_lost": int(state.wickets_lost),
+            }
+
+        if state.wickets_lost >= 10:
+            return {
+                "applied": True,
+                "reason": "all_out",
+                "probability": 0.0,
+                "runs_needed": int(runs_needed),
+                "balls_remaining": int(max(0, balls_remaining)),
+                "wickets_lost": int(state.wickets_lost),
+            }
+
+        if balls_remaining <= 0:
+            return {
+                "applied": True,
+                "reason": "no_balls_remaining",
+                "probability": 0.0,
+                "runs_needed": int(runs_needed),
+                "balls_remaining": 0,
+                "wickets_lost": int(state.wickets_lost),
+            }
+
+        if runs_needed > balls_remaining * 6:
+            return {
+                "applied": True,
+                "reason": "mathematically_impossible",
+                "probability": 0.0,
+                "runs_needed": int(runs_needed),
+                "balls_remaining": int(balls_remaining),
+                "wickets_lost": int(state.wickets_lost),
+            }
+
+        return None
 
     @classmethod
     def load(cls, model_dir: str | Path, feature_store_dir: str | Path = None, league: str = None):
@@ -367,6 +424,22 @@ class Predictor:
             except Exception as e:
                 logger.warning(f"Failed to load calibrator: {e}")
         
+        # Load phase×target calibrators if available (inn2 9-segment calibration)
+        phase_target_calibrators = None
+        pt_cal_path = path / "phase_target_calibrators.pkl"
+        if pt_cal_path.exists():
+            try:
+                pt_data = joblib.load(pt_cal_path)
+                if isinstance(pt_data, dict) and 'calibrators' in pt_data:
+                    phase_target_calibrators = pt_data
+                    logger.info(
+                        "Loaded phase×target calibrators (inn2 9-segment)",
+                        n_segments=len(pt_data['calibrators']),
+                        keys=list(pt_data['calibrators'].keys())
+                    )
+            except Exception as e:
+                logger.warning(f"Failed to load phase_target_calibrators: {e}")
+        
         # Load league-specific calibrator if league is specified
         league_calibrator = None
         if league:
@@ -390,7 +463,7 @@ class Predictor:
         # Resolve FormatConfig from league
         format_config = FormatConfig.from_league(league) if league else FormatConfig.t20()
         
-        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type, league_calibrator, model_dir=str(path), format_config=format_config)
+        return cls(model, feature_store, global_stats, calibrator, calibrator_inn1, calibrator_inn2, phase_calibrators, per_over_calibrators, calibrator_type, league_calibrator, model_dir=str(path), format_config=format_config, phase_target_calibrators=phase_target_calibrators)
 
     def _hydrate_features(self, state: MatchState) -> pd.DataFrame:
         """
@@ -605,6 +678,8 @@ class Predictor:
             debug: If True, print all features being fed to the model
             ball_history: Optional list of ball data dicts for rolling stats
         """
+        self.last_terminal_clamp = None
+
         # Feed ball history to mapper if provided
         if ball_history:
             self.feature_mapper.ball_history = ball_history
@@ -817,6 +892,36 @@ class Predictor:
             else:
                 base_prob = raw_prob
             
+            # --- PHASE×TARGET CALIBRATION (Inn2 only) ---
+            # Chain: raw -> per-over isotonic -> phase×target isotonic
+            # 9 segments: (PP/Mid/Death) × (below_par/on_par/above_par)
+            self.last_calibrated_phase_target = base_prob
+            if self.phase_target_calibrators and state.innings == 2:
+                if current_over <= 6:
+                    pt_phase = 'PP'
+                elif current_over <= 15:
+                    pt_phase = 'Mid'
+                else:
+                    pt_phase = 'Death'
+                
+                target_above_par = float(X['target_above_par'].iloc[0]) if 'target_above_par' in X.columns else 0.0
+                if target_above_par < -15:
+                    pt_tgt_cat = 'below_par'
+                elif target_above_par <= 15:
+                    pt_tgt_cat = 'on_par'
+                else:
+                    pt_tgt_cat = 'above_par'
+                
+                pt_key = f'{pt_phase}_{pt_tgt_cat}'
+                calibrators_dict = self.phase_target_calibrators.get('calibrators', {})
+                if pt_key in calibrators_dict:
+                    pt_cal = calibrators_dict[pt_key]
+                    calibrated_pt = float(pt_cal.predict([base_prob])[0])
+                    self.last_calibrated_phase_target = calibrated_pt
+                    if debug:
+                        print(f"[PT_CAL] Phase×Target ({pt_key}): {base_prob:.1%} -> {calibrated_pt:.1%}")
+                    base_prob = calibrated_pt
+            
             # --- CONSTRAINT LAYER (Second Innings) ---
             # Principle: NEVER push probabilities upward beyond calibrated model output.
             # Only apply mathematical constraints and downward caps.
@@ -834,6 +939,10 @@ class Predictor:
                 
                 # Match already lost (no balls remaining)
                 elif balls_remaining <= 0:
+                    prob = 0.0
+
+                # Match already lost (all out)
+                elif wickets_remaining <= 0:
                     prob = 0.0
                 
                 # Mathematically impossible: Need more runs than max possible
@@ -957,7 +1066,19 @@ class Predictor:
                     if debug:
                         print(f"[TRANSITION] Inn1 prior: {inn1_prior:.1%}, alpha: {alpha:.2f}, "
                               f"model: {pre_blend:.1%} -> blended: {prob:.1%}")
-            
+
+            terminal_clamp = self._second_innings_terminal_clamp(state)
+            if terminal_clamp is not None:
+                pre_clamp = prob
+                prob = float(terminal_clamp["probability"])
+                terminal_clamp["pre_clamp_probability"] = float(pre_clamp)
+                self.last_terminal_clamp = terminal_clamp
+                if debug:
+                    print(
+                        f"[TERMINAL] {terminal_clamp['reason']}: "
+                        f"{pre_clamp:.1%} -> {prob:.1%}"
+                    )
+             
             return float(prob)
         except Exception as e:
             logger.error(f"Prediction failed: {e}")

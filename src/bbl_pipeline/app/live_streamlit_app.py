@@ -36,6 +36,8 @@ PROJECT_SRC = PROJECT_ROOT / "src"
 if str(PROJECT_SRC) not in sys.path:
     sys.path.insert(0, str(PROJECT_SRC))
 
+from bbl_pipeline.app.live_source_defaults import select_initial_json_source
+
 
 def _python_executable() -> str:
     """Prefer the repository virtualenv interpreter for backend subprocesses."""
@@ -444,6 +446,8 @@ DEFAULT_JSON = os.environ.get("PREDICTOR_JSON", "data/live_state.json")
 JSON_SOURCES = {
     "IPL ML+MC (odm mirror)": "data/ipl_live_ml_odm.json",
     "IPL ML+MC raw (ipl_live_ml.json)": "data/ipl_live_ml.json",
+    "IPL ML+MC (odm mirror, slot 1)": "data/ipl_live_ml_odm_1.json",
+    "IPL ML+MC raw (ipl_live_ml_1.json)": "data/ipl_live_ml_1.json",
     "IPL MC-only (ipl_live_mc.json)": "data/ipl_live_mc.json",
     "PSL ML+MC (odm mirror)": "data/psl_live_ml_odm.json",
     "PSL ML+MC (psl_live_ml.json)": "data/psl_live_ml.json",
@@ -454,6 +458,8 @@ JSON_SOURCES = {
     "SA20 (sa20_live_state.json)": "data/sa20_live_state.json",
     "Custom path...": "__custom__",
 }
+
+JSON_SOURCE_OPTIONS = list(JSON_SOURCES.keys())
 
 _league_context = None
 
@@ -467,6 +473,7 @@ PREDICTOR_CONFIGS = {
         "mc_only": False,
         "model_dir": "models/ipl_v6",
         "odm_model_dir": "models/odm_v1",
+        "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v3",
         "league": "ipl",
         "states_dir": "data/match_states/ipl",
@@ -475,6 +482,7 @@ PREDICTOR_CONFIGS = {
         "output_json": "data/ipl_live_mc.json",
         "mc_only": True,
         "model_dir": "models/ipl_v6",
+        "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v3",
         "league": "ipl",
         "states_dir": "data/match_states/ipl",
@@ -483,17 +491,17 @@ PREDICTOR_CONFIGS = {
         "output_json": "data/psl_live_ml.json",
         "display_json": "data/psl_live_ml_odm.json",
         "mc_only": False,
-        "model_dir": "models/psl_v1",
+        "model_dir": "models/psl_v4",
         "odm_model_dir": "models/odm_v1",
-        "feature_store_dir": "data/psl_feature_store_v1",
+        "feature_store_dir": "data/psl_feature_store_v4",
         "league": "psl",
         "states_dir": "data/match_states/psl",
     },
     "PSL MC-only": {
         "output_json": "data/psl_live_mc.json",
         "mc_only": True,
-        "model_dir": "models/psl_v1",
-        "feature_store_dir": "data/psl_feature_store_v1",
+        "model_dir": "models/psl_v4",
+        "feature_store_dir": "data/psl_feature_store_v4",
         "league": "psl",
         "states_dir": "data/match_states/psl",
     },
@@ -597,7 +605,9 @@ def _start_predictor(name: str, match_url: str) -> tuple[int, int | None]:
     ]
     if cfg["mc_only"]:
         cmd.append("--mc-only")
-    
+    if cfg.get("market_stack_model_dir") and not cfg["mc_only"]:
+        cmd += ["--market-stack-model-dir", cfg["market_stack_model_dir"]]
+     
     log_path = Path(f"logs/{_log_stem(name)}.log")
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_file = open(log_path, "a")
@@ -1419,13 +1429,27 @@ def main():
     render_backend_controls()
     
     # Controls
+    if "json_source_label" not in st.session_state:
+        default_label, default_custom_path = select_initial_json_source(
+            JSON_SOURCES,
+            DEFAULT_JSON,
+            env_json=os.environ.get("PREDICTOR_JSON"),
+        )
+        st.session_state["json_source_label"] = default_label
+        if default_custom_path is not None:
+            st.session_state.setdefault("custom_json_path", default_custom_path)
+
     col1, col2, col3 = st.columns([3, 1, 1])
     with col1:
-        source_label = st.selectbox("JSON Source", options=list(JSON_SOURCES.keys()),
+        source_label = st.selectbox("JSON Source", options=JSON_SOURCE_OPTIONS,
                                      help="Select the live state JSON source")
         selected = JSON_SOURCES[source_label]
         if selected == "__custom__":
-            json_path = st.text_input("Custom JSON path", value=DEFAULT_JSON)
+            json_path = st.text_input(
+                "Custom JSON path",
+                value=st.session_state.get("custom_json_path", DEFAULT_JSON),
+                key="custom_json_path",
+            )
         else:
             json_path = selected
     with col2:
@@ -1556,6 +1580,7 @@ def main():
     inn_specific_prob = d.get("calibrated_win_prob", d["bat_win_prob"])
     phase_specific_prob = d.get("calibrated_phase_prob", None)
     per_over_prob = d.get("calibrated_per_over_prob", None)  # Per-over brier-optimized
+    phase_target_prob = d.get("calibrated_phase_target_prob", None)  # Inn2 phase×target calibration
     league_calibrated_prob = d.get("league_calibrated_prob", None)  # League-specific (temperature/platt)
     league = d.get("league", None)  # League code if specified
     
@@ -1700,6 +1725,37 @@ def main():
                 <span style="font-size: 0.9em; color: #666;">League-Calibrated</span>
             </div>
             ''', unsafe_allow_html=True)
+
+    terminal_clamp = d.get("terminal_clamp") if isinstance(d.get("terminal_clamp"), dict) else None
+    if terminal_clamp:
+        reason = str(terminal_clamp.get("reason", "terminal"))
+        pre_clamp = terminal_clamp.get("pre_clamp_probability")
+        pre_text = f" Previous model value: {float(pre_clamp) * 100:.1f}%." if pre_clamp is not None else ""
+        st.info(f"Terminal clamp active: {reason}.{pre_text}")
+
+    market_stack = d.get("market_stack") if isinstance(d.get("market_stack"), dict) else None
+    if market_stack and market_stack.get("status") == "ready":
+        st.markdown("---")
+        st.subheader("🧪 IPL Innings-2 Market Stack Candidate (Dry Run)")
+        stack_bat_prob = float(market_stack.get("stack_bat_win_prob", d["bat_win_prob"]))
+        stack_bowl_prob = 1.0 - stack_bat_prob
+        delta_bat = stack_bat_prob - float(market_stack.get("base_bat_win_prob", d["bat_win_prob"]))
+        market_bat = float(market_stack.get("market_bat_win_prob", 0.0))
+
+        stack_cols = st.columns(4)
+        with stack_cols[0]:
+            st.metric("Stack batting", f"{stack_bat_prob * 100:.1f}%", f"{delta_bat * 100:+.1f} pp")
+        with stack_cols[1]:
+            st.metric("Stack bowling", f"{stack_bowl_prob * 100:.1f}%")
+        with stack_cols[2]:
+            st.metric("Market batting", f"{market_bat * 100:.1f}%")
+        with stack_cols[3]:
+            st.metric("Mode", "Dry run", "not primary")
+
+        if market_stack.get("terminal_clamp"):
+            st.caption("Terminal clamp remains primary; stack is shown only for comparison.")
+    elif market_stack and market_stack.get("status") not in (None, "not_applicable"):
+        st.caption(f"Market stack: {market_stack.get('status')} - {market_stack.get('reason', '')}")
 
     odm = d.get("odm") if isinstance(d.get("odm"), dict) else None
     if odm:
@@ -2014,6 +2070,12 @@ def main():
     wpl_teams = {'MIW', 'MI-W', 'Mumbai Indians', 'RCBW', 'RCB-W', 'Royal Challengers Bengaluru',
                  'DCW', 'DC-W', 'Delhi Capitals', 'GGW', 'GG-W', 'Gujarat Giants', 
                  'UPW', 'UP-W', 'UP Warriorz'}
+    # IPL teams (Indian Premier League)
+    ipl_teams = {'MI', 'Mumbai Indians', 'CSK', 'Chennai Super Kings',
+                 'RCB', 'Royal Challengers Bengaluru', 'Royal Challengers Bangalore',
+                 'KKR', 'Kolkata Knight Riders', 'DC', 'Delhi Capitals',
+                 'SRH', 'Sunrisers Hyderabad', 'RR', 'Rajasthan Royals',
+                 'PBKS', 'Punjab Kings', 'GT', 'Gujarat Titans', 'LSG', 'Lucknow Super Giants'}
     # T20 International teams (Men's)
     t20i_teams = {'Australia', 'AUS', 'India', 'IND', 'England', 'ENG', 'New Zealand', 'NZ',
                   'South Africa', 'SA', 'Pakistan', 'PAK', 'West Indies', 'WI', 'Sri Lanka', 'SL',
@@ -2029,6 +2091,7 @@ def main():
     is_ssm_female = batting_team in ssm_female_teams
     is_wpl = batting_team in wpl_teams
     is_t20i = batting_team in t20i_teams
+    is_ipl = batting_team in ipl_teams
     
     # Calculate ECE-optimized probability (for calibration display)
     ece_optimized_prob = None
@@ -2636,6 +2699,21 @@ def main():
                     brier_prob = t20i_brier_prob
                     brier_label = f"Brier-Optimized ({t20i_brier_source})"
                     brier_desc = "Brier=0.1438, 672K samples"
+                elif is_ipl:
+                    # IPL v6: per-over isotonic + phase×target (9-segment inn2 correction)
+                    inn_num_local = d.get("innings", 1)
+                    if inn_num_local == 2 and phase_target_prob is not None and phase_target_prob != per_over_prob:
+                        brier_prob = phase_target_prob
+                        brier_label = "Phase x Target Cal (Inn2)"
+                        brier_desc = "PerOver -> 9-seg phase*target, OOF -8.9% death"
+                    elif per_over_prob is not None and per_over_prob != raw_prob:
+                        brier_prob = per_over_prob
+                        brier_label = "Per-Over Calibrated"
+                        brier_desc = "Inn1: per-over isotonic (OOF Brier 0.1837)"
+                    else:
+                        brier_prob = raw_prob
+                        brier_label = "Raw Model Output"
+                        brier_desc = "Fallback"
                 else:
                     brier_prob = raw_prob
                     brier_label = "Raw Model Output"

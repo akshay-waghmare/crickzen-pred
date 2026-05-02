@@ -176,7 +176,8 @@ class CrexLivePredictor:
                  live_match_json: str = None, venue: str = None, league: str = None,
                  odm_model_dir: str = None,
                  use_ml_model: bool = False, record_states: bool = False, states_dir: str = None,
-                 total_overs: int = None, revised_target: int = None, mc_only: bool = False):
+                 total_overs: int = None, revised_target: int = None, mc_only: bool = False,
+                 market_stack_model_dir: str = None):
         self.original_match_url = match_url
         self.match_url = self._normalize_live_url(match_url)
         self.model_dir = model_dir
@@ -189,6 +190,7 @@ class CrexLivePredictor:
         self.output_json = output_json  # Path for JSON output (for Streamlit)
         self.venue_override = venue
         self.mc_only = mc_only  # Force MC-only mode even for 20-over matches
+        self.market_stack_model_dir_override = market_stack_model_dir
 
         league_code = (league or "").lower()
         default_odm_model_dir = "models/odm_v1" if league_code in {"ipl", "psl"} and not mc_only else None
@@ -228,6 +230,7 @@ class CrexLivePredictor:
         self._first_prediction = True  # Debug flag for first prediction
         self._prediction_history = []  # Track predictions over time
         self.local_storage = {}  # CREX localStorage for resolving team/player codes
+        self._poll_count = 0  # Used to trigger periodic localStorage refresh
         self._inn1_cached_stats = {}  # Cache inn1 stats (PP runs, death RR, wickets) at innings break
         
         # Persist history to separate file for Streamlit page refresh resilience
@@ -240,6 +243,15 @@ class CrexLivePredictor:
         # Try to load the prediction model
         self.model = None
         self._load_model()
+        self.market_stack = None
+        self.market_stack_model_dir = None
+        self.last_market_stack = {
+            "status": "unavailable",
+            "reason": "IPL innings-2 market stack candidate not loaded.",
+        }
+        self._last_market_update_at = None
+        self._last_market_age_seconds = None
+        self._load_market_stack_candidate()
 
         # ODM (Odds Direction Model) advisory
         from bbl_pipeline.inference.odds_direction_model import OddsDirectionModel
@@ -287,6 +299,12 @@ class CrexLivePredictor:
         """Trim CREX section labels from team-like text snippets."""
         candidate = re.sub(r'\s+', ' ', (team_name or '').strip()).strip(' -|,')
         candidate = re.sub(
+            r'\s+(?:neither|both|without|with|despite|after|before|as|while|when)\b.*$',
+            '',
+            candidate,
+            flags=re.IGNORECASE,
+        )
+        candidate = re.sub(
             r'\s+(?:in\s+Points\s+Table|Points\s+Table|Team\s+Form|Match\s+Info|Live|Scorecard|Commentary)\b.*$',
             '',
             candidate,
@@ -294,6 +312,142 @@ class CrexLivePredictor:
         )
         candidate = re.sub(r'\s+\d+(?:st|nd|rd|th)[-\s]*Match\b.*$', '', candidate, flags=re.IGNORECASE)
         return candidate.strip(' -|,')
+
+    @staticmethod
+    def _clean_venue_text(venue_name: str) -> str:
+        """Trim broadcast/page chrome accidentally captured after a venue name."""
+        candidate = re.sub(r'\s+', ' ', (venue_name or '').strip()).strip(' -|,')
+        candidate = re.sub(
+            r'\s+(?:Star\s+Sports|JioHotstar|Sony\s+Sports|Willow\s+TV|Sky\s+Sports|FanCode|'
+            r'Team\s+Form|Match\s+Info|Live|Scorecard|Commentary)\b.*$',
+            '',
+            candidate,
+            flags=re.IGNORECASE,
+        )
+        candidate = re.sub(
+            r'\s+\b(?:MI|CSK|RCB|KKR|SRH|DC|PBKS|RR|GT|LSG)\b.*$',
+            '',
+            candidate,
+        )
+        return candidate.rstrip(', ')
+
+    @staticmethod
+    def _looks_like_valid_team_name(team_name: str) -> bool:
+        """Reject obvious article/preview snippets that are not team names."""
+        candidate = re.sub(r'\s+', ' ', (team_name or '').strip())
+        if not candidate:
+            return False
+        lower = candidate.lower()
+        bad_fragments = (
+            ' neither ', ' nor ', ' part of ', ' star sports', 'jiohotstar',
+            ' points table', ' team form', ' match info', ' scorecard',
+            ' commentary', ' live forecast',
+        )
+        padded = f" {lower} "
+        if any(fragment in padded for fragment in bad_fragments):
+            return False
+        if len(candidate) > 45:
+            return False
+        if len(candidate.split()) > 5:
+            return False
+        return True
+
+    def _known_team_codes(self) -> set[str]:
+        """Return normalized team codes that may appear in CREX URL slugs."""
+        codes = {
+            'mi', 'csk', 'rcb', 'kkr', 'srh', 'dc', 'pbks', 'pk', 'rr', 'gt', 'lsg',
+            'ind', 'aus', 'eng', 'nz', 'wi', 'sa', 'pak', 'sl', 'ban', 'afg',
+        }
+        try:
+            from bbl_pipeline.features.store import InMemoryFeatureStore
+
+            for mapping_name in (
+                'TEAM_ABBREVIATIONS_IPL',
+                'TEAM_ABBREVIATIONS_PSL',
+                'TEAM_ABBREVIATIONS_T20I',
+                'TEAM_ABBREVIATIONS',
+            ):
+                mapping = getattr(InMemoryFeatureStore, mapping_name, {})
+                codes.update(str(code).lower() for code in mapping)
+        except Exception:
+            pass
+        return {code.replace('_', '-').lower() for code in codes if code}
+
+    def _match_known_code_suffix(self, text: str) -> str:
+        normalized = (text or '').strip('-/').lower()
+        for code in sorted(self._known_team_codes(), key=len, reverse=True):
+            if normalized == f'{code}-w' or normalized.endswith(f'-{code}-w'):
+                return f'{code.upper()}-W'
+            if normalized == code or normalized.endswith(f'-{code}'):
+                return code.upper()
+        parts = [part for part in normalized.split('-') if part]
+        return parts[-1].upper() if parts else ''
+
+    def _match_known_code_prefix(self, text: str) -> str:
+        normalized = (text or '').strip('-/').lower()
+        for code in sorted(self._known_team_codes(), key=len, reverse=True):
+            if normalized == f'{code}-w' or normalized.startswith(f'{code}-w-'):
+                return f'{code.upper()}-W'
+            if normalized == code or normalized.startswith(f'{code}-'):
+                return code.upper()
+        parts = [part for part in normalized.split('-') if part]
+        return parts[0].upper() if parts else ''
+
+    def _extract_teams_from_url(self) -> Optional[tuple[str, str]]:
+        """Extract teams from CREX URL slugs like csk-vs-mi-33rd-match..."""
+        for url in (self.match_url, self.original_match_url):
+            if not url:
+                continue
+            match = re.search(r'/([^/?#]*?-vs-[^/?#]*)', url, re.IGNORECASE)
+            if not match:
+                continue
+            slug = match.group(1).strip('/').lower()
+            if '-vs-' not in slug:
+                continue
+            left, right = slug.split('-vs-', 1)
+            left_code = self._match_known_code_suffix(left)
+            right_code = self._match_known_code_prefix(right)
+            team1 = self._resolve_team_name(left_code)
+            team2 = self._resolve_team_name(right_code)
+            if (
+                team1
+                and team2
+                and self._looks_like_valid_team_name(team1)
+                and self._looks_like_valid_team_name(team2)
+                and self._normalize_team_key(team1) != self._normalize_team_key(team2)
+            ):
+                return team1, team2
+        return None
+
+    def _repair_match_teams_from_url(self) -> None:
+        """Use URL teams to replace invalid or article-snippet team names."""
+        teams = self._extract_teams_from_url()
+        if not teams:
+            return
+        team1, team2 = teams
+        self._team1 = team1
+        self._team2 = team2
+
+        batting = self.match_state.batting_team
+        bowling = self.match_state.bowling_team
+        batting_key = self._normalize_team_key(batting)
+        team1_key = self._normalize_team_key(team1)
+        team2_key = self._normalize_team_key(team2)
+
+        if not self._looks_like_valid_team_name(batting):
+            self.match_state.batting_team = team1
+            batting_key = team1_key
+
+        if (
+            not self._looks_like_valid_team_name(bowling)
+            or self._normalize_team_key(bowling) == batting_key
+        ):
+            if batting_key == team1_key:
+                self.match_state.bowling_team = team2
+            elif batting_key == team2_key:
+                self.match_state.bowling_team = team1
+            else:
+                self.match_state.bowling_team = team2
 
     def _resolve_team_name(self, team_name: str) -> str:
         """Resolve CREX team codes into displayable team names when possible."""
@@ -305,20 +459,70 @@ class CrexLivePredictor:
         if isinstance(storage_name, str) and storage_name.strip():
             return storage_name.strip()
 
+        league = (self.league or '').lower()
+        code = candidate.upper()
+        base_code = code[:-2] if code.endswith('-W') else code
+        if code.endswith('W') and len(code) >= 3 and not code.endswith('-W'):
+            base_code = code[:-1]
+
+        static_league_maps = {
+            'ipl': {
+                'MI': 'Mumbai Indians',
+                'CSK': 'Chennai Super Kings',
+                'RCB': 'Royal Challengers Bengaluru',
+                'KKR': 'Kolkata Knight Riders',
+                'SRH': 'Sunrisers Hyderabad',
+                'DC': 'Delhi Capitals',
+                'PBKS': 'Punjab Kings',
+                'PK': 'Punjab Kings',
+                'RR': 'Rajasthan Royals',
+                'GT': 'Gujarat Titans',
+                'LSG': 'Lucknow Super Giants',
+            },
+        }
+        league_map = static_league_maps.get(league)
+        if league_map:
+            direct_match = league_map.get(code) or league_map.get(base_code)
+            if direct_match:
+                return direct_match
+
         try:
             from bbl_pipeline.features.store import InMemoryFeatureStore
 
+            resolved = None
             feature_store = getattr(getattr(self, 'predictor', None), 'feature_store', None)
             if feature_store and hasattr(feature_store, '_resolve_team_abbrev'):
-                resolved = feature_store._resolve_team_abbrev(candidate)
-            else:
-                league = (self.league or '').lower()
+                resolved_candidate = feature_store._resolve_team_abbrev(candidate)
+                if isinstance(resolved_candidate, str) and resolved_candidate.strip():
+                    resolved_candidate = resolved_candidate.strip()
+                    # Some feature-store contexts return the original short code unchanged.
+                    if (
+                        self._normalize_team_key(resolved_candidate) != self._normalize_team_key(candidate)
+                        or " " in resolved_candidate
+                        or len(resolved_candidate) > len(candidate)
+                    ):
+                        resolved = resolved_candidate
+            if not resolved:
                 if league in ('ipl', 'indian_premier_league'):
-                    resolved = InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL.get(candidate.upper())
+                    resolved = (
+                        InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL.get(code)
+                        or InMemoryFeatureStore.TEAM_ABBREVIATIONS_IPL.get(base_code)
+                    )
                 elif league in ('psl', 'pakistan_super_league'):
-                    resolved = InMemoryFeatureStore.TEAM_ABBREVIATIONS_PSL.get(candidate.upper())
+                    resolved = (
+                        InMemoryFeatureStore.TEAM_ABBREVIATIONS_PSL.get(code)
+                        or InMemoryFeatureStore.TEAM_ABBREVIATIONS_PSL.get(base_code)
+                    )
+                elif league in ('t20i', 't20i_female', 't20_international', 't20_international_female'):
+                    resolved = (
+                        InMemoryFeatureStore.TEAM_ABBREVIATIONS_T20I.get(base_code)
+                        or InMemoryFeatureStore.TEAM_ABBREVIATIONS_T20I.get(code)
+                    )
                 else:
-                    resolved = InMemoryFeatureStore.TEAM_ABBREVIATIONS.get(candidate.upper())
+                    resolved = (
+                        InMemoryFeatureStore.TEAM_ABBREVIATIONS.get(base_code)
+                        or InMemoryFeatureStore.TEAM_ABBREVIATIONS.get(code)
+                    )
             if isinstance(resolved, str) and resolved.strip():
                 return resolved.strip()
         except Exception:
@@ -331,6 +535,22 @@ class CrexLivePredictor:
         if not text:
             return None
 
+        code_match = re.search(
+            r"\b([A-Z][A-Z0-9]{1,5}(?:-[A-Z])?)\s+vs\s+([A-Z][A-Z0-9]{1,5}(?:-[A-Z])?)\b",
+            text,
+        )
+        if code_match:
+            team1 = self._resolve_team_name(code_match.group(1))
+            team2 = self._resolve_team_name(code_match.group(2))
+            if (
+                team1
+                and team2
+                and self._looks_like_valid_team_name(team1)
+                and self._looks_like_valid_team_name(team2)
+                and self._normalize_team_key(team1) != self._normalize_team_key(team2)
+            ):
+                return team1, team2
+
         patterns = [
             r"([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,50}?)\s+vs\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,60}?)(?:\s+\d+(?:st|nd|rd|th)[-\s]*Match\b|\s+\|\s+|\s+Team Form\b|\s+Match Info\b|\s+Live\b|\s+Scorecard\b|\s+Commentary\b|$)",
             r"([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,50}?)\s+vs\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,60}?)(?:\n|$)",
@@ -341,7 +561,13 @@ class CrexLivePredictor:
                 continue
             team1 = self._resolve_team_name(match.group(1))
             team2 = self._resolve_team_name(match.group(2))
-            if team1 and team2 and self._normalize_team_key(team1) != self._normalize_team_key(team2):
+            if (
+                team1
+                and team2
+                and self._looks_like_valid_team_name(team1)
+                and self._looks_like_valid_team_name(team2)
+                and self._normalize_team_key(team1) != self._normalize_team_key(team2)
+            ):
                 return team1, team2
         return None
     
@@ -399,7 +625,177 @@ class CrexLivePredictor:
             print(f"[WARN] Could not load model: {e}")
             print("   Will run in scraper-only mode (no predictions)")
             self.predictor = None
-    
+
+    def _load_market_stack_candidate(self):
+        """Load the inactive IPL innings-2 market-stack candidate for dry-run output."""
+        league_code = (self.league or "").lower()
+        model_name = Path(self.model_dir).name.lower() if self.model_dir else ""
+        if league_code not in {"ipl", "indian_premier_league"} and "ipl" not in model_name:
+            return
+
+        if self.market_stack_model_dir_override:
+            candidate_dir = Path(self.market_stack_model_dir_override)
+        else:
+            candidate_dir = Path(__file__).resolve().parents[3] / "models" / "ipl_v7_inn2_market_stack_candidate"
+        stack_path = candidate_dir / "inn2_market_stack.joblib"
+        if not stack_path.exists():
+            self.last_market_stack = {
+                "status": "unavailable",
+                "reason": f"Market-stack candidate not found at {stack_path}",
+            }
+            return
+
+        try:
+            import joblib
+
+            artifact = joblib.load(stack_path)
+            model = artifact.get("model") if isinstance(artifact, dict) else artifact
+            input_features = artifact.get("input_features", []) if isinstance(artifact, dict) else []
+            if model is None or not hasattr(model, "predict_proba"):
+                raise ValueError("market stack artifact does not contain a predict_proba model")
+            if not input_features:
+                input_features = ["logit_iso_p_inn1", "logit_market_p_inn1"]
+
+            self.market_stack = {
+                "model": model,
+                "input_features": list(input_features),
+                "probability_space": artifact.get("probability_space", "p_innings1_wins") if isinstance(artifact, dict) else "p_innings1_wins",
+                "applies_to": artifact.get("applies_to", "innings_2_only") if isinstance(artifact, dict) else "innings_2_only",
+            }
+            self.market_stack_model_dir = str(candidate_dir)
+            self.last_market_stack = {
+                "status": "loaded",
+                "model_dir": self.market_stack_model_dir,
+                "is_dry_run": True,
+                "used_for_primary": False,
+            }
+            print(f"[INFO] Loaded IPL inn2 market-stack candidate (dry-run): {candidate_dir}")
+        except Exception as e:
+            self.market_stack = None
+            self.last_market_stack = {
+                "status": "error",
+                "reason": f"Failed to load market-stack candidate: {e}",
+            }
+
+    @staticmethod
+    def _clip_probability(value: float, eps: float = 1e-3) -> float:
+        return max(eps, min(1.0 - eps, float(value)))
+
+    @classmethod
+    def _logit_probability(cls, value: float) -> float:
+        import math
+
+        prob = cls._clip_probability(value)
+        return math.log(prob / (1.0 - prob))
+
+    def _market_age_seconds(self) -> Optional[float]:
+        if self._last_market_update_at is None:
+            return None
+        return max(0.0, (datetime.now() - self._last_market_update_at).total_seconds())
+
+    def _get_market_batting_probability(self) -> Optional[float]:
+        """Return market-implied P(current batting team wins), if odds can be mapped."""
+        state = self.match_state
+        if not state.market_fav_prob or not state.market_fav_team:
+            return None
+
+        if self.match_state_logger:
+            market_batting_prob, _ = self.match_state_logger._map_market_probs(
+                state.market_fav_team,
+                state.market_fav_prob,
+                state.batting_team,
+                state.bowling_team,
+            )
+            return market_batting_prob
+
+        fav_key = self._normalize_team_key(state.market_fav_team)
+        batting_key = self._normalize_team_key(state.batting_team)
+        bowling_key = self._normalize_team_key(state.bowling_team)
+        if fav_key == batting_key:
+            return float(state.market_fav_prob)
+        if fav_key == bowling_key:
+            return 1.0 - float(state.market_fav_prob)
+        return None
+
+    def _compute_market_stack_overlay(
+        self,
+        win_prob: float,
+        market_batting_prob: Optional[float],
+    ) -> Dict[str, Any]:
+        """Compute dry-run innings-2 stack probability without changing primary output."""
+        state = self.match_state
+        terminal_clamp = getattr(
+            self,
+            "_last_terminal_clamp",
+            getattr(getattr(self, "predictor", None), "last_terminal_clamp", None),
+        )
+
+        if not self.market_stack:
+            return dict(self.last_market_stack)
+        if not state.is_second_innings:
+            return {
+                "status": "not_applicable",
+                "reason": "Market stack applies to innings 2 only.",
+                "is_dry_run": True,
+                "used_for_primary": False,
+            }
+        if market_batting_prob is None:
+            return {
+                "status": "unavailable",
+                "reason": "Market probability could not be mapped to batting/bowling team.",
+                "is_dry_run": True,
+                "used_for_primary": False,
+            }
+
+        try:
+            import pandas as pd
+
+            base_bat_prob = self._clip_probability(win_prob)
+            market_bat_prob = self._clip_probability(market_batting_prob)
+            base_inn1_prob = self._clip_probability(1.0 - base_bat_prob)
+            market_inn1_prob = self._clip_probability(1.0 - market_bat_prob)
+
+            row = {
+                "logit_iso_p_inn1": self._logit_probability(base_inn1_prob),
+                "logit_market_p_inn1": self._logit_probability(market_inn1_prob),
+            }
+            input_features = self.market_stack["input_features"]
+            X = pd.DataFrame([{feature: row[feature] for feature in input_features}])
+            stack_inn1_prob = float(self.market_stack["model"].predict_proba(X)[0, 1])
+            stack_inn1_prob = self._clip_probability(stack_inn1_prob)
+            stack_bat_prob = 1.0 - stack_inn1_prob
+
+            result = {
+                "status": "ready",
+                "model_dir": self.market_stack_model_dir,
+                "applies_to": self.market_stack.get("applies_to", "innings_2_only"),
+                "probability_space": self.market_stack.get("probability_space", "p_innings1_wins"),
+                "is_dry_run": True,
+                "used_for_primary": False,
+                "market_age_seconds": self._market_age_seconds(),
+                "base_bat_win_prob": float(base_bat_prob),
+                "base_inn1_win_prob": float(base_inn1_prob),
+                "market_bat_win_prob": float(market_bat_prob),
+                "market_inn1_win_prob": float(market_inn1_prob),
+                "stack_bat_win_prob": float(stack_bat_prob),
+                "stack_inn1_win_prob": float(stack_inn1_prob),
+                "delta_bat_vs_base": float(stack_bat_prob - base_bat_prob),
+                "delta_inn1_vs_base": float(stack_inn1_prob - base_inn1_prob),
+                "terminal_clamp": terminal_clamp,
+            }
+            self.last_market_stack = result
+            return result
+        except Exception as e:
+            result = {
+                "status": "error",
+                "reason": str(e),
+                "is_dry_run": True,
+                "used_for_primary": False,
+                "terminal_clamp": terminal_clamp,
+            }
+            self.last_market_stack = result
+            return result
+     
     def _load_history(self):
         """Load prediction history from file for persistence across restarts."""
         if not self._history_file:
@@ -1051,6 +1447,7 @@ class CrexLivePredictor:
                             venue = venue_match.group(1).strip()
                             # Clean up venue - remove any newlines or extra whitespace
                             venue = ' '.join(venue.split())
+                            venue = self._clean_venue_text(venue)
                             # Remove time prefixes like "45 PM" or date info
                             venue = re.sub(r'^\d+\s*(?:AM|PM)\s+', '', venue, flags=re.IGNORECASE)
                             # Remove common trailing words that get captured
@@ -1063,8 +1460,9 @@ class CrexLivePredictor:
                                 print(f"[VENUE] Venue: {self.match_state.venue}")
                                 break
             
-            # Extract teams from info page - store both teams, we'll figure out batting/bowling from title
-            teams = self._extract_vs_teams(page_text)
+            # Extract teams from URL first. CREX info text can include match-preview
+            # article snippets directly after "CSK vs MI", which are not team names.
+            teams = self._extract_teams_from_url() or self._extract_vs_teams(page_text)
             if teams:
                 team1, team2 = teams
                 # Store as team1 and team2 initially - batting will be set from title later
@@ -1219,12 +1617,32 @@ class CrexLivePredictor:
                             
             # Extract market odds from API (fields F and R)
             # F = Favorite team code, R = Odds in format "back+diff"
+            # CREX uses t_H_name / t_M_name in localStorage where H=first-team and M=second-team.
             fav_team_code = data.get("F", "").replace("^", "")
+            r_raw = data.get("R", "")
+            if fav_team_code or r_raw:
+                self.log.debug(
+                    "market_odds_received",
+                    F=data.get("F"), fav_code=fav_team_code, R=r_raw,
+                    ls_lookup=self.local_storage.get(f"t_{fav_team_code}_name"),
+                    team2=getattr(self, "_team2", None),
+                )
             if fav_team_code:
                 # Resolve team code to name using localStorage.
                 # Some payloads briefly carry non-team values (e.g. "1I").
                 # Do not overwrite with unresolved code strings.
                 fav_team_name = self.local_storage.get(f"t_{fav_team_code}_name")
+                if not fav_team_name:
+                    # Fallback: CREX uses H=home (first in URL) and M=match/away (second in URL).
+                    code_upper = fav_team_code.upper()
+                    if code_upper == "H":
+                        fav_team_name = getattr(self, "_team1", None)
+                    elif code_upper == "M":
+                        fav_team_name = getattr(self, "_team2", None)
+                if not fav_team_name:
+                    resolved_fav_team = self._resolve_team_name(fav_team_code)
+                    if self._looks_like_valid_team_name(resolved_fav_team):
+                        fav_team_name = resolved_fav_team
                 if fav_team_name:
                     self.match_state.market_fav_team = fav_team_name
             
@@ -1244,6 +1662,8 @@ class CrexLivePredictor:
                         back_int = int(back)
                         if back_int > 0:
                             self.match_state.market_fav_prob = 100.0 / (100.0 + back_int)
+                            self._last_market_update_at = datetime.now()
+                            self._last_market_age_seconds = 0.0
                     except ValueError:
                         pass
                 else:
@@ -1253,6 +1673,8 @@ class CrexLivePredictor:
                         back_int = int(r_str)
                         if back_int > 0:
                             self.match_state.market_fav_prob = 100.0 / (100.0 + back_int)
+                            self._last_market_update_at = datetime.now()
+                            self._last_market_age_seconds = 0.0
                     except ValueError:
                         pass
                         
@@ -1314,7 +1736,7 @@ class CrexLivePredictor:
                     self.match_state.batting_team = self._team1
                     self.match_state.bowling_team = self._team2
                 else:
-                    teams = self._extract_vs_teams(title)
+                    teams = self._extract_teams_from_url() or self._extract_vs_teams(title)
                     if teams:
                         self.match_state.batting_team, self.match_state.bowling_team = teams
             
@@ -1406,7 +1828,7 @@ class CrexLivePredictor:
                 
                 # If still not set, look for "vs TEAM" pattern - "PRS-W vs SYS-W"
                 if not self.match_state.bowling_team or self.match_state.bowling_team == self.match_state.batting_team:
-                    teams = self._extract_vs_teams(page_text) or self._extract_vs_teams(title)
+                    teams = self._extract_teams_from_url() or self._extract_vs_teams(page_text) or self._extract_vs_teams(title)
                     if teams:
                         team1, team2 = teams
                         # The batting team is from title, bowling is the other
@@ -1420,6 +1842,8 @@ class CrexLivePredictor:
                                 self.match_state.bowling_team = team2
                             else:
                                 self.match_state.bowling_team = team1
+
+            self._repair_match_teams_from_url()
             
             # Calculate run rate
             if self.match_state.overs > 0:
@@ -1583,6 +2007,22 @@ class CrexLivePredictor:
             return None
         
         try:
+            self._poll_count += 1
+
+            # Refresh localStorage every 10 polls so team/player codes get populated
+            # even if they were not ready when start() loaded the page.
+            if self._poll_count % 10 == 0 or (
+                not self.match_state.market_fav_team and self._poll_count <= 30
+            ):
+                try:
+                    new_ls = await self.page.evaluate(
+                        "() => Object.fromEntries(Object.entries(localStorage).map(([k, v]) => [k, v]))"
+                    )
+                    if new_ls:
+                        self.local_storage = new_ls
+                except Exception:
+                    pass
+
             # Refresh match state from DOM
             await self._extract_match_info()
             
@@ -1755,6 +2195,7 @@ class CrexLivePredictor:
             self.last_calibrated_combined = win_prob
             self.last_calibrated_phase = win_prob
             self.last_calibrated_per_over = win_prob
+            self.last_calibrated_phase_target = win_prob
             
             return float(win_prob)
             
@@ -1771,9 +2212,28 @@ class CrexLivePredictor:
         instead of the trained XGBLogRegEnsemble model.
         """
         try:
+            self._last_terminal_clamp = None
+
             # First check if match has a definitive result
             final_result = self._check_match_result()
             if final_result is not None:
+                state = self.match_state
+                reason = "chase_complete" if final_result == 1.0 else "innings_complete"
+                if state.is_second_innings and state.wickets >= 10 and state.total_runs < (state.target or 0):
+                    reason = "all_out"
+                elif state.is_second_innings and state.overs >= float(self.format_config.total_overs):
+                    reason = "no_balls_remaining"
+                overs_int = int(state.overs)
+                balls_part = int(round((state.overs - overs_int) * 10))
+                balls_bowled = overs_int * 6 + min(5, max(0, balls_part))
+                self._last_terminal_clamp = {
+                    "applied": True,
+                    "reason": reason,
+                    "probability": float(final_result),
+                    "runs_needed": int(max(0, (state.target or 0) - state.total_runs)),
+                    "balls_remaining": int(max(0, self.format_config.total_balls - balls_bowled)),
+                    "wickets_lost": int(state.wickets),
+                }
                 return final_result
             
             # Apply CLI revised_target override for 2nd innings
@@ -1799,26 +2259,32 @@ class CrexLivePredictor:
             # to CREX live venue stats directly without fuzzy-matching a generic placeholder.
             venue_name = (self.match_state.venue or "").strip()
                 
-            pred_state = PredictorMatchState(
-                match_id="live_match",  # Required field
-                venue=venue_name,
-                batting_team=self.match_state.batting_team,
-                bowling_team=self.match_state.bowling_team,
-                innings=2 if self.match_state.is_second_innings else 1,
-                over=over,
-                ball=ball,
-                current_score=self.match_state.total_runs,
-                wickets_lost=self.match_state.wickets,
-                batsman_1=self.match_state.batsman1_name or "Unknown",
-                batsman_2=self.match_state.batsman2_name or "Unknown",
-                bowler=self.match_state.bowler1_name or "Unknown",
-                target_runs=self.match_state.target,
-                first_innings_score=self.match_state.target - 1 if self.match_state.target else None,
-                total_overs=self.format_config.total_overs,
-                toss_winner=self._resolve_toss_winner_full_name() or None,
-                toss_decision=self.match_state.toss_decision or None,
+            pred_state_kwargs = {
+                "match_id": "live_match",  # Required field
+                "venue": venue_name,
+                "batting_team": self.match_state.batting_team,
+                "bowling_team": self.match_state.bowling_team,
+                "innings": 2 if self.match_state.is_second_innings else 1,
+                "over": over,
+                "ball": ball,
+                "current_score": self.match_state.total_runs,
+                "wickets_lost": self.match_state.wickets,
+                "batsman_1": self.match_state.batsman1_name or "Unknown",
+                "batsman_2": self.match_state.batsman2_name or "Unknown",
+                "bowler": self.match_state.bowler1_name or "Unknown",
+                "target_runs": self.match_state.target,
+                "first_innings_score": self.match_state.target - 1 if self.match_state.target else None,
+                "total_overs": self.format_config.total_overs,
+                "toss_winner": self._resolve_toss_winner_full_name() or None,
+                "toss_decision": self.match_state.toss_decision or None,
                 **self._compute_inn1_carryover_stats(),
-            )
+            }
+            supported_fields = set(getattr(PredictorMatchState, "__dataclass_fields__", {}).keys())
+            if supported_fields:
+                pred_state_kwargs = {
+                    key: value for key, value in pred_state_kwargs.items() if key in supported_fields
+                }
+            pred_state = PredictorMatchState(**pred_state_kwargs)
             
             # Convert ball history to mapper format for rolling stats
             ball_history = self._build_ball_history_for_mapper()
@@ -1845,7 +2311,9 @@ class CrexLivePredictor:
             self.last_calibrated_combined = getattr(self.predictor, 'last_calibrated_combined', win_prob)
             self.last_calibrated_phase = getattr(self.predictor, 'last_calibrated_phase', win_prob)
             self.last_calibrated_per_over = getattr(self.predictor, 'last_calibrated_per_over', win_prob)
-            
+            self.last_calibrated_phase_target = getattr(self.predictor, 'last_calibrated_phase_target', win_prob)
+            self._last_terminal_clamp = getattr(self.predictor, 'last_terminal_clamp', None)
+             
             return float(win_prob)
             
         except Exception as e:
@@ -2348,19 +2816,9 @@ class CrexLivePredictor:
             display += f" | {state.batting_team}: {win_prob*100:.1f}% [{bar}] {state.bowling_team}: {bowling_prob*100:.1f}%"
 
             # Ensemble blending with market odds
-            market_batting_prob = None
-            if state.market_fav_prob and state.market_fav_team:
-                if self.match_state_logger:
-                    market_batting_prob, _ = self.match_state_logger._map_market_probs(
-                        state.market_fav_team, state.market_fav_prob,
-                        state.batting_team, state.bowling_team,
-                    )
-                elif state.market_fav_team.upper() == state.batting_team.upper():
-                    market_batting_prob = state.market_fav_prob
-                elif state.market_fav_team.upper() == state.bowling_team.upper():
-                    market_batting_prob = 1.0 - state.market_fav_prob
-
-            market_age = getattr(self, '_last_market_age_seconds', None)
+            market_batting_prob = self._get_market_batting_probability()
+            market_age = self._market_age_seconds()
+            self._last_market_age_seconds = market_age
             ensemble_alpha = getattr(self, 'ensemble_alpha', 0.7)
             ensemble_prob, ensemble_source = blend_predictions(
                 model_prob=win_prob,
@@ -2375,6 +2833,20 @@ class CrexLivePredictor:
 
             if ensemble_source == "ensemble":
                 display += f" | Ens: {ensemble_prob*100:.1f}%"
+
+            market_stack = self._compute_market_stack_overlay(win_prob, market_batting_prob)
+            self._last_market_stack = market_stack
+            if market_stack.get("status") == "ready":
+                stack_bat_prob = float(market_stack["stack_bat_win_prob"])
+                display += f" | Stack(dry): {stack_bat_prob*100:.1f}%"
+            terminal_clamp = getattr(
+                self,
+                "_last_terminal_clamp",
+                getattr(getattr(self, "predictor", None), "last_terminal_clamp", None),
+            )
+            self._last_terminal_clamp = terminal_clamp
+            if terminal_clamp:
+                display += f" | Clamp: {terminal_clamp.get('reason')}"
 
             over, ball, live_features = self._build_live_feature_snapshot()
             self._update_odm_prediction(live_features, over, ball)
@@ -2393,6 +2865,12 @@ class CrexLivePredictor:
                 "innings": 2 if state.is_second_innings else 1,
                 "batting_team": state.batting_team,
                 "bowling_team": state.bowling_team,
+                "market_stack_bat_prob": (
+                    market_stack.get("stack_bat_win_prob")
+                    if market_stack.get("status") == "ready"
+                    else None
+                ),
+                "terminal_clamp": terminal_clamp,
                 "timestamp": datetime.now().isoformat()
             })
             
@@ -2549,6 +3027,7 @@ class CrexLivePredictor:
                 "calibrated_win_prob": getattr(self, 'last_calibrated_prob', win_prob),
                 "calibrated_phase_prob": getattr(self, 'last_calibrated_phase', win_prob),
                 "calibrated_per_over_prob": getattr(self, 'last_calibrated_per_over', win_prob),
+                "calibrated_phase_target_prob": getattr(self, 'last_calibrated_phase_target', win_prob),
                 "league": self.league,  # League code if --league was specified
                 "league_calibrated_prob": win_prob if self.league else None,  # Final league-calibrated prob
                 "features": features,
@@ -2563,6 +3042,9 @@ class CrexLivePredictor:
                 "ensemble_prob": getattr(self, '_last_ensemble_prob', None),
                 "ensemble_source": getattr(self, '_last_ensemble_source', None),
                 "ensemble_alpha": getattr(self, '_last_ensemble_alpha', None),
+                # Candidate-only market-aware innings-2 overlay; never used as primary probability.
+                "market_stack": getattr(self, '_last_market_stack', self.last_market_stack),
+                "terminal_clamp": getattr(self, '_last_terminal_clamp', None),
                 # Monte Carlo simulation results (uses league-calibrated win_prob for betting edge)
                 "monte_carlo": self._run_monte_carlo_simulation(model_prob=win_prob, use_ml_model=self.use_ml_model),
                 # Reduced-over / DLS / ODI fields
@@ -2621,6 +3103,8 @@ class CrexLivePredictor:
                         "ball_history": ball_history,
                         "features": features,
                         "odm": self.last_odm_prediction,
+                        "market_stack": output.get("market_stack"),
+                        "terminal_clamp": output.get("terminal_clamp"),
                         "bat_win_prob": win_prob,
                         "bowl_win_prob": 1 - win_prob,
                         "history": self._prediction_history[-200:],
@@ -2716,6 +3200,11 @@ async def main():
              "Bypasses the trained XGBLogRegEnsemble model. "
              "Automatically enabled for ODI (>= 40 overs) and reduced-over (< 20) matches.",
     )
+    parser.add_argument(
+        "--market-stack-model-dir",
+        default=None,
+        help="Optional IPL innings-2 market-stack candidate directory for dry-run overlay output.",
+    )
     
     args = parser.parse_args()
     
@@ -2735,6 +3224,7 @@ async def main():
         total_overs=args.total_overs,
         revised_target=args.revised_target,
         mc_only=args.mc_only,
+        market_stack_model_dir=args.market_stack_model_dir,
     )
     
     await predictor.run(poll_interval=args.poll_interval)
