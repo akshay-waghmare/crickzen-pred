@@ -964,13 +964,30 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     df['wickets_last_30'] = df.groupby(['match_id', 'innings'])['is_wicket'].transform(
         lambda x: x.rolling(window=30, min_periods=1).sum()
     )
-    
-    # 20. Boundary percentage (aggression indicator)
-    df['boundary_pct_last_18'] = np.where(
-        df['runs_last_18'] > 0,
-        df['boundaries_last_12'] * 4 / df['runs_last_18'],  # Approximate
-        0.0
+
+    # 20. Wickets in last 6 balls (immediate shock signal, research rank #4 death overs)
+    df['wickets_last_6'] = df.groupby(['match_id', 'innings'])['is_wicket'].transform(
+        lambda x: x.rolling(window=6, min_periods=1).sum()
     )
+
+    # 21. Boundary ball rate (true ball fraction, not run fraction — bug fix)
+    df['boundaries_last_18'] = df.groupby(['match_id', 'innings'])['is_boundary'].transform(
+        lambda x: x.rolling(window=18, min_periods=1).sum()
+    )
+    df['boundary_pct_last_18'] = df['boundaries_last_18'] / df['balls_bowled'].clip(lower=1, upper=18)
+
+    # 22. Dot ball rate over last 12 balls (stagnation indicator, research rank #4/#10)
+    df['dot_pct_last_12'] = df['dots_last_12'] / df['balls_bowled'].clip(lower=1, upper=12)
+
+    # 23. Balls since last wicket (partnership stability, research rank #11)
+    df['_prev_wickets'] = df.groupby(['match_id', 'innings'])['is_wicket'].transform(
+        lambda x: x.shift(1, fill_value=0).cumsum()
+    )
+    df['balls_since_wicket'] = df.groupby(['match_id', 'innings', '_prev_wickets']).cumcount()
+    df.drop(columns=['_prev_wickets'], inplace=True)
+
+    # 24. Set batter exposure (balls faced by current batter in innings, research rank #2/#8)
+    df['set_batter_exposure'] = df.groupby(['match_id', 'innings', 'batter_id']).cumcount()
     
     # --- TEAM-SCORE INTERACTION FEATURES ---
     # These help the model learn that a high score matters less when a strong team is bowling
@@ -1053,6 +1070,10 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     df['projected_vs_venue_avg'] = df['projected_vs_venue_avg'].fillna(0.0)
     df['wickets_last_30'] = df['wickets_last_30'].fillna(0.0)
     df['boundary_pct_last_18'] = df['boundary_pct_last_18'].fillna(0.0)
+    df['wickets_last_6'] = df['wickets_last_6'].fillna(0.0)
+    df['dot_pct_last_12'] = df['dot_pct_last_12'].fillna(0.35)
+    df['balls_since_wicket'] = df['balls_since_wicket'].fillna(0.0)
+    df['set_batter_exposure'] = df['set_batter_exposure'].fillna(0.0)
     df['rr_vs_venue_winning'] = df['rr_vs_venue_winning'].fillna(0.0)
     
     # Fill DLS-based features
@@ -1167,6 +1188,10 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         'runs_last_18',             
         'wickets_last_12',          
         'boundary_pct_last_18',     
+        'dot_pct_last_12',          # Stagnation indicator (research rank #4/#10)
+        'set_batter_exposure',      # Batter settledness (research rank #2/#8)
+        'balls_since_wicket',       # Partnership stability (research rank #11)
+        'wickets_last_6',           # Immediate shock window
         # Team win rates
         'batting_team_win_rate',    
         'bowling_team_win_rate',    

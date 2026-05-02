@@ -42,6 +42,8 @@ class RealTimeFeatureMapper:
         self.format_config = format_config or FormatConfig.t20()
         self.resource_calculator = ResourceFeatureCalculator(config=self.format_config)
         self.ball_history = []
+        self._balls_since_wicket: int = 0   # Persistent partnership counter
+        self._current_innings: int = None   # Track innings for counter reset
     
     def _update_history(self, current_ball_data: Dict[str, Any]):
         """Update ball history with current ball."""
@@ -59,6 +61,17 @@ class RealTimeFeatureMapper:
         
         self.ball_history.append(current_ball_data)
         
+        # Maintain balls_since_wicket counter (reset on innings change or wicket)
+        new_innings = current_ball_data.get('innings_num', 1)
+        if new_innings != self._current_innings:
+            self._current_innings = new_innings
+            self._balls_since_wicket = 0
+        is_wicket = int(current_ball_data.get('is_wicket', 0))
+        if is_wicket:
+            self._balls_since_wicket = 0
+        else:
+            self._balls_since_wicket += 1
+        
         # Keep last 30 balls for rolling stats
         if len(self.ball_history) > 30:
             self.ball_history.pop(0)
@@ -75,10 +88,12 @@ class RealTimeFeatureMapper:
         # If we don't have any history, return sensible defaults
         if len(self.ball_history) == 0:
             return {
-                'runs_last_12': 12.0,  # ~6 runs per over (2 overs) is typical
-                'runs_last_18': 18.0,  # ~6 runs per over (3 overs)
-                'wickets_last_12': 0.5, # ~1 wicket every 4 overs on average
-                'boundary_pct_last_18': 0.15  # ~15% boundary rate typical
+                'runs_last_12': 12.0,
+                'runs_last_18': 18.0,
+                'wickets_last_12': 0.5,
+                'boundary_pct_last_18': 0.15,
+                'dot_pct_last_12': 0.35,
+                'wickets_last_6': 0.25,
             }
             
         # Convert to DF for easier calc (use whatever history we have)
@@ -92,10 +107,12 @@ class RealTimeFeatureMapper:
         # At innings start, we should assume average performance, not worst case
         if len(df) == 0:
             return {
-                'runs_last_12': 12.0,  # ~6 runs per over (2 overs) is typical
-                'runs_last_18': 18.0,  # ~6 runs per over (3 overs)
-                'wickets_last_12': 0.5, # ~1 wicket every 4 overs on average
-                'boundary_pct_last_18': 0.15  # ~15% boundary rate typical
+                'runs_last_12': 12.0,
+                'runs_last_18': 18.0,
+                'wickets_last_12': 0.5,
+                'boundary_pct_last_18': 0.15,
+                'dot_pct_last_12': 0.35,
+                'wickets_last_6': 0.25,
             }
         
         # Check if ball history is incomplete (missing data from scraper)
@@ -117,10 +134,12 @@ class RealTimeFeatureMapper:
         if history_completeness < 0.3:
             logger.info("Ball history too sparse - using default rolling stats")
             return {
-                'runs_last_12': 12.0,  # ~6 runs per over (2 overs) is typical
-                'runs_last_18': 18.0,  # ~6 runs per over (3 overs)
-                'wickets_last_12': 0.5, # ~1 wicket every 4 overs on average
-                'boundary_pct_last_18': 0.15  # ~15% boundary rate typical
+                'runs_last_12': 12.0,
+                'runs_last_18': 18.0,
+                'wickets_last_12': 0.5,
+                'boundary_pct_last_18': 0.15,
+                'dot_pct_last_12': 0.35,
+                'wickets_last_6': 0.25,
             }
         
         # Ensure columns exist
@@ -152,14 +171,28 @@ class RealTimeFeatureMapper:
         # Last 18 balls (approx 3 overs)
         last_18 = df.tail(18)
         runs_last_18 = last_18['runs_scored'].sum()
-        boundaries = last_18['is_boundary'].sum()
-        boundary_pct_last_18 = boundaries / len(last_18) if len(last_18) > 0 else 0
+
+        # True boundary ball rate: boundaries in last 18 balls / actual balls faced
+        boundaries_last_18 = last_18['is_boundary'].sum()
+        n_last_18 = max(len(last_18), 1)
+        boundary_pct_last_18 = boundaries_last_18 / n_last_18
+
+        # Dot ball rate: dots in last 12 balls / actual balls faced
+        dots_last_12 = (last_12['runs_scored'] == 0).sum()
+        n_last_12 = max(len(last_12), 1)
+        dot_pct_last_12 = dots_last_12 / n_last_12
+
+        # Wickets in last 6 balls (immediate collapse signal)
+        last_6 = current_innings[-6:] if len(current_innings) >= 6 else current_innings
+        wickets_last_6 = last_6['is_wicket'].sum()
         
         return {
             'runs_last_12': runs_last_12,
             'runs_last_18': runs_last_18,
             'wickets_last_12': wickets_last_12,
-            'boundary_pct_last_18': boundary_pct_last_18
+            'boundary_pct_last_18': boundary_pct_last_18,
+            'dot_pct_last_12': dot_pct_last_12,
+            'wickets_last_6': wickets_last_6,
         }
 
     def map_scraped_to_match_state(self, scraped_data: Dict[str, Any]) -> MatchState:
@@ -329,8 +362,8 @@ class RealTimeFeatureMapper:
             run_rate_diff = current_run_rate - required_run_rate
         
         # --- Projected/Expected Scores ---
-        expected_final_score = scraped_data.get('projected_score',
-                                                resource_features['expected_final_score'])
+        # expected_final_score is the DLS/resource projection used in training.
+        expected_final_score = resource_features['expected_final_score']
         runs_required = scraped_data.get('runs_needed', 0) if innings == 2 else 0
         
         # --- Phase Features ---
@@ -355,24 +388,35 @@ class RealTimeFeatureMapper:
         resource_win_prob = resource_features['resource_win_prob']
         
         # --- Derived Features for Model ---
-        projected_score = expected_final_score
-        
-        # score_vs_par: For 2nd innings, compare against TARGET not venue average
-        # This fixes the issue where easy chases show negative score_vs_par
-        if innings == 2 and target_runs is not None and target_runs > 0:
-            # Par score at this point = target * (resources used / 100)
-            resources_used = 100 - resource_features.get('resource_pct', 100)
-            par_at_this_point = target_runs * (resources_used / 100)
-            score_vs_par = current_score - par_at_this_point
+        # Match processor.py: projected_score is a simple innings-1 linear
+        # projection and is zero for innings 2.
+        if innings == 1:
+            projected_score = current_score + (current_run_rate * balls_remaining / 6.0)
+            projected_vs_venue_avg = projected_score - venue_avg_score
         else:
-            # 1st innings: compare against venue average
-            score_vs_par = current_score - (venue_avg_score * (1 - resource_features.get('resource_pct', 100)/100))
-        
-        projected_vs_venue_avg = projected_score - venue_avg_score
+            projected_score = 0.0
+            projected_vs_venue_avg = 0.0
+
+        # Training resources_remaining is not DLS resource_pct; it is the simple
+        # balls-and-wickets resource proxy used by processor.py.
+        resources_remaining = (balls_remaining / self.format_config.total_balls) * (wickets_remaining / 10.0)
+        resources_used = 1.0 - resources_remaining
+        first_innings_score_for_par = scraped_data.get('first_innings_score')
+        if first_innings_score_for_par is None and target_runs is not None:
+            first_innings_score_for_par = target_runs - 1
+        if innings == 2 and first_innings_score_for_par is not None:
+            par_score = float(first_innings_score_for_par) * resources_used
+        else:
+            par_score = venue_avg_score * resources_used
+        score_vs_par = current_score - par_score
+
         score_per_wicket = current_score / (wickets_lost + 1)
         wickets_times_balls = wickets_lost * (self.format_config.total_balls - balls_remaining)
         rrr_times_wickets = required_run_rate * wickets_lost
-        chase_difficulty = required_run_rate / (current_run_rate + 0.1) if innings == 2 else 0
+        if innings == 2 and resources_remaining > 0 and first_innings_score_for_par is not None:
+            chase_difficulty = runs_required / (resources_remaining * float(first_innings_score_for_par) + 1)
+        else:
+            chase_difficulty = 0.0
         
         # Team situation win rates - based on batting/bowling first
         # Innings 1: batting_team bats first, bowling_team bowls first
@@ -423,10 +467,7 @@ class RealTimeFeatureMapper:
                 wickets_last_30 = last_30['is_wicket'].sum()
         
         # CRR times resources remaining
-        crr_times_res = current_run_rate * resource_features.get('resource_pct', 100) / 100
-        
-        # Resources remaining (for both innings)
-        resources_remaining = resource_features.get('resource_pct', 100) / 100
+        crr_times_res = current_run_rate * resources_remaining
         
         # --- Inn1 Carryover Features (v6+) ---
         # These bridge the innings transition by carrying inn1 context into inn2.
@@ -504,6 +545,13 @@ class RealTimeFeatureMapper:
             'runs_last_12': rolling_stats['runs_last_12'],
             'runs_last_18': rolling_stats['runs_last_18'],
             'wickets_last_12': rolling_stats['wickets_last_12'],
+            'dot_pct_last_12': rolling_stats['dot_pct_last_12'],
+            'set_batter_exposure': float(max(
+                scraped_data.get('batsman1_balls', 0) or 0,
+                scraped_data.get('batsman2_balls', 0) or 0,
+            )),
+            'balls_since_wicket': float(self._balls_since_wicket),
+            'wickets_last_6': rolling_stats['wickets_last_6'],
             
             # Player-venue and player-vs-team stats
             'batsman_venue_avg': batsman_venue_avg,

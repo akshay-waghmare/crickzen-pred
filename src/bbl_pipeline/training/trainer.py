@@ -41,12 +41,16 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
     TOP_FEATURES = [
         'expected_final_score', 'resource_win_prob', 'score_vs_par', 
         'dls_pressure_index', 'projected_vs_venue_avg', 'projected_score',
-        'is_powerplay', 'score_per_wicket', 'run_rate_diff', 'required_run_rate',
+        'is_powerplay', 'score_per_wicket', 'run_rate_diff', 'current_run_rate', 'required_run_rate',
         'chase_difficulty', 'wickets_times_balls', 'pressure_index', 
         'team_strength_diff', 'rrr_times_wickets', 'overs_remaining',
         'batting_team_win_rate', 'bowling_team_win_rate', 'batting_team_situation_wr',
         'situation_advantage', 'boundary_pct_last_18', 'bowling_team_situation_wr',
         'runs_last_12', 'runs_last_18', 'wickets_last_12',
+        'dot_pct_last_12',          # Stagnation indicator (research rank #4/#10)
+        'set_batter_exposure',      # Batter settledness (research rank #2/#8)
+        'balls_since_wicket',       # Partnership stability (research rank #11)
+        'wickets_last_6',           # Immediate shock window
         # Inn1 carryover features (bridge innings transition)
         'inn1_defendability', 'target_above_par',
         # Inn1 detailed carryover (pre-chase prior)
@@ -206,7 +210,7 @@ class Trainer:
 
         # Primary model: XGBLogRegEnsemble (Brier 0.1777)
         self.models = {
-            'ensemble': XGBLogRegEnsemble(xgb_weight=0.5, n_features=32),
+            'ensemble': XGBLogRegEnsemble(xgb_weight=0.5, n_features=37),
         }
         
         self.splitter = TimeSeriesCalibrationSplit(n_splits=5, calibration_size=0.30)

@@ -1464,6 +1464,10 @@ class Predictor:
         wickets_last_12 = 0.5
         boundary_pct_last_18 = 0.15
         wickets_last_30 = 1.0
+        dot_pct_last_12 = 0.35
+        wickets_last_6 = 0.25
+        set_batter_exposure = 20.0
+        balls_since_wicket = 12.0
         acceleration_potential = 15.0
         crr_times_res = current_run_rate * resource_pct / 100.0
         resources_remaining = resource_pct / 100.0
@@ -1495,6 +1499,10 @@ class Predictor:
             'runs_last_12': np.full(num_states, runs_last_12),
             'runs_last_18': np.full(num_states, runs_last_18),
             'wickets_last_12': np.full(num_states, wickets_last_12),
+            'dot_pct_last_12': np.full(num_states, dot_pct_last_12),
+            'set_batter_exposure': np.full(num_states, set_batter_exposure),
+            'balls_since_wicket': np.full(num_states, balls_since_wicket),
+            'wickets_last_6': np.full(num_states, wickets_last_6),
             'batsman_venue_avg': np.full(num_states, batsman_venue_avg),
             'batsman_venue_sr': np.full(num_states, batsman_venue_sr),
             'batsman_vs_team_avg': np.full(num_states, batsman_vs_team_avg),
