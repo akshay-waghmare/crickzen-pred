@@ -807,60 +807,64 @@
       }
     },
     "IPL": {
-      "path": "models/ipl_v3",
-      "version": "v3",
-      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration + LogitBias + Transition Blend. OOS: Brier 0.1407 (-2.7% vs market)",
+      "path": "models/ipl_v7",
+      "version": "v7",
+      "description": "XGBLogRegEnsemble (32 features) + Per-Over Brier-Optimized Calibration + Inn2 Isotonic Recalibrator (428 rows). OOF Brier: 0.1817 (brier_optimized). Trained on 282,997 rows including latest 2025-26 season data.",
       "training": {
-        "samples": 278954,
-        "date": "2026-04-19",
-        "brier_score": 0.1817153726463826
+        "samples": 282997,
+        "date": "2026-04-22",
+        "brier_score": 0.1858,
+        "oof_brier": 0.1817,
+        "n_features": 32,
+        "input_file": "data/ipl_features_latest/training.parquet"
       },
       "calibrator": {
-        "path": "models/ipl_v3/isotonic_calibrator.pkl",
-        "type": "per_over_brier_optimized",
-        "n_calibrators": 38
+        "path": "models/ipl_v7/isotonic_calibrator.pkl",
+        "type": "innings_phase_specific_with_per_over_brier_optimized",
+        "n_calibrators": 38,
+        "oof_metrics": {
+          "brier": 0.1817,
+          "ece": 0.0,
+          "logloss": 0.5297
+        }
       },
-      "league_calibrator": {
-        "path": "models/ipl_v3/league_calibrators/ipl/league_calibrator.pkl",
-        "method": "logit_bias",
-        "biases": {
-          "inn1_powerplay": 0.0645,
-          "inn1_middle": -0.3227,
-          "inn1_death": -0.689,
-          "inn2_powerplay": 0.1022,
-          "innings_1": -0.2892
-        },
-        "notes": "inn2_mid/death/innings_2 removed \u00e2\u20ac\u201d corrected resource calc makes them unnecessary"
+      "inn2_recalibrator": {
+        "path": "models/ipl_v7/inn2_isotonic_calibrator.pkl",
+        "type": "inn2_isotonic",
+        "n_train": 428,
+        "train_matches": 24,
+        "description": "Corrects S-curve flattening in inn2 predictions"
       },
       "oos_metrics": {
-        "dataset": "12 IPL 2026 matches, 432 obs vs Betfair exchange",
-        "brier_overall": 0.1407,
-        "brier_vs_market": "-2.7%",
-        "brier_inn1": 0.1812,
-        "brier_inn2": 0.0941,
-        "brier_inn2_death": 0.0615,
-        "transition_blend_overs": 6
+        "dataset": "Last 10 matches holdout from market comparison data",
+        "inn2_brier_v6": 0.1392,
+        "inn2_brier_v7_recalib": 0.1828,
+        "inn2_brier_market": 0.1989,
+        "inn1_brier_v6": 0.348,
+        "inn1_brier_market": 0.3463,
+        "notes": "v7 inn2 recalibrator on v6 raw_p uses simple isotonic vs v6 per-over isotonic; v6 per-over isotonic remains better on this holdout"
       },
+      "oof_calibration_results": "models/ipl_v7/oof_calibration_results.csv",
+      "oof_report": "models/ipl_v7/OOF_CALIBRATION_REPORT.md",
       "feature_store": {
         "path": "data/ipl_feature_store_v3",
         "version": "v3",
-        "generated_date": "2026-04-19",
-        "training_data_samples": 278954
+        "notes": "Same feature store as ipl_v3/v6 - no feature store update needed"
       }
     },
     "PSL": {
-      "path": "models/psl_v5",
-      "version": "v5",
-      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1830, ECE: 0.0000)",
+      "path": "models/psl_v4",
+      "version": "v4",
+      "description": "XGBLogRegEnsemble (32 features) + PSL-tuned adaptive sigmoid; live champion uses per-over temperature replacement (T=0.437) over OOF isotonic artifacts",
       "training": {
         "samples": 78040,
         "date": "2026-04-22",
-        "brier_score": 0.1829952792159469
+        "brier_score": 0.18353293583934815
       },
       "calibrator": {},
       "feature_store": {
-        "path": "data/psl_feature_store_v5",
-        "version": "v5",
+        "path": "data/psl_feature_store_v4",
+        "version": "v4",
         "generated_date": "2026-04-22",
         "training_data_samples": 78040
       }

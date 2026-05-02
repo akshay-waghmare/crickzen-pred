@@ -1,0 +1,71 @@
+======================================================================
+IPL v7 Feature Residual Analysis
+Date: 2026-04-22
+======================================================================
+
+Dataset: 282997 rows -> 45737 end-of-over rows
+Merged with market (inn2 only): 573 rows
+
+Residual = iso_p_inn1 - actual_inn1_wins
+  Mean bias: 0.0463
+  Std:       0.3107
+
+======================================================================
+TOP 20 FEATURES BY |PEARSON CORR| WITH RESIDUAL
+======================================================================
+bowling_team_situation_wr    0.369323
+batting_team_win_rate        0.301788
+batting_won_toss            -0.284324
+current_run_rate             0.284045
+expected_final_score         0.276658
+score_adjusted_by_team       0.252760
+score_vs_par                 0.248303
+batsman_rolling_sr           0.244956
+venue_chase_success         -0.242776
+score_per_wicket             0.239445
+batting_team_situation_wr    0.236424
+crr_times_res                0.228283
+wickets_times_balls         -0.213176
+wickets_last_30             -0.199888
+batting_pair_strength        0.198870
+wickets_lost                -0.191507
+wickets_last_12             -0.180942
+dls_pressure_index          -0.174789
+batsman_rolling_avg          0.170840
+runs_last_12                 0.167522
+
+======================================================================
+TOP 20 FEATURES BY RANDOM FOREST IMPORTANCE (residual prediction)
+======================================================================
+target_above_par             0.179765
+batting_team_win_rate        0.145714
+resource_win_prob            0.085326
+resource_team_adjusted       0.071114
+dls_pressure_index           0.061018
+current_run_rate             0.057807
+inn1_death_rr                0.044733
+inn1_defendability           0.032623
+venue_chase_success          0.030453
+team_strength_diff           0.029263
+required_run_rate            0.024990
+inn1_pp_runs                 0.023539
+expected_final_score         0.022931
+run_rate_diff                0.019425
+run_rate_team_adj            0.017412
+score_vs_par                 0.014543
+bowling_team_situation_wr    0.012488
+score_adjusted_by_team       0.012434
+pressure_index               0.011731
+inn1_wickets_lost            0.011623
+
+======================================================================
+INTERPRETATION
+======================================================================
+Features highly correlated with residual indicate where the model
+systematically over- or under-predicts.
+
+Key inn2 calibration issue: model S-curve is flattened vs reality.
+  - (0.3-0.4]: model 0.351 vs actual 0.140 -> +0.211 overestimate
+  - (0.6-0.7]: model 0.659 vs actual 0.811 -> -0.152 underestimate
+
+Recommendation: Apply IsotonicRegression on raw_p_inn1 for inn2.
