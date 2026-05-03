@@ -1013,7 +1013,6 @@ class Predictor:
             # Chain: temperature scaling (sharpness) → logit bias (shift) 
             pre_league_prob = prob  # Save for debug output
             if self.league_calibrator:
-                import numpy as np
                 method = self.league_calibrator.get('method', 'temperature')
                 calibrators = self.league_calibrator.get('calibrators', {})
                 temperature_scalers = self.league_calibrator.get('temperature_scalers', {})
