@@ -150,6 +150,7 @@ class Predictor:
         self.last_terminal_clamp = None  # Final deterministic inn2 terminal override, if any
         self.last_calibrated_phase_target = None  # Phase×target calibrated probability
         self.last_shadow_prob = None  # Shadow: segment-specific T prediction (not production)
+        self.last_t_applied = 1.0  # Production T actually used this prediction (1.0 = no-op)
     
     def reset_innings_prior(self):
         """Reset the inn1 prior (call when starting a new match)."""
@@ -976,13 +977,23 @@ class Predictor:
                 # First innings: trust the calibrated model
                 prob = base_prob
 
-            # --- GLOBAL TEMPERATURE SHARPENING (T=0.75) ---
-            # Applied post-calibration to sharpen predictions toward extremes.
-            # T=0.75 chosen from 2026 holdout analysis (16 matches vs Betfair):
-            #   T=1.00 → Brier 0.1287 (-12.4% vs market)
-            #   T=0.75 → Brier 0.1271 (-13.4% vs market)  ← production
-            # Curve is flat between 0.65–0.90; T=0.75 sits safely in the valley.
-            _GLOBAL_T = 0.75
+            # --- SEGMENT-AWARE TEMPERATURE SHARPENING ---
+            # Applied post-calibration. Only sharpen segments where T < 1.0 helps.
+            # 16-match IPL 2026 holdout vs Betfair optimal T per segment:
+            #   Inn1 PP=0.364, Inn1 Mid=1.06, Inn1 Death=0.97
+            #   Inn2 PP=0.606, Inn2 Mid=0.327, Inn2 Death=1.07
+            # Segments with optimal T ≥ 0.95 (Inn1 Mid/Death, Inn2 Death) left at T=1.0
+            # to avoid sharpening where the model is already well-calibrated.
+            # Segments needing sharpening use conservative T=0.75 (flat valley 0.65–0.90).
+            _over_1b = state.over + 1
+            _PROD_T = {
+                'inn1_powerplay': 0.75,  # optimal 0.364 → conservative 0.75
+                'inn1_middle':    1.00,  # optimal 1.06  → no sharpening (would hurt)
+                'inn1_death':     1.00,  # optimal 0.97  → no sharpening
+                'inn2_powerplay': 0.75,  # optimal 0.606 → conservative 0.75
+                'inn2_middle':    0.75,  # optimal 0.327 → conservative 0.75
+                'inn2_death':     1.00,  # optimal 1.07  → no sharpening (would hurt)
+            }
             _SHADOW_T = {
                 # Segment-specific T values — shadow mode only (tested on 16 matches).
                 # Promote to production after ~30+ more matches confirm stability.
@@ -990,22 +1001,32 @@ class Predictor:
                 'inn2_powerplay': 0.60,   # Stable across 12 & 16 match analyses
                 'inn2_middle':    0.50,   # Conservative vs optimal 0.33–0.55 (noisy estimate)
             }
-            if 0.001 < prob < 0.999:
+            # Determine segment
+            if state.innings == 1:
+                if _over_1b <= 6:
+                    _seg = 'inn1_powerplay'
+                elif _over_1b <= 15:
+                    _seg = 'inn1_middle'
+                else:
+                    _seg = 'inn1_death'
+            else:
+                if _over_1b <= 6:
+                    _seg = 'inn2_powerplay'
+                elif _over_1b <= 15:
+                    _seg = 'inn2_middle'
+                else:
+                    _seg = 'inn2_death'
+            # Apply production T (no-op for segments where T=1.0)
+            _prod_t = _PROD_T.get(_seg, 1.0)
+            self.last_t_applied = _prod_t
+            if _prod_t != 1.0 and 0.001 < prob < 0.999:
                 _logit = np.log(prob / (1 - prob))
-                prob = float(1 / (1 + np.exp(-_logit / _GLOBAL_T)))
-
-            # Compute shadow prediction with segment-specific T (stored for logging, not used)
-            _over_1b = state.over + 1
-            _seg = None
-            if state.innings == 1 and _over_1b <= 6:
-                _seg = 'inn1_powerplay'
-            elif state.innings == 2 and _over_1b <= 6:
-                _seg = 'inn2_powerplay'
-            elif state.innings == 2 and 7 <= _over_1b <= 15:
-                _seg = 'inn2_middle'
-            if _seg and _seg in _SHADOW_T and 0.001 < base_prob < 0.999:
+                prob = float(1 / (1 + np.exp(-_logit / _prod_t)))
+            # Compute shadow prediction with aggressive segment-specific T (stored for logging only)
+            _shadow_t_val = _SHADOW_T.get(_seg, 1.0)
+            if _shadow_t_val != 1.0 and 0.001 < base_prob < 0.999:
                 _sl = np.log(base_prob / (1 - base_prob))
-                self.last_shadow_prob = float(1 / (1 + np.exp(-_sl / _SHADOW_T[_seg])))
+                self.last_shadow_prob = float(1 / (1 + np.exp(-_sl / _shadow_t_val)))
             else:
                 self.last_shadow_prob = prob  # Same as production for non-shadow segments
 
@@ -1750,13 +1771,29 @@ class Predictor:
             # Single calibrator
             calibrated = self.calibrator.predict(raw_probs)
         
-        # Apply league calibration if available
-        # Global T=0.75 sharpening applied before league calibration
-        _GLOBAL_T = 0.75
-        safe = (calibrated > 0.001) & (calibrated < 0.999)
-        if np.any(safe):
-            _logits = np.log(calibrated[safe] / (1 - calibrated[safe]))
-            calibrated[safe] = 1 / (1 + np.exp(-_logits / _GLOBAL_T))
+        # Segment-aware temperature sharpening (before league calibration).
+        # Only sharpen Inn1 PP, Inn2 PP, Inn2 Mid — segments with optimal T < 0.95.
+        # Inn1 Mid (opt 1.06), Inn1 Death (opt 0.97), Inn2 Death (opt 1.07) left at T=1.0.
+        _PROD_T_SEGS = [
+            (1, 1,  6, 0.75),   # Inn1 PP
+            (1, 7, 15, 1.00),   # Inn1 Mid  — no sharpening
+            (1, 16, 20, 1.00),  # Inn1 Death — no sharpening
+            (2, 1,  6, 0.75),   # Inn2 PP
+            (2, 7, 15, 0.75),   # Inn2 Mid
+            (2, 16, 20, 1.00),  # Inn2 Death — no sharpening
+        ]
+        for inn, ov_min, ov_max, t_val in _PROD_T_SEGS:
+            if t_val == 1.0:
+                continue
+            mask = (
+                (innings_arr == inn) &
+                (current_over_1based >= ov_min) &
+                (current_over_1based <= ov_max) &
+                (calibrated > 0.001) & (calibrated < 0.999)
+            )
+            if np.any(mask):
+                _logits = np.log(calibrated[mask] / (1 - calibrated[mask]))
+                calibrated[mask] = 1 / (1 + np.exp(-_logits / t_val))
 
         if self.league_calibrator:
             method = self.league_calibrator.get('method', 'temperature')
