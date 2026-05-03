@@ -2313,6 +2313,12 @@ class CrexLivePredictor:
             self.last_calibrated_per_over = getattr(self.predictor, 'last_calibrated_per_over', win_prob)
             self.last_calibrated_phase_target = getattr(self.predictor, 'last_calibrated_phase_target', win_prob)
             self._last_terminal_clamp = getattr(self.predictor, 'last_terminal_clamp', None)
+            self.last_shadow_prob = getattr(self.predictor, 'last_shadow_prob', win_prob)
+
+            # Log shadow vs production when they differ (segment-specific T in shadow mode)
+            if self.last_shadow_prob is not None and abs(self.last_shadow_prob - win_prob) > 0.002:
+                over_1b = pred_state.over + 1
+                print(f"[SHADOW] T=0.75 prod={win_prob:.1%} | seg-T shadow={self.last_shadow_prob:.1%} | inn={pred_state.innings} ov={over_1b}")
              
             return float(win_prob)
             
@@ -3028,6 +3034,7 @@ class CrexLivePredictor:
                 "calibrated_phase_prob": getattr(self, 'last_calibrated_phase', win_prob),
                 "calibrated_per_over_prob": getattr(self, 'last_calibrated_per_over', win_prob),
                 "calibrated_phase_target_prob": getattr(self, 'last_calibrated_phase_target', win_prob),
+                "shadow_t_prob": getattr(self, 'last_shadow_prob', None),  # Shadow: segment-specific T
                 "league": self.league,  # League code if --league was specified
                 "league_calibrated_prob": win_prob if self.league else None,  # Final league-calibrated prob
                 "features": features,

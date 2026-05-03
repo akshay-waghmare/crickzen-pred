@@ -471,7 +471,7 @@ PREDICTOR_CONFIGS = {
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",
         "mc_only": False,
-        "model_dir": "models/ipl_v6",
+        "model_dir": "models/ipl_v7",
         "odm_model_dir": "models/odm_v1",
         "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v3",
@@ -481,7 +481,7 @@ PREDICTOR_CONFIGS = {
     "IPL MC-only": {
         "output_json": "data/ipl_live_mc.json",
         "mc_only": True,
-        "model_dir": "models/ipl_v6",
+        "model_dir": "models/ipl_v7",
         "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v3",
         "league": "ipl",
@@ -1583,6 +1583,7 @@ def main():
     phase_target_prob = d.get("calibrated_phase_target_prob", None)  # Inn2 phase×target calibration
     league_calibrated_prob = d.get("league_calibrated_prob", None)  # League-specific (temperature/platt)
     league = d.get("league", None)  # League code if specified
+    shadow_t_prob = d.get("shadow_t_prob", None)  # Shadow: segment-specific T (Inn1PP/Inn2PP/Inn2Mid)
     
     # Detect if this is SA20 and recalculate calibrated probabilities client-side
     # BUT skip if CLI already applied league calibration (league field is set)
@@ -1639,12 +1640,16 @@ def main():
     # Decide number of columns based on whether phase-specific and league-specific are available
     has_phase = phase_specific_prob is not None and abs(phase_specific_prob - inn_specific_prob) > 0.001
     has_league = league_calibrated_prob is not None and league is not None
+    prod_ref = league_calibrated_prob if has_league else inn_specific_prob
+    has_shadow = shadow_t_prob is not None and abs(shadow_t_prob - prod_ref) > 0.002
     
     # Calculate number of columns
     num_cols = 4
     if has_phase:
         num_cols += 1
     if has_league:
+        num_cols += 1
+    if has_shadow:
         num_cols += 1
     
     prob_cols = st.columns(num_cols)
@@ -1723,6 +1728,35 @@ def main():
                 <span style="font-size: 1.5em; color: #00796b;">{league_calibrated_prob*100:.1f}%</span><br>
                 <span style="font-size: 1.1em; color: #333;">Odds: <b>{league_calibrated_odds}</b></span><br>
                 <span style="font-size: 0.9em; color: #666;">League-Calibrated</span>
+            </div>
+            ''', unsafe_allow_html=True)
+
+    # Shadow T column — segment-specific T (Inn1PP T=0.40, Inn2PP T=0.60, Inn2Mid T=0.50)
+    # Only appears during those segments; hides otherwise.
+    if has_shadow:
+        shadow_col_idx = num_cols - 1
+        with prob_cols[shadow_col_idx]:
+            shadow_odds = prob_to_odds(shadow_t_prob)
+            delta_pp = (shadow_t_prob - prod_ref) * 100
+            delta_str = f"{delta_pp:+.1f} pp"
+            overs_float = d.get("overs", 0.0)
+            import math as _math
+            _ov = max(1, min(20, _math.ceil(overs_float) if overs_float > 0 else 1))
+            inn_num_s = 2 if d.get("is_second_innings") else 1
+            if inn_num_s == 1 and _ov <= 6:
+                seg_label = "Inn1 PP · T=0.40"
+            elif inn_num_s == 2 and _ov <= 6:
+                seg_label = "Inn2 PP · T=0.60"
+            elif inn_num_s == 2 and 7 <= _ov <= 15:
+                seg_label = "Inn2 Mid · T=0.50"
+            else:
+                seg_label = "Seg-T"
+            st.markdown(f'''
+            <div style="text-align: center; padding: 10px; background: #fff8e1; border-radius: 10px; border-left: 4px solid #f9a825;">
+                <b>🔬 Shadow T</b><br>
+                <span style="font-size: 1.5em; color: #f9a825;">{shadow_t_prob*100:.1f}%</span><br>
+                <span style="font-size: 1.1em; color: #333;">Odds: <b>{shadow_odds}</b> <span style="color:#888;font-size:0.85em;">({delta_str})</span></span><br>
+                <span style="font-size: 0.9em; color: #666;">{seg_label}</span>
             </div>
             ''', unsafe_allow_html=True)
 
@@ -2700,7 +2734,7 @@ def main():
                     brier_label = f"Brier-Optimized ({t20i_brier_source})"
                     brier_desc = "Brier=0.1438, 672K samples"
                 elif is_ipl:
-                    # IPL v6: per-over isotonic + phase×target (9-segment inn2 correction)
+                    # IPL v7: per-over isotonic + phase×target (9-segment inn2 correction)
                     inn_num_local = d.get("innings", 1)
                     if inn_num_local == 2 and phase_target_prob is not None and phase_target_prob != per_over_prob:
                         brier_prob = phase_target_prob
@@ -2709,7 +2743,7 @@ def main():
                     elif per_over_prob is not None and per_over_prob != raw_prob:
                         brier_prob = per_over_prob
                         brier_label = "Per-Over Calibrated"
-                        brier_desc = "Inn1: per-over isotonic (OOF Brier 0.1837)"
+                        brier_desc = "IPL v7 per-over isotonic"
                     else:
                         brier_prob = raw_prob
                         brier_label = "Raw Model Output"

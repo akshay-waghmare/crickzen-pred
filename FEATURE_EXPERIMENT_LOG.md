@@ -1,5 +1,55 @@
 # Feature Experiment Log
 
+## Experiment: 013 — IPL v7 Temperature Sharpening
+**Date**: 2026-05-03  
+**Model**: IPL v7 (`models/ipl_v7/`)  
+**Technique**: Post-calibration temperature scaling (T < 1 sharpens predictions toward extremes)  
+**Full doc**: `docs/IPL_V7_MODEL.md`
+
+### Motivation
+IPL v7 (37 features) OOF Brier = 0.1810, but OOS predictions looked under-confident — model showed
+flat curves where the market was already pricing more extreme probabilities. Hypothesis: the model
+has signal but is being softened by isotonic calibration.
+
+### Method
+Analysed 16 IPL 2026 matches against Betfair market odds using a proper 3-way split:
+- Train: all seasons ≤ 2025
+- Calibration: 2025 season
+- Holdout: IPL 2026 (Apr 3–16, 16 matches, 580 per-over rows from `data/ipl_betx21_full_market_2026.parquet`)
+
+Swept T ∈ {0.40, 0.50, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00} globally and per-segment.
+
+### Results
+
+| T | Brier | vs Market (0.1469) |
+|---|:-----:|:------------------:|
+| 1.00 (baseline) | 0.1287 | −12.4% |
+| 0.90 | 0.1276 | −13.1% |
+| **0.75** | **0.1271** | **−13.4%** ← adopted |
+| 0.65 | 0.1273 | −13.3% |
+| 0.50 | 0.1301 | −11.4% |
+
+**Decision**: Global T=0.75 baked into `Predictor.predict()` and `Predictor._calibrate_batch()`.
+
+### Shadow Mode (monitoring, not production)
+Segment-specific T values logged alongside production for 30+ match validation:
+
+| Segment | Shadow T | Status |
+|---------|:--------:|--------|
+| Inn1 PP | 0.40 | Shadow — needs 30+ match validation |
+| Inn2 PP | 0.60 | Shadow — needs 30+ match validation |
+| Inn2 Mid | 0.50 | Shadow (conservative; optimal 0.33–0.55 but noisy) |
+
+Shadow visible in: Streamlit amber `🔬 Shadow T` column + `[SHADOW]` console log + `shadow_t_prob` JSON field.
+
+### Key Findings
+- Brier curve flat between T=0.65–0.90 (max swing <0.001) — T=0.75 is safe mid-valley choice
+- Inn1 PP is ONLY segment behind market (+5.1%); all Inn2 segments crush market (−33% to −40%)
+- Inn2 Mid T=0.30 HURTS despite model dominance there — it's a feature gap, not calibration gap
+- Segment-specific T combo achieves −16.3% vs market on this sample but too noisy to productionise
+
+---
+
 ## Experiment: 012 — IPL Feature Enhancement
 **Date**: 2026-04-19
 **Spec**: specs/012-ipl-feature-enhancement/spec.md

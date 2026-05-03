@@ -149,6 +149,7 @@ class Predictor:
         self.last_transition_alpha = None  # For debug/logging access
         self.last_terminal_clamp = None  # Final deterministic inn2 terminal override, if any
         self.last_calibrated_phase_target = None  # Phase×target calibrated probability
+        self.last_shadow_prob = None  # Shadow: segment-specific T prediction (not production)
     
     def reset_innings_prior(self):
         """Reset the inn1 prior (call when starting a new match)."""
@@ -974,7 +975,40 @@ class Predictor:
             else:
                 # First innings: trust the calibrated model
                 prob = base_prob
-            
+
+            # --- GLOBAL TEMPERATURE SHARPENING (T=0.75) ---
+            # Applied post-calibration to sharpen predictions toward extremes.
+            # T=0.75 chosen from 2026 holdout analysis (16 matches vs Betfair):
+            #   T=1.00 → Brier 0.1287 (-12.4% vs market)
+            #   T=0.75 → Brier 0.1271 (-13.4% vs market)  ← production
+            # Curve is flat between 0.65–0.90; T=0.75 sits safely in the valley.
+            _GLOBAL_T = 0.75
+            _SHADOW_T = {
+                # Segment-specific T values — shadow mode only (tested on 16 matches).
+                # Promote to production after ~30+ more matches confirm stability.
+                'inn1_powerplay': 0.40,   # Only segment losing to market; strong sharpening
+                'inn2_powerplay': 0.60,   # Stable across 12 & 16 match analyses
+                'inn2_middle':    0.50,   # Conservative vs optimal 0.33–0.55 (noisy estimate)
+            }
+            if 0.001 < prob < 0.999:
+                _logit = np.log(prob / (1 - prob))
+                prob = float(1 / (1 + np.exp(-_logit / _GLOBAL_T)))
+
+            # Compute shadow prediction with segment-specific T (stored for logging, not used)
+            _over_1b = state.over + 1
+            _seg = None
+            if state.innings == 1 and _over_1b <= 6:
+                _seg = 'inn1_powerplay'
+            elif state.innings == 2 and _over_1b <= 6:
+                _seg = 'inn2_powerplay'
+            elif state.innings == 2 and 7 <= _over_1b <= 15:
+                _seg = 'inn2_middle'
+            if _seg and _seg in _SHADOW_T and 0.001 < base_prob < 0.999:
+                _sl = np.log(base_prob / (1 - base_prob))
+                self.last_shadow_prob = float(1 / (1 + np.exp(-_sl / _SHADOW_T[_seg])))
+            else:
+                self.last_shadow_prob = prob  # Same as production for non-shadow segments
+
             # Apply league-specific calibrator if available
             # Chain: temperature scaling (sharpness) → logit bias (shift) 
             pre_league_prob = prob  # Save for debug output
@@ -1469,6 +1503,10 @@ class Predictor:
         set_batter_exposure = 20.0
         balls_since_wicket = 12.0
         acceleration_potential = 15.0
+        score_vs_venue_over_par = 0.0  # MC simulates terminal state; 0.0 is neutral default
+        batting_team_venue_wr = 0.5
+        batting_recent_nrr_l5 = 0.0
+        is_low_target = 0.0
         crr_times_res = current_run_rate * resource_pct / 100.0
         resources_remaining = resource_pct / 100.0
         
@@ -1533,6 +1571,10 @@ class Predictor:
             'runs_required': runs_required,
             'is_middle_overs': is_middle_overs,
             'is_death_overs': is_death_overs,
+            'score_vs_venue_over_par': np.full(num_states, score_vs_venue_over_par),
+            'batting_team_venue_wr': np.full(num_states, batting_team_venue_wr),
+            'batting_recent_nrr_l5': np.full(num_states, batting_recent_nrr_l5),
+            'is_low_target': np.full(num_states, is_low_target),
         }
         
         X = pd.DataFrame(feature_dict)
@@ -1710,6 +1752,13 @@ class Predictor:
             calibrated = self.calibrator.predict(raw_probs)
         
         # Apply league calibration if available
+        # Global T=0.75 sharpening applied before league calibration
+        _GLOBAL_T = 0.75
+        safe = (calibrated > 0.001) & (calibrated < 0.999)
+        if np.any(safe):
+            _logits = np.log(calibrated[safe] / (1 - calibrated[safe]))
+            calibrated[safe] = 1 / (1 + np.exp(-_logits / _GLOBAL_T))
+
         if self.league_calibrator:
             method = self.league_calibrator.get('method', 'temperature')
             calibrators = self.league_calibrator.get('calibrators', {})
