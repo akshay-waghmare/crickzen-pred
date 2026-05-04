@@ -30,7 +30,8 @@ Start script:
 
 Current behavior:
 
-- auto-discovers the newest live state with `--source-dir data/dashboard_states`
+- auto-discovers the active live state from `--source-dir data/dashboard_states`
+- ignores stale feeds and completed matches when a fresher active match exists
 - scans every 20 seconds
 - logs heartbeat lines when no signal is due
 - auto-approves by default except `final_review`, which stays queued for manual approval

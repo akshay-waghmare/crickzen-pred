@@ -11,6 +11,7 @@ from bbl_pipeline.telegram.signal_publisher import PublicSignalPublisher
 from bbl_pipeline.telegram.signal_review_queue import SignalReviewQueue
 from bbl_pipeline.telegram.signal_runner import (
     SignalAutomationRunner,
+    _find_latest_state_json,
     detect_current_phase,
     should_auto_approve_phase,
 )
@@ -206,3 +207,49 @@ def test_approve_stale_draft_bypasses_freshness():
         posted_text = client.send_message.call_args[0][0]
         assert "Innings Break" in posted_text
         assert "RR vs DC" in posted_text
+
+
+def test_find_latest_state_json_prefers_active_match_over_newer_completed_file():
+    with TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+        now_iso = datetime.now(timezone.utc).isoformat()
+
+        active_json = tmp / "active_match.json"
+        completed_json = tmp / "completed_match.json"
+
+        _write_json(
+            active_json,
+            {
+                "timestamp": now_iso,
+                "batting_team": "CSK",
+                "bowling_team": "PBKS",
+                "score": 74,
+                "wickets": 2,
+                "overs": 8.1,
+                "is_second_innings": False,
+                "total_overs": 20,
+                "history": [],
+            },
+        )
+        _write_json(
+            completed_json,
+            {
+                "timestamp": now_iso,
+                "batting_team": "DC",
+                "bowling_team": "MI",
+                "score": 171,
+                "wickets": 4,
+                "overs": 19.2,
+                "target": 171,
+                "is_second_innings": True,
+                "total_overs": 20,
+                "history": [],
+            },
+        )
+
+        completed_json.touch()
+
+        selected = _find_latest_state_json(tmp)
+
+        assert selected is not None
+        assert selected.name == "active_match.json"

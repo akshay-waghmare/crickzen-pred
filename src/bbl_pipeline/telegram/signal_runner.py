@@ -31,6 +31,7 @@ from bbl_pipeline.telegram.signals import (
     SignalSnapshot,
 )
 from bbl_pipeline.telegram.storage import PredictionStorage
+from bbl_pipeline.ops.prod_ops_agent import choose_active_state_json
 
 
 RUNNER_STATE_DEFAULT = "data/telegram_signal_runner_state.json"
@@ -343,7 +344,10 @@ def _determine_winner(main_state: dict[str, Any]) -> str | None:
 
 
 def _find_latest_state_json(state_dir: Path) -> Path | None:
-    """Return the most-recently modified non-history/sidecar JSON in state_dir."""
+    """Return the best state JSON to treat as current."""
+    selected = choose_active_state_json(state_dir)
+    if selected is not None:
+        return selected
     candidates = [
         p for p in state_dir.glob("*.json")
         if not p.stem.endswith("_history") and not p.stem.endswith("_livematch")

@@ -213,7 +213,7 @@ class CrexLivePredictor:
         """Trim CREX section labels from team-like text snippets."""
         candidate = re.sub(r'\s+', ' ', (team_name or '').strip()).strip(' -|,')
         candidate = re.sub(
-            r'\s+(?:in\s+Points\s+Table|Points\s+Table|Team\s+Form|Match\s+Info|Live|Scorecard|Commentary)\b.*$',
+            r'\s+(?:Head\s+to\s+Head|in\s+Points\s+Table|Points\s+Table|Team\s+Form|Match\s+Info|Live|Scorecard|Commentary)\b.*$',
             '',
             candidate,
             flags=re.IGNORECASE,
@@ -256,7 +256,7 @@ class CrexLivePredictor:
             return None
 
         patterns = [
-            r"([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,50}?)\s+vs\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,60}?)(?:\s+\d+(?:st|nd|rd|th)[-\s]*Match\b|\s+\|\s+|\s+Team Form\b|\s+Match Info\b|\s+Live\b|\s+Scorecard\b|\s+Commentary\b|$)",
+            r"([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,50}?)\s+vs\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,60}?)(?:\s+\d+(?:st|nd|rd|th)[-\s]*Match\b|\s+\|\s+|\s+Head\s+to\s+Head\b|\s+Team Form\b|\s+Match Info\b|\s+Live\b|\s+Scorecard\b|\s+Commentary\b|$)",
             r"([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,50}?)\s+vs\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{1,60}?)(?:\n|$)",
         ]
         for pattern in patterns:
@@ -267,6 +267,29 @@ class CrexLivePredictor:
             team2 = self._resolve_team_name(match.group(2))
             if team1 and team2 and self._normalize_team_key(team1) != self._normalize_team_key(team2):
                 return team1, team2
+        return None
+
+    def _extract_live_score_from_page_text(self, page_text: str) -> Optional[tuple[str, int, int, float]]:
+        """Extract batting team and score from the live score block in body text."""
+        if not page_text:
+            return None
+
+        patterns = [
+            r"Match\s*Details\s*#?\s*.*?live\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{0,40})\s+(?:PP|P[1-3])?\s*(\d+)[-/](\d+)\s+(\d+(?:\.\d+)?)",
+            r"live\s+([A-Za-z0-9][A-Za-z0-9&.'\- ]{0,40})\s+(?:PP|P[1-3])?\s*(\d+)[-/](\d+)\s+(\d+(?:\.\d+)?)",
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, page_text, re.IGNORECASE | re.DOTALL)
+            if not match:
+                continue
+            team = self._resolve_team_name(match.group(1).strip())
+            try:
+                runs = int(match.group(2))
+                wickets = int(match.group(3))
+                overs = float(match.group(4))
+            except ValueError:
+                continue
+            return team, runs, wickets, overs
         return None
     
     def _init_match_state_logger(self):
@@ -1248,6 +1271,23 @@ class CrexLivePredictor:
             
             # Get page text to detect second innings and extract data
             page_text = await self.page.inner_text("body")
+
+            # Fallback: CREX sometimes leaves the page title stale while the score block in body is current.
+            body_score = self._extract_live_score_from_page_text(page_text)
+            if body_score and (self.match_state.total_runs == 0 and self.match_state.wickets == 0 and self.match_state.overs == 0.0):
+                current_batting_team, total_runs, wickets, overs = body_score
+                self.match_state.total_runs = total_runs
+                self.match_state.wickets = wickets
+                self.match_state.overs = overs
+                if self.match_state.batting_team and self._normalize_team_key(self.match_state.batting_team) != self._normalize_team_key(current_batting_team):
+                    self.match_state.bowling_team = self.match_state.batting_team
+                elif not self.match_state.bowling_team:
+                    if hasattr(self, '_team1') and hasattr(self, '_team2'):
+                        if self._normalize_team_key(current_batting_team) == self._normalize_team_key(self._team1):
+                            self.match_state.bowling_team = self._team2
+                        elif self._normalize_team_key(current_batting_team) == self._normalize_team_key(self._team2):
+                            self.match_state.bowling_team = self._team1
+                self.match_state.batting_team = current_batting_team
             
             # --- DLS / Reduced-over auto-detection ---
             # Detect revised target (e.g. "Revised Target: 156 (DLS)" or "Target: 156 (D/L)")
