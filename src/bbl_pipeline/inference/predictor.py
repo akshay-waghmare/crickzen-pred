@@ -151,6 +151,10 @@ class Predictor:
         self.last_calibrated_phase_target = None  # Phase×target calibrated probability
         self.last_shadow_prob = None  # Shadow: segment-specific T prediction (not production)
         self.last_t_applied = 1.0  # Production T actually used this prediction (1.0 = no-op)
+        # Inn2 phase routing (ipl_v11 architecture — attach via Inn2PhaseRouter.load())
+        self.inn2_router = None
+        self.last_inn2_router_phase = None  # Which phase the router used ("pp"/"mid"/"death")
+        self._last_full_feature_dict: dict = {}  # Full unfiltered feature dict for router
     
     def reset_innings_prior(self):
         """Reset the inn1 prior (call when starting a new match)."""
@@ -714,6 +718,8 @@ class Predictor:
         try:
             # Use RealTimeFeatureMapper to generate all features
             X = self.feature_mapper.create_feature_dataframe(scraped_data)
+            # Save full (unfiltered) feature dict for inn2 phase router before column selection
+            self._last_full_feature_dict = X.iloc[0].to_dict() if len(X) > 0 else {}
             
             # Get expected features from model
             expected_features = None
@@ -894,11 +900,34 @@ class Predictor:
             else:
                 base_prob = raw_prob
             
-            # --- PHASE×TARGET CALIBRATION (Inn2 only) ---
+            # --- INN2 PHASE ROUTING (ipl_v11 architecture) ---
+            # Replaces base_prob with the phase-model output for inn2.
+            # Per-over isotonic calibration is baked into the router output.
+            # phase_target_calibrators are skipped when the router is active.
+            # Fail-open: any exception falls back to the v7 base_prob unchanged.
+            self.last_inn2_router_phase = None
+            if self.inn2_router is not None and state.innings == 2:
+                try:
+                    router_prob, router_phase = self.inn2_router.predict(
+                        self._last_full_feature_dict, current_over
+                    )
+                    self.last_inn2_router_phase = router_phase
+                    base_prob = router_prob
+                    self.last_calibrated_per_over = router_prob
+                    self.last_calibrated_phase = router_prob
+                    if debug:
+                        print(f"[INN2Router] phase={router_phase} over={current_over} "
+                              f"v7_raw={raw_prob:.1%} router_cal={router_prob:.1%}")
+                except Exception as _router_exc:
+                    logger.warning(f"Inn2PhaseRouter failed at over={current_over}, "
+                                   f"falling back to v7: {_router_exc}")
+                    # base_prob remains v7 calibrated — fail-open
+
+            # --- PHASE×TARGET CALIBRATION (Inn2 only, skipped when router is active) ---
             # Chain: raw -> per-over isotonic -> phase×target isotonic
             # 9 segments: (PP/Mid/Death) × (below_par/on_par/above_par)
             self.last_calibrated_phase_target = base_prob
-            if self.phase_target_calibrators and state.innings == 2:
+            if self.phase_target_calibrators and state.innings == 2 and not self.last_inn2_router_phase:
                 if current_over <= 6:
                     pt_phase = 'PP'
                 elif current_over <= 15:
@@ -1135,7 +1164,8 @@ class Predictor:
              
             return float(prob)
         except Exception as e:
-            logger.error(f"Prediction failed: {e}")
+            import traceback
+            logger.error(f"Prediction failed: {e}\n{traceback.format_exc()}")
             # Fallback: Use resource-based win probability
             resource_features = self.resource_calculator.calculate_all_features(
                 innings=state.innings,

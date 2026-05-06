@@ -614,13 +614,43 @@ class CrexLivePredictor:
             return
         try:
             from bbl_pipeline.inference.predictor import Predictor
-            self.predictor = Predictor.load(self.model_dir, self.feature_store_dir, league=self.league)
+
+            # Detect routing config — if present, load inn1 model from routing_config.inn1_model_dir
+            routing_cfg = None
+            routing_config_path = Path(self.model_dir) / "routing_config.json"
+            if routing_config_path.exists():
+                import json as _json
+                with open(routing_config_path) as _rf:
+                    routing_cfg = _json.load(_rf)
+
+            if routing_cfg and routing_cfg.get("type") == "inn2_phase_router":
+                inn1_dir = routing_cfg.get("inn1_model_dir", self.model_dir)
+                # Paths in routing_config.json are project-root-relative (same cwd as the process)
+                inn1_dir_resolved = Path(inn1_dir)
+                print(f"[INFO] ipl_v11 routing: loading inn1 model from {inn1_dir_resolved}")
+                self.predictor = Predictor.load(
+                    inn1_dir_resolved, self.feature_store_dir, league=self.league
+                )
+            else:
+                self.predictor = Predictor.load(self.model_dir, self.feature_store_dir, league=self.league)
+
             self.model = self.predictor.model
             print(f"[OK] Model loaded from {self.model_dir}")
             if self.feature_store_dir:
                 print(f"[INFO] Feature store: {self.feature_store_dir}")
             if self.league:
                 print(f"[INFO] League calibrator: {self.league}")
+
+            # Attach inn2 phase router if routing config present
+            if routing_cfg and routing_cfg.get("type") == "inn2_phase_router":
+                try:
+                    from bbl_pipeline.inference.inn2_phase_router import Inn2PhaseRouter
+                    phase_dir = routing_cfg.get("inn2_phase_model_dir", "models/ipl_inn2_v1")
+                    # Paths are project-root-relative
+                    self.predictor.inn2_router = Inn2PhaseRouter.load(Path(phase_dir))
+                    print(f"[OK] Inn2PhaseRouter loaded from {phase_dir}")
+                except Exception as _re:
+                    print(f"[WARN] Could not load Inn2PhaseRouter: {_re} — v7 fallback for all innings")
         except Exception as e:
             print(f"[WARN] Could not load model: {e}")
             print("   Will run in scraper-only mode (no predictions)")

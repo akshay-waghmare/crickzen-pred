@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22",
+  "last_updated": "2026-05-06",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -807,49 +807,29 @@
       }
     },
     "IPL": {
-      "path": "models/ipl_v7",
-      "version": "v7",
-      "description": "XGBLogRegEnsemble (32 features) + Per-Over Brier-Optimized Calibration + Inn2 Isotonic Recalibrator (428 rows). OOF Brier: 0.1817 (brier_optimized). Trained on 282,997 rows including latest 2025-26 season data.",
+      "path": "models/ipl_v11",
+      "version": "v11",
+      "description": "Hybrid routing: ipl_v7 global model for inn1 (Brier 0.18099), 3 phase-specific models for inn2 (PP/Mid/Death) with per-over isotonic calibration. Inn2 routing Brier 0.1359 (-3.3% vs v7 inn2 0.14054). Death phase -16.8%, Mid -9.2%, PP -4.7% vs v7.",
       "training": {
-        "samples": 282997,
-        "date": "2026-04-22",
-        "brier_score": 0.1858,
-        "oof_brier": 0.1817,
-        "n_features": 32,
-        "input_file": "data/ipl_features_latest/training.parquet"
-      },
-      "calibrator": {
-        "path": "models/ipl_v7/isotonic_calibrator.pkl",
-        "type": "innings_phase_specific_with_per_over_brier_optimized",
-        "n_calibrators": 38,
-        "oof_metrics": {
-          "brier": 0.1817,
-          "ece": 0.0,
-          "logloss": 0.5297
+        "date": "2026-05-06",
+        "architecture": "ipl_v11_routing",
+        "inn1_model": "models/ipl_v7",
+        "inn2_model": "models/ipl_inn2_v1",
+        "inn2_routing_brier_oof": 0.1359,
+        "v7_inn2_brier_oof": 0.14054,
+        "routing_gain_pct": -3.3,
+        "inn2_phase_brier": {
+          "pp_calibrated": 0.1717,
+          "mid_calibrated": 0.1307,
+          "death_calibrated": 0.0771
         }
       },
-      "inn2_recalibrator": {
-        "path": "models/ipl_v7/inn2_isotonic_calibrator.pkl",
-        "type": "inn2_isotonic",
-        "n_train": 428,
-        "train_matches": 24,
-        "description": "Corrects S-curve flattening in inn2 predictions"
-      },
-      "oos_metrics": {
-        "dataset": "Last 10 matches holdout from market comparison data",
-        "inn2_brier_v6": 0.1392,
-        "inn2_brier_v7_recalib": 0.1828,
-        "inn2_brier_market": 0.1989,
-        "inn1_brier_v6": 0.348,
-        "inn1_brier_market": 0.3463,
-        "notes": "v7 inn2 recalibrator on v6 raw_p uses simple isotonic vs v6 per-over isotonic; v6 per-over isotonic remains better on this holdout"
-      },
-      "oof_calibration_results": "models/ipl_v7/oof_calibration_results.csv",
-      "oof_report": "models/ipl_v7/OOF_CALIBRATION_REPORT.md",
+      "routing_config": "models/ipl_v11/routing_config.json",
       "feature_store": {
-        "path": "data/ipl_feature_store_v3",
-        "version": "v3",
-        "notes": "Same feature store as ipl_v3/v6 - no feature store update needed"
+        "path": "data/ipl_feature_store_v9",
+        "version": "v9",
+        "generated_date": "2026-05-03",
+        "training_data_samples": 278954
       }
     },
     "PSL": {
@@ -868,6 +848,16 @@
         "generated_date": "2026-04-22",
         "training_data_samples": 78040
       }
+    },
+    "ipl": {
+      "version": "v7",
+      "model_dir": "models/ipl_v7",
+      "champion_model": "models/ipl_v7/champion_model.joblib",
+      "oof_calibrators": "models/ipl_v7/oof_calibrators.pkl",
+      "inn2_isotonic_calibrator": "models/ipl_v7/inn2_isotonic_calibrator.pkl",
+      "training_data": "data/ipl_features_latest/training.parquet",
+      "oof_brier": 0.1817,
+      "updated": "2026-05-02"
     }
   },
   "archived_models": {
@@ -922,7 +912,68 @@
           "impact": "Aligns SMA inference with BBL-style flow (raw model + external OOF calibrator)"
         }
       }
-    }
+    },
+    "IPL": [
+      {
+        "path": "models/ipl_v10",
+        "version": "v10",
+        "description": "XGBLogRegEnsemble (50 features) + Per-Over Brier-Optimized Calibration (Brier: 0.18153, ECE: 0.0000). Adds 9 inn2 momentum features: momentum_under_pressure, net_momentum, batting_pair_momentum, wicket_adj_momentum, recovery_momentum, recent_surge_flag, momentum_acceleration, chase_category, inn1_quality_index.",
+        "training": {
+          "samples": 278954,
+          "date": "2026-05-06",
+          "brier_score": 0.18153,
+          "n_features": 50,
+          "features_path": "data/ipl_features_v10/training.parquet",
+          "oof_by_segment": {
+            "overall": 0.18153,
+            "inn2_overall": null,
+            "inn2_powerplay": 0.18094,
+            "inn2_middle": 0.14411,
+            "inn2_death": 0.09314
+          },
+          "inn2_phase_models": {
+            "description": "Phase-specific inn2 models with momentum features (research)",
+            "models_dir": "models/ipl_inn2_v1",
+            "oof_brier_raw": {
+              "inn2_pp": 0.1749,
+              "inn2_mid": 0.1335,
+              "inn2_death": 0.0791,
+              "routing": 0.1387
+            },
+            "vs_v9_calibrated": {
+              "inn2_pp": "-3.3%",
+              "inn2_mid": "-7.4%",
+              "inn2_death": "-15.6%"
+            }
+          }
+        },
+        "calibrator": {},
+        "feature_store": {
+          "path": "data/ipl_feature_store_v9",
+          "version": "v9",
+          "generated_date": "2026-05-03",
+          "training_data_samples": 278954
+        },
+        "_archived_from_active": "2026-05-06"
+      },
+      {
+        "path": "models/ipl_v9",
+        "version": "v9",
+        "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1817, ECE: 0.0000)",
+        "training": {
+          "samples": 278954,
+          "date": "2026-05-03",
+          "brier_score": 0.18165221845939
+        },
+        "calibrator": {},
+        "feature_store": {
+          "path": "data/ipl_feature_store_v9",
+          "version": "v9",
+          "generated_date": "2026-05-03",
+          "training_data_samples": 278954
+        }
+      }
+    ]
   },
   "T20_FEMALE": {
     "model_path": "models/t20_female_v2",

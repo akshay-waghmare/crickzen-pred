@@ -37,17 +37,18 @@ WINDOWS_NEW_CONSOLE = getattr(subprocess, "CREATE_NEW_CONSOLE", 0)
 LEAGUE_CONFIGS = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v6",
-        "feature_store_dir": "data/ipl_feature_store_v3",
+        "model_dir": "models/ipl_v11",
+        "feature_store_dir": "data/ipl_feature_store_v9",
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",
         "odm_model_dir": "models/odm_v1",
+        "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "states_dir": "data/match_states/ipl",
     },
     "PSL": {
         "league": "psl",
-        "model_dir": "models/t20_male_v2",
-        "feature_store_dir": "data/psl_feature_store_v1",
+            "model_dir": "models/psl_v4",
+            "feature_store_dir": "data/psl_feature_store_v4",
         "output_json": "data/psl_live_ml.json",
         "display_json": "data/psl_live_ml_odm.json",
         "odm_model_dir": "models/odm_v1",
@@ -371,6 +372,9 @@ class MatchSlot:
         odm_model_dir = cfg.get("odm_model_dir")
         if odm_model_dir and not mc_only:
             cmd += ["--odm-model-dir", odm_model_dir]
+        market_stack_model_dir = cfg.get("market_stack_model_dir")
+        if market_stack_model_dir and not mc_only:
+            cmd += ["--market-stack-model-dir", market_stack_model_dir]
         if mc_only:
             cmd.append("--mc-only")
         if total_overs is not None:
@@ -385,6 +389,8 @@ class MatchSlot:
         self.app._log(f"[{tag}] {format_output_json_hint(output_json)}")
         if display_json != output_json:
             self.app._log(f"[{tag}] ODM mirror: {Path(display_json)}")
+        if market_stack_model_dir and not mc_only:
+            self.app._log(f"[{tag}] Market stack dry-run: {Path(market_stack_model_dir)}")
         if mc_only or (total_overs is not None and total_overs < 20):
             mode_bits = ["MC-only"]
             if total_overs is not None:

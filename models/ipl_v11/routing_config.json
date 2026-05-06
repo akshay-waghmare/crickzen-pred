@@ -1,0 +1,13 @@
+{
+  "type": "inn2_phase_router",
+  "description": "ipl_v11: v7 global model for inn1, 3 phase models for inn2 (PP/Mid/Death)",
+  "inn1_model_dir": "models/ipl_v7",
+  "inn2_phase_model_dir": "models/ipl_inn2_v1",
+  "inn2_phases": {
+    "pp":    {"overs": "1-6",   "brier_oof_calibrated": 0.1717, "vs_v7_pct": -4.7},
+    "mid":   {"overs": "7-15",  "brier_oof_calibrated": 0.1307, "vs_v7_pct": -9.2},
+    "death": {"overs": "16-20", "brier_oof_calibrated": 0.0771, "vs_v7_pct": -16.8}
+  },
+  "routing_brier_oof": 0.1359,
+  "v7_brier_oof_inn2": 0.14054
+}
