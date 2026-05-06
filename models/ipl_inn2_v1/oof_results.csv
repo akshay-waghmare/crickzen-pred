@@ -1,0 +1,5 @@
+model,oof_brier_raw,v7_raw,vs_v7_raw_pct,v7_cal,vs_v7_cal_pct
+inn2_pp_eng,0.17486,0.18299,-4.4,0.18026,-3.0
+inn2_mid_eng,0.1335,0.14667,-9.0,0.14389,-7.2
+inn2_death_eng,0.07914,0.09617,-17.7,0.0926,-14.5
+inn2_routing_eng,0.1387,,,,

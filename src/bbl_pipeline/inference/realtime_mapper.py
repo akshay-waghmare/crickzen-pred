@@ -183,7 +183,7 @@ class RealTimeFeatureMapper:
         dot_pct_last_12 = dots_last_12 / n_last_12
 
         # Wickets in last 6 balls (immediate collapse signal)
-        last_6 = current_innings[-6:] if len(current_innings) >= 6 else current_innings
+        last_6 = df.tail(6)
         wickets_last_6 = last_6['is_wicket'].sum()
         
         return {
@@ -283,6 +283,11 @@ class RealTimeFeatureMapper:
         batsman_2_stats = self.feature_store.get_player_stats(batsman_2_name) or {}
         bowler_stats = self.feature_store.get_player_stats(bowler_name) or {}
         venue_stats = self.feature_store.get_venue_stats(venue) or {}
+
+        # Venue-over par: expected cumulative score at end of this over at this venue
+        over_number_int = max(1, int(over) + 1)  # over_number is 0-indexed in scraper
+        venue_over_par = self.feature_store.get_venue_over_par(venue, over_number_int)
+        score_vs_venue_over_par = (current_score - venue_over_par) if innings == 1 else 0.0
         
         # Get with fallbacks
         batsman_rolling_avg = batsman_1_stats.get('batsman_rolling_avg', 
@@ -320,6 +325,11 @@ class RealTimeFeatureMapper:
              team_strength_diff = batting_team_win_rate - bowling_team_win_rate
         else:
              logger.warning("Feature store does not have get_team_stats method")
+
+        # v9: team-venue win rate (batting team at this specific venue)
+        batting_team_venue_wr = 0.5
+        if hasattr(self.feature_store, 'get_team_venue_wr'):
+            batting_team_venue_wr = self.feature_store.get_team_venue_wr(batting_team, venue)
 
         # --- Resource-based Features (DLS-style) ---
         target_runs = scraped_data.get('target_score') if innings == 2 else None
@@ -516,6 +526,16 @@ class RealTimeFeatureMapper:
             inn1_defendability = defend_features.get('resource_win_prob', 0.5)
         else:
             inn1_defendability = 0.5
+
+        # v9: recent NRR and low-target flag
+        batting_recent_nrr_l5 = 0.0
+        if hasattr(self.feature_store, 'get_team_stats'):
+            batting_stats_nrr = self.feature_store.get_team_stats(batting_team) or {}
+            batting_recent_nrr_l5 = float(batting_stats_nrr.get('recent_nrr', 0.0))
+
+        is_low_target = 0.0
+        if innings == 2 and first_innings_score is not None:
+            is_low_target = float(first_innings_score < 140)
         
         # --- Construct Feature DataFrame ---
         features = {
@@ -576,6 +596,12 @@ class RealTimeFeatureMapper:
             'inn1_pp_runs': inn1_pp_runs,
             'inn1_death_rr': inn1_death_rr,
             'inn1_defendability': inn1_defendability,
+            # Venue-over par (v8+)
+            'score_vs_venue_over_par': score_vs_venue_over_par,
+            # v9: team-venue WR, recent NRR form, low-target flag
+            'batting_team_venue_wr': batting_team_venue_wr,
+            'batting_recent_nrr_l5': batting_recent_nrr_l5,
+            'is_low_target': is_low_target,
             
             # Extra features (kept for completeness)
             'innings': innings,

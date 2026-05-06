@@ -314,6 +314,13 @@ class InMemoryFeatureStore:
         self._venue_names_lower: Dict[str, str] = {}
         self._team_names_lower: Dict[str, str] = {}
         self.league_context: Optional[str] = None
+
+        # Venue-over par lookup: (venue_lower, over_int) -> expected cumulative score
+        self._venue_over_par: Dict[tuple, float] = {}
+        self._league_over_par: Dict[int, float] = {}
+
+        # Team × venue win rate lookup: (team_lower, venue_lower) -> win_rate
+        self._team_venue_stats: Dict[tuple, float] = {}
         
         # Player-venue and player-vs-team lookup tables
         self._player_venue_batting: Dict[tuple, Dict[str, Any]] = {}
@@ -375,6 +382,33 @@ class InMemoryFeatureStore:
         
         # Load player-venue and player-vs-team lookup tables
         self._load_player_venue_tables()
+
+        # Load venue-over par lookup (optional — only present in v8+ feature stores)
+        venue_over_par_path = self.venue_stats_path.parent / 'venue_over_par.parquet'
+        if venue_over_par_path.exists():
+            try:
+                df_vop = pd.read_parquet(venue_over_par_path)
+                for _, row in df_vop.iterrows():
+                    key = (str(row['venue']).lower(), int(row['over']))
+                    self._venue_over_par[key] = float(row['venue_over_par'])
+                # Compute league-level fallback as mean across all venues per over
+                for over, grp in df_vop.groupby('over'):
+                    self._league_over_par[int(over)] = float(grp['venue_over_par'].mean())
+                logger.info(f"Loaded venue-over par: {len(self._venue_over_par)} (venue,over) entries")
+            except Exception as e:
+                logger.warning(f"Could not load venue_over_par.parquet: {e}")
+
+        # Load team × venue win rates (v9 feature: batting_team_venue_wr)
+        team_venue_path = self.venue_stats_path.parent / 'team_venue_ratings.parquet'
+        if team_venue_path.exists():
+            try:
+                df_tv = pd.read_parquet(team_venue_path)
+                for _, row in df_tv.iterrows():
+                    key = (str(row['team']).lower().strip(), str(row['venue']).lower().strip())
+                    self._team_venue_stats[key] = float(row['win_rate'])
+                logger.info(f"Loaded team-venue ratings: {len(self._team_venue_stats)} combos")
+            except Exception as e:
+                logger.warning(f"Could not load team_venue_ratings.parquet: {e}")
 
         # Seed IPL venue averages — these are not in the BBL feature store parquet.
         # Based on recent IPL T20 first-innings averages. CREX live venue stats
@@ -706,13 +740,14 @@ class InMemoryFeatureStore:
     }
     
     # =====================================================================
-    # CONFIGURATION - Toggle between historical data and season overrides
+    # CONFIGURATION - Toggle between historical data and live overrides
     # =====================================================================
     # DISABLED: CREX "Last 10 matches" stats cause train/inference mismatch.
     # Model trained on historical win rates (~0.55), but CREX can show 0.90 vs 0.30
     # which creates team_strength_diff=0.60 (6x larger than training distribution).
     # Use historical feature store data only for consistency.
-    USE_SEASON_OVERRIDES = True
+    USE_SEASON_OVERRIDES = False
+    USE_VENUE_SITUATION_OVERRIDES = False
     
     # =====================================================================
     # VENUE SITUATION STATS - Bat/Bowl first win rates from current venue
@@ -835,6 +870,49 @@ class InMemoryFeatureStore:
         
         return None
 
+    def get_venue_over_par(self, venue_name: str, over: int) -> float:
+        """Return the expected cumulative inn1 score at the end of 'over' at this venue.
+
+        Returns 0.0 if no venue-over par data is loaded (pre-v8 feature stores).
+        """
+        if not self._loaded:
+            self.load()
+        if not self._venue_over_par:
+            return 0.0
+
+        over_int = int(over)
+        # 1. Try exact lowercase venue name
+        key = (venue_name.lower(), over_int)
+        if key in self._venue_over_par:
+            return self._venue_over_par[key]
+        # 2. Try VENUE_ALIASES canonical name
+        canonical = VENUE_ALIASES.get(venue_name, venue_name)
+        key2 = (canonical.lower(), over_int)
+        if key2 in self._venue_over_par:
+            return self._venue_over_par[key2]
+        # 3. Fall back to league-average for this over
+        return self._league_over_par.get(over_int, 0.0)
+
+    def get_team_venue_wr(self, team_name: str, venue_name: str) -> float:
+        """Return the historical win rate for team_name at venue_name.
+
+        Uses the same alias resolution as get_venue_over_par / get_team_stats.
+        Returns 0.5 (no-information prior) when insufficient data or unknown combo.
+        """
+        if not self._loaded:
+            self.load()
+        if not self._team_venue_stats:
+            return 0.5
+
+        team_key = self._resolve_team_abbrev(team_name).lower().strip()
+        # Try canonical venue alias first, then raw name
+        canonical_venue = VENUE_ALIASES.get(venue_name, venue_name)
+        for vk in (canonical_venue.lower().strip(), venue_name.lower().strip()):
+            key = (team_key, vk)
+            if key in self._team_venue_stats:
+                return self._team_venue_stats[key]
+        return 0.5
+
     def get_team_stats(self, team_name: str) -> Optional[Dict[str, Any]]:
         if not self._loaded:
             self.load()
@@ -942,8 +1020,9 @@ class InMemoryFeatureStore:
                 'venue_avg_wickets': 6.0,
                 'venue_bat_first_win_rate': 0.5,
             }
-            # Override with live VENUE_SITUATION_STATS from CREX if available
-            if self.VENUE_SITUATION_STATS:
+            # Optional live CREX venue override. Disabled by default because
+            # IPL v6 was trained on feature-store venue priors.
+            if self.USE_VENUE_SITUATION_OVERRIDES and self.VENUE_SITUATION_STATS:
                 match_details_avg = self.VENUE_SITUATION_STATS.get(
                     'match_details_avg_1st_inns',
                     self.VENUE_SITUATION_STATS.get('avg_1st_inns')
@@ -1016,10 +1095,9 @@ class InMemoryFeatureStore:
                 'venue_bat_first_win_rate': 0.5,
             }
         
-        # 5. Override with live VENUE_SITUATION_STATS from CREX if available
-        # This ensures we use the actual venue avg from the current match info page
-        # for consistency with what's displayed on CREX
-        if self.VENUE_SITUATION_STATS:
+        # 5. Optionally override with live VENUE_SITUATION_STATS from CREX.
+        # Keep disabled for IPL v6 training parity unless explicitly enabled.
+        if self.USE_VENUE_SITUATION_OVERRIDES and self.VENUE_SITUATION_STATS:
             match_details_avg = self.VENUE_SITUATION_STATS.get(
                 'match_details_avg_1st_inns',
                 self.VENUE_SITUATION_STATS.get('avg_1st_inns')
