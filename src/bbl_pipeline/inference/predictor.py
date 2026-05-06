@@ -1008,27 +1008,27 @@ class Predictor:
 
             # --- SEGMENT-AWARE TEMPERATURE SHARPENING ---
             # Applied post-calibration. Only sharpen segments where T < 1.0 helps.
-            # 16-match IPL 2026 holdout vs Betfair optimal T per segment:
-            #   Inn1 PP=0.364, Inn1 Mid=1.06, Inn1 Death=0.97
-            #   Inn2 PP=0.606, Inn2 Mid=0.327, Inn2 Death=1.07
-            # Segments with optimal T ≥ 0.95 (Inn1 Mid/Death, Inn2 Death) left at T=1.0
-            # to avoid sharpening where the model is already well-calibrated.
-            # Segments needing sharpening use conservative T=0.75 (flat valley 0.65–0.90).
+            # Inn1: based on 16-match IPL 2026 holdout vs Betfair (v7 output):
+            #   Inn1 PP optimal=0.364, Inn1 Mid=1.06, Inn1 Death=0.97
+            # Inn2: based on ipl_v11 router OOF (134k samples, in-sample optimal):
+            #   Inn2 PP optimal=0.45 (+11.7% Brier), Mid=0.55 (+8.9%), Death=0.65 (+4.9%)
+            #   Isotonic over-smoothing causes S-curve: low probs too high, high probs too low.
+            #   Using conservative midpoints (in-sample optimal → previous prod T) to avoid overfit.
             _over_1b = state.over + 1
             _PROD_T = {
-                'inn1_powerplay': 0.75,  # optimal 0.364 → conservative 0.75
-                'inn1_middle':    1.00,  # optimal 1.06  → no sharpening (would hurt)
-                'inn1_death':     1.00,  # optimal 0.97  → no sharpening
-                'inn2_powerplay': 0.75,  # optimal 0.606 → conservative 0.75
-                'inn2_middle':    0.75,  # optimal 0.327 → conservative 0.75
-                'inn2_death':     1.00,  # optimal 1.07  → no sharpening (would hurt)
+                'inn1_powerplay': 0.75,  # v7: optimal 0.364 → conservative 0.75
+                'inn1_middle':    1.00,  # v7: optimal 1.06  → no sharpening (would hurt)
+                'inn1_death':     1.00,  # v7: optimal 0.97  → no sharpening
+                'inn2_powerplay': 0.60,  # router: optimal 0.45 → conservative 0.60 (-7.1%→-10%+ Brier)
+                'inn2_middle':    0.65,  # router: optimal 0.55 → conservative 0.65 (-6.4%→-8%+ Brier)
+                'inn2_death':     0.80,  # router: optimal 0.65 → conservative 0.80 (was 1.0, +4.9% gain)
             }
             _SHADOW_T = {
-                # Segment-specific T values — shadow mode only (tested on 16 matches).
-                # Promote to production after ~30+ more matches confirm stability.
-                'inn1_powerplay': 0.40,   # Only segment losing to market; strong sharpening
-                'inn2_powerplay': 0.60,   # Stable across 12 & 16 match analyses
-                'inn2_middle':    0.50,   # Conservative vs optimal 0.33–0.55 (noisy estimate)
+                # More aggressive values — shadow mode only, promote after ~30 live matches.
+                'inn1_powerplay': 0.40,   # Only inn1 segment losing to market; strong sharpening
+                'inn2_powerplay': 0.45,   # In-sample optimal
+                'inn2_middle':    0.55,   # In-sample optimal
+                'inn2_death':     0.65,   # In-sample optimal
             }
             # Determine segment
             if state.innings == 1:
@@ -1802,15 +1802,16 @@ class Predictor:
             calibrated = self.calibrator.predict(raw_probs)
         
         # Segment-aware temperature sharpening (before league calibration).
-        # Only sharpen Inn1 PP, Inn2 PP, Inn2 Mid — segments with optimal T < 0.95.
-        # Inn1 Mid (opt 1.06), Inn1 Death (opt 0.97), Inn2 Death (opt 1.07) left at T=1.0.
+        # Inn2 values updated for ipl_v11 router output (OOF analysis, 134k samples):
+        #   PP optimal=0.45 (+11.7% Brier), Mid=0.55 (+8.9%), Death=0.65 (+4.9%)
+        # Using conservative midpoints to avoid overfitting to training distribution.
         _PROD_T_SEGS = [
-            (1, 1,  6, 0.75),   # Inn1 PP
-            (1, 7, 15, 1.00),   # Inn1 Mid  — no sharpening
-            (1, 16, 20, 1.00),  # Inn1 Death — no sharpening
-            (2, 1,  6, 0.75),   # Inn2 PP
-            (2, 7, 15, 0.75),   # Inn2 Mid
-            (2, 16, 20, 1.00),  # Inn2 Death — no sharpening
+            (1, 1,  6, 0.75),   # Inn1 PP   — v7 holdout optimal 0.364 → conservative 0.75
+            (1, 7, 15, 1.00),   # Inn1 Mid  — no sharpening (optimal 1.06, would hurt)
+            (1, 16, 20, 1.00),  # Inn1 Death — no sharpening (optimal 0.97)
+            (2, 1,  6, 0.60),   # Inn2 PP   — router optimal 0.45 → conservative 0.60
+            (2, 7, 15, 0.65),   # Inn2 Mid  — router optimal 0.55 → conservative 0.65
+            (2, 16, 20, 0.80),  # Inn2 Death — router optimal 0.65 → conservative 0.80
         ]
         for inn, ov_min, ov_max, t_val in _PROD_T_SEGS:
             if t_val == 1.0:
