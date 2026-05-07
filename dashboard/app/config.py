@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     SESSION_CAP: int = 50
     MAX_USER_MATCHES: int = 2
     MAX_TOTAL_MATCHES: int = 6
+    FINISHED_MATCH_RETENTION_MINUTES: int = 30
+    STALE_RUNNING_MATCH_MINUTES: int = 30
 
     # Automatic match discovery/start
     AUTO_PREDICTIONS_ENABLED: bool = False
@@ -67,8 +69,8 @@ class Settings(BaseSettings):
 LEAGUE_CONFIGS: dict[str, dict] = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v6",
-        "feature_store_dir": "data/ipl_feature_store_v3",
+        "model_dir": "models/ipl_v11",
+        "feature_store_dir": "data/ipl_feature_store_v9",
         "series_url": "https://crex.com/series/indian-premier-league-2026-1PW",
     },
     "PSL": {
@@ -102,6 +104,11 @@ LEAGUE_CONFIGS: dict[str, dict] = {
         "model_dir": "models/t20_international_male_v2",
         "feature_store_dir": "data/t20_international_male_feature_store_v2",
     },
+    "Women T20I": {
+        "league": "t20i_female",
+        "model_dir": "models/t20_female_v4",
+        "feature_store_dir": "data/t20_female_feature_store_v4",
+    },
     "SSM": {
         "league": "ssm",
         "model_dir": "models/t20_male_v2",
@@ -122,6 +129,7 @@ _URL_LEAGUE_PATTERNS: list[tuple[str, str]] = [
     (r"betway-sa20|sa20-league|sa20", "SA20"),
     (r"international-league-t20|ilt20", "ILT20"),
     (r"womens-premier-league|wpl", "WPL"),
+    (r"women-tour|women-s-tour|women.*tour|ind-w|sa-w|aus-w|eng-w|nz-w|wi-w|pak-w|sl-w|ban-w", "Women T20I"),
     (r"t20-world-cup|icc-mens-t20", "T20 World Cup"),
     (r"super-smash", "SSM"),
     (r"bangladesh-premier-league|bpl", "BPL"),
