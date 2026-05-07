@@ -1,0 +1,75 @@
+Loading dataΓÇª
+  Inn2 rows: 134,614  seasons: ['2007/08', '2009', '2009/10', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020/21', '2021', '2022', '2023', '2024', '2025', '2026']
+
+Step 1: OOF season-fold CV for calibratorsΓÇª
+
+  Phase: PP (overs 1-6)
+    fold 0: val=['2007/08', '2009', '2009/10'], n=6,509, brier=0.1629
+    fold 1: val=['2011', '2012', '2013'], n=8,210, brier=0.1748
+    fold 2: val=['2014', '2015', '2016'], n=6,506, brier=0.1654
+    fold 3: val=['2017', '2018', '2019'], n=6,463, brier=0.2026
+    fold 4: val=['2020/21', '2021', '2022', '2023', '2024', '2025', '2026'], n=15,863, brier=0.1686
+  OOF Brier (raw): 0.17349
+
+  Phase: MID (overs 7-15)
+    fold 0: val=['2007/08', '2009', '2009/10'], n=9,196, brier=0.1319
+    fold 1: val=['2011', '2012', '2013'], n=11,831, brier=0.1208
+    fold 2: val=['2014', '2015', '2016'], n=9,183, brier=0.1289
+    fold 3: val=['2017', '2018', '2019'], n=9,326, brier=0.1587
+    fold 4: val=['2020/21', '2021', '2022', '2023', '2024', '2025', '2026'], n=23,200, brier=0.1323
+  OOF Brier (raw): 0.13348
+
+  Phase: DEATH (overs 16-20)
+    fold 0: val=['2007/08', '2009', '2009/10'], n=2,936, brier=0.0767
+    fold 1: val=['2011', '2012', '2013'], n=3,983, brier=0.0743
+    fold 2: val=['2014', '2015', '2016'], n=3,073, brier=0.0644
+    fold 3: val=['2017', '2018', '2019'], n=3,190, brier=0.0941
+    fold 4: val=['2020/21', '2021', '2022', '2023', '2024', '2025', '2026'], n=7,790, brier=0.0822
+  OOF Brier (raw): 0.07914
+
+Fitting calibrators on OOF predictionsΓÇª
+  PP: phase_iso + 6 per-over isotonic
+  MID: phase Platt fitted; per-over Platt for 9 overs
+  DEATH: phase_iso + 4 per-over isotonic
+  Saved: models\ipl_v12\phase_oof_calibrators.pkl
+
+Step 2: Training champion models on ALL dataΓÇª
+  PP: 43,551 rows ├ù 60 features
+    Saved: champion_model_pp.joblib
+  MID: 62,736 rows ├ù 71 features
+    Saved: champion_model_mid.joblib
+  DEATH: 20,972 rows ├ù 59 features
+    Saved: champion_model_death.joblib
+  Saved: phase_features.json
+
+Step 3: True OOS evaluation (train<2025, test=2025+2026)ΓÇª
+  OOS train seasons: ['2007/08', '2009', '2009/10', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020/21', '2021', '2022', '2023', '2024']
+  OOS test  seasons: ['2025', '2026']
+
+  Building V11 baseline (OOS train<2025)ΓÇª
+
+  Building V12 (OOS train<2025)ΓÇª
+
+
+==========================================================================================
+IPL v12 BUILD ΓÇö OOS COMPARISON  (train: pre-2025, test: 2025+2026)
+==========================================================================================
+
+Phase           v11 cal    v12 cal     Change    v11 raw    v12 raw
+-----------------------------------------------------------------
+  Overall       0.11313    0.11325      +0.1%                      
+  PP            0.14602    0.14637      +0.2% Γ¥î  (n=3481  raw: v11=0.14546 v12=0.14509)
+  MID           0.10415    0.10415      +0.0% Γ¥î  (n=5050  raw: v11=0.10329 v12=0.10329)
+  DEATH         0.06752    0.06752      +0.0% Γ¥î  (n=1516  raw: v11=0.06624 v12=0.06624)
+
+  Overall: Γ¥î v12 LOSES  (+0.1% Brier)
+
+  v12 wins on 0/3 phases
+  Promotion decision: KEEP v11 as champion
+  (Requires: overall v12 < v11 AND win ΓëÑ 2 of 3 phases)
+
+  Saved: models\ipl_v12\oof_results.csv
+  Saved: models\ipl_v12\OOS_COMPARISON.md
+
+  v12 artifacts ready in: models\ipl_v12
+DONE.

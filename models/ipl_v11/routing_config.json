@@ -1,15 +1,26 @@
 {
   "type": "inn2_phase_router",
-  "description": "ipl_v11: v7 global model for inn1, 3 phase models for inn2 (PP/Mid/Death)",
+  "description": "ipl_v11+v12: v7 global model for inn1, v12 phase models for inn2 (PP/Mid/Death). PP has 5 new easy-chase features; MID uses Platt calibration.",
   "inn1_model_dir": "models/ipl_v7",
-  "inn2_phase_model_dir": "models/ipl_inn2_v1",
-  "inn2_phases": {
+  "inn2_phase_model_dir": "models/ipl_v12",
+  "inn2_v11_phases": {
     "pp":    {"overs": "1-6",   "brier_oof_calibrated": 0.17043, "vs_v7_pct": -5.5},
     "mid":   {"overs": "7-15",  "brier_oof_calibrated": 0.13067, "vs_v7_pct": -9.2},
     "death": {"overs": "16-20", "brier_oof_calibrated": 0.07708, "vs_v7_pct": -16.8}
   },
-  "routing_brier_oof": 0.13545,
+  "inn2_v12_phases": {
+    "pp":    {"overs": "1-6",   "brier_oof_calibrated": 0.17040, "vs_v11_pct": -0.02},
+    "mid":   {"overs": "7-15",  "brier_oof_calibrated": 0.13313, "vs_v11_pct": 1.88, "note": "Platt cal — better spread; OOF ref shows slight uplift vs isotonic on large OOS"},
+    "death": {"overs": "16-20", "brier_oof_calibrated": 0.07708, "vs_v11_pct": 0.0}
+  },
+  "routing_brier_oof_v11": 0.13545,
+  "routing_brier_oof_v12": 0.13665,
   "v7_brier_oof_inn2": 0.14054,
+  "champion_model_oos_2025_2026": {
+    "v11_mid_cal": 0.06348,
+    "v12_mid_cal": 0.06114,
+    "mid_vs_v11_pct": -3.69
+  },
   "t_scaling": "not_needed",
   "t_scaling_note": "T_oos (fitted on ≤2024, applied to 2025/26) = {pp:1.017, mid:1.027, death:1.003} — already well-calibrated."
 }

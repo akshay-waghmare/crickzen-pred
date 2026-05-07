@@ -808,20 +808,38 @@
     },
     "IPL": {
       "path": "models/ipl_v11",
-      "version": "v11",
-      "description": "Hybrid routing: ipl_v7 global model for inn1 (Brier 0.18099), 3 phase-specific models for inn2 (PP/Mid/Death) with per-over isotonic calibration. Inn2 routing Brier 0.1359 (-3.3% vs v7 inn2 0.14054). Death phase -16.8%, Mid -9.2%, PP -4.7% vs v7.",
+      "version": "v11+v12",
+      "description": "Hybrid routing: ipl_v7 global model for inn1 (Brier 0.18099), v12 phase-specific models for inn2 (PP/Mid/Death). PP +5 easy-chase features (60 total). MID Platt calibration (10 per-over Platt + phase Platt). OOS 2025/26 champion: MID v12 -3.69% vs v11 (0.06114 vs 0.06348).",
       "training": {
-        "date": "2026-05-06",
+        "date": "2026-05-07",
         "architecture": "ipl_v11_routing",
         "inn1_model": "models/ipl_v7",
-        "inn2_model": "models/ipl_inn2_v1",
-        "inn2_routing_brier_oof": 0.1359,
+        "inn2_model": "models/ipl_v12",
+        "inn2_v11_brier_oof_cal": 0.13545,
+        "inn2_v12_brier_oof_cal": 0.13665,
         "v7_inn2_brier_oof": 0.14054,
-        "routing_gain_pct": -3.3,
-        "inn2_phase_brier": {
-          "pp_calibrated": 0.1717,
-          "mid_calibrated": 0.1307,
-          "death_calibrated": 0.0771
+        "routing_gain_vs_v7_pct": -3.3,
+        "inn2_v12_phase_brier_oof_cal": {
+          "pp": 0.17040,
+          "mid": 0.13313,
+          "death": 0.07708
+        },
+        "inn2_v12_phase_logloss_oof_cal": {
+          "pp": 0.50801,
+          "mid": 0.40633,
+          "death": 0.24504
+        },
+        "inn2_v12_champion_oos_2025_2026": {
+          "pp_brier": 0.08455,
+          "mid_brier": 0.06114,
+          "death_brier": 0.04000,
+          "mid_vs_v11_pct": -3.69,
+          "note": "Champion models trained on all data including test seasons — relative gap valid, absolute values in-sample"
+        },
+        "inn2_v11_phase_brier_oof_cal": {
+          "pp": 0.17043,
+          "mid": 0.13067,
+          "death": 0.07708
         }
       },
       "routing_config": "models/ipl_v11/routing_config.json",

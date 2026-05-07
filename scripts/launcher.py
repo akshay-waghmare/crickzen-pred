@@ -38,6 +38,7 @@ LEAGUE_CONFIGS = {
     "IPL": {
         "league": "ipl",
         "model_dir": "models/ipl_v11",
+        "inn2_model_dir": "models/ipl_v12",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",

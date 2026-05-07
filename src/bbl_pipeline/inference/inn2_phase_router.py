@@ -1,18 +1,21 @@
 """
 Inn2PhaseRouter — routes inn2 predictions to phase-specific models.
 
-Architecture (ipl_v11):
+Architecture (ipl_v12):
   Inn1: global v7 model  (unchanged)
-  Inn2 PP    (overs 1–6):  champion_model_pp.joblib
-  Inn2 Mid   (overs 7–15): champion_model_mid.joblib
+  Inn2 PP    (overs 1–6):  champion_model_pp.joblib   (60 features, +5 easy-chase)
+  Inn2 Mid   (overs 7–15): champion_model_mid.joblib  (Platt calibration)
   Inn2 Death (overs 16–20):champion_model_death.joblib
 
 Each phase model uses engineered inn2 features (chase labels, momentum, etc.)
-with per-over isotonic calibrators as the primary calibration path,
-falling back to phase-level isotonic, then raw if neither is available.
+with per-over calibrators as the primary calibration path,
+falling back to phase-level calibrator, then raw if neither is available.
+
+PP/Death use per-over IsotonicRegression calibrators.
+MID uses per-over PlattCalibrator (logit-space LogReg) for better spread preservation.
 
 Usage:
-    router = Inn2PhaseRouter.load("models/ipl_inn2_v1")
+    router = Inn2PhaseRouter.load("models/ipl_v12")
     prob, phase = router.predict(feature_dict, over_1indexed=8)
     # Returns (calibrated_probability, "mid") or raises on total failure
 

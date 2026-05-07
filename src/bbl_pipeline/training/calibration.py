@@ -2,8 +2,48 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.base import BaseEstimator, ClassifierMixin
+from scipy.special import logit
 from typing import Literal
 import numpy as np
+
+
+class PlattCalibrator:
+    """Logistic regression in logit space (Platt scaling) for post-hoc probability calibration.
+
+    Operates on raw probabilities, not on model inputs — the API matches
+    ``IsotonicRegression``: call ``.transform(raw_probs)`` to get calibrated probs.
+
+    This is the production calibrator used for MID-phase predictions in IPL v12.
+    It preserves prediction spread better than isotonic when the calibration
+    dataset is small (< ~5,000 samples per phase).
+
+    Usage::
+
+        cal = PlattCalibrator()
+        cal.fit(oof_raw_probs, oof_labels)
+        calibrated = cal.transform(new_raw_probs)
+    """
+
+    def __init__(self, C: float = 1.0):
+        self.C = C
+        self._eps = 1e-6
+        self._lr: LogisticRegression | None = None
+
+    def fit(self, raw: np.ndarray, y: np.ndarray) -> "PlattCalibrator":
+        X = logit(np.clip(raw, self._eps, 1 - self._eps)).reshape(-1, 1)
+        self._lr = LogisticRegression(C=self.C, max_iter=2000, random_state=42)
+        self._lr.fit(X, y.astype(int))
+        return self
+
+    def transform(self, raw: np.ndarray) -> np.ndarray:
+        if self._lr is None:
+            raise RuntimeError("PlattCalibrator not fitted — call .fit() first.")
+        X = logit(np.clip(raw, self._eps, 1 - self._eps)).reshape(-1, 1)
+        return self._lr.predict_proba(X)[:, 1]
+
+    # sklearn-style alias so the object works as a drop-in for IsotonicRegression
+    def predict(self, raw: np.ndarray) -> np.ndarray:
+        return self.transform(raw)
 
 class CalibratedModel(BaseEstimator, ClassifierMixin):
     """
