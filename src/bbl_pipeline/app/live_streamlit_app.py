@@ -2734,16 +2734,18 @@ def main():
                     brier_label = f"Brier-Optimized ({t20i_brier_source})"
                     brier_desc = "Brier=0.1438, 672K samples"
                 elif is_ipl:
-                    # IPL v7: per-over isotonic + phase×target (9-segment inn2 correction)
+                    # IPL v11 inn1 (v7 global) + v12 inn2 phase router (PP/MID/Death)
+                    # Inn2: calibrated_per_over_prob = v12 router output
+                    #   MID uses Platt calibration, PP/Death use per-over isotonic
                     inn_num_local = d.get("innings", 1)
-                    if inn_num_local == 2 and phase_target_prob is not None and phase_target_prob != per_over_prob:
-                        brier_prob = phase_target_prob
-                        brier_label = "Phase x Target Cal (Inn2)"
-                        brier_desc = "PerOver -> 9-seg phase*target, OOF -8.9% death"
-                    elif per_over_prob is not None and per_over_prob != raw_prob:
+                    if per_over_prob is not None and per_over_prob != raw_prob:
                         brier_prob = per_over_prob
-                        brier_label = "Per-Over Calibrated"
-                        brier_desc = "IPL v7 per-over isotonic"
+                        if inn_num_local == 2:
+                            brier_label = "v12 Phase Router (Inn2)"
+                            brier_desc = "PP/Death: per-over isotonic | MID: Platt cal"
+                        else:
+                            brier_label = "Per-Over Calibrated (Inn1)"
+                            brier_desc = "IPL v7 per-over isotonic"
                     else:
                         brier_prob = raw_prob
                         brier_label = "Raw Model Output"
