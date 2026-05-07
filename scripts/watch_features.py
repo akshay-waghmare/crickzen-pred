@@ -16,6 +16,12 @@ import sys
 import time
 from pathlib import Path
 
+# Force UTF-8 stdout on Windows so emoji/ANSI print correctly
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+
 # ── ANSI colours ──────────────────────────────────────────────────────────────
 GREEN  = "\033[92m"
 YELLOW = "\033[93m"
@@ -181,7 +187,7 @@ def format_value(v):
 
 
 def print_audit(json_path: Path):
-    with open(json_path) as f:
+    with open(json_path, encoding="utf-8") as f:
         d = json.load(f)
 
     feats = d.get("features", {})
