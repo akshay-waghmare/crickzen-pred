@@ -2501,7 +2501,7 @@ class CrexLivePredictor:
             if project_root not in sys.path:
                 sys.path.insert(0, project_root)
             from scripts.fetch_betx21_inn1_stats import (
-                list_matches, download_scores, load_scores, extract_inn1_stats
+                auto_detect_match_id, download_scores, load_scores, extract_inn1_stats
             )
         except ImportError:
             logger.debug("betx21 fetch script not available")
@@ -2510,29 +2510,16 @@ class CrexLivePredictor:
         try:
             today = datetime.utcnow().strftime("%Y-%m-%d")
             
-            # Find matching match by team names
+            # In inn2 batting_team is the chaser, bowling_team is the defender
+            # Use both so token matching works regardless of who batted first
             batting_team = self.match_state.batting_team or ""
             bowling_team = self.match_state.bowling_team or ""
             if not batting_team:
                 return {}
             
             logger.info(f"Trying betx21 fallback for {batting_team} vs {bowling_team}")
-            matches = list_matches(today)
-            
-            match_id = None
-            for m in matches:
-                t1_lower = m.get("t1", "").lower()
-                t2_lower = m.get("t2", "").lower()
-                bat_lower = batting_team.lower()
-                bowl_lower = bowling_team.lower()
-                # Match if either team name appears in either position
-                if (bat_lower in t1_lower or bat_lower in t2_lower or
-                    t1_lower in bat_lower or t2_lower in bat_lower or
-                    bowl_lower in t1_lower or bowl_lower in t2_lower or
-                    t1_lower in bowl_lower or t2_lower in bowl_lower):
-                    match_id = m["id"]
-                    logger.info(f"Found betx21 match: {m['t1']} vs {m['t2']} (id={match_id})")
-                    break
+            # Use token-overlap matching (handles abbreviated names like "R C Bengaluru")
+            match_id = auto_detect_match_id(today, batting_team, bowling_team)
             
             if not match_id:
                 logger.debug(f"No betx21 match found for {batting_team} vs {bowling_team}")
@@ -3119,13 +3106,7 @@ class CrexLivePredictor:
                 "over": over,
                 "ball": ball,
                 "target": state.target,
-                "is_second_innings": state.is_second_innings,
-                "venue": state.venue,
-                "batsman1_name": state.batsman1_name,
-                "batsman1_runs": state.batsman1_runs,
-                "batsman1_balls": state.batsman1_balls,
-                "batsman2_name": state.batsman2_name,
-                "batsman2_runs": state.batsman2_runs,
+                "target_runs": state.target,  # alias for external consumers
                 "batsman2_balls": state.batsman2_balls,
                 "current_run_rate": state.current_run_rate,
                 "required_run_rate": state.required_run_rate,
@@ -3191,9 +3172,8 @@ class CrexLivePredictor:
                             "over": over,
                             "ball": ball,
                             "target": state.target,
+                            "target_runs": state.target,  # alias for external consumers
                             "is_second_innings": state.is_second_innings,
-                            "venue": state.venue,
-                            "toss_winner": state.toss_winner,
                             "toss_decision": state.toss_decision,
                             "batsman1_name": state.batsman1_name,
                             "batsman1_runs": state.batsman1_runs,
