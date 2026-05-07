@@ -570,7 +570,14 @@ class RealTimeFeatureMapper:
                 scraped_data.get('batsman1_balls', 0) or 0,
                 scraped_data.get('batsman2_balls', 0) or 0,
             )),
-            'balls_since_wicket': float(self._balls_since_wicket),
+            # Scoreboard correction: if no wickets have fallen, the whole innings
+            # is one partnership. Use total balls bowled when the persistent counter
+            # is lower (happens on mid-match restart with sparse CREX history).
+            'balls_since_wicket': float(
+                total_balls_in_innings
+                if wickets_lost == 0 and total_balls_in_innings > self._balls_since_wicket
+                else self._balls_since_wicket
+            ),
             'wickets_last_6': rolling_stats['wickets_last_6'],
             
             # Player-venue and player-vs-team stats

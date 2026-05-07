@@ -689,6 +689,18 @@ class Predictor:
         # Feed ball history to mapper if provided
         if ball_history:
             self.feature_mapper.ball_history = ball_history
+            # Sync _balls_since_wicket from the injected history so the feature
+            # reflects reality (not the stale persistent counter).
+            bsw = 0
+            innings_ref = ball_history[-1].get('innings_num', 1) if ball_history else 1
+            for ball in reversed(ball_history):
+                if ball.get('innings_num') != innings_ref:
+                    break
+                if ball.get('is_wicket', 0):
+                    break
+                bsw += 1
+            self.feature_mapper._balls_since_wicket = bsw
+            self.feature_mapper._current_innings = innings_ref
         
         # Convert MatchState to scraped_data format for the mapper
         scraped_data = {
