@@ -271,6 +271,130 @@ def extract_inn1_stats(lines: list[dict]) -> dict:
     return result
 
 
+def _parse_ball_value(val: str) -> tuple:
+    """Parse a betx21 ball value to (runs, is_wicket, is_boundary).
+
+    betx21 `b` array values:
+      "0"-"9" → runs scored
+      "4" / "Four" → 4-run boundary
+      "6" / "Six"  → 6-run boundary
+      "W" / "Wkt"  → wicket (0 runs)
+      "Wd" / "Wide" / "Nb" / "NoBall" → extra (0, treat as dot for rolling stats)
+      anything else → treat as 0 runs
+    """
+    val = str(val).strip()
+    if val in ("W", "Wkt", "Out", "Wicket"):
+        return 0, 1, 0
+    if val in ("4", "Four"):
+        return 4, 0, 1
+    if val in ("6", "Six"):
+        return 6, 0, 1
+    if val in ("Wd", "Wide", "Nb", "NoBall", "NB", "LB", "Legbye"):
+        return 0, 0, 0
+    try:
+        runs = int(val)
+        return runs, 0, (1 if runs >= 4 else 0)
+    except (ValueError, TypeError):
+        return 0, 0, 0
+
+
+def extract_ball_history(lines: list, innings_num: int = 1) -> list:
+    """Reconstruct ball-by-ball history from betx21 score ticks.
+
+    Each tick's `b` field is a list of ball outcomes for the current over.
+    By keeping the last `b` array seen per over we reconstruct ball-by-ball data.
+
+    Args:
+        lines:      List of score tick dicts loaded from betx21 JSONL.
+        innings_num: 1 = first innings, 2 = second innings.
+
+    Returns:
+        List of dicts compatible with _build_ball_history_for_mapper:
+          {innings_num, over_number, ball_number, runs_scored,
+           is_wicket, is_boundary, total_score, total_wickets}
+    """
+    if not lines:
+        return []
+
+    order = detect_batting_order(lines)
+    bat_first = order.get("batting_first", "t1")
+
+    # Which score field tracks this innings
+    if innings_num == 1:
+        score_field = "s1" if bat_first == "t1" else "s2"
+    else:
+        score_field = "s2" if bat_first == "t1" else "s1"
+
+    # Collect (over_num, b_array) for each tick that has ball data
+    over_balls: dict = {}  # over_num → last seen b array
+    for tick in lines:
+        score_str = tick.get(score_field, "")
+        b_array = tick.get("b", [])
+        if not score_str or not b_array:
+            continue
+        parsed = parse_score(score_str)
+        if not parsed:
+            continue
+        _, _, overs = parsed
+        over_num = int(overs)  # floor = current over being played
+        over_balls[over_num] = list(b_array)
+
+    # Reconstruct ball-by-ball
+    history = []
+    running_score = 0
+    running_wickets = 0
+
+    for over_num in sorted(over_balls.keys()):
+        for ball_idx, ball_val in enumerate(over_balls[over_num]):
+            runs, is_wicket, is_boundary = _parse_ball_value(ball_val)
+            running_score += runs
+            if is_wicket:
+                running_wickets += 1
+            history.append({
+                'innings_num': innings_num,
+                'over_number': over_num,
+                'ball_number': ball_idx + 1,
+                'runs_scored': runs,
+                'is_wicket': is_wicket,
+                'is_boundary': is_boundary,
+                'total_score': running_score,
+                'total_wickets': running_wickets,
+            })
+
+    return history
+
+
+def auto_detect_match_id(date: str, batting_team: str, bowling_team: str) -> Optional[str]:
+    """Find betx21 match ID by fuzzy-matching team names for a given date.
+
+    Args:
+        date:         Date string YYYY-MM-DD.
+        batting_team: CREX batting team name (e.g. "Lucknow Super Giants").
+        bowling_team: CREX bowling team name (e.g. "Royal Challengers Bengaluru").
+
+    Returns:
+        betx21 event ID string, or None if not found.
+    """
+    matches = list_matches(date)
+    if not matches:
+        return None
+
+    def _token_overlap(crex_name: str, bx_name: str) -> int:
+        crex_tokens = set(crex_name.lower().split())
+        bx_tokens = set(bx_name.lower().split())
+        return len(crex_tokens & bx_tokens)
+
+    for m in matches:
+        t1, t2 = m.get("t1", ""), m.get("t2", "")
+        # Each CREX team should overlap at least 1 token with a betx21 team
+        bat_match = max(_token_overlap(batting_team, t1), _token_overlap(batting_team, t2))
+        bowl_match = max(_token_overlap(bowling_team, t1), _token_overlap(bowling_team, t2))
+        if bat_match >= 1 and bowl_match >= 1:
+            return m["id"]
+
+    return None
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch inn1 stats from betx21 production")
     parser.add_argument("--match-id", help="betx21 event ID (e.g., 35503673)")

@@ -2318,6 +2318,14 @@ class CrexLivePredictor:
             
             # Convert ball history to mapper format for rolling stats
             ball_history = self._build_ball_history_for_mapper()
+
+            # If CREX gave sparse ball history, try betx21 recordings for richer data
+            total_balls_bowled = int(self.match_state.overs) * 6 + int(round((self.match_state.overs % 1) * 10))
+            if total_balls_bowled > 0:
+                completeness = len(ball_history) / total_balls_bowled
+                if completeness < 0.3:
+                    ball_history = self._try_betx21_backfill(ball_history)
+
             logger.info(f"Ball history has {len(ball_history)} balls, current state: {self.match_state.total_runs}/{self.match_state.wickets}")
             
             # Log ball history details for debugging
@@ -2640,7 +2648,73 @@ class CrexLivePredictor:
                 )
         
         return history
-    
+
+    def _try_betx21_backfill(self, crex_history: list) -> list:
+        """Try to backfill sparse CREX ball history with betx21 recordings.
+
+        When CREX only provides a handful of balls on a mid-match restart, this
+        method downloads today's betx21 scores file, reconstructs ball-by-ball
+        data from the `b` arrays, and returns the richer history.
+
+        Falls back to the original crex_history on any error.
+        """
+        try:
+            import sys as _sys
+            from pathlib import Path as _Path
+            _scripts = _Path(__file__).resolve().parents[3] / "scripts"
+            if str(_scripts) not in _sys.path:
+                _sys.path.insert(0, str(_scripts))
+
+            from fetch_betx21_inn1_stats import (
+                auto_detect_match_id,
+                download_scores,
+                load_scores,
+                extract_ball_history,
+            )
+            from datetime import datetime as _dt
+
+            innings_num = 2 if self.match_state.is_second_innings else 1
+            batting_team = self.match_state.batting_team or ""
+            bowling_team = self.match_state.bowling_team or ""
+
+            # Try today first, then yesterday as fallback
+            for date_offset in (0, -1):
+                import datetime as _datetime
+                date_str = (_dt.utcnow() + _datetime.timedelta(days=date_offset)).strftime("%Y-%m-%d")
+                match_id = auto_detect_match_id(date_str, batting_team, bowling_team)
+                if match_id:
+                    break
+            else:
+                logger.warning("betx21 backfill: no matching match found", batting=batting_team, bowling=bowling_team)
+                return crex_history
+
+            scores_path = download_scores(match_id, date_str)
+            if not scores_path:
+                logger.warning("betx21 backfill: failed to download scores", match_id=match_id)
+                return crex_history
+
+            ticks = load_scores(scores_path)
+            bx_history = extract_ball_history(ticks, innings_num=innings_num)
+
+            if not bx_history:
+                logger.warning("betx21 backfill: extracted 0 balls", match_id=match_id)
+                return crex_history
+
+            # Only use betx21 data when it's actually richer than CREX
+            if len(bx_history) > len(crex_history):
+                logger.info(
+                    "betx21 backfill: using richer history",
+                    betx21_balls=len(bx_history),
+                    crex_balls=len(crex_history),
+                    match_id=match_id,
+                )
+                return bx_history
+
+        except Exception as exc:
+            logger.warning("betx21 backfill failed", error=str(exc))
+
+        return crex_history
+
     def _build_features(self) -> Optional[Dict[str, Any]]:
         """Build feature dictionary from match state for model input."""
         try:
