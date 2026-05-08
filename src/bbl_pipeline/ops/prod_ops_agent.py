@@ -89,6 +89,7 @@ _URL_LEAGUE_PATTERNS: list[tuple[str, str]] = [
 ]
 
 CREX_LIVE_MATCHES_URL = "https://crex.com/live-matches"
+BACKEND_LIVE_MATCHES_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8099") + "/cricket-data/live-matches"
 
 
 def _detect_league_from_url(url: str) -> str | None:
@@ -102,30 +103,88 @@ def _detect_league_from_url(url: str) -> str | None:
 
 def _match_id_from_url(url: str) -> str:
     """Derive a stable match_id from a CREX scoreboard URL."""
-    # e.g. .../rcb-vs-mi-match-45-indian-premier-league-2026/live -> rcb-vs-mi-match-45-...
     parts = [p for p in url.rstrip("/").split("/") if p]
-    for i, part in enumerate(reversed(parts)):
+    for part in reversed(parts):
         if re.search(r"[a-z]+-vs-[a-z]+", part, re.IGNORECASE):
             return part
-    # Fallback: use the last meaningful path segment
     for part in reversed(parts):
         if len(part) > 5 and part not in ("live", "info", "scorecard"):
             return part
     return parts[-1] if parts else "unknown"
 
 
+def _build_match_entries_from_urls(raw_urls: list[str]) -> list[dict[str, str]]:
+    """Convert a list of CREX URLs into auto-start match entries (known leagues only)."""
+    entries = []
+    for url in raw_urls:
+        if not url or "/scoreboard/" not in url:
+            continue
+        full_url = f"https://crex.com{url}" if not url.startswith("http") else url
+        league = _detect_league_from_url(full_url)
+        if league is None:
+            continue
+        entries.append({
+            "url": full_url,
+            "match_id": _match_id_from_url(full_url),
+            "league": league,
+            "record_states": "true",
+            "enabled": "true",
+        })
+    return entries
+
+
+def _query_backend_live_matches() -> list[dict[str, str]]:
+    """
+    Query the local backend API (populated by the CREX scraper) for live match URLs.
+    Also triggers the scraper's live-match discovery endpoint to ensure it is fresh.
+    Returns match entries for supported leagues. Fast — no browser needed.
+    """
+    try:
+        import requests as _req
+        scraper_base = os.environ.get("SCRAPER_URL", "http://127.0.0.1:5000")
+        # Ping the scraper to trigger / reuse its live-match discovery thread
+        try:
+            _req.get(f"{scraper_base}/scrape-live-matches-link", timeout=3)
+        except Exception:
+            pass  # scraper may not be running; continue anyway
+        resp = _req.get(BACKEND_LIVE_MATCHES_URL, timeout=5)
+        resp.raise_for_status()
+        data = resp.json()
+        raw_urls: list[str] = []
+        if isinstance(data, list):
+            for item in data:
+                if isinstance(item, str):
+                    raw_urls.append(item)
+                elif isinstance(item, dict):
+                    raw_urls.append(item.get("url") or item.get("matchUrl") or item.get("sourceUrl") or "")
+        return _build_match_entries_from_urls(raw_urls)
+    except Exception as exc:
+        print(f"[auto-start] Backend API unavailable ({BACKEND_LIVE_MATCHES_URL}): {exc}", flush=True)
+        return []
+
+
 async def _discover_crex_live_matches() -> list[dict[str, str]]:
     """
-    Fetch live match URLs from https://crex.com/live-matches using Playwright.
-    Returns list of dicts with keys: url, match_id, league (only supported leagues).
+    Discover live match URLs. Strategy:
+      1. Query local backend API at http://127.0.0.1:8099 (no browser, fast)
+      2. Fall back to scraping https://crex.com/live-matches with Playwright
+    Returns list of match entries with keys: url, match_id, league.
     """
+    # --- Strategy 1: local backend API ---
+    backend_entries = _query_backend_live_matches()
+    if backend_entries:
+        print(f"[auto-start] Backend API returned {len(backend_entries)} match(es).", flush=True)
+        return backend_entries
+
+    # --- Strategy 2: Playwright scrape ---
+    print("[auto-start] Backend API empty — trying Playwright scrape of crex.com/live-matches...", flush=True)
     try:
         from playwright.async_api import async_playwright
     except ImportError:
         print("[auto-start] WARNING: playwright not installed, CREX discovery unavailable.", flush=True)
         return []
 
-    results: list[dict[str, str]] = []
+    hrefs: list[str] = []
     try:
         async with async_playwright() as pw:
             browser = await pw.chromium.launch(headless=True)
@@ -135,15 +194,14 @@ async def _discover_crex_live_matches() -> list[dict[str, str]]:
                 try:
                     await page.wait_for_selector("li.live-card, div.live-card", timeout=15000)
                 except Exception:
-                    pass  # Page may have loaded without the selector becoming visible
+                    pass
                 hrefs = await page.evaluate("""() => {
                     const seen = new Set();
                     const out = [];
                     document.querySelectorAll('li.live-card a, div.live-card a').forEach(a => {
                         const h = a.getAttribute('href');
                         if (h && h.includes('/scoreboard/') && !seen.has(h)) {
-                            seen.add(h);
-                            out.push(h);
+                            seen.add(h); out.push(h);
                         }
                     });
                     return out;
@@ -151,23 +209,9 @@ async def _discover_crex_live_matches() -> list[dict[str, str]]:
             finally:
                 await browser.close()
     except Exception as exc:
-        print(f"[auto-start] WARNING: CREX discovery failed: {exc}", flush=True)
-        return []
+        print(f"[auto-start] WARNING: Playwright CREX scrape failed: {exc}", flush=True)
 
-    for href in hrefs:
-        url = f"https://crex.com{href}" if not href.startswith("http") else href
-        league = _detect_league_from_url(url)
-        if league is None:
-            continue  # skip unknown leagues
-        results.append({
-            "url": url,
-            "match_id": _match_id_from_url(url),
-            "league": league,
-            "record_states": "true",
-            "enabled": "true",
-        })
-
-    return results
+    return _build_match_entries_from_urls(hrefs)
 
 
 class LiveStateError(Exception):
