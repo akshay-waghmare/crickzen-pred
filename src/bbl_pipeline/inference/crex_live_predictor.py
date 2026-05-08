@@ -166,6 +166,11 @@ class CrexLivePredictor:
         self._first_prediction = True  # Debug flag for first prediction
         self._prediction_history = []  # Track predictions over time
         self.local_storage = {}  # CREX localStorage for resolving team/player codes
+        self._latest_page_title = ""
+        self._latest_page_text = ""
+        self.match_status = "initializing"
+        self.match_status_reason = "Initializing live match detector"
+        self.prediction_status_reason = "Waiting for first state snapshot"
         
         # Persist history to separate file for Streamlit page refresh resilience
         if output_json:
@@ -291,6 +296,89 @@ class CrexLivePredictor:
                 continue
             return team, runs, wickets, overs
         return None
+
+    def _has_live_score(self, title: str = "", page_text: str = "") -> bool:
+        """Return True when CREX is showing a live score block, including 0/0 (0.0)."""
+        title = title or getattr(self, "_latest_page_title", "")
+        page_text = page_text or getattr(self, "_latest_page_text", "")
+
+        title_has_score = bool(
+            re.search(r"\b\d+[/-]\d+\s+\(\d+(?:\.\d+)?\)", title or "", re.IGNORECASE)
+        )
+        body_has_score = self._extract_live_score_from_page_text(page_text) is not None
+        return title_has_score or body_has_score
+
+    def _detect_match_status(self, title: str, page_text: str) -> tuple[str, str]:
+        """Classify the current CREX page into a small set of operational match statuses."""
+        combined_text = " ".join(part for part in (title, page_text) if part)
+        normalized = re.sub(r"\s+", " ", combined_text).strip().lower()
+        has_live_score = self._has_live_score(title, page_text)
+
+        if not normalized:
+            return "unknown", "Waiting for CREX page text"
+
+        result_patterns = (
+            (r"\bwon by\b", "Result reported on CREX"),
+            (r"\b(?:match )?tied\b", "Match tied on CREX"),
+            (r"\bno result\b", "No-result reported on CREX"),
+            (r"\babandoned\b", "Match abandoned on CREX"),
+            (r"\bcancelled\b", "Match cancelled on CREX"),
+            (r"\bcalled off\b", "Match called off on CREX"),
+        )
+        for pattern, reason in result_patterns:
+            if re.search(pattern, normalized):
+                return "completed", reason
+
+        if self.match_state.is_second_innings and self.match_state.target and self._check_match_result() is not None:
+            return "completed", "Match result determined from chase state"
+
+        if re.search(
+            r"\b(?:rain delay|start delayed|match delayed|delayed due to|play interrupted|match interrupted|rain interrupted|interrupted due to|play suspended|play stopped|wet outfield|inspection|bad weather)\b",
+            normalized,
+        ):
+            if has_live_score:
+                return "interrupted", "Play interrupted after live scoring started"
+            return "delayed", "Match delayed before live play"
+
+        first_innings_complete = (
+            not self.match_state.is_second_innings
+            and (self.match_state.wickets >= 10 or self.match_state.overs >= float(self.format_config.total_overs))
+        )
+        if first_innings_complete or re.search(
+            r"\b(?:innings break|end of innings|innings completed|innings complete)\b",
+            normalized,
+        ):
+            return "innings_break", "Waiting for the next innings to start"
+
+        if has_live_score:
+            return "live", "Live score detected on CREX"
+
+        if self.match_state.toss_winner:
+            return "toss", "Toss complete; waiting for the first ball"
+
+        if re.search(r"\b(?:scheduled|starts? at|starting in|today,|tomorrow,)\b", normalized):
+            return "scheduled", "Match scheduled but not live yet"
+
+        return "scheduled", "Waiting for live score from CREX"
+
+    def _can_predict_current_state(self) -> tuple[bool, str]:
+        """Determine whether the current state is predictable yet."""
+        status = getattr(self, "match_status", "unknown")
+
+        if status in {"scheduled", "toss", "delayed", "interrupted", "innings_break", "unknown"}:
+            return False, self.match_status_reason
+
+        if not self.match_state.batting_team or not self.match_state.bowling_team:
+            return False, "Waiting for batting and bowling teams"
+
+        effective_overs = self._effective_total_overs or self.format_config.total_overs
+        if status == "completed":
+            return True, "Match result is final"
+        if effective_overs < 20 or self.mc_only:
+            return True, "Monte Carlo prediction available"
+        if not self.predictor:
+            return False, "Prediction model not loaded"
+        return True, "Live score is ready for prediction"
     
     def _init_match_state_logger(self):
         """Initialize match state logger if recording is enabled."""
@@ -1271,6 +1359,8 @@ class CrexLivePredictor:
             
             # Get page text to detect second innings and extract data
             page_text = await self.page.inner_text("body")
+            self._latest_page_title = title
+            self._latest_page_text = page_text
 
             # Fallback: CREX sometimes leaves the page title stale while the score block in body is current.
             body_score = self._extract_live_score_from_page_text(page_text)
@@ -1383,6 +1473,8 @@ class CrexLivePredictor:
                 self.match_state.current_run_rate = round(
                     self.match_state.total_runs / self.match_state.overs, 2
                 )
+
+            self.match_status, self.match_status_reason = self._detect_match_status(title, page_text)
             
             # Extract batsman data from DOM (fallback if title parsing didn't work)
             if not self.match_state.batsman1_name or self.match_state.batsman1_name == "Unknown":
@@ -1542,14 +1634,12 @@ class CrexLivePredictor:
         try:
             # Refresh match state from DOM
             await self._extract_match_info()
-            
-            # Run prediction if model is loaded or MC-only mode
-            effective_overs = self._effective_total_overs or self.format_config.total_overs
-            can_predict = self.model or self.mc_only or effective_overs < 20
+
+            can_predict, reason = self._can_predict_current_state()
+            self.prediction_status_reason = reason
             if can_predict:
-                win_prob = self._run_prediction()
-                return win_prob
-            
+                return self._run_prediction()
+
             return None
             
         except Exception as e:
@@ -2044,11 +2134,7 @@ class CrexLivePredictor:
             
             # Persist history to file for page refresh resilience
             self._save_history()
-            
-            # Write to JSON if output file specified
-            if self.output_json:
-                self._write_json_state(win_prob)
-            
+
             # Record ball state if logger is enabled
             if self.match_state_logger and self.predictor:
                 try:
@@ -2096,11 +2182,20 @@ class CrexLivePredictor:
                     )
                 except Exception as e:
                     pass  # Logging errors are already handled in logger
+        else:
+            status_label = getattr(self, "match_status", "unknown").replace("_", " ").upper()
+            display += f" | Status: {status_label}"
+            reason = getattr(self, "prediction_status_reason", "") or getattr(self, "match_status_reason", "")
+            if reason:
+                display += f" | {reason}"
+
+        if self.output_json:
+            self._write_json_state(win_prob)
         
         # Pad and print
         print(display.ljust(120), end="", flush=True)
     
-    def _write_json_state(self, win_prob: float):
+    def _write_json_state(self, win_prob: Optional[float]):
         """Write current state to JSON file for Streamlit."""
         try:
             state = self.match_state
@@ -2115,7 +2210,7 @@ class CrexLivePredictor:
             scraped_data = None
             ball_history = None
             features = {}
-            if self.predictor:
+            if self.predictor and win_prob is not None:
                 try:
                     from bbl_pipeline.inference.schema import MatchState as PredictorMatchState
 
@@ -2158,12 +2253,19 @@ class CrexLivePredictor:
                     }
                 except Exception:
                     pass
-            
+            bowling_prob = (1 - win_prob) if win_prob is not None else None
+            prediction_available = win_prob is not None
+
             output = {
                 "timestamp": datetime.now().isoformat(),
                 "match_url": self.match_url,
                 "model_dir": self.model_dir,
                 "feature_store_dir": self.feature_store_dir,
+                "match_status": getattr(self, "match_status", "unknown"),
+                "match_status_reason": getattr(self, "match_status_reason", ""),
+                "prediction_available": prediction_available,
+                "prediction_status_reason": None if prediction_available else getattr(self, "prediction_status_reason", ""),
+                "has_live_score": self._has_live_score(),
                 "batting_team": state.batting_team,
                 "bowling_team": state.bowling_team,
                 "score": state.total_runs,
@@ -2183,15 +2285,15 @@ class CrexLivePredictor:
                 "current_run_rate": state.current_run_rate,
                 "required_run_rate": state.required_run_rate,
                 "bat_win_prob": win_prob,
-                "bowl_win_prob": 1 - win_prob,
-                "raw_win_prob": getattr(self, 'last_raw_prob', win_prob),
-                "smoothed_win_prob": getattr(self, 'last_smoothed_prob', win_prob),
-                "calibrated_combined_prob": getattr(self, 'last_calibrated_combined', win_prob),
-                "calibrated_win_prob": getattr(self, 'last_calibrated_prob', win_prob),
-                "calibrated_phase_prob": getattr(self, 'last_calibrated_phase', win_prob),
-                "calibrated_per_over_prob": getattr(self, 'last_calibrated_per_over', win_prob),
+                "bowl_win_prob": bowling_prob,
+                "raw_win_prob": getattr(self, 'last_raw_prob', win_prob) if prediction_available else None,
+                "smoothed_win_prob": getattr(self, 'last_smoothed_prob', win_prob) if prediction_available else None,
+                "calibrated_combined_prob": getattr(self, 'last_calibrated_combined', win_prob) if prediction_available else None,
+                "calibrated_win_prob": getattr(self, 'last_calibrated_prob', win_prob) if prediction_available else None,
+                "calibrated_phase_prob": getattr(self, 'last_calibrated_phase', win_prob) if prediction_available else None,
+                "calibrated_per_over_prob": getattr(self, 'last_calibrated_per_over', win_prob) if prediction_available else None,
                 "league": self.league,  # League code if --league was specified
-                "league_calibrated_prob": win_prob if self.league else None,  # Final league-calibrated prob
+                "league_calibrated_prob": win_prob if (self.league and prediction_available) else None,  # Final league-calibrated prob
                 "features": features,
                 "history": self._prediction_history[-50:],  # Last 50 data points
                 # Market odds from CREX
@@ -2200,10 +2302,10 @@ class CrexLivePredictor:
                 "market_lay_odds": state.market_lay_odds,
                 "market_fav_prob": state.market_fav_prob,
                 # Monte Carlo simulation results (uses league-calibrated win_prob for betting edge)
-                "monte_carlo": self._run_monte_carlo_simulation(model_prob=win_prob, use_ml_model=self.use_ml_model),
+                "monte_carlo": self._run_monte_carlo_simulation(model_prob=win_prob, use_ml_model=self.use_ml_model) if prediction_available else None,
                 # Reduced-over / DLS / ODI fields
                 "total_overs": self._effective_total_overs or self.format_config.total_overs,
-                "revised_target": self._cli_revised_target,
+                "revised_target": getattr(self, "_cli_revised_target", None),
                 "format": self.format_config.format_name,
                 "par_score": self.format_config.par_score,
                 "mc_only": self.mc_only or (self._effective_total_overs or self.format_config.total_overs) < 20 or (self._effective_total_overs or self.format_config.total_overs) >= 40,
@@ -2225,6 +2327,10 @@ class CrexLivePredictor:
                         "match_url": self.match_url,
                         "model_dir": self.model_dir,
                         "feature_store_dir": self.feature_store_dir,
+                        "match_status": output["match_status"],
+                        "match_status_reason": output["match_status_reason"],
+                        "prediction_available": output["prediction_available"],
+                        "prediction_status_reason": output["prediction_status_reason"],
                         "state": {
                             "batting_team": state.batting_team,
                             "bowling_team": state.bowling_team,
@@ -2250,7 +2356,7 @@ class CrexLivePredictor:
                             "bowler1_wickets": state.bowler1_wickets,
                             "current_run_rate": state.current_run_rate,
                             "required_run_rate": state.required_run_rate,
-                            "last_ball_number": self.last_ball_number,
+                            "last_ball_number": getattr(self, "last_ball_number", ""),
                         },
                         "pred_state": asdict(pred_state) if pred_state else None,
                         "scraped_data": scraped_data,

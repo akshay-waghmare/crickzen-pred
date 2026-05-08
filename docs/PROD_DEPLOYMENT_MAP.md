@@ -7,14 +7,32 @@ This repo is the app and orchestration side of the production setup. The separat
 1. `app.crickzen.com` is fronted by Caddy.
 2. Default traffic is reverse-proxied to `crickzen-dashboard:8000`.
 3. `/telegram*` is reverse-proxied to host port `8502`.
-4. The dashboard/predictor layer writes live state JSON files into `data/dashboard_states/`.
-5. The Telegram signal runner watches `data/dashboard_states/` and posts lifecycle updates.
+4. **Auto-start watchdog** (`pm2: auto-predictor`) queries the backend API and spawns
+   `crex_live_predictor` automatically when a live match is detected.
+5. The predictor writes live state JSON files into `data/dashboard_states/`.
+6. The Streamlit dashboard picks the active state via `resolve_live_state_path`.
+7. The Telegram signal runner watches `data/dashboard_states/` and posts lifecycle updates.
+
+```
+CREX scraper (port 5000)  ──→  Backend API (port 8099)
+                                       │
+                              auto-start watchdog (PM2)
+                                       │ spawns
+                              crex_live_predictor
+                                       │ writes
+                              data/dashboard_states/<match>.json
+                                       │
+                     Streamlit dashboard ←  Telegram signal runner
+```
 
 Evidence in this repo:
 
-- [deploy/caddy/app.crickzen.com.telegram.caddy](/abs/path/C:/Users/ADMINS/Documents/projects/machine_learning_bbl_009-odi-mc-predictor-startupos-wt/deploy/caddy/app.crickzen.com.telegram.caddy)
-- [scripts/start_ipl_signal_runner.sh](/abs/path/C:/Users/ADMINS/Documents/projects/machine_learning_bbl_009-odi-mc-predictor-startupos-wt/scripts/start_ipl_signal_runner.sh)
-- [docs/TELEGRAM_SIGNAL_RUNNER_PROD.md](/abs/path/C:/Users/ADMINS/Documents/projects/machine_learning_bbl_009-odi-mc-predictor-startupos-wt/docs/TELEGRAM_SIGNAL_RUNNER_PROD.md)
+- [src/bbl_pipeline/ops/prod_ops_agent.py](../src/bbl_pipeline/ops/prod_ops_agent.py) — watchdog core
+- [scripts/start_auto_predictor.sh](../scripts/start_auto_predictor.sh) — PM2 startup script
+- [docs/AUTO_START_WATCHDOG.md](AUTO_START_WATCHDOG.md) — full watchdog guide
+- [deploy/caddy/app.crickzen.com.telegram.caddy](../deploy/caddy/app.crickzen.com.telegram.caddy)
+- [scripts/start_ipl_signal_runner.sh](../scripts/start_ipl_signal_runner.sh)
+- [docs/TELEGRAM_SIGNAL_RUNNER_PROD.md](TELEGRAM_SIGNAL_RUNNER_PROD.md)
 
 ## Repo responsibilities
 
@@ -49,6 +67,24 @@ Continuously watch for stale or completed current matches:
 ```bash
 python -m src.bbl_pipeline.ops.prod_ops_agent watch --source-dir data/dashboard_states --interval-seconds 30
 ```
+
+Run the auto-start watchdog (normally managed by PM2):
+
+```bash
+python -m src.bbl_pipeline.ops.prod_ops_agent auto-start \
+  --source-dir data/dashboard_states \
+  --interval-seconds 60 \
+  --auto-discover
+
+# Check status
+pm2 status
+pm2 logs auto-predictor --lines 30
+
+# Restart
+pm2 restart auto-predictor
+```
+
+See [docs/AUTO_START_WATCHDOG.md](AUTO_START_WATCHDOG.md) for the full runbook.
 
 ## What to confirm on the server
 

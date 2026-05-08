@@ -27,6 +27,8 @@ requires-python = ">=3.10"
 
 [project.scripts]
 bbl-pipeline = "bbl_pipeline.cli:main"
+bbl-telegram-signals = "bbl_pipeline.telegram.signal_runner:main"
+bbl-prod-ops = "bbl_pipeline.ops.prod_ops_agent:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

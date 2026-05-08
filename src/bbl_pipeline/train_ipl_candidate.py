@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from bbl_pipeline.inference.predictor import Predictor
+from bbl_pipeline.inference.schema import MatchState
 
 
 def _load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -64,6 +65,24 @@ def _write_predictions(path: Path, rows: list[dict[str, str]]) -> None:
     path.write_text(serialized, encoding="utf-8")
 
 
+def _build_match_state(row: dict[str, Any]) -> MatchState:
+    return MatchState(
+        match_id=str(row["match_id"]),
+        venue=str(row["venue"]),
+        batting_team=str(row["batting_team"]),
+        bowling_team=str(row["bowling_team"]),
+        innings=int(row["innings_num"]),
+        over=int(row["over_number"]),
+        ball=int(row["ball_number"]),
+        current_score=int(row["total_score"]),
+        wickets_lost=int(row["total_wickets"]),
+        batsman_1=str(row["batsman1_name"]),
+        batsman_2=str(row["batsman2_name"]),
+        bowler=str(row["bowler1_name"]),
+        target_runs=int(row["target_score"]) if row.get("target_score") is not None else None,
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="StartupOS bounded IPL candidate wrapper")
     parser.add_argument("--seed", type=int, required=True)
@@ -103,15 +122,8 @@ def main() -> int:
     predictor = Predictor.load(model_dir=model_dir, feature_store_dir=feature_store_dir, league=args.league)
 
     predictions: list[dict[str, str]] = []
-    expected_features = None
-    if hasattr(predictor.model, "feature_names_in_") and predictor.model.feature_names_in_ is not None:
-        expected_features = list(predictor.model.feature_names_in_)
-
     for row in rows:
-        features_df = predictor.feature_mapper.create_feature_dataframe(row)
-        if expected_features is not None:
-            features_df = predictor.feature_mapper.validate_features(features_df, expected_features)
-        probability = float(predictor.model.predict_proba(features_df)[0][1])
+        probability = float(predictor.predict(_build_match_state(row)))
         predictions.append(
             {
                 "case_id": str(row["case_id"]),

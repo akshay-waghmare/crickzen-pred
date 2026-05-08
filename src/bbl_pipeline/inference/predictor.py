@@ -21,12 +21,46 @@ logger = structlog.get_logger()
 
 class DummyFeatureStore:
     """Fallback feature store that returns empty dicts (uses global defaults)."""
+
+    DEFAULT_TEAM_STATS = {
+        "win_rate": 0.5,
+        "bat_first_wr": 0.5,
+        "bowl_first_wr": 0.5,
+        "matches": 0,
+    }
+    DEFAULT_VENUE_STATS = {
+        "venue_avg_score": 160.0,
+        "venue_avg_wickets": 6.0,
+        "venue_bat_first_win_rate": 0.5,
+    }
     
     def get_player_stats(self, player_name: str) -> Dict[str, Any]:
         return {}
     
     def get_venue_stats(self, venue: str) -> Dict[str, Any]:
+        return self.DEFAULT_VENUE_STATS.copy()
+
+    def get_team_stats(self, team_name: str) -> Dict[str, Any]:
+        return self.DEFAULT_TEAM_STATS.copy()
+
+    def get_player_venue_batting_stats(self, player_name: str, venue: str) -> Dict[str, Any]:
         return {}
+
+    def get_player_vs_team_batting_stats(self, player_name: str, opposition: str) -> Dict[str, Any]:
+        return {}
+
+    def get_player_venue_bowling_stats(self, player_name: str, venue: str) -> Dict[str, Any]:
+        return {}
+
+    def get_player_vs_team_bowling_stats(self, player_name: str, opposition: str) -> Dict[str, Any]:
+        return {}
+
+    def get_venue_over_par(self, venue: str, over_number: int) -> float:
+        """Compatibility fallback for older live mappers that request over-level venue par."""
+        over_number = max(0, int(over_number or 0))
+        total_overs = 20
+        venue_avg_score = self.DEFAULT_VENUE_STATS["venue_avg_score"]
+        return venue_avg_score * min(over_number, total_overs) / total_overs
     
     def load(self):
         pass

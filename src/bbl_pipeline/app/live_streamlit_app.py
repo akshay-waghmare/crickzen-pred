@@ -34,6 +34,11 @@ PROJECT_SRC = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_SRC) not in sys.path:
     sys.path.insert(0, str(PROJECT_SRC))
 
+from bbl_pipeline.app.live_state_discovery import (
+    AUTO_CURRENT_SOURCE_VALUE,
+    resolve_live_state_path,
+)
+
 # Page config
 st.set_page_config(
     page_title="T20 Live Predictor",
@@ -243,9 +248,11 @@ T20I_TEAM_NAMES = {
 }
 
 DEFAULT_JSON = os.environ.get("PREDICTOR_JSON", "data/live_state.json")
+DASHBOARD_STATES_DIR = Path(os.environ.get("DASHBOARD_STATES_DIR", "data/dashboard_states"))
 
 # Pre-configured JSON source options (displayed in dropdown)
 JSON_SOURCES = {
+    "Auto current match (dashboard_states)": AUTO_CURRENT_SOURCE_VALUE,
     "IPL ML+MC (ipl_live_ml.json)": "data/ipl_live_ml.json",
     "IPL MC-only (ipl_live_mc.json)": "data/ipl_live_mc.json",
     "PSL ML+MC (psl_live_ml.json)": "data/psl_live_ml.json",
@@ -816,8 +823,10 @@ def _history_path_for_json(json_path: str) -> Path:
     return path.with_name(f"{path.stem}_history.json")
 
 
-def load_state(json_path: str) -> dict:
+def load_state(json_path: str | None) -> dict | None:
     """Load state from JSON file."""
+    if not json_path:
+        return None
     try:
         with open(json_path, 'r') as f:
             state = json.load(f)
@@ -1137,20 +1146,25 @@ def main():
                                      help="Select the live state JSON source")
         selected = JSON_SOURCES[source_label]
         if selected == "__custom__":
-            json_path = st.text_input("Custom JSON path", value=DEFAULT_JSON)
+            raw_json_path = st.text_input("Custom JSON path", value=DEFAULT_JSON)
         else:
-            json_path = selected
+            raw_json_path = selected
     with col2:
         refresh = st.button("🔄 Refresh")
     with col3:
         auto = st.checkbox("🔁 Auto (3s)", value=True, help="Auto-refresh every 3 seconds")
+
+    json_path, source_note = resolve_live_state_path(raw_json_path, source_dir=DASHBOARD_STATES_DIR)
+    if source_note:
+        st.caption(source_note)
     
     # Load state
     state = load_state(json_path)
     
     if state is None:
+        missing_source = json_path or str(DASHBOARD_STATES_DIR)
         st.warning(f"""
-        ⚠️ No live data found at `{json_path}`
+        ⚠️ No live data found at `{missing_source}`
         
         **Start the backend predictor first (choose your league):**
         
@@ -1179,6 +1193,11 @@ def main():
     
     global _league_context
     _league_context = infer_league_context(state)
+    match_status = state.get("match_status", "live")
+    match_status_reason = state.get("match_status_reason", "")
+    prediction_available = state.get("prediction_available")
+    if prediction_available is None:
+        prediction_available = state.get("bat_win_prob") is not None and state.get("bowl_win_prob") is not None
 
     # Parse timestamp
     try:
@@ -1195,7 +1214,16 @@ def main():
     c1, c2, c3 = st.columns([1, 2, 1])
     with c2:
         badge_class = "stale-badge" if is_stale else "live-badge"
-        badge_text = "⏸️ STALE" if is_stale else "🔴 LIVE"
+        status_badges = {
+            "live": "🔴 LIVE",
+            "interrupted": "⏸️ INTERRUPTED",
+            "innings_break": "☕ INNINGS BREAK",
+            "delayed": "🌧️ DELAYED",
+            "toss": "🪙 TOSS DONE",
+            "scheduled": "⏳ NOT STARTED",
+            "completed": "✅ RESULT",
+        }
+        badge_text = "⏸️ STALE" if is_stale else status_badges.get(match_status, f"ℹ️ {match_status.replace('_', ' ').upper()}")
         st.markdown(
             f'<div style="text-align:center;">'
             f'<span class="{badge_class}">{badge_text}</span> '
@@ -1203,9 +1231,12 @@ def main():
             f'📍 {state.get("venue", "Unknown")}</div>',
             unsafe_allow_html=True
         )
+        if match_status_reason:
+            st.caption(match_status_reason)
     
     # Score cards
     d = state
+    side_panel_text = match_status_reason or "1st Innings in progress"
     st.markdown("---")
     col1, col2, col3 = st.columns([2, 1, 2])
     
@@ -1247,9 +1278,19 @@ def main():
                 padding: 20px; border-radius: 15px; color: white; text-align: center;">
                 <div class="team-name">{get_name(d["bowling_team"])}</div>
                 <div class="score-display">Yet to bat</div>
-                <div style="margin-top: 30px;">1st Innings in progress</div>
+                <div style="margin-top: 30px;">{side_panel_text}</div>
             </div>
             ''', unsafe_allow_html=True)
+
+    if not prediction_available:
+        st.markdown("---")
+        st.subheader("🎯 Win Probability & Odds")
+        reason = d.get("prediction_status_reason") or match_status_reason or "Waiting for a predictable live state."
+        st.info(reason)
+        if auto:
+            time.sleep(3)
+            st.rerun()
+        return
     
     # Win probability gauges with odds
     st.markdown("---")
