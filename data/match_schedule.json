@@ -1,0 +1,12 @@
+{
+  "schedule": [
+    {
+      "match_id": "ipl_2026_m45_example",
+      "url": "https://crex.com/scoreboard/XYZ/123/match-name/live",
+      "league": "ipl",
+      "start_time": "2026-05-09T14:00:00Z",
+      "record_states": true,
+      "enabled": false
+    }
+  ]
+}
