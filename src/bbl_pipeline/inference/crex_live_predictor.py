@@ -232,6 +232,7 @@ class CrexLivePredictor:
         self.local_storage = {}  # CREX localStorage for resolving team/player codes
         self._poll_count = 0  # Used to trigger periodic localStorage refresh
         self._inn1_cached_stats = {}  # Cache inn1 stats (PP runs, death RR, wickets) at innings break
+        self._venue_pitch_baselines = None  # Loaded lazily from v14 router artifacts
         
         # Persist history to separate file for Streamlit page refresh resilience
         if output_json:
@@ -627,7 +628,7 @@ class CrexLivePredictor:
                 inn1_dir = routing_cfg.get("inn1_model_dir", self.model_dir)
                 # Paths in routing_config.json are project-root-relative (same cwd as the process)
                 inn1_dir_resolved = Path(inn1_dir)
-                print(f"[INFO] ipl_v11 routing: loading inn1 model from {inn1_dir_resolved}")
+                print(f"[INFO] IPL innings router: loading inn1 model from {inn1_dir_resolved}")
                 self.predictor = Predictor.load(
                     inn1_dir_resolved, self.feature_store_dir, league=self.league
                 )
@@ -2440,11 +2441,16 @@ class CrexLivePredictor:
                 
                 pp_runs = sum(b.runs for b in inn1_balls if b.over_number < 6)
                 result['inn1_pp_runs'] = float(pp_runs)
-                
-                death_balls = [b for b in inn1_balls if b.over_number >= 16]
+                result['inn1_pp_wickets'] = sum(
+                    1 for b in inn1_balls if b.over_number < 6 and b.is_wicket
+                )
+
+                death_balls = [b for b in inn1_balls if b.over_number >= 15]
                 if death_balls:
                     death_runs = sum(b.runs for b in death_balls)
                     result['inn1_death_rr'] = (death_runs / len(death_balls)) * 6
+                    result['inn1_death_wickets'] = sum(1 for b in death_balls if b.is_wicket)
+                result.update(self._compute_v14_pitch_features(inn1_balls, result))
                 
                 # Update cache with computed values
                 self._inn1_cached_stats.update(result)
@@ -2480,11 +2486,85 @@ class CrexLivePredictor:
         pp_runs = sum(b.runs for b in balls if b.over_number < 6)
         if any(b.over_number < 6 for b in balls):
             self._inn1_cached_stats['inn1_pp_runs'] = float(pp_runs)
-        
-        death_balls = [b for b in balls if b.over_number >= 16]
+            self._inn1_cached_stats['inn1_pp_wickets'] = sum(
+                1 for b in balls if b.over_number < 6 and b.is_wicket
+            )
+
+        death_balls = [b for b in balls if b.over_number >= 15]
         if death_balls:
             death_runs = sum(b.runs for b in death_balls)
             self._inn1_cached_stats['inn1_death_rr'] = (death_runs / len(death_balls)) * 6
+            self._inn1_cached_stats['inn1_death_wickets'] = sum(1 for b in death_balls if b.is_wicket)
+        self._inn1_cached_stats.update(
+            self._compute_v14_pitch_features(balls, self._inn1_cached_stats)
+        )
+
+    def _venue_pitch_key(self) -> str:
+        venue = self.match_state.venue
+        if not venue or str(venue).strip().lower() in {"unknown", "not available"}:
+            venue = self.venue_override or ""
+        return venue.split(",")[0].strip() if venue else "Unknown"
+
+    def _load_venue_pitch_baselines(self) -> dict:
+        if self._venue_pitch_baselines is not None:
+            return self._venue_pitch_baselines
+        self._venue_pitch_baselines = {}
+        try:
+            path = Path(self.model_dir) / "venue_pitch_baselines.json"
+            if path.exists():
+                with open(path, encoding="utf-8") as f:
+                    self._venue_pitch_baselines = json.load(f)
+        except Exception as exc:
+            logger.debug(f"Could not load venue pitch baselines: {exc}")
+            self._venue_pitch_baselines = {}
+        return self._venue_pitch_baselines
+
+    @staticmethod
+    def _average_boundary_pct_last_18(balls: list[BallData]) -> Optional[float]:
+        if not balls:
+            return None
+        vals = []
+        for idx in range(len(balls)):
+            window = balls[max(0, idx - 17): idx + 1]
+            vals.append(sum(1 for b in window if b.is_boundary) / len(window))
+        return float(sum(vals) / len(vals)) if vals else None
+
+    def _compute_v14_pitch_features(self, inn1_balls: list[BallData], stats: dict) -> dict:
+        """Compute v14 live pitch-relative features from inn1 carryover data."""
+        baselines = self._load_venue_pitch_baselines()
+        global_base = baselines.get("global", {}) if isinstance(baselines, dict) else {}
+        venue_base = {}
+        if isinstance(baselines, dict):
+            venue_base = baselines.get("venues", {}).get(self._venue_pitch_key(), {})
+
+        def base(name: str, default: float) -> float:
+            value = venue_base.get(name, global_base.get(name, default))
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        out = {}
+        if "inn1_pp_runs" in stats:
+            out["pp_score_vs_venue"] = float(stats["inn1_pp_runs"]) - base("venue_pp_avg", 45.0)
+        if "inn1_pp_wickets" in stats:
+            out["pp_wkts_vs_venue"] = float(stats["inn1_pp_wickets"]) - base("venue_pp_wickets_avg", 1.3)
+        if "inn1_death_rr" in stats:
+            out["death_rr_vs_venue"] = float(stats["inn1_death_rr"]) - base("venue_death_rr_avg", 10.0)
+        if "inn1_death_wickets" in stats:
+            out["death_wkts_vs_venue"] = float(stats["inn1_death_wickets"]) - base("venue_death_wickets_avg", 2.5)
+
+        if inn1_balls:
+            avg_boundary18 = self._average_boundary_pct_last_18(inn1_balls)
+            mid_balls = [b for b in inn1_balls if 6 <= b.over_number <= 14]
+            mid_avg_boundary18 = self._average_boundary_pct_last_18(mid_balls)
+            if avg_boundary18 is not None:
+                out["avg_boundary18_vs_venue"] = avg_boundary18 - base("venue_avg_boundary18", 0.18)
+            if mid_avg_boundary18 is not None:
+                out["mid_avg_boundary18_vs_venue"] = (
+                    mid_avg_boundary18 - base("venue_mid_avg_boundary18", 0.18)
+                )
+        return out
 
     def _fetch_inn1_stats_from_betx21(self) -> dict:
         """Fallback: fetch inn1 stats from betx21 production score recordings.
@@ -2540,6 +2620,11 @@ class CrexLivePredictor:
                     result["inn1_death_rr"] = float(stats["inn1_death_rr"])
                 if "inn1_wickets_lost" in stats:
                     result["inn1_wickets_lost"] = int(stats["inn1_wickets_lost"])
+                if "inn1_pp_wickets" in stats:
+                    result["inn1_pp_wickets"] = int(stats["inn1_pp_wickets"])
+                if "inn1_death_wickets" in stats:
+                    result["inn1_death_wickets"] = int(stats["inn1_death_wickets"])
+                result.update(self._compute_v14_pitch_features([], result))
                 return result
             
             return {}

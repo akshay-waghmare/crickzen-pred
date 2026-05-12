@@ -1,0 +1,23 @@
+{
+  "type": "inn2_phase_router",
+  "description": "ipl_v14_pitch_features production router: v12 + phase-specific first-innings pitch/venue-relative features.",
+  "inn1_model_dir": "models/ipl_v7",
+  "inn2_phase_model_dir": "models/ipl_v14_pitch_features",
+  "inn2_changes_vs_v12": {
+    "pp": [
+      "pp_score_vs_venue",
+      "pp_wkts_vs_venue",
+      "death_rr_vs_venue",
+      "death_wkts_vs_venue"
+    ],
+    "mid": [
+      "pp_wkts_vs_venue"
+    ],
+    "death": [
+      "inn1_pp_wickets",
+      "mid_avg_boundary18_vs_venue",
+      "avg_boundary18_vs_venue"
+    ]
+  },
+  "routing_brier_oof": null
+}

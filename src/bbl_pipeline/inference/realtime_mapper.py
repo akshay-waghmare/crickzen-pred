@@ -286,7 +286,10 @@ class RealTimeFeatureMapper:
 
         # Venue-over par: expected cumulative score at end of this over at this venue
         over_number_int = max(1, int(over) + 1)  # over_number is 0-indexed in scraper
-        venue_over_par = self.feature_store.get_venue_over_par(venue, over_number_int)
+        if hasattr(self.feature_store, 'get_venue_over_par'):
+            venue_over_par = self.feature_store.get_venue_over_par(venue, over_number_int)
+        else:
+            venue_over_par = venue_stats.get('venue_avg_score', self.format_config.par_score)
         score_vs_venue_over_par = (current_score - venue_over_par) if innings == 1 else 0.0
         
         # Get with fallbacks
@@ -323,6 +326,18 @@ class RealTimeFeatureMapper:
              bowling_team_bat_first_wr = bowling_stats.get('bat_first_wr', 0.5)
              bowling_team_bowl_first_wr = bowling_stats.get('bowl_first_wr', 0.5)
              team_strength_diff = batting_team_win_rate - bowling_team_win_rate
+
+             # Fallback: venue not found → use avg of both teams' avg_score as venue_avg_score
+             if not venue_stats.get('_venue_found', True):
+                 bat_avg = batting_stats.get('avg_score')
+                 bowl_avg = bowling_stats.get('avg_score')
+                 team_avgs = [s for s in [bat_avg, bowl_avg] if s is not None]
+                 if team_avgs:
+                     venue_avg_score = sum(team_avgs) / len(team_avgs)
+                     logger.info(
+                         f"Venue '{venue}' not found — using team avg scores as venue_avg_score: "
+                         f"{batting_team}={bat_avg}, {bowling_team}={bowl_avg} → {venue_avg_score:.1f}"
+                     )
         else:
              logger.warning("Feature store does not have get_team_stats method")
 
@@ -509,10 +524,26 @@ class RealTimeFeatureMapper:
             
             inn1_death_rr = scraped_data.get('inn1_death_rr')
             inn1_death_rr = float(inn1_death_rr) if inn1_death_rr is not None else 9.0
+
+            inn1_pp_wickets = scraped_data.get('inn1_pp_wickets')
+            inn1_pp_wickets = float(inn1_pp_wickets) if inn1_pp_wickets is not None else 1.3
+            pp_score_vs_venue = float(scraped_data.get('pp_score_vs_venue') or 0.0)
+            pp_wkts_vs_venue = float(scraped_data.get('pp_wkts_vs_venue') or 0.0)
+            death_rr_vs_venue = float(scraped_data.get('death_rr_vs_venue') or 0.0)
+            death_wkts_vs_venue = float(scraped_data.get('death_wkts_vs_venue') or 0.0)
+            avg_boundary18_vs_venue = float(scraped_data.get('avg_boundary18_vs_venue') or 0.0)
+            mid_avg_boundary18_vs_venue = float(scraped_data.get('mid_avg_boundary18_vs_venue') or 0.0)
         else:
             inn1_wickets_lost = 5.0   # Default for inn1 (matches training)
             inn1_pp_runs = 45.0
             inn1_death_rr = 9.0
+            inn1_pp_wickets = 1.3
+            pp_score_vs_venue = 0.0
+            pp_wkts_vs_venue = 0.0
+            death_rr_vs_venue = 0.0
+            death_wkts_vs_venue = 0.0
+            avg_boundary18_vs_venue = 0.0
+            mid_avg_boundary18_vs_venue = 0.0
         
         # inn1_defendability: resource_win_prob at end of inn1
         if innings == 2 and first_innings_score is not None:
@@ -602,6 +633,13 @@ class RealTimeFeatureMapper:
             'inn1_wickets_lost': inn1_wickets_lost,
             'inn1_pp_runs': inn1_pp_runs,
             'inn1_death_rr': inn1_death_rr,
+            'inn1_pp_wickets': inn1_pp_wickets,
+            'pp_score_vs_venue': pp_score_vs_venue,
+            'pp_wkts_vs_venue': pp_wkts_vs_venue,
+            'death_rr_vs_venue': death_rr_vs_venue,
+            'death_wkts_vs_venue': death_wkts_vs_venue,
+            'avg_boundary18_vs_venue': avg_boundary18_vs_venue,
+            'mid_avg_boundary18_vs_venue': mid_avg_boundary18_vs_venue,
             'inn1_defendability': inn1_defendability,
             # Venue-over par (v8+)
             'score_vs_venue_over_par': score_vs_venue_over_par,

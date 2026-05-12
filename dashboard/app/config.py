@@ -69,7 +69,7 @@ class Settings(BaseSettings):
 LEAGUE_CONFIGS: dict[str, dict] = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v11",
+        "model_dir": "models/ipl_v14_pitch_features",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "series_url": "https://crex.com/series/indian-premier-league-2026-1PW",
     },

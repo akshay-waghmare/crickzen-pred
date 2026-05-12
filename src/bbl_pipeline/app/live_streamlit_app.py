@@ -471,7 +471,7 @@ PREDICTOR_CONFIGS = {
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",
         "mc_only": False,
-        "model_dir": "models/ipl_v11",
+        "model_dir": "models/ipl_v14_pitch_features",
         "odm_model_dir": "models/odm_v1",
         "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v9",
@@ -481,7 +481,7 @@ PREDICTOR_CONFIGS = {
     "IPL MC-only": {
         "output_json": "data/ipl_live_mc.json",
         "mc_only": True,
-        "model_dir": "models/ipl_v11",
+        "model_dir": "models/ipl_v14_pitch_features",
         "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "league": "ipl",
@@ -1759,6 +1759,26 @@ def main():
                 <span style="font-size: 0.9em; color: #666;">{seg_label}</span>
             </div>
             ''', unsafe_allow_html=True)
+
+    # Model routing note — shows which cards use the IPL v14 router vs v7 inn1 base
+    _is_inn2 = d.get("is_second_innings", False)
+    _router_active = (
+        _is_inn2
+        and per_over_prob is not None
+        and combined_prob is not None
+        and abs(per_over_prob - combined_prob) > 0.005
+    )
+    if _router_active:
+        st.caption(
+            "🟢 **ipl_v14 router active (Inn2)** — "
+            "Inn×Phase · IPL · Shadow T use **ipl_v14_pitch_features** phase models. "
+            "⚠️ Raw · Smoothed · Combined · Inn-Specific still reflect **ipl_v7** (no inn2 equivalent calibrators)."
+        )
+    else:
+        _inn_label = "Inn2" if _is_inn2 else "Inn1"
+        st.caption(
+            f"ℹ️ All cards use **ipl_v7** ({_inn_label} base model) — ipl_v14 router activates in Inn2 when per-over calibration diverges."
+        )
 
     terminal_clamp = d.get("terminal_clamp") if isinstance(d.get("terminal_clamp"), dict) else None
     if terminal_clamp:

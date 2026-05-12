@@ -196,7 +196,9 @@ def extract_inn1_stats(lines: list[dict]) -> dict:
 
     Returns dict with:
         - inn1_pp_runs: runs scored in overs 0-6
+        - inn1_pp_wickets: wickets lost in overs 0-6
         - inn1_death_rr: run rate in overs 16-20
+        - inn1_death_wickets: wickets lost in overs 16-20
         - inn1_wickets_lost: total wickets lost in inn1
         - inn1_total: total runs scored
         - batting_first: which team batted first
@@ -244,11 +246,13 @@ def extract_inn1_stats(lines: list[dict]) -> dict:
 
     if pp_score:
         result["inn1_pp_runs"] = pp_score[0]
+        result["inn1_pp_wickets"] = pp_score[1]
         result["pp_over"] = pp_score[2]
     if death_start and final:
         death_overs = final[2] - death_start[2]
         death_runs = final[0] - death_start[0]
         result["inn1_death_rr"] = round(death_runs / death_overs, 2) if death_overs > 0 else 0.0
+        result["inn1_death_wickets"] = final[1] - death_start[1]
         result["death_runs"] = death_runs
         result["death_overs"] = round(death_overs, 1)
     if final:

@@ -12,6 +12,14 @@ Our latest champion model achieves state-of-the-art performance:
 - **Calibrators:** 38 per-over + 6 phase-specific isotonic calibrators
 - [Read the full documentation](docs/BBL_V12_MODEL.md) - Includes detailed OOF calibration analysis.
 
+## Active IPL Production Model: v14 Pitch Features
+
+IPL live production uses `models/ipl_v14_pitch_features` as the active innings-2 router. Innings 1 still uses the stable `models/ipl_v7` base model; innings 2 uses v14 PP/MID/DEATH phase models with first-innings venue-relative pitch features.
+
+v14 keeps the resource calculator unchanged. Resource features such as `resource_win_prob`, `score_vs_par`, `dls_pressure_index`, and `resources_remaining` are still generated normally, then the ML router learns how to adjust them using pitch context like PP score/wickets versus venue, death RR/wickets versus venue, and first-innings boundary-freedom signals.
+
+Production pointers are in `models/model_registry.json`, `scripts/launcher.py`, `dashboard/app/config.py`, and `src/bbl_pipeline/app/live_streamlit_app.py`. See [docs/IPL_V14_PITCH_FEATURES.md](docs/IPL_V14_PITCH_FEATURES.md) for the feature list, artifacts, OOS results, and this-stage change log.
+
 ## Features
 
 ### Data Pipeline

@@ -807,42 +807,56 @@
       }
     },
     "IPL": {
-      "path": "models/ipl_v11",
-      "version": "v11+v12",
-      "description": "Hybrid routing: ipl_v7 global model for inn1 (Brier 0.18099), v12 phase-specific models for inn2 (PP/Mid/Death). PP +5 easy-chase features (60 total). MID Platt calibration (10 per-over Platt + phase Platt). OOS 2025/26 champion: MID v12 -3.69% vs v11 (0.06114 vs 0.06348).",
+      "path": "models/ipl_v14_pitch_features",
+      "version": "v14_pitch_features",
+      "description": "Active IPL production model. Hybrid routing: ipl_v7 global model for inn1, v14 pitch-feature phase router for inn2. Keeps resource calculator unchanged; retrained ML phase models combine resource features with first-innings venue-relative pitch signals: PP score/wickets, death RR/wickets, and death-phase boundary-freedom features.",
       "training": {
-        "date": "2026-05-07",
-        "architecture": "ipl_v11_routing",
+        "date": "2026-05-13",
+        "architecture": "ipl_v14_pitch_router",
         "inn1_model": "models/ipl_v7",
-        "inn2_model": "models/ipl_v12",
-        "inn2_v11_brier_oof_cal": 0.13545,
-        "inn2_v12_brier_oof_cal": 0.13665,
-        "v7_inn2_brier_oof": 0.14054,
-        "routing_gain_vs_v7_pct": -3.3,
-        "inn2_v12_phase_brier_oof_cal": {
+        "inn2_model": "models/ipl_v14_pitch_features",
+        "resource_calculator_usage": "Unchanged. v14 uses resource_win_prob and related resource/scoreboard columns as ML inputs, then adds first-innings pitch context as separate ML features.",
+        "stage_summary": "Selective v15 death boundary features were merged into v14; separate v15 artifacts were removed; production configs and live feature wiring now point to v14.",
+        "phase_added_features": {
+          "pp": [
+            "pp_score_vs_venue",
+            "pp_wkts_vs_venue",
+            "death_rr_vs_venue",
+            "death_wkts_vs_venue"
+          ],
+          "mid": [
+            "pp_wkts_vs_venue"
+          ],
+          "death": [
+            "inn1_pp_wickets",
+            "mid_avg_boundary18_vs_venue",
+            "avg_boundary18_vs_venue"
+          ]
+        },
+        "inn2_v14_brier_oof_cal": {
           "pp": 0.17040,
-          "mid": 0.13313,
-          "death": 0.07708
+          "mid": 0.13327,
+          "death": 0.07790
         },
-        "inn2_v12_phase_logloss_oof_cal": {
-          "pp": 0.50801,
-          "mid": 0.40633,
-          "death": 0.24504
-        },
-        "inn2_v12_champion_oos_2025_2026": {
-          "pp_brier": 0.08455,
-          "mid_brier": 0.06114,
-          "death_brier": 0.04000,
-          "mid_vs_v11_pct": -3.69,
-          "note": "Champion models trained on all data including test seasons — relative gap valid, absolute values in-sample"
-        },
-        "inn2_v11_phase_brier_oof_cal": {
-          "pp": 0.17043,
-          "mid": 0.13067,
-          "death": 0.07708
+        "oos_2025_2026_vs_v12": {
+          "pp_brier_cal": 0.14382,
+          "mid_brier_cal": 0.10370,
+          "death_brier_cal": 0.06493,
+          "overall_brier_cal": 0.11175,
+          "overall_vs_v12_pct": -1.24
         }
       },
-      "routing_config": "models/ipl_v11/routing_config.json",
+      "routing_config": "models/ipl_v14_pitch_features/routing_config.json",
+      "artifacts": {
+        "phase_features": "models/ipl_v14_pitch_features/phase_features.json",
+        "phase_oof_calibrators": "models/ipl_v14_pitch_features/phase_oof_calibrators.pkl",
+        "venue_pitch_baselines": "models/ipl_v14_pitch_features/venue_pitch_baselines.json",
+        "oos_comparison": "models/ipl_v14_pitch_features/oos_comparison.csv",
+        "oof_results": "models/ipl_v14_pitch_features/oof_results.csv",
+        "pitch_partnership_eda_correlations": "models/ipl_v14_pitch_features/pitch_partnership_eda_correlations.csv",
+        "pitch_partnership_eda_groups": "models/ipl_v14_pitch_features/pitch_partnership_eda_groups.csv"
+      },
+      "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
       "feature_store": {
         "path": "data/ipl_feature_store_v9",
         "version": "v9",
@@ -868,14 +882,22 @@
       }
     },
     "ipl": {
-      "version": "v7",
-      "model_dir": "models/ipl_v7",
-      "champion_model": "models/ipl_v7/champion_model.joblib",
-      "oof_calibrators": "models/ipl_v7/oof_calibrators.pkl",
+      "version": "v14_pitch_features",
+      "model_dir": "models/ipl_v14_pitch_features",
+      "champion_model": "models/ipl_v14_pitch_features/champion_model_pp.joblib",
+      "phase_models": {
+        "pp": "models/ipl_v14_pitch_features/champion_model_pp.joblib",
+        "mid": "models/ipl_v14_pitch_features/champion_model_mid.joblib",
+        "death": "models/ipl_v14_pitch_features/champion_model_death.joblib"
+      },
+      "oof_calibrators": "models/ipl_v14_pitch_features/phase_oof_calibrators.pkl",
+      "routing_config": "models/ipl_v14_pitch_features/routing_config.json",
+      "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
+      "resource_calculator_usage": "Unchanged; v14 pitch features are separate ML router inputs.",
       "inn2_isotonic_calibrator": "models/ipl_v7/inn2_isotonic_calibrator.pkl",
       "training_data": "data/ipl_features_latest/training.parquet",
-      "oof_brier": 0.1817,
-      "updated": "2026-05-02"
+      "oof_brier": 0.13327,
+      "updated": "2026-05-13"
     }
   },
   "archived_models": {
