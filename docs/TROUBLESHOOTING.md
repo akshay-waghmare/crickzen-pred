@@ -201,4 +201,98 @@ When adding support for a new league (e.g., BPL, NPL):
 
 ---
 
-*Last updated: December 28, 2025*
+## 7. Dashboard: Zombie Predictors Blocking New Matches
+
+**Date:** 2026-05-16 | **Severity:** P1 — no live predictions served  
+**Fixed in:** `dashboard/app/prediction_manager.py` commit `7852b8f`
+
+### Symptoms
+
+- `prediction.crickzen.com` shows today's match as "Awaiting model" or only shows old completed matches
+- Dashboard container logs repeat: `Auto-start failed for <today's URL>: You can only run 2 matches at a time`
+- `ps aux` on prod shows predictor processes with very high CPU (`40–45%`) running since days ago
+- Public API `/api/public/matches` returns `score: "0/0"` for matches that were played days ago
+
+### Root Cause
+
+When a match ends, Crex's live score page transitions to a completed-match layout. The predictor process scrapes
+the page but can no longer extract live ball data, so it writes `score=0, overs=0.0` to the state JSON
+every ~5 seconds indefinitely.
+
+The staleness check (`is_stale_running`) used file modification time (mtime) to decide if a prediction was
+stuck. Because the zombie process kept writing fresh mtime stamps, the check **never fired**. Both 2-match
+user slots were permanently consumed, and the auto-scheduler could not start today's match.
+
+```
+Match 58 MI vs PBKS  (played May 14) → PID 1548969 → writing score=0/overs=0 for 2+ days
+Match 59 CSK vs LSG  (played May 15) → PID 2070055 → writing score=0/overs=0 for 1+ day
+↳ both counted as "running" by PredictionManager
+↳ auto-scheduler tried to start Match 60 KKR vs GT → "You can only run 2 matches at a time"
+```
+
+### Immediate Fix (emergency recovery)
+
+1. Find the container-internal PIDs of the zombie predictors:
+
+```bash
+docker exec crickzen-dashboard sh -c "grep -rl crex_live /proc/*/cmdline 2>/dev/null"
+# e.g. returns /proc/141755/cmdline  /proc/909/cmdline
+```
+
+2. Kill them via Python inside the container (no `kill` binary in slim image):
+
+```bash
+docker exec crickzen-dashboard python3 -c \
+  "import os,signal; os.kill(141755, signal.SIGKILL); os.kill(909, signal.SIGKILL); print('Killed')"
+```
+
+3. The auto-scheduler detects the freed slots within 60 s and auto-starts today's match. Verify:
+
+```bash
+curl -s http://127.0.0.1:8000/api/public/matches | python3 -m json.tool
+# should show today's match as "running" with a real score
+```
+
+### Permanent Fix
+
+Added a **"stuck at zero score"** detector to `is_stale_running()` in
+`dashboard/app/prediction_manager.py`:
+
+```python
+# If prediction has been running for >max(30, STALE_RUNNING_MATCH_MINUTES*3) minutes
+# and score is still 0/0, Crex is no longer serving live data for this match.
+zero_stuck_cutoff = timedelta(minutes=max(30, settings.STALE_RUNNING_MATCH_MINUTES * 3))
+if now - self.created_at > zero_stuck_cutoff:
+    state = self.read_state()
+    if state is not None and _safe_int(state.get("score")) == 0 and _safe_float(state.get("overs")) == 0.0:
+        logger.warning("Prediction %s stuck at 0/0 — marking stale", self.id)
+        return True
+```
+
+With `STALE_RUNNING_MATCH_MINUTES=10` this triggers after **30 minutes** of zero-score output,
+giving legitimate pre-match or delayed-start predictors enough warm-up time.
+
+After applying the fix, rebuild and restart the container:
+
+```bash
+cd /home/administrator/projects/machine_learning_bbl
+docker build -t crickzen-dashboard:latest -f dashboard/Dockerfile dashboard/
+docker stop crickzen-dashboard && docker rm crickzen-dashboard
+docker run -d --name crickzen-dashboard --restart unless-stopped \
+  -p 127.0.0.1:8000:8000 \
+  -v /home/administrator/projects/machine_learning_bbl/data:/app/data:rw \
+  -v /home/administrator/projects/machine_learning_bbl/src:/app/src:ro \
+  -v /home/administrator/projects/machine_learning_bbl/models:/app/models:ro \
+  --env-file /home/administrator/projects/machine_learning_bbl/dashboard/.env \
+  crickzen-dashboard:latest
+```
+
+### Why `kill` fails with "Operation not permitted"
+
+Zombie predictor processes run as `root` inside the Docker container. SSH sessions run as `administrator`
+(non-root), so `kill <PID>` from the SSH shell is rejected. Use `docker exec` with Python as shown above.
+The container has no `kill` binary in `$PATH` (slim image), so `os.kill()` via Python is the workaround.
+
+---
+
+*Last updated: 2026-05-16*
