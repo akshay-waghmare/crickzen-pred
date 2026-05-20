@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     DOMAIN: str = "localhost"
     ADMIN_EMAIL: str = "admin@example.com"
     ADMIN_PASSWORD: str = "change-me"
+    ADMIN_FORCE_SYNC: bool = False
 
     # Polling & state
     POLL_INTERVAL_MS: int = 3000
@@ -34,6 +35,7 @@ class Settings(BaseSettings):
     MAX_TOTAL_MATCHES: int = 6
     FINISHED_MATCH_RETENTION_MINUTES: int = 30
     STALE_RUNNING_MATCH_MINUTES: int = 30
+    PUBLIC_MATCH_STALE_SECONDS: int = 300
 
     # Automatic match discovery/start
     AUTO_PREDICTIONS_ENABLED: bool = False
@@ -69,7 +71,7 @@ class Settings(BaseSettings):
 LEAGUE_CONFIGS: dict[str, dict] = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v14_pitch_features",
+        "model_dir": "models/ipl_v15_wicket_features",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "series_url": "https://crex.com/series/indian-premier-league-2026-1PW",
     },

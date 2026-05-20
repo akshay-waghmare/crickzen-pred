@@ -1,0 +1,45 @@
+{
+  "type": "inn2_phase_router",
+  "description": "ipl_v15_wicket_features: v14 + wicket\u00d7chase interaction features (runs_per_wkt_rem, wickets_x_high_chase, wicket_resource_buffer, high_chase_wickets_flag) added to all phases.",
+  "inn1_model_dir": "models/ipl_v7",
+  "inn2_phase_model_dir": "models/ipl_v15_wicket_features",
+  "apply_calibration": false,
+  "post_model_calibration": {
+    "enabled": true,
+    "artifact": "post_model_calibration_router.pkl",
+    "description": "Copy post-model calibration router from v14."
+  },
+  "pp_low_fallback_model_dir": "models/ipl_v12",
+  "pp_low_fallback_rule": "phase == pp and target_above_par < -20 uses models/ipl_v12 champion_model_pp raw probability",
+  "inn2_changes_vs_v14": {
+    "pp": [
+      "pp_score_vs_venue",
+      "pp_wkts_vs_venue",
+      "death_rr_vs_venue",
+      "death_wkts_vs_venue",
+      "runs_per_wkt_rem",
+      "wickets_x_high_chase",
+      "wicket_resource_buffer",
+      "high_chase_wickets_flag",
+      "wr_x_rrr",
+      "comfortable_wicket_zone"
+    ],
+    "mid": [
+      "pp_wkts_vs_venue",
+      "runs_per_wkt_rem",
+      "wickets_x_high_chase",
+      "wicket_resource_buffer",
+      "high_chase_wickets_flag"
+    ],
+    "death": [
+      "inn1_pp_wickets",
+      "mid_avg_boundary18_vs_venue",
+      "avg_boundary18_vs_venue",
+      "runs_per_wkt_rem",
+      "wickets_x_high_chase",
+      "wicket_resource_buffer",
+      "high_chase_wickets_flag"
+    ]
+  },
+  "routing_brier_oof": null
+}

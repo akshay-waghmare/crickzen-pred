@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-06",
+  "last_updated": "2026-05-20",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -807,54 +807,105 @@
       }
     },
     "IPL": {
-      "path": "models/ipl_v14_pitch_features",
-      "version": "v14_pitch_features",
-      "description": "Active IPL production model. Hybrid routing: ipl_v7 global model for inn1, v14 pitch-feature phase router for inn2. Keeps resource calculator unchanged; retrained ML phase models combine resource features with first-innings venue-relative pitch signals: PP score/wickets, death RR/wickets, and death-phase boundary-freedom features.",
+      "path": "models/ipl_v15_wicket_features",
+      "version": "v15_wicket_features",
+      "description": "Active IPL production model. Hybrid routing: ipl_v7 for inn1, v15 wicket-feature phase router for inn2. Adds wicket x chase interaction features to fix PP high-chase underprediction (LSG vs RR May 19 2026 root cause).",
       "training": {
-        "date": "2026-05-13",
-        "architecture": "ipl_v14_pitch_router",
+        "date": "2026-05-20",
+        "architecture": "ipl_v15_wicket_router",
         "inn1_model": "models/ipl_v7",
-        "inn2_model": "models/ipl_v14_pitch_features",
-        "resource_calculator_usage": "Unchanged. v14 uses resource_win_prob and related resource/scoreboard columns as ML inputs, then adds first-innings pitch context as separate ML features.",
-        "stage_summary": "Selective v15 death boundary features were merged into v14; separate v15 artifacts were removed; production configs and live feature wiring now point to v14.",
-        "phase_added_features": {
+        "inn2_model": "models/ipl_v15_wicket_features",
+        "resource_calculator_usage": "Unchanged. v15 adds wicket-context features on top of v14 pitch features.",
+        "stage_summary": "v15 adds wicket x chase interactions to all phases on top of v14 pitch features. PP: +6 features, MID: +4, DEATH: +3.",
+        "motivation": "v14 PP underestimated win probability for high-chase PP scenarios because resource_win_prob (DLS wicket-blind) dominated. wickets_x_high_chase and wicket_resource_buffer explicitly encode wicket buffer vs DLS shortfall.",
+        "phase_added_features_vs_v14": {
           "pp": [
-            "pp_score_vs_venue",
-            "pp_wkts_vs_venue",
-            "death_rr_vs_venue",
-            "death_wkts_vs_venue"
+            "runs_per_wkt_rem",
+            "wr_x_rrr",
+            "comfortable_wicket_zone",
+            "wickets_x_high_chase",
+            "wicket_resource_buffer",
+            "high_chase_wickets_flag"
           ],
           "mid": [
-            "pp_wkts_vs_venue"
+            "wickets_x_high_chase",
+            "wicket_resource_buffer",
+            "high_chase_wickets_flag",
+            "runs_per_wkt_rem"
           ],
           "death": [
-            "inn1_pp_wickets",
-            "mid_avg_boundary18_vs_venue",
-            "avg_boundary18_vs_venue"
+            "wickets_x_high_chase",
+            "wicket_resource_buffer",
+            "high_chase_wickets_flag"
           ]
         },
+        "inn2_v15_brier_oof_cal": {
+          "pp": 0.17032,
+          "mid": 0.1332,
+          "death": 0.07796
+        },
         "inn2_v14_brier_oof_cal": {
-          "pp": 0.17040,
+          "pp": 0.1704,
           "mid": 0.13327,
-          "death": 0.07790
+          "death": 0.0779
+        },
+        "oos_2025_2026_vs_v14": {
+          "pp_brier_cal": 0.14239,
+          "mid_brier_cal": 0.1048,
+          "death_brier_cal": 0.06438,
+          "overall_brier_cal": 0.11173,
+          "pp_delta_pct": -1.0,
+          "mid_delta_pct": 1.07,
+          "mid_delta_pvalue": 0.856,
+          "death_delta_pct": -0.86,
+          "overall_delta_pct": -0.02
         },
         "oos_2025_2026_vs_v12": {
-          "pp_brier_cal": 0.14382,
-          "mid_brier_cal": 0.10370,
-          "death_brier_cal": 0.06493,
-          "overall_brier_cal": 0.11175,
-          "overall_vs_v12_pct": -1.24
+          "overall_brier_cal": 0.11173,
+          "overall_vs_v12_pct": -0.0179
+        },
+        "post_model_calibration_note": "Copied from v14. Inn2 high-chase guardrail (tap>20) passes through uncorrected -- v15 raw improvements apply directly to the original failure scenario.",
+        "replaced_model": "models/ipl_v14_pitch_features",
+        "failed_post_v14_experiments": {
+          "status": "archived_useful_failures",
+          "conclusion": "Keep v14 as IPL champion. v15/v16 improved the 70-80 favourite compression bucket but worsened overall OOS Brier/LogLoss or guardrails. Next path is a bounded specialist correction for the exact failure region, not broader global resource context.",
+          "v15_context_resource": {
+            "path": "models/ipl_v15_context_resource",
+            "script": "scripts/ipl_v15_context_resource_experiment.py",
+            "formula": "logit(resource_context_win_prob)=logit(resource_win_prob)+contextual_adjustment",
+            "best_candidate": "v15_add_context_resource",
+            "oos_brier": 0.11189616061780804,
+            "oos_brier_delta_pct": 0.13065401522045306,
+            "oos_logloss": 0.37621920614388604,
+            "oos_logloss_delta_pct": 0.5097647466191939,
+            "bucket_70_80_improved": true,
+            "guardrails_passed": false,
+            "promoted": false
+          },
+          "v16_context_interactions": {
+            "path": "models/ipl_v16_context_interactions",
+            "script": "scripts/ipl_v16_context_interactions_experiment.py",
+            "formula": "logit(resource_context_interaction_prob)=logit(resource_win_prob)+phase+venue_regime+phase_x_venue_regime+target_bucket_x_venue_regime",
+            "best_candidate": "v16_C_both_plus_regimes",
+            "oos_brier": 0.11308286957209449,
+            "oos_brier_delta_pct": 1.1925844966806873,
+            "oos_logloss": 0.3769055187413359,
+            "oos_logloss_delta_pct": 0.6931182718667646,
+            "bucket_70_80_improved": true,
+            "pp_ece": 0.11830690176935924,
+            "guardrails_passed": false,
+            "promoted": false
+          }
         }
       },
-      "routing_config": "models/ipl_v14_pitch_features/routing_config.json",
+      "routing_config": "models/ipl_v15_wicket_features/routing_config.json",
       "artifacts": {
-        "phase_features": "models/ipl_v14_pitch_features/phase_features.json",
-        "phase_oof_calibrators": "models/ipl_v14_pitch_features/phase_oof_calibrators.pkl",
-        "venue_pitch_baselines": "models/ipl_v14_pitch_features/venue_pitch_baselines.json",
-        "oos_comparison": "models/ipl_v14_pitch_features/oos_comparison.csv",
-        "oof_results": "models/ipl_v14_pitch_features/oof_results.csv",
-        "pitch_partnership_eda_correlations": "models/ipl_v14_pitch_features/pitch_partnership_eda_correlations.csv",
-        "pitch_partnership_eda_groups": "models/ipl_v14_pitch_features/pitch_partnership_eda_groups.csv"
+        "phase_features": "models/ipl_v15_wicket_features/phase_features.json",
+        "phase_oof_calibrators": "models/ipl_v15_wicket_features/phase_oof_calibrators.pkl",
+        "post_model_calibration_router": "models/ipl_v15_wicket_features/post_model_calibration_router.pkl",
+        "venue_pitch_baselines": "models/ipl_v15_wicket_features/venue_pitch_baselines.json",
+        "oos_comparison": "models/ipl_v15_wicket_features/oos_comparison.csv",
+        "oof_results": "models/ipl_v15_wicket_features/oof_results.csv"
       },
       "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
       "feature_store": {
@@ -882,22 +933,22 @@
       }
     },
     "ipl": {
-      "version": "v14_pitch_features",
-      "model_dir": "models/ipl_v14_pitch_features",
-      "champion_model": "models/ipl_v14_pitch_features/champion_model_pp.joblib",
+      "version": "v15_wicket_features",
+      "model_dir": "models/ipl_v15_wicket_features",
+      "champion_model": "models/ipl_v15_wicket_features/champion_model_pp.joblib",
       "phase_models": {
-        "pp": "models/ipl_v14_pitch_features/champion_model_pp.joblib",
-        "mid": "models/ipl_v14_pitch_features/champion_model_mid.joblib",
-        "death": "models/ipl_v14_pitch_features/champion_model_death.joblib"
+        "pp": "models/ipl_v15_wicket_features/champion_model_pp.joblib",
+        "mid": "models/ipl_v15_wicket_features/champion_model_mid.joblib",
+        "death": "models/ipl_v15_wicket_features/champion_model_death.joblib"
       },
-      "oof_calibrators": "models/ipl_v14_pitch_features/phase_oof_calibrators.pkl",
-      "routing_config": "models/ipl_v14_pitch_features/routing_config.json",
+      "oof_calibrators": "models/ipl_v15_wicket_features/phase_oof_calibrators.pkl",
+      "routing_config": "models/ipl_v15_wicket_features/routing_config.json",
       "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
-      "resource_calculator_usage": "Unchanged; v14 pitch features are separate ML router inputs.",
+      "resource_calculator_usage": "Unchanged; v15 wicket features are extra ML inputs on top of v14 pitch features.",
       "inn2_isotonic_calibrator": "models/ipl_v7/inn2_isotonic_calibrator.pkl",
-      "training_data": "data/ipl_features_latest/training.parquet",
-      "oof_brier": 0.13327,
-      "updated": "2026-05-13"
+      "training_data": "data/ipl_features_v10/training.parquet",
+      "oof_brier": 0.1332,
+      "updated": "2026-05-20"
     }
   },
   "archived_models": {

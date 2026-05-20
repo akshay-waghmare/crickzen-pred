@@ -85,6 +85,12 @@ def engineer_inn2_features(df: pd.DataFrame) -> pd.DataFrame:
     df["wicket_shock_recency"]    = (wl6 / (wl12 + 0.5)).clip(0, 2)
     df["wicket_free_balls"]       = df.get("balls_since_wicket", pd.Series(0, index=df.index)).fillna(0).clip(0, 120)
 
+    # Wicket × Chase difficulty interactions (helps all phases, especially PP high-chase)
+    # High wickets in hand while DLS pace says you're behind → model was ignoring this signal
+    df["wickets_x_high_chase"]    = (df["wickets_remaining"] * df["is_high_chase"]).clip(0, 10)
+    df["wicket_resource_buffer"]  = (df["wickets_remaining"] / 10.0 - rwp.clip(0, 1)).clip(-1, 1)
+    df["high_chase_wickets_flag"] = ((df["is_high_chase"] > 0) & (df["wickets_remaining"] >= 8)).astype(float)
+
     # ── 4. Momentum / Stagnation Features ─────────────────────────────────────
     r12   = df.get("runs_last_12",        pd.Series(0, index=df.index)).fillna(0)
     r18   = df.get("runs_last_18",        pd.Series(0, index=df.index)).fillna(0)
@@ -155,6 +161,16 @@ def engineer_inn2_features(df: pd.DataFrame) -> pd.DataFrame:
     df["pp_run_rate_premium"]  = (crr - 8.0).clip(-8, 20)
     df["pp_chase_feasibility"] = (crr / rrr.replace(0, np.nan)).fillna(1).clip(0, 4)
 
+    # PP easy-chase features (used by ipl_v12 PP model)
+    vcs = df.get("venue_chase_success", pd.Series(0.5, index=df.index)).fillna(0.5)
+    res = df.get("resources_remaining", pd.Series(1.0, index=df.index)).fillna(1.0)
+    rrr_clipped = rrr.clip(lower=0.1)
+    df["pp_ease_score"]           = (-tap / rrr_clipped).clip(-50, 50)
+    df["pp_rrr_ease"]             = (10.0 - rrr).clip(-40, 10)
+    df["chase_ease_x_venue"]      = ((-tap).clip(lower=0) * vcs).clip(0, 200)
+    df["low_target_strong_venue"] = ((tap < -15).astype(float) * vcs).clip(0, 1)
+    df["pp_resources_adj_ease"]   = ((-tap) * res).clip(-300, 300)
+
     df["partnership_solidity"] = (
         df["wicket_free_balls"] / 30 * 0.4
         + df.get("set_batter_exposure", pd.Series(0, index=df.index)).fillna(0) / 60 * 0.3
@@ -212,6 +228,9 @@ def get_feature_sets() -> dict:
         "pressure_x_high_chase", "inn1def_x_hard_chase",
         "wickets_remaining", "overs_remaining",
         "resource_team_adjusted", "resources_remaining",
+        # Wicket-resource interaction features
+        "runs_per_wkt_rem", "wr_x_rrr", "comfortable_wicket_zone",
+        "wickets_x_high_chase", "wicket_resource_buffer", "high_chase_wickets_flag",
     ]
 
     INN2_MID = [
@@ -245,6 +264,8 @@ def get_feature_sets() -> dict:
         "comfortable_chase_flag", "rescue_needed_flag",
         "rrr_times_wickets", "wickets_times_balls", "pressure_index",
         "overs_remaining", "resource_pct",
+        # Wicket-resource interaction features
+        "runs_per_wkt_rem", "wickets_x_high_chase", "wicket_resource_buffer", "high_chase_wickets_flag",
     ]
 
     INN2_DEATH = [
@@ -275,6 +296,8 @@ def get_feature_sets() -> dict:
         "batting_team_win_rate", "situation_advantage",
         "rrr_x_high_chase", "tight_finish_zone",
         "comfortable_chase_flag", "rescue_needed_flag",
+        # Wicket-resource interaction features
+        "wickets_x_high_chase", "wicket_resource_buffer", "high_chase_wickets_flag",
     ]
 
     return {"pp": INN2_PP, "mid": INN2_MID, "death": INN2_DEATH}

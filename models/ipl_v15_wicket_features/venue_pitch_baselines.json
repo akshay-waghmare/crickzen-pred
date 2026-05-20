@@ -1,0 +1,349 @@
+{
+  "description": "IPL v14 venue baselines for live first-innings pitch-relative features; fitted on seasons <2025.",
+  "global": {
+    "venue_pp_avg": 46.095613532553,
+    "venue_pp_wickets_avg": 1.3242453748782863,
+    "venue_death_rr_avg": 10.252906781985203,
+    "venue_death_wickets_avg": 2.5326192794547224,
+    "venue_avg_boundary18": 0.15928222160647235,
+    "venue_mid_avg_boundary18": 0.1404544344715937
+  },
+  "venues": {
+    "Arun Jaitley Stadium": {
+      "venue_pp_avg": 53.01737451737451,
+      "venue_pp_wickets_avg": 1.3928571428571428,
+      "venue_death_rr_avg": 11.720279183417441,
+      "venue_death_wickets_avg": 2.0,
+      "venue_avg_boundary18": 0.1848611391034615,
+      "venue_mid_avg_boundary18": 0.14954558307309798
+    },
+    "Barabati Stadium": {
+      "venue_pp_avg": 42.714285714285715,
+      "venue_pp_wickets_avg": 1.8571428571428572,
+      "venue_death_rr_avg": 10.228571428571428,
+      "venue_death_wickets_avg": 2.7142857142857144,
+      "venue_avg_boundary18": 0.16975794015122098,
+      "venue_mid_avg_boundary18": 0.1395543683242096
+    },
+    "Barsapara Cricket Stadium": {
+      "venue_pp_avg": 56.333333333333336,
+      "venue_pp_wickets_avg": 0.3333333333333333,
+      "venue_death_rr_avg": 10.333333333333336,
+      "venue_death_wickets_avg": 2.3333333333333335,
+      "venue_avg_boundary18": 0.21932627792194195,
+      "venue_mid_avg_boundary18": 0.1542087542087542
+    },
+    "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium": {
+      "venue_pp_avg": 45.53846153846154,
+      "venue_pp_wickets_avg": 1.5384615384615385,
+      "venue_death_rr_avg": 10.456090595078479,
+      "venue_death_wickets_avg": 2.3846153846153846,
+      "venue_avg_boundary18": 0.14580920638686484,
+      "venue_mid_avg_boundary18": 0.1227904775797496
+    },
+    "Brabourne Stadium": {
+      "venue_pp_avg": 55.177918809497754,
+      "venue_pp_wickets_avg": 1.0384615384615385,
+      "venue_death_rr_avg": 10.510685817678826,
+      "venue_death_wickets_avg": 2.6538461538461537,
+      "venue_avg_boundary18": 0.18856439375560793,
+      "venue_mid_avg_boundary18": 0.16586881852968421
+    },
+    "Buffalo Park": {
+      "venue_pp_avg": 41.0,
+      "venue_pp_wickets_avg": 1.6666666666666667,
+      "venue_death_rr_avg": 9.956140828868099,
+      "venue_death_wickets_avg": 3.0,
+      "venue_avg_boundary18": 0.11153445453843032,
+      "venue_mid_avg_boundary18": 0.07459979916120267
+    },
+    "De Beers Diamond Oval": {
+      "venue_pp_avg": 42.666666666666664,
+      "venue_pp_wickets_avg": 1.3333333333333333,
+      "venue_death_rr_avg": 10.963636363636368,
+      "venue_death_wickets_avg": 2.3333333333333335,
+      "venue_avg_boundary18": 0.1327722092463782,
+      "venue_mid_avg_boundary18": 0.09833520389075945
+    },
+    "Dr DY Patil Sports Academy": {
+      "venue_pp_avg": 43.98330683624801,
+      "venue_pp_wickets_avg": 1.8235294117647058,
+      "venue_death_rr_avg": 10.469446980022614,
+      "venue_death_wickets_avg": 2.5,
+      "venue_avg_boundary18": 0.1525117293411026,
+      "venue_mid_avg_boundary18": 0.13386535745533942
+    },
+    "Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium": {
+      "venue_pp_avg": 45.34954954954955,
+      "venue_pp_wickets_avg": 1.1333333333333333,
+      "venue_death_rr_avg": 10.504059645054884,
+      "venue_death_wickets_avg": 3.0,
+      "venue_avg_boundary18": 0.1534017482268788,
+      "venue_mid_avg_boundary18": 0.13592033222520733
+    },
+    "Dubai International Cricket Stadium": {
+      "venue_pp_avg": 45.82629263290218,
+      "venue_pp_wickets_avg": 1.186046511627907,
+      "venue_death_rr_avg": 9.856992122902028,
+      "venue_death_wickets_avg": 2.372093023255814,
+      "venue_avg_boundary18": 0.14633957644232826,
+      "venue_mid_avg_boundary18": 0.12079543540294956
+    },
+    "Eden Gardens": {
+      "venue_pp_avg": 47.682553761191535,
+      "venue_pp_wickets_avg": 1.3058823529411765,
+      "venue_death_rr_avg": 10.21687618052905,
+      "venue_death_wickets_avg": 2.5294117647058822,
+      "venue_avg_boundary18": 0.17560347816657595,
+      "venue_mid_avg_boundary18": 0.14925035729157843
+    },
+    "Feroz Shah Kotla": {
+      "venue_pp_avg": 46.34555984555984,
+      "venue_pp_wickets_avg": 1.4464285714285714,
+      "venue_death_rr_avg": 9.998762992633612,
+      "venue_death_wickets_avg": 2.4107142857142856,
+      "venue_avg_boundary18": 0.1631652367265371,
+      "venue_mid_avg_boundary18": 0.14238250446434017
+    },
+    "Green Park": {
+      "venue_pp_avg": 50.7027027027027,
+      "venue_pp_wickets_avg": 1.75,
+      "venue_death_rr_avg": 8.665517241379314,
+      "venue_death_wickets_avg": 3.5,
+      "venue_avg_boundary18": 0.17962793672259247,
+      "venue_mid_avg_boundary18": 0.147644679881522
+    },
+    "Himachal Pradesh Cricket Association Stadium": {
+      "venue_pp_avg": 44.69230769230769,
+      "venue_pp_wickets_avg": 1.3846153846153846,
+      "venue_death_rr_avg": 11.903237677145736,
+      "venue_death_wickets_avg": 2.1538461538461537,
+      "venue_avg_boundary18": 0.19383046383193173,
+      "venue_mid_avg_boundary18": 0.1882152635404299
+    },
+    "Holkar Cricket Stadium": {
+      "venue_pp_avg": 45.142857142857146,
+      "venue_pp_wickets_avg": 1.1428571428571428,
+      "venue_death_rr_avg": 11.64748238774213,
+      "venue_death_wickets_avg": 2.4285714285714284,
+      "venue_avg_boundary18": 0.16882299271584159,
+      "venue_mid_avg_boundary18": 0.1462147432072244
+    },
+    "JSCA International Stadium Complex": {
+      "venue_pp_avg": 39.0,
+      "venue_pp_wickets_avg": 1.1666666666666667,
+      "venue_death_rr_avg": 9.07526110253383,
+      "venue_death_wickets_avg": 2.8333333333333335,
+      "venue_avg_boundary18": 0.13263265745836444,
+      "venue_mid_avg_boundary18": 0.10798637188744402
+    },
+    "Kingsmead": {
+      "venue_pp_avg": 49.03423423423423,
+      "venue_pp_wickets_avg": 1.4,
+      "venue_death_rr_avg": 8.563274467878207,
+      "venue_death_wickets_avg": 3.066666666666667,
+      "venue_avg_boundary18": 0.14511763111138257,
+      "venue_mid_avg_boundary18": 0.11895931398859078
+    },
+    "M Chinnaswamy Stadium": {
+      "venue_pp_avg": 44.9256467572257,
+      "venue_pp_wickets_avg": 1.2142857142857142,
+      "venue_death_rr_avg": 11.076595514167435,
+      "venue_death_wickets_avg": 2.9714285714285715,
+      "venue_avg_boundary18": 0.17334816466871492,
+      "venue_mid_avg_boundary18": 0.1578912223382157
+    },
+    "M.Chinnaswamy Stadium": {
+      "venue_pp_avg": 47.3938223938224,
+      "venue_pp_wickets_avg": 1.2142857142857142,
+      "venue_death_rr_avg": 11.438976175339812,
+      "venue_death_wickets_avg": 2.7857142857142856,
+      "venue_avg_boundary18": 0.18072010953037118,
+      "venue_mid_avg_boundary18": 0.1531400074058804
+    },
+    "MA Chidambaram Stadium": {
+      "venue_pp_avg": 46.97641501150273,
+      "venue_pp_wickets_avg": 1.2469135802469136,
+      "venue_death_rr_avg": 9.86968633164168,
+      "venue_death_wickets_avg": 2.54320987654321,
+      "venue_avg_boundary18": 0.15100549222150264,
+      "venue_mid_avg_boundary18": 0.13590587884545619
+    },
+    "Maharaja Yadavindra Singh International Cricket Stadium": {
+      "venue_pp_avg": 48.4,
+      "venue_pp_wickets_avg": 1.4,
+      "venue_death_rr_avg": 10.673671782762693,
+      "venue_death_wickets_avg": 4.0,
+      "venue_avg_boundary18": 0.16502057292995578,
+      "venue_mid_avg_boundary18": 0.11945459889904335
+    },
+    "Maharashtra Cricket Association Stadium": {
+      "venue_pp_avg": 46.77060497029537,
+      "venue_pp_wickets_avg": 1.1470588235294117,
+      "venue_death_rr_avg": 10.685663727294491,
+      "venue_death_wickets_avg": 2.2941176470588234,
+      "venue_avg_boundary18": 0.1516950381492593,
+      "venue_mid_avg_boundary18": 0.1419312144760704
+    },
+    "Narendra Modi Stadium": {
+      "venue_pp_avg": 48.784958871915386,
+      "venue_pp_wickets_avg": 1.3043478260869565,
+      "venue_death_rr_avg": 10.464318340220347,
+      "venue_death_wickets_avg": 2.391304347826087,
+      "venue_avg_boundary18": 0.16399043546487097,
+      "venue_mid_avg_boundary18": 0.16210983036884685
+    },
+    "Nehru Stadium": {
+      "venue_pp_avg": 36.858108108108105,
+      "venue_pp_wickets_avg": 1.75,
+      "venue_death_rr_avg": 9.849999999999998,
+      "venue_death_wickets_avg": 2.75,
+      "venue_avg_boundary18": 0.12594972882114724,
+      "venue_mid_avg_boundary18": 0.10540508468140046
+    },
+    "New Wanderers Stadium": {
+      "venue_pp_avg": 37.820945945945944,
+      "venue_pp_wickets_avg": 2.125,
+      "venue_death_rr_avg": 9.517024625572054,
+      "venue_death_wickets_avg": 2.625,
+      "venue_avg_boundary18": 0.11075722945139857,
+      "venue_mid_avg_boundary18": 0.09842772967772967
+    },
+    "Newlands": {
+      "venue_pp_avg": 37.3018711018711,
+      "venue_pp_wickets_avg": 2.0,
+      "venue_death_rr_avg": 9.219875902217968,
+      "venue_death_wickets_avg": 3.2,
+      "venue_avg_boundary18": 0.13563164613252382,
+      "venue_mid_avg_boundary18": 0.11525626636737747
+    },
+    "OUTsurance Oval": {
+      "venue_pp_avg": 35.5,
+      "venue_pp_wickets_avg": 2.0,
+      "venue_death_rr_avg": 7.906593406593404,
+      "venue_death_wickets_avg": 3.0,
+      "venue_avg_boundary18": 0.07593040207286741,
+      "venue_mid_avg_boundary18": 0.07671451355661882
+    },
+    "Punjab Cricket Association IS Bindra Stadium": {
+      "venue_pp_avg": 49.92312944523471,
+      "venue_pp_wickets_avg": 0.92,
+      "venue_death_rr_avg": 10.308325271566378,
+      "venue_death_wickets_avg": 2.48,
+      "venue_avg_boundary18": 0.1699453391752498,
+      "venue_mid_avg_boundary18": 0.1586361061619178
+    },
+    "Punjab Cricket Association Stadium": {
+      "venue_pp_avg": 47.048986486486484,
+      "venue_pp_wickets_avg": 1.3125,
+      "venue_death_rr_avg": 10.128265036666427,
+      "venue_death_wickets_avg": 2.59375,
+      "venue_avg_boundary18": 0.16204338619383254,
+      "venue_mid_avg_boundary18": 0.1439329467262437
+    },
+    "Rajiv Gandhi International Stadium": {
+      "venue_pp_avg": 44.74035087719298,
+      "venue_pp_wickets_avg": 1.4,
+      "venue_death_rr_avg": 9.861335977320744,
+      "venue_death_wickets_avg": 2.7066666666666666,
+      "venue_avg_boundary18": 0.1535406166875149,
+      "venue_mid_avg_boundary18": 0.1343807278323549
+    },
+    "Sardar Patel Stadium": {
+      "venue_pp_avg": 47.8968058968059,
+      "venue_pp_wickets_avg": 1.4545454545454546,
+      "venue_death_rr_avg": 9.872330974810314,
+      "venue_death_wickets_avg": 2.909090909090909,
+      "venue_avg_boundary18": 0.15807664728257045,
+      "venue_mid_avg_boundary18": 0.11787561189475064
+    },
+    "Saurashtra Cricket Association Stadium": {
+      "venue_pp_avg": 51.333333333333336,
+      "venue_pp_wickets_avg": 1.1111111111111112,
+      "venue_death_rr_avg": 10.016701539696193,
+      "venue_death_wickets_avg": 2.5555555555555554,
+      "venue_avg_boundary18": 0.16575391466715708,
+      "venue_mid_avg_boundary18": 0.14200254658344325
+    },
+    "Sawai Mansingh Stadium": {
+      "venue_pp_avg": 44.60326364099949,
+      "venue_pp_wickets_avg": 1.0754716981132075,
+      "venue_death_rr_avg": 9.84282968368698,
+      "venue_death_wickets_avg": 2.2641509433962264,
+      "venue_avg_boundary18": 0.15128753033684633,
+      "venue_mid_avg_boundary18": 0.13534539967950635
+    },
+    "Shaheed Veer Narayan Singh International Stadium": {
+      "venue_pp_avg": 36.157420578473214,
+      "venue_pp_wickets_avg": 1.6666666666666667,
+      "venue_death_rr_avg": 10.002564102564103,
+      "venue_death_wickets_avg": 1.8333333333333333,
+      "venue_avg_boundary18": 0.12313652665952012,
+      "venue_mid_avg_boundary18": 0.10437800097887817
+    },
+    "Sharjah Cricket Stadium": {
+      "venue_pp_avg": 43.67664092664093,
+      "venue_pp_wickets_avg": 1.4285714285714286,
+      "venue_death_rr_avg": 9.571419815553652,
+      "venue_death_wickets_avg": 2.4285714285714284,
+      "venue_avg_boundary18": 0.13634287858430258,
+      "venue_mid_avg_boundary18": 0.11739664635013639
+    },
+    "Sheikh Zayed Stadium": {
+      "venue_pp_avg": 44.396049896049895,
+      "venue_pp_wickets_avg": 1.3846153846153846,
+      "venue_death_rr_avg": 10.185580518599673,
+      "venue_death_wickets_avg": 2.5,
+      "venue_avg_boundary18": 0.1430936073503492,
+      "venue_mid_avg_boundary18": 0.12005087353065777
+    },
+    "St George's Park": {
+      "venue_pp_avg": 47.59073359073359,
+      "venue_pp_wickets_avg": 1.1428571428571428,
+      "venue_death_rr_avg": 9.399763872491146,
+      "venue_death_wickets_avg": 2.0,
+      "venue_avg_boundary18": 0.12774452273490716,
+      "venue_mid_avg_boundary18": 0.1169829468611625
+    },
+    "Subrata Roy Sahara Stadium": {
+      "venue_pp_avg": 39.307432432432435,
+      "venue_pp_wickets_avg": 1.125,
+      "venue_death_rr_avg": 9.490346017618744,
+      "venue_death_wickets_avg": 1.75,
+      "venue_avg_boundary18": 0.12418962412883468,
+      "venue_mid_avg_boundary18": 0.10277568722252631
+    },
+    "SuperSport Park": {
+      "venue_pp_avg": 39.92874692874693,
+      "venue_pp_wickets_avg": 2.090909090909091,
+      "venue_death_rr_avg": 9.381793548546021,
+      "venue_death_wickets_avg": 2.4545454545454546,
+      "venue_avg_boundary18": 0.13329555730836953,
+      "venue_mid_avg_boundary18": 0.12050246010905234
+    },
+    "Vidarbha Cricket Association Stadium": {
+      "venue_pp_avg": 46.0,
+      "venue_pp_wickets_avg": 2.0,
+      "venue_death_rr_avg": 6.689075630252099,
+      "venue_death_wickets_avg": 4.0,
+      "venue_avg_boundary18": 0.12386464647489237,
+      "venue_mid_avg_boundary18": 0.12828282828282828
+    },
+    "Wankhede Stadium": {
+      "venue_pp_avg": 45.23459305678367,
+      "venue_pp_wickets_avg": 1.3513513513513513,
+      "venue_death_rr_avg": 10.745922965608997,
+      "venue_death_wickets_avg": 2.4684684684684686,
+      "venue_avg_boundary18": 0.16759633576301053,
+      "venue_mid_avg_boundary18": 0.15831329593725113
+    },
+    "Zayed Cricket Stadium": {
+      "venue_pp_avg": 50.64478764478764,
+      "venue_pp_wickets_avg": 1.0,
+      "venue_death_rr_avg": 9.89824506380125,
+      "venue_death_wickets_avg": 2.4285714285714284,
+      "venue_avg_boundary18": 0.1608950776484513,
+      "venue_mid_avg_boundary18": 0.1115119699601738
+    }
+  }
+}

@@ -37,8 +37,8 @@ WINDOWS_NEW_CONSOLE = getattr(subprocess, "CREATE_NEW_CONSOLE", 0)
 LEAGUE_CONFIGS = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v14_pitch_features",
-        "inn2_model_dir": "models/ipl_v14_pitch_features",
+        "model_dir": "models/ipl_v15_wicket_features",
+        "inn2_model_dir": "models/ipl_v15_wicket_features",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",
@@ -501,6 +501,7 @@ class LauncherApp:
         self.root.minsize(960, 680)
 
         self.streamlit_proc: subprocess.Popen | None = None
+        self.diagnostic_proc: subprocess.Popen | None = None
         self.match_slots: list[MatchSlot] = []
 
         self._build_ui()
@@ -571,6 +572,14 @@ class LauncherApp:
 
         ttk.Separator(btn_frame, orient="vertical").pack(side="left", fill="y", padx=8)
 
+        self.start_diag_btn = ttk.Button(btn_frame, text="▶  Start Diagnostics", command=self._start_diagnostics)
+        self.start_diag_btn.pack(side="left", padx=4)
+
+        self.stop_diag_btn = ttk.Button(btn_frame, text="⏹  Stop Diagnostics", command=self._stop_diagnostics, state="disabled")
+        self.stop_diag_btn.pack(side="left", padx=4)
+
+        ttk.Separator(btn_frame, orient="vertical").pack(side="left", fill="y", padx=8)
+
         ttk.Button(btn_frame, text="🚀 Start Everything", command=self._start_everything).pack(side="left", padx=4)
         ttk.Button(btn_frame, text="🛑 Stop Everything", command=self._stop_everything).pack(side="left", padx=4)
 
@@ -579,6 +588,9 @@ class LauncherApp:
         status_frame.pack(fill="x", **pad)
         self.st_status = tk.StringVar(value="Streamlit: stopped")
         ttk.Label(status_frame, textvariable=self.st_status, foreground="gray").pack(side="left")
+        ttk.Label(status_frame, text="  |  ", foreground="gray").pack(side="left")
+        self.diag_status = tk.StringVar(value="Diagnostics: stopped")
+        ttk.Label(status_frame, textvariable=self.diag_status, foreground="gray").pack(side="left")
 
         # --- Log output ---
         log_frame = ttk.LabelFrame(self.root, text="Log Output", padding=4)
@@ -725,15 +737,56 @@ class LauncherApp:
             self.root.after(0, lambda: self.stop_st_btn.configure(state="disabled"))
 
     # ------------------------------------------------------------------
+    # Feature Diagnostics (port 8503)
+    # ------------------------------------------------------------------
+    def _start_diagnostics(self):
+        if self.diagnostic_proc and self.diagnostic_proc.poll() is None:
+            messagebox.showinfo("Running", "Diagnostics is already running.")
+            return
+
+        diag_path = str(PROJECT_ROOT / "src" / "bbl_pipeline" / "app" / "feature_diagnostic.py")
+        cmd = [_python_executable(), "-m", "streamlit", "run", diag_path, "--server.port", "8503"]
+
+        self._log("Starting Feature Diagnostics on http://localhost:8503")
+        try:
+            self.diagnostic_proc = self._launch_process(cmd, "DX")
+            self.diag_status.set(f"Diagnostics: running (PID {self.diagnostic_proc.pid})")
+            self.start_diag_btn.configure(state="disabled")
+            self.stop_diag_btn.configure(state="normal")
+            threading.Thread(target=self._watch_diagnostics, daemon=True).start()
+        except Exception as e:
+            self._log(f"ERROR starting Diagnostics: {e}")
+
+    def _stop_diagnostics(self):
+        if self.diagnostic_proc and self.diagnostic_proc.poll() is None:
+            self._log("Stopping Diagnostics...")
+            self._kill_proc(self.diagnostic_proc)
+            self.diagnostic_proc = None
+        self.diag_status.set("Diagnostics: stopped")
+        self.start_diag_btn.configure(state="normal")
+        self.stop_diag_btn.configure(state="disabled")
+
+    def _watch_diagnostics(self):
+        if self.diagnostic_proc:
+            self.diagnostic_proc.wait()
+            self.root.after(0, self._log,
+                            f"Diagnostics exited (code {self.diagnostic_proc.returncode})")
+            self.root.after(0, lambda: self.diag_status.set("Diagnostics: stopped"))
+            self.root.after(0, lambda: self.start_diag_btn.configure(state="normal"))
+            self.root.after(0, lambda: self.stop_diag_btn.configure(state="disabled"))
+
+    # ------------------------------------------------------------------
     # Start / Stop everything
     # ------------------------------------------------------------------
     def _start_everything(self):
         self._start_all_predictors()
         self._start_streamlit()
+        self._start_diagnostics()
 
     def _stop_everything(self):
         self._stop_all_predictors()
         self._stop_streamlit()
+        self._stop_diagnostics()
 
     # ------------------------------------------------------------------
     # Process helpers
