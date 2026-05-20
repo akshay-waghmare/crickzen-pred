@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, EmailStr
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlmodel import Session, select
 
+from app.analytics import record_registration_success
 from app.auth import (
     create_access_token,
     create_refresh_token,
@@ -54,6 +55,7 @@ class UserResponse(BaseModel):
     email: str
     is_active: bool
     plan: str
+    is_admin: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -87,6 +89,7 @@ def login(
 @router.post("/register", response_model=TokenResponse)
 def register(
     body: RegisterRequest,
+    request: Request,
     session: Session = Depends(get_session),
     settings: Settings = Depends(get_settings),
 ):
@@ -111,6 +114,7 @@ def register(
     session.add(user)
     session.commit()
     session.refresh(user)
+    record_registration_success(session, request, user.id)
 
     access_token, expires_in = create_access_token(user.id, settings)
     refresh_token = create_refresh_token(user.id, session, settings)
@@ -147,4 +151,4 @@ def logout(
 
 @router.get("/me", response_model=UserResponse)
 def me(user: User = Depends(get_current_user)):
-    return UserResponse(id=user.id, email=user.email, is_active=user.is_active, plan=user.plan)
+    return UserResponse(id=user.id, email=user.email, is_active=user.is_active, plan=user.plan, is_admin=user.is_admin)

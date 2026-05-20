@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ seo.title }}{% endblock %}
+
+{% block content %}
+{% if match %}
+<div class="space-y-6">
+  <section class="grid gap-6 border-b border-slate-800 pb-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div>
+      <div class="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+        <span class="rounded-full bg-emerald-400 px-2 py-1 text-slate-950">{{ match.league }}</span>
+        <span>{{ match.status }}</span>
+        <span>{{ match.venue or "Venue TBC" }}</span>
+      </div>
+      <h1 class="mt-3 text-4xl font-black tracking-tight text-white md:text-5xl">{{ match.title }} win probability</h1>
+      <p class="mt-3 max-w-3xl text-base leading-7 text-slate-300">{{ match.insight }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-right">
+      <div class="text-xs uppercase tracking-widest text-slate-500">{{ match.batting_team or "Batting side" }} win probability</div>
+      <div class="mt-2 text-6xl font-black text-emerald-300">
+        {% if match.win_probability_pct is not none %}{{ match.win_probability_pct }}%{% else %}-{% endif %}
+      </div>
+      <div class="mt-3 text-sm text-slate-400">{{ match.batting_team or "Batting side" }} {{ match.score or "awaiting score" }}{% if match.overs %} / {{ match.overs }} overs{% endif %}</div>
+      <div class="mt-1 text-sm text-slate-400">{{ match.projection_label or "Awaiting model projection" }}</div>
+    </div>
+  </section>
+
+  <section class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div class="space-y-5">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-white">Recent probability swings</h2>
+            <p class="mt-1 text-sm text-slate-500">Public view shows only the latest rounded movement points.</p>
+          </div>
+          <a href="/login" class="hidden rounded-lg border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 hover:border-emerald-400 md:inline-block">Full timeline</a>
+        </div>
+        <div class="mt-5 grid gap-3 md:grid-cols-5">
+          {% for point in match.last_swings %}
+            <div class="rounded-xl border border-slate-800 bg-slate-950 p-3">
+              <div class="text-xs uppercase tracking-widest text-slate-500">Over {{ point.over or "-" }}</div>
+              <div class="mt-2 text-2xl font-black text-white">{% if point.win_probability_pct is not none %}{{ point.win_probability_pct }}%{% else %}-{% endif %}</div>
+              <div class="mt-1 text-xs text-slate-500">{{ point.score }} / {{ point.label }}</div>
+            </div>
+          {% endfor %}
+        </div>
+        {% if not match.last_swings %}
+          <div class="mt-5 rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+            Probability swings will appear once enough live model points are available.
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+        <h2 class="text-xl font-black text-white">Unlock full model dashboard</h2>
+        <div class="mt-4 grid gap-3 md:grid-cols-2">
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <div class="text-sm font-black text-white">Monte Carlo detail</div>
+            <p class="mt-2 text-sm leading-5 text-slate-500">Simulation probability, uncertainty, and model blend weights.</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <div class="text-sm font-black text-white">ODM signal</div>
+            <p class="mt-2 text-sm leading-5 text-slate-500">Short-term direction and momentum phase reads.</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <div class="text-sm font-black text-white">Ball timeline</div>
+            <p class="mt-2 text-sm leading-5 text-slate-500">Full probability chart and commentary context.</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <div class="text-sm font-black text-white">Alerts</div>
+            <p class="mt-2 text-sm leading-5 text-slate-500">Turning-point and pressure updates during live matches.</p>
+          </div>
+        </div>
+        <a href="/login" class="btn-primary mt-5 inline-block">Unlock full model dashboard</a>
+      </div>
+    </div>
+
+    <aside class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+      <h2 class="text-lg font-black text-white">Public match detail</h2>
+      <div class="mt-4 space-y-3 text-sm">
+        <div class="flex justify-between gap-3 border-b border-slate-800 pb-3"><span class="text-slate-500">Batting</span><strong class="text-right text-white">{{ match.batting_team or "-" }}</strong></div>
+        <div class="flex justify-between gap-3 border-b border-slate-800 pb-3"><span class="text-slate-500">Bowling</span><strong class="text-right text-white">{{ match.bowling_team or "-" }}</strong></div>
+        <div class="flex justify-between gap-3 border-b border-slate-800 pb-3"><span class="text-slate-500">Target</span><strong class="text-white">{{ match.target or "-" }}</strong></div>
+        <div class="flex justify-between gap-3 border-b border-slate-800 pb-3"><span class="text-slate-500">Updated</span><strong class="text-right text-white">{{ match.updated_at or "-" }}</strong></div>
+      </div>
+      <a href="/ipl-prediction-today" class="mt-5 block rounded-lg border border-slate-700 px-4 py-2 text-center text-sm font-bold text-slate-200 hover:border-emerald-400">More IPL predictions</a>
+    </aside>
+  </section>
+</div>
+{% else %}
+<section class="rounded-2xl border border-dashed border-slate-700 bg-slate-900/60 p-8 text-center">
+  <div class="text-xs font-black uppercase tracking-[0.28em] text-emerald-300">Match unavailable</div>
+  <h1 class="mt-3 text-3xl font-black text-white">This public prediction is not live right now</h1>
+  <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-400">
+    The match may have finished, not started yet, or been cleared from the live runtime. Today&apos;s public prediction cards are still available.
+  </p>
+  <div class="mt-6 flex justify-center gap-3">
+    <a href="/ipl-prediction-today" class="btn-primary">See IPL prediction today</a>
+    <a href="/" class="rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-emerald-400">Home</a>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

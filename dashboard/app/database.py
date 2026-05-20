@@ -60,6 +60,17 @@ def seed_admin_user(session: Session, settings: Settings | None = None):
         return
     existing = session.exec(select(User).where(User.email == s.ADMIN_EMAIL)).first()
     if existing:
+        if s.ADMIN_FORCE_SYNC:
+            from app.auth import hash_password
+
+            existing.hashed_password = hash_password(s.ADMIN_PASSWORD)
+            existing.is_active = True
+            existing.is_admin = True
+            existing.plan = "admin"
+            session.add(existing)
+            session.commit()
+            logger.info("Admin user synced from environment: %s", s.ADMIN_EMAIL)
+            return
         logger.info("Admin user already exists: %s", s.ADMIN_EMAIL)
         return
     from app.auth import hash_password
@@ -68,6 +79,7 @@ def seed_admin_user(session: Session, settings: Settings | None = None):
         email=s.ADMIN_EMAIL,
         hashed_password=hash_password(s.ADMIN_PASSWORD),
         is_active=True,
+        is_admin=True,
         plan="admin",
     )
     session.add(admin)

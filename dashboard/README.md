@@ -60,6 +60,7 @@ The dashboard reads prediction state from JSON files written by `crex_live_predi
 
 - **JWT Authentication** — Secure login with access + refresh tokens
 - **Subscriber Management** — Admin can create, suspend, reactivate users
+- **Visitor Analytics** — First-party page-view + signup tracking with UTM attribution for Instagram/reel campaigns
 - **Multi-Match Support** — Up to 6 concurrent predictions, 2 per user
 - **Automatic Match Startup** — Optional CREX discovery/direct URL scheduler for deployed runs
 - **Live Updates** — Polling every 3s for ball-by-ball win probability
@@ -115,6 +116,7 @@ The dashboard reads prediction state from JSON files written by `crex_live_predi
 |--------|------|-------------|
 | `POST` | `/admin/subscribers` | Add subscriber |
 | `GET`  | `/admin/subscribers` | List subscribers |
+| `GET`  | `/admin/analytics/summary` | Traffic, UTM, and signup summary |
 | `PATCH`| `/admin/subscribers/{id}/suspend` | Suspend account |
 | `PATCH`| `/admin/subscribers/{id}/reactivate` | Reactivate account |
 
@@ -132,6 +134,7 @@ The dashboard reads prediction state from JSON files written by `crex_live_predi
 | `JWT_SECRET` | ✅ | — | Secret key for signing JWTs |
 | `ADMIN_EMAIL` | ✅ | — | Bootstrap admin email |
 | `ADMIN_PASSWORD` | ✅ | — | Bootstrap admin password |
+| `ADMIN_FORCE_SYNC` | ❌ | `false` | When `true`, reset/sync the seeded admin account password and flags from env on startup |
 | `DOMAIN` | ❌ | `localhost` | Domain for HTTPS (Caddy) |
 | `STATE_DIR` | ❌ | `data/dashboard_states` | Where prediction JSON files are written |
 | `DATABASE_URL` | ❌ | `sqlite:///./auth.db` | SQLAlchemy connection string |
@@ -141,6 +144,8 @@ The dashboard reads prediction state from JSON files written by `crex_live_predi
 | `SESSION_CAP` | ❌ | `50` | Max concurrent sessions |
 | `MAX_USER_MATCHES` | ❌ | `2` | Max predictions per user |
 | `MAX_TOTAL_MATCHES` | ❌ | `6` | Max system-wide predictions |
+| `STALE_RUNNING_MATCH_MINUTES` | ❌ | `30` | Kill and clear a predictor after this much no-file activity |
+| `PUBLIC_MATCH_STALE_SECONDS` | ❌ | `300` | Hide frozen public live cards when the predictor JSON stops updating |
 | `AUTO_PREDICTIONS_ENABLED` | ❌ | `false` | Enable deployed auto-start scheduler |
 | `AUTO_LEAGUE_KEY` | ❌ | `IPL` | League to discover from CREX (`IPL`, `PSL`, etc.) |
 | `AUTO_MATCH_URLS` | ❌ | — | CREX URLs to auto-start directly, separated by spaces or commas |
@@ -163,6 +168,15 @@ AUTO_LEAGUE_KEY=IPL
 ```
 
 The scheduler scans CREX's IPL 2026 series page and live-score pages. It starts live matches immediately, and starts scheduled discovered matches only inside the configured local evening window.
+
+### Known prod failure mode: frozen live card
+
+If the dashboard API process restarts, `PredictionManager.cleanup_all()` stops all child
+`crex_live_predictor` processes immediately. Separately, a predictor can hang while the
+dashboard stays healthy, leaving the public site stuck on an old score. The public
+surface now hides stale cards after `PUBLIC_MATCH_STALE_SECONDS`, and the auto-scheduler
+clears stale runners before duplicate checks so a replacement can be started once the
+stale threshold is crossed.
 
 For the current PSL test URL, set:
 

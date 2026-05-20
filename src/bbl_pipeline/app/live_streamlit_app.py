@@ -1583,7 +1583,36 @@ def main():
     phase_target_prob = d.get("calibrated_phase_target_prob", None)  # Inn2 phase×target calibration
     league_calibrated_prob = d.get("league_calibrated_prob", None)  # League-specific (temperature/platt)
     league = d.get("league", None)  # League code if specified
+    post_cal_rule = d.get("post_model_calibration_rule")
+    post_cal_input_prob = d.get("post_model_calibration_input_prob")
+    post_cal_prob = d.get("post_model_calibration_prob")
     shadow_t_prob = d.get("shadow_t_prob", None)  # Shadow: segment-specific T (Inn1PP/Inn2PP/Inn2Mid)
+    inn2_router_phase = d.get("inn2_router_phase")
+    inn2_router_source = d.get("inn2_router_source")
+    inn2_router_raw_prob = d.get("inn2_router_raw_prob")
+    inn2_router_output_prob = d.get("inn2_router_output_prob")
+    _is_inn2 = d.get("is_second_innings", False)
+    _router_active = (
+        _is_inn2
+        and (
+            bool(inn2_router_phase or inn2_router_source)
+            or (
+                per_over_prob is not None
+                and combined_prob is not None
+                and abs(per_over_prob - combined_prob) > 0.005
+            )
+        )
+    )
+    if _router_active:
+        if inn2_router_raw_prob is not None:
+            raw_prob = inn2_router_raw_prob
+        router_display_prob = inn2_router_output_prob if inn2_router_output_prob is not None else per_over_prob
+        if router_display_prob is not None:
+            smoothed_prob = router_display_prob
+            combined_prob = router_display_prob
+            inn_specific_prob = router_display_prob
+            phase_specific_prob = router_display_prob
+            per_over_prob = router_display_prob
     
     # Detect if this is SA20 and recalculate calibrated probabilities client-side
     # BUT skip if CLI already applied league calibration (league field is set)
@@ -1640,7 +1669,13 @@ def main():
     # Decide number of columns based on whether phase-specific and league-specific are available
     has_phase = phase_specific_prob is not None and abs(phase_specific_prob - inn_specific_prob) > 0.001
     has_league = league_calibrated_prob is not None and league is not None
-    prod_ref = league_calibrated_prob if has_league else inn_specific_prob
+    has_post_cal = (
+        post_cal_rule is not None
+        and post_cal_prob is not None
+        and post_cal_input_prob is not None
+        and abs(post_cal_prob - post_cal_input_prob) > 0.002
+    )
+    prod_ref = post_cal_prob if has_post_cal else (league_calibrated_prob if has_league else inn_specific_prob)
     has_shadow = shadow_t_prob is not None and abs(shadow_t_prob - prod_ref) > 0.002
     
     # Calculate number of columns
@@ -1648,6 +1683,8 @@ def main():
     if has_phase:
         num_cols += 1
     if has_league:
+        num_cols += 1
+    if has_post_cal:
         num_cols += 1
     if has_shadow:
         num_cols += 1
@@ -1659,40 +1696,45 @@ def main():
         league_calibrated_odds = prob_to_odds(league_calibrated_prob)
     
     with prob_cols[0]:
+        raw_title = "Router Raw" if _router_active else "Raw Model"
+        raw_desc = inn2_router_source or "XGB+LogReg Ensemble"
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #2196F3;">
-            <b>📊 Raw Model</b><br>
+            <b>📊 {raw_title}</b><br>
             <span style="font-size: 1.5em; color: #2196F3;">{raw_prob*100:.1f}%</span><br>
             <span style="font-size: 1.1em; color: #333;">Odds: <b>{raw_odds}</b></span><br>
-            <span style="font-size: 0.9em; color: #666;">XGB+LogReg Ensemble</span>
+            <span style="font-size: 0.9em; color: #666;">{raw_desc}</span>
         </div>
         ''', unsafe_allow_html=True)
     with prob_cols[1]:
+        smoothed_desc = inn2_router_source or "30% Calibrated Blend"
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #FF9800;">
-            <b>🔄 Smoothed</b><br>
+            <b>🔄 {"Router Output" if _router_active else "Smoothed"}</b><br>
             <span style="font-size: 1.5em; color: #FF9800;">{smoothed_prob*100:.1f}%</span><br>
             <span style="font-size: 1.1em; color: #333;">Odds: <b>{smoothed_odds}</b></span><br>
-            <span style="font-size: 0.9em; color: #666;">30% Calibrated Blend</span>
+            <span style="font-size: 0.9em; color: #666;">{smoothed_desc}</span>
         </div>
         ''', unsafe_allow_html=True)
     with prob_cols[2]:
+        combined_desc = inn2_router_source or "Combined Isotonic"
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #9C27B0;">
-            <b>🎯 Combined</b><br>
+            <b>🎯 {"Router Main" if _router_active else "Combined"}</b><br>
             <span style="font-size: 1.5em; color: #9C27B0;">{combined_prob*100:.1f}%</span><br>
             <span style="font-size: 1.1em; color: #333;">Odds: <b>{combined_odds}</b></span><br>
-            <span style="font-size: 0.9em; color: #666;">Combined Isotonic</span>
+            <span style="font-size: 0.9em; color: #666;">{combined_desc}</span>
         </div>
         ''', unsafe_allow_html=True)
     with prob_cols[3]:
         innings_label = "Inn1" if not d.get("is_second_innings") else "Inn2"
+        inn_specific_desc = inn2_router_source if _router_active else f"{innings_label} Isotonic"
         st.markdown(f'''
         <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 10px; border-left: 4px solid #4CAF50;">
-            <b>✅ Inn-Specific</b><br>
+            <b>✅ {"Router Selected" if _router_active else "Inn-Specific"}</b><br>
             <span style="font-size: 1.5em; color: #4CAF50;">{inn_specific_prob*100:.1f}%</span><br>
             <span style="font-size: 1.1em; color: #333;">Odds: <b>{inn_specific_odds}</b></span><br>
-            <span style="font-size: 0.9em; color: #666;">{innings_label} Isotonic</span>
+            <span style="font-size: 0.9em; color: #666;">{inn_specific_desc}</span>
         </div>
         ''', unsafe_allow_html=True)
     
@@ -1731,6 +1773,27 @@ def main():
             </div>
             ''', unsafe_allow_html=True)
 
+    if has_post_cal:
+        post_col_idx = 4 + (1 if has_phase else 0) + (1 if has_league else 0)
+        with prob_cols[post_col_idx]:
+            post_cal_odds = prob_to_odds(post_cal_prob)
+            post_delta_pp = (post_cal_prob - post_cal_input_prob) * 100
+            post_delta_str = f"{post_delta_pp:+.1f} pp"
+            rule_labels = {
+                "inn1_low_side": "Inn1 low-side",
+                "inn2_easy_chase": "Inn2 easy chase",
+                "inn2_par_pp_mid": "Inn2 par PP/Mid",
+            }
+            post_rule_label = rule_labels.get(post_cal_rule, str(post_cal_rule))
+            st.markdown(f'''
+            <div style="text-align: center; padding: 10px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #1565c0;">
+                <b>🧭 Post-Cal</b><br>
+                <span style="font-size: 1.5em; color: #1565c0;">{post_cal_prob*100:.1f}%</span><br>
+                <span style="font-size: 1.1em; color: #333;">Odds: <b>{post_cal_odds}</b> <span style="color:#888;font-size:0.85em;">({post_delta_str})</span></span><br>
+                <span style="font-size: 0.9em; color: #666;">{post_rule_label}</span>
+            </div>
+            ''', unsafe_allow_html=True)
+
     # Shadow T column — segment-specific T (Inn1PP T=0.40, Inn2PP T=0.60, Inn2Mid T=0.50)
     # Only appears during those segments; hides otherwise.
     if has_shadow:
@@ -1760,24 +1823,30 @@ def main():
             </div>
             ''', unsafe_allow_html=True)
 
-    # Model routing note — shows which cards use the IPL v14 router vs v7 inn1 base
-    _is_inn2 = d.get("is_second_innings", False)
-    _router_active = (
-        _is_inn2
-        and per_over_prob is not None
-        and combined_prob is not None
-        and abs(per_over_prob - combined_prob) > 0.005
-    )
+    # Model routing note — shows which cards use the IPL raw router vs v7 inn1 base
     if _router_active:
+        _source_label = inn2_router_source or f"v14_{inn2_router_phase}_raw"
+        _post_note = (
+            f" Post-Cal rule **{post_cal_rule}** is active."
+            if has_post_cal else
+            " Post-Cal is loaded but no gate fired for this ball."
+        )
         st.caption(
             "🟢 **ipl_v14 router active (Inn2)** — "
-            "Inn×Phase · IPL · Shadow T use **ipl_v14_pitch_features** phase models. "
-            "⚠️ Raw · Smoothed · Combined · Inn-Specific still reflect **ipl_v7** (no inn2 equivalent calibrators)."
+            f"using **{_source_label}**. "
+            "Current base rule is raw phase output; PP easy chases use **v12 PP raw**."
+            + _post_note
         )
     else:
         _inn_label = "Inn2" if _is_inn2 else "Inn1"
+        _post_note = (
+            f" Post-Cal rule **{post_cal_rule}** is active."
+            if has_post_cal else
+            ""
+        )
         st.caption(
-            f"ℹ️ All cards use **ipl_v7** ({_inn_label} base model) — ipl_v14 router activates in Inn2 when per-over calibration diverges."
+            f"ℹ️ All base cards use **ipl_v7** ({_inn_label} base model) — ipl_v14 raw router activates in Inn2."
+            + _post_note
         )
 
     terminal_clamp = d.get("terminal_clamp") if isinstance(d.get("terminal_clamp"), dict) else None
@@ -1827,6 +1896,9 @@ def main():
             phase_name = odm.get("phase", "unknown")
             history_points = odm.get("history_points", "?")
             delta_mode = odm.get("selected_delta_mode", "unknown")
+            delta_point_mode = odm.get("selected_delta_point_mode", delta_mode)
+            delta_point_scale = _safe_float_or_none(odm.get("selected_delta_point_scale")) or 1.0
+            point_status = str(delta_12.get("point_estimate_status", "experimental")).replace("_", " ").title()
 
             odm_cols = st.columns(3)
             with odm_cols[0]:
@@ -1854,12 +1926,15 @@ def main():
                 <div style="text-align: center; padding: 10px; background: #fff8e1; border-radius: 10px; border-left: 4px solid #ef6c00;">
                     <b>🧪 Point Estimate</b><br>
                     <span style="font-size: 1.5em; color: #ef6c00;">{point_estimate}</span><br>
-                    <span style="font-size: 0.95em; color: #444;">Experimental only</span><br>
-                    <span style="font-size: 0.9em; color: #666;">History points: {history_points}</span>
+                    <span style="font-size: 0.95em; color: #444;">{point_status}</span><br>
+                    <span style="font-size: 0.9em; color: #666;">Mode: {delta_point_mode} | Scale: {delta_point_scale:.2f}</span>
                 </div>
                 ''', unsafe_allow_html=True)
 
-            point_note = "Central ODM delta is still experimental. Use direction and interval as the primary advisory signals."
+            point_note = odm.get("advisory", {}).get(
+                "point_estimate_note",
+                "Central ODM delta is still experimental. Use direction and interval as the primary advisory signals.",
+            )
             st.caption(point_note)
 
         elif odm_status == "warming_up":
@@ -2754,18 +2829,16 @@ def main():
                     brier_label = f"Brier-Optimized ({t20i_brier_source})"
                     brier_desc = "Brier=0.1438, 672K samples"
                 elif is_ipl:
-                    # IPL v11 inn1 (v7 global) + v12 inn2 phase router (PP/MID/Death)
-                    # Inn2: calibrated_per_over_prob = v12 router output
-                    #   MID uses Platt calibration, PP/Death use per-over isotonic
+                    # IPL inn1 uses v7; inn2 uses the raw phase router output.
                     inn_num_local = d.get("innings", 1)
-                    if per_over_prob is not None and per_over_prob != raw_prob:
+                    if inn_num_local == 2 and per_over_prob is not None and (inn2_router_source or per_over_prob != raw_prob):
                         brier_prob = per_over_prob
-                        if inn_num_local == 2:
-                            brier_label = "v12 Phase Router (Inn2)"
-                            brier_desc = "PP/Death: per-over isotonic | MID: Platt cal"
-                        else:
-                            brier_label = "Per-Over Calibrated (Inn1)"
-                            brier_desc = "IPL v7 per-over isotonic"
+                        brier_label = "IPL Raw Phase Router (Inn2)"
+                        brier_desc = inn2_router_source or "v14 raw; PP-low falls back to v12 raw"
+                    elif per_over_prob is not None and per_over_prob != raw_prob:
+                        brier_prob = per_over_prob
+                        brier_label = "Per-Over Calibrated (Inn1)"
+                        brier_desc = "IPL v7 per-over isotonic"
                     else:
                         brier_prob = raw_prob
                         brier_label = "Raw Model Output"

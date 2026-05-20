@@ -75,3 +75,38 @@ class TestSubscriberCRUD:
                           headers={"Authorization": f"Bearer {admin_token}"}).json()
         user = next(u for u in subs if u["id"] == user_id)
         assert user["is_active"] is True
+
+
+class TestAnalytics:
+    def test_analytics_summary_requires_admin(self, client, user_token):
+        resp = client.get("/admin/analytics/summary", headers={
+            "Authorization": f"Bearer {user_token}",
+        })
+
+        assert resp.status_code == 403
+
+    def test_analytics_summary_reports_sources_and_signups(self, client, admin_token):
+        resp = client.get(
+            "/login?utm_source=instagram&utm_medium=reel&utm_campaign=launch",
+            headers={"referer": "https://www.instagram.com/reel/abc123/"},
+        )
+        assert resp.status_code == 200
+        assert "cz_vid=" in resp.headers.get("set-cookie", "")
+
+        register = client.post("/auth/register", json={
+            "email": "tracked@test.com",
+            "password": "trackedpassword123",
+        })
+        assert register.status_code == 200
+
+        summary = client.get("/admin/analytics/summary", headers={
+            "Authorization": f"Bearer {admin_token}",
+        })
+        assert summary.status_code == 200
+        data = summary.json()
+        assert data["total_page_views"] >= 1
+        assert data["unique_visitors"] >= 1
+        assert data["total_registrations"] == 1
+        assert any(bucket["label"] == "instagram" and bucket["registrations"] == 1 for bucket in data["top_sources"])
+        assert any(bucket["label"] == "launch" for bucket in data["top_campaigns"])
+        assert any(visit["event_name"] == "register_success" for visit in data["recent_visits"])

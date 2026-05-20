@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-20",
+  "last_updated": "2026-05-21",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -807,9 +807,59 @@
       }
     },
     "IPL": {
-      "path": "models/ipl_v15_wicket_features",
-      "version": "v15_wicket_features",
-      "description": "Active IPL production model. Hybrid routing: ipl_v7 for inn1, v15 wicket-feature phase router for inn2. Adds wicket x chase interaction features to fix PP high-chase underprediction (LSG vs RR May 19 2026 root cause).",
+      "path": "models/ipl_v17_pp_features",
+      "version": "v17_pp_features",
+      "description": "Active IPL production model. Hybrid routing: ipl_v7 for inn1, v17 phase router for inn2. v17 adds 14 high-signal PP features + per-cell calibration (18: 6 overs × 3 chase_categories). PP XGB tuned: depth=4, minwt=15.",
+      "training": {
+        "date": "2026-05-21",
+        "architecture": "ipl_v17_pp_router",
+        "inn1_model": "models/ipl_v7",
+        "inn2_model": "models/ipl_v17_pp_features",
+        "resource_calculator_usage": "Unchanged. v17 adds PP feature expansion and per-cell calibration.",
+        "stage_summary": "v17 adds 14 chase-difficulty/momentum features to PP (70→84). MID and DEATH unchanged from v15. Per-cell calibration replaces PostModelCalibrationRouter.",
+        "motivation": "v15 PP still showed systematic underprediction in par chases. Per-cell calibration (over × chase_category) addresses residual bias per segment. 14 new features add direct chase-difficulty signal.",
+        "phase_added_features_vs_v15": {
+          "pp": [
+            "late_mid_urgency", "death_feasibility", "finish_quality_zone",
+            "chase_on_track_score", "chase_run_buffer", "svp_x_chase_cat",
+            "momentum_under_pressure", "required_rpb", "early_mid_rrr_vs_venue_avg",
+            "chase_difficulty", "score_per_wicket", "wickets_times_balls",
+            "wickets_last_30", "balls_since_wicket"
+          ],
+          "mid": [],
+          "death": []
+        },
+        "inn2_brier_oof_cal": {
+          "pp_v15_baseline": 0.17032,
+          "pp_v17_std_cal": 0.16991,
+          "pp_v17_cell_cal": 0.16663,
+          "pp_v17_improvement_pct": "-2.17%",
+          "mid": 0.1332,
+          "death": 0.07796
+        },
+        "oos_2025_2026": {
+          "pp_v15_brier": 0.14239,
+          "pp_v17_brier": 0.16016,
+          "note": "OOS uses pre-2025 training only; production uses all seasons so OOF is a better estimate"
+        },
+        "calibration_note": "apply_calibration=True. Per-cell isotonic (18 cells: over 1-6 × cat {-1,0,1}). PostModelCalibrationRouter disabled (per-cell replaces it).",
+        "replaced_model": "models/ipl_v15_wicket_features"
+      },
+      "routing_config": "models/ipl_v17_pp_features/routing_config.json",
+      "artifacts": {
+        "phase_features": "models/ipl_v17_pp_features/phase_features.json",
+        "phase_oof_calibrators": "models/ipl_v17_pp_features/phase_oof_calibrators.pkl",
+        "venue_pitch_baselines": "models/ipl_v17_pp_features/venue_pitch_baselines.json",
+        "oof_results": "models/ipl_v17_pp_features/oof_results.csv"
+      },
+      "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
+      "feature_store": {
+        "path": "data/ipl_feature_store_v9",
+        "version": "v9",
+        "generated_date": "2026-05-03",
+        "training_data_samples": 278954
+      }
+    },
       "training": {
         "date": "2026-05-20",
         "architecture": "ipl_v15_wicket_router",
@@ -933,22 +983,23 @@
       }
     },
     "ipl": {
-      "version": "v15_wicket_features",
-      "model_dir": "models/ipl_v15_wicket_features",
-      "champion_model": "models/ipl_v15_wicket_features/champion_model_pp.joblib",
+      "version": "v17_pp_features",
+      "model_dir": "models/ipl_v17_pp_features",
+      "champion_model": "models/ipl_v17_pp_features/champion_model_pp.joblib",
       "phase_models": {
-        "pp": "models/ipl_v15_wicket_features/champion_model_pp.joblib",
-        "mid": "models/ipl_v15_wicket_features/champion_model_mid.joblib",
-        "death": "models/ipl_v15_wicket_features/champion_model_death.joblib"
+        "pp": "models/ipl_v17_pp_features/champion_model_pp.joblib",
+        "mid": "models/ipl_v17_pp_features/champion_model_mid.joblib",
+        "death": "models/ipl_v17_pp_features/champion_model_death.joblib"
       },
-      "oof_calibrators": "models/ipl_v15_wicket_features/phase_oof_calibrators.pkl",
-      "routing_config": "models/ipl_v15_wicket_features/routing_config.json",
+      "oof_calibrators": "models/ipl_v17_pp_features/phase_oof_calibrators.pkl",
+      "routing_config": "models/ipl_v17_pp_features/routing_config.json",
       "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
-      "resource_calculator_usage": "Unchanged; v15 wicket features are extra ML inputs on top of v14 pitch features.",
-      "inn2_isotonic_calibrator": "models/ipl_v7/inn2_isotonic_calibrator.pkl",
+      "resource_calculator_usage": "Unchanged. v17 adds 14 PP chase-difficulty features and per-cell calibration.",
       "training_data": "data/ipl_features_v10/training.parquet",
-      "oof_brier": 0.1332,
-      "updated": "2026-05-20"
+      "oof_brier_pp_cell_cal": 0.16663,
+      "oof_brier_pp_v15_baseline": 0.17032,
+      "pp_improvement_pct": "-2.17%",
+      "updated": "2026-05-21"
     }
   },
   "archived_models": {

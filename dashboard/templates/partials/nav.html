@@ -1,24 +1,25 @@
-<nav class="bg-gray-800 border-b border-gray-700 shadow-lg">
-  <div class="max-w-7xl mx-auto px-4">
+<nav class="border-b border-slate-800 bg-slate-950/95 shadow-lg shadow-black/20">
+  <div class="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Logo -->
-      <a href="/dashboard" class="flex items-center space-x-2">
-        <span class="text-2xl">🏏</span>
-        <span class="text-xl font-bold text-brand-500">CrickenZen</span>
+      <a href="/" class="flex items-center space-x-3">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-400 text-sm font-black text-slate-950">CZ</span>
+        <span class="text-xl font-black tracking-tight text-white">CrickenZen</span>
       </a>
 
       <!-- Nav links -->
       <div class="flex items-center space-x-4">
+        <a href="/ipl-prediction-today" class="hidden text-slate-300 transition-colors hover:text-white sm:inline">IPL Today</a>
         <template x-if="isLoggedIn">
           <div class="flex items-center space-x-4">
-            <a href="/dashboard" class="text-gray-300 hover:text-white transition-colors">Dashboard</a>
+            <a href="/dashboard" class="text-slate-300 hover:text-white transition-colors">Match Centre</a>
             <template x-if="isAdmin">
-              <a href="/admin" class="text-gray-300 hover:text-white transition-colors">Admin</a>
+              <a href="/admin" class="text-slate-300 hover:text-white transition-colors">Admin</a>
             </template>
-            <span class="text-gray-500">|</span>
-            <span class="text-sm text-gray-400" x-text="user?.email"></span>
+            <span class="text-slate-700">|</span>
+            <span class="text-sm text-slate-400" x-text="user?.email"></span>
             <span class="text-xs px-2 py-0.5 rounded-full"
-                  :class="user?.plan === 'admin' ? 'bg-purple-600' : user?.plan === 'monthly' ? 'bg-brand-600' : 'bg-gray-600'"
+                  :class="user?.plan === 'admin' ? 'bg-emerald-500 text-slate-950' : user?.plan === 'monthly' ? 'bg-brand-600' : 'bg-slate-700'"
                   x-text="user?.plan"></span>
             <button @click="logout()" class="text-sm text-red-400 hover:text-red-300 transition-colors">
               Logout

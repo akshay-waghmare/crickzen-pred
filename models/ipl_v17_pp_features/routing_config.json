@@ -1,0 +1,43 @@
+{
+  "type": "inn2_phase_router",
+  "description": "ipl_v17_pp_features: v15 + 14 high-signal PP features + per-cell calibration (6 overs \u00d7 3 chase_categories). PP XGB: depth=4, minwt=15. MID and DEATH phases identical to v15.",
+  "inn1_model_dir": "models/ipl_v7",
+  "inn2_phase_model_dir": "models/ipl_v17_pp_features",
+  "apply_calibration": true,
+  "post_model_calibration": {
+    "enabled": false,
+    "reason": "Per-cell calibration in phase_oof_calibrators.pkl replaces post_model_calibration_router."
+  },
+  "pp_low_fallback_model_dir": "models/ipl_v12",
+  "pp_low_fallback_rule": "phase == pp and target_above_par < -20 uses models/ipl_v12 raw probability",
+  "inn2_changes_vs_v15": {
+    "pp": [
+      "late_mid_urgency",
+      "death_feasibility",
+      "finish_quality_zone",
+      "chase_on_track_score",
+      "chase_run_buffer",
+      "svp_x_chase_cat",
+      "momentum_under_pressure",
+      "required_rpb",
+      "early_mid_rrr_vs_venue_avg",
+      "chase_difficulty",
+      "score_per_wicket",
+      "wickets_times_balls",
+      "wickets_last_30",
+      "balls_since_wicket"
+    ],
+    "mid": [],
+    "death": []
+  },
+  "calibration": {
+    "pp": "per_cell_isotonic (6 overs \u00d7 3 chase_categories = 18 calibrators)",
+    "mid": "per_over_isotonic",
+    "death": "per_over_isotonic"
+  },
+  "oof_brier": {
+    "pp_v15_baseline": 0.17032,
+    "pp_v17_cell_cal": 0.16663,
+    "pp_v17_improvement_pct": "-2.17%"
+  }
+}

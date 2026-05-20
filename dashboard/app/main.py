@@ -7,14 +7,16 @@ import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.exc import SQLAlchemyError
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from sqlmodel import Session
 
+from app.analytics import record_page_view, should_track_page_view
 from app.config import Settings, get_settings
 
 logger = logging.getLogger(__name__)
@@ -96,6 +98,18 @@ def create_app(
         lifespan=lifespan,
     )
 
+    @application.middleware("http")
+    async def capture_visitor_analytics(request: Request, call_next):
+        response = await call_next(request)
+        if not should_track_page_view(request, response):
+            return response
+        try:
+            with Session(engine) as session:
+                record_page_view(session, request, response)
+        except SQLAlchemyError:
+            logger.exception("Failed to record visitor analytics for %s", request.url.path)
+        return response
+
     # Rate limiter
     application.state.limiter = limiter
     application.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -118,12 +132,14 @@ def create_app(
     from app.routers.auth import router as auth_router
     from app.routers.admin import router as admin_router
     from app.routers.live import router as live_router
+    from app.routers.public import router as public_router
     from app.routers.pages import router as pages_router
     from app.health import router as health_router
 
     application.include_router(auth_router)
     application.include_router(admin_router)
     application.include_router(live_router)
+    application.include_router(public_router)
     application.include_router(health_router)
     # Pages router last (catch-all "/" route)
     application.include_router(pages_router)

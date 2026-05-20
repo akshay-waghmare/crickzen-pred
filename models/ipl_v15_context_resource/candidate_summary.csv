@@ -1,0 +1,4 @@
+version,oos_brier,oos_brier_delta_pct,oos_logloss,oos_logloss_delta_pct,guardrails_50_60_80_ok,bucket_70_80_improved,promote
+v14_original,0.11175015455386834,0.0,0.37431110011282837,0.0,True,False,False
+v15_add_context_resource,0.11189616061780804,0.13065401522045306,0.37621920614388604,0.5097647466191939,False,True,False
+v15_replace_resource,0.1125747444361845,0.737887017345165,0.3779273058602048,0.9660963156813653,False,True,False

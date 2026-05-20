@@ -101,12 +101,135 @@
       </div>
     </div>
   </div>
+
+  <div class="card mt-6">
+    <div class="flex items-center justify-between gap-4 mb-4">
+      <div>
+        <h2 class="text-lg font-semibold">Traffic Analytics</h2>
+        <p class="text-sm text-gray-400">First-party page views, Instagram UTM attribution, and signup conversions.</p>
+      </div>
+      <div class="text-xs text-gray-500">Last refreshed in browser</div>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-4 text-center">
+      <div class="bg-gray-700/50 rounded-lg p-4">
+        <div class="text-2xl font-bold text-brand-500" x-text="analytics.total_page_views"></div>
+        <div class="text-sm text-gray-400">Page Views</div>
+      </div>
+      <div class="bg-gray-700/50 rounded-lg p-4">
+        <div class="text-2xl font-bold text-emerald-400" x-text="analytics.unique_visitors"></div>
+        <div class="text-sm text-gray-400">Unique Visitors</div>
+      </div>
+      <div class="bg-gray-700/50 rounded-lg p-4">
+        <div class="text-2xl font-bold text-blue-400" x-text="analytics.total_registrations"></div>
+        <div class="text-sm text-gray-400">Tracked Signups</div>
+      </div>
+      <div class="bg-gray-700/50 rounded-lg p-4">
+        <div class="text-2xl font-bold text-purple-400" x-text="analytics.page_views_last_7_days"></div>
+        <div class="text-sm text-gray-400">Views Last 7 Days</div>
+      </div>
+    </div>
+
+    <div class="grid gap-6 mt-6 xl:grid-cols-3">
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-3">Top Sources</h3>
+        <div class="space-y-2">
+          <template x-for="source in analytics.top_sources" :key="source.label">
+            <div class="rounded-lg border border-gray-700/60 bg-gray-800/40 p-3 flex items-center justify-between gap-4">
+              <div>
+                <div class="font-medium text-white" x-text="source.label"></div>
+                <div class="text-xs text-gray-400"><span x-text="source.registrations"></span> registrations</div>
+              </div>
+              <div class="text-right text-brand-400 font-semibold" x-text="source.count"></div>
+            </div>
+          </template>
+          <div x-show="analytics.top_sources.length === 0" class="text-sm text-gray-500">No tracked traffic yet.</div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-3">Top Campaigns</h3>
+        <div class="space-y-2">
+          <template x-for="campaign in analytics.top_campaigns" :key="campaign.label">
+            <div class="rounded-lg border border-gray-700/60 bg-gray-800/40 p-3 flex items-center justify-between gap-4">
+              <div>
+                <div class="font-medium text-white" x-text="campaign.label"></div>
+                <div class="text-xs text-gray-400"><span x-text="campaign.registrations"></span> registrations</div>
+              </div>
+              <div class="text-right text-blue-400 font-semibold" x-text="campaign.count"></div>
+            </div>
+          </template>
+          <div x-show="analytics.top_campaigns.length === 0" class="text-sm text-gray-500">No campaign tags captured yet.</div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-3">Top Pages</h3>
+        <div class="space-y-2">
+          <template x-for="page in analytics.top_pages" :key="page.label">
+            <div class="rounded-lg border border-gray-700/60 bg-gray-800/40 p-3 flex items-center justify-between gap-4">
+              <div class="font-medium text-white break-all" x-text="page.label"></div>
+              <div class="text-right text-emerald-400 font-semibold" x-text="page.count"></div>
+            </div>
+          </template>
+          <div x-show="analytics.top_pages.length === 0" class="text-sm text-gray-500">No page views yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-3">Recent Traffic</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-400 border-b border-gray-700">
+              <th class="pb-3 pr-4">When</th>
+              <th class="pb-3 pr-4">Event</th>
+              <th class="pb-3 pr-4">Source</th>
+              <th class="pb-3 pr-4">Campaign</th>
+              <th class="pb-3 pr-4">Page</th>
+              <th class="pb-3">Landing</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="visit in analytics.recent_visits" :key="`${visit.event_name}-${visit.created_at}-${visit.path}`">
+              <tr class="border-b border-gray-700/50">
+                <td class="py-3 pr-4 text-gray-400" x-text="new Date(visit.created_at).toLocaleString()"></td>
+                <td class="py-3 pr-4">
+                  <span class="text-xs px-2 py-0.5 rounded-full"
+                        :class="visit.event_name === 'register_success' ? 'bg-emerald-700 text-emerald-100' : 'bg-slate-700 text-slate-100'"
+                        x-text="visit.event_name"></span>
+                </td>
+                <td class="py-3 pr-4 text-white" x-text="visit.source"></td>
+                <td class="py-3 pr-4 text-gray-300" x-text="visit.campaign"></td>
+                <td class="py-3 pr-4 text-gray-300 break-all" x-text="visit.path"></td>
+                <td class="py-3 text-gray-500 break-all" x-text="visit.landing_path || '-'"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+      <div x-show="analytics.recent_visits.length === 0" class="text-center py-8 text-gray-500">
+        No tracked visits yet
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 function adminPage() {
   return {
     subscribers: [],
+    analytics: {
+      total_page_views: 0,
+      unique_visitors: 0,
+      total_registrations: 0,
+      page_views_last_7_days: 0,
+      top_sources: [],
+      top_pages: [],
+      top_campaigns: [],
+      recent_visits: [],
+    },
     showAdd: false,
     newEmail: '',
     newPassword: '',
@@ -116,6 +239,7 @@ function adminPage() {
 
     async init() {
       await this.loadSubscribers();
+      await this.loadAnalytics();
     },
 
     async loadSubscribers() {
@@ -124,6 +248,15 @@ function adminPage() {
         this.subscribers = await czFetch('/admin/subscribers', { token });
       } catch (e) {
         console.error('Failed to load subscribers', e);
+      }
+    },
+
+    async loadAnalytics() {
+      const token = localStorage.getItem('cz_token');
+      try {
+        this.analytics = await czFetch('/admin/analytics/summary', { token });
+      } catch (e) {
+        console.error('Failed to load analytics', e);
       }
     },
 
@@ -140,7 +273,7 @@ function adminPage() {
         this.newEmail = '';
         this.newPassword = '';
         this.showAdd = false;
-        await this.loadSubscribers();
+        await Promise.all([this.loadSubscribers(), this.loadAnalytics()]);
       } catch (e) {
         this.addError = e.message || 'Failed to create subscriber';
       } finally {
@@ -152,7 +285,7 @@ function adminPage() {
       const token = localStorage.getItem('cz_token');
       try {
         await czFetch(`/admin/subscribers/${userId}/suspend`, { method: 'PATCH', token });
-        await this.loadSubscribers();
+        await Promise.all([this.loadSubscribers(), this.loadAnalytics()]);
       } catch {}
     },
 
@@ -160,7 +293,7 @@ function adminPage() {
       const token = localStorage.getItem('cz_token');
       try {
         await czFetch(`/admin/subscribers/${userId}/reactivate`, { method: 'PATCH', token });
-        await this.loadSubscribers();
+        await Promise.all([this.loadSubscribers(), this.loadAnalytics()]);
       } catch {}
     },
   };

@@ -133,6 +133,23 @@ class FormatConfig:
     # --- Final-over lookup (optional, None = use sigmoid fallback) ----------
     final_over_lookup: Optional[Dict[int, Dict[int, float]]] = None
 
+    # --- Target-category-aware chase sigmoid (optional) ---------------------
+    # When set, selects different (midpoint, slope, beta) based on how the
+    # target compares to par.  None = single sigmoid for all targets.
+    #
+    # Keys per category dict: "midpoint", "slope", "beta"
+    # Categories: "below_par" | "on_par" | "above_par"
+    #
+    # Boundary rule (target_above_par = target - par_score):
+    #   target_above_par < rrr_target_cat_below_threshold  → below_par
+    #   target_above_par > rrr_target_cat_above_threshold  → above_par
+    #   otherwise                                          → on_par
+    #
+    # Derived from IPL EDA (282k inn2 rows): stratified Brier -1.15% vs single.
+    rrr_params_by_target_cat: Optional[Dict[str, Dict[str, float]]] = None
+    rrr_target_cat_below_threshold: float = -15.0  # target < par-15 → below_par
+    rrr_target_cat_above_threshold: float = 15.0   # target > par+15 → above_par
+
     # ── Validation ──────────────────────────────────────────────────────────
 
     def __post_init__(self) -> None:
@@ -426,6 +443,20 @@ class FormatConfig:
                 19: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.04, 5: 0.09, 6: 0.19, 7: 0.19, 8: 0.19, 9: 0.19, 10: 0.19},
                 20: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.04, 5: 0.07, 6: 0.19, 7: 0.19, 8: 0.19, 9: 0.19, 10: 0.19},
             },
+            # IPL target-category-aware chase sigmoid (derived from 282k inn2 rows EDA):
+            # Stratified by how target compares to par (173.45):
+            #   below_par  = target < par - 15  (easy chase:   mean RRR 6.85)
+            #   on_par     = |target - par| ≤ 15 (moderate:    mean RRR 9.49)
+            #   above_par  = target > par + 15  (hard chase:   mean RRR 12.57)
+            # Overall Brier improvement vs single sigmoid: -1.15%
+            # Largest gain: above_par × death phase (−8pp bias corrected).
+            rrr_params_by_target_cat={
+                "below_par": {"midpoint": 9.021, "slope": 0.0712, "beta": 0.550},
+                "on_par":    {"midpoint": 8.408, "slope": 0.1128, "beta": 0.674},
+                "above_par": {"midpoint": 8.259, "slope": 0.1949, "beta": 0.614},
+            },
+            rrr_target_cat_below_threshold=-15.0,
+            rrr_target_cat_above_threshold=15.0,
         )
 
     @classmethod

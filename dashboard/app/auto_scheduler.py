@@ -98,6 +98,7 @@ class AutoPredictionScheduler:
         self._last_error = None
 
         try:
+            self.manager.cleanup_expired(self.settings)
             candidates = await self.discover_candidates()
             self._last_candidates = candidates
             for candidate in candidates:
@@ -242,7 +243,7 @@ def extract_crex_match_candidates(
         absolute_url = _normalize_crex_url(urljoin(base_url, unescape(href)))
         if not _is_crex_match_url(absolute_url):
             continue
-        league_key = detect_league_from_url(absolute_url) or target_league_key
+        league_key = detect_league_from_url(absolute_url)
         if league_key != target_league_key:
             continue
         label = _strip_tags(body)

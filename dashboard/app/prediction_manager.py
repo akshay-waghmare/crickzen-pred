@@ -13,7 +13,7 @@ import signal
 import subprocess
 import threading
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse, urlunparse
@@ -30,6 +30,7 @@ from app.config import (
 logger = logging.getLogger(__name__)
 
 WINDOWS_PROCESS_GROUP = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+TERMINAL_STATUSES = {"stopped", "finished", "error"}
 
 
 def _normalize_match_url_key(url: str) -> str:
@@ -61,6 +62,7 @@ class Prediction:
         self.proc = proc
         self.created_at = datetime.now(timezone.utc)
         self.status = "running"
+        self.status_updated_at = self.created_at
 
     @property
     def pid(self) -> int | None:
@@ -69,6 +71,36 @@ class Prediction:
     @property
     def is_alive(self) -> bool:
         return self.proc is not None and self.proc.poll() is None
+
+    def set_status(self, status: str) -> None:
+        if self.status != status:
+            self.status = status
+            self.status_updated_at = datetime.now(timezone.utc)
+
+    def refresh_status(self) -> None:
+        """Synchronize status with subprocess state."""
+        if self.status == "running" and not self.is_alive:
+            code = self.proc.returncode if self.proc else 0
+            self.set_status("finished" if code == 0 else "error")
+
+    def latest_state_at(self) -> datetime | None:
+        """Return the latest output-file write time, if any."""
+        try:
+            path = Path(self.output_json_path)
+            if not path.exists():
+                return None
+            return datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+        except OSError:
+            return None
+
+    def is_stale_running(self, now: datetime, settings: Settings) -> bool:
+        """Return true for very old running predictions that should be cleared."""
+        if self.status != "running":
+            return False
+
+        cutoff = timedelta(minutes=max(1, settings.STALE_RUNNING_MATCH_MINUTES))
+        newest_activity = self.latest_state_at() or self.created_at
+        return now - newest_activity > cutoff
 
     def read_state(self) -> dict[str, Any] | None:
         """Read the latest JSON state from the output file."""
@@ -84,6 +116,13 @@ class Prediction:
             logger.debug("Failed to read state for %s: %s", self.id, exc)
             return None
 
+    def state_indicates_finished(self) -> bool:
+        """Return true when the latest predictor JSON shows a completed match."""
+        state = self.read_state()
+        if not state:
+            return False
+        return _state_has_result(state)
+
     def stop(self):
         """Kill the subprocess."""
         if self.proc and self.proc.poll() is None:
@@ -98,7 +137,7 @@ class Prediction:
                 self.proc.kill()
             except (OSError, ProcessLookupError):
                 pass
-        self.status = "stopped"
+        self.set_status("stopped")
 
 
 class PredictionManager:
@@ -110,6 +149,7 @@ class PredictionManager:
     def __init__(self):
         self._predictions: dict[str, Prediction] = {}
         self._monitor_threads: dict[str, threading.Thread] = {}
+        self._predictions_lock = threading.RLock()
 
     @classmethod
     def get_instance(cls) -> PredictionManager:
@@ -143,6 +183,7 @@ class PredictionManager:
             ValueError: If limits exceeded or league unknown.
         """
         settings = get_settings()
+        self.cleanup_expired(settings)
 
         # Auto-detect league
         if not league_key:
@@ -208,7 +249,8 @@ class PredictionManager:
             output_json_path=output_json,
             proc=proc,
         )
-        self._predictions[prediction_id] = prediction
+        with self._predictions_lock:
+            self._predictions[prediction_id] = prediction
 
         # Monitor thread to detect when process exits
         t = threading.Thread(target=self._watch, args=(prediction_id,), daemon=True)
@@ -228,12 +270,24 @@ class PredictionManager:
         return True
 
     def get_prediction(self, prediction_id: str) -> Prediction | None:
-        return self._predictions.get(prediction_id)
+        pred = self._predictions.get(prediction_id)
+        if pred is not None:
+            pred.refresh_status()
+        return pred
 
     def find_active_by_url(self, match_url: str, league_key: str | None = None) -> Prediction | None:
         """Return an active prediction for this CREX URL if one already exists."""
         target = _normalize_match_url_key(match_url)
+        settings = get_settings()
+        now = datetime.now(timezone.utc)
         for pred in self._predictions.values():
+            pred.refresh_status()
+            if pred.status == "running" and pred.state_indicates_finished():
+                pred.set_status("finished")
+                continue
+            if pred.is_stale_running(now, settings):
+                pred.stop()
+                continue
             if not pred.is_alive:
                 continue
             if league_key and pred.league_key != league_key:
@@ -250,13 +304,13 @@ class PredictionManager:
 
     def list_predictions(self, user_id: str | None = None) -> list[dict[str, Any]]:
         """Return summary dicts for active/recent predictions."""
+        self.cleanup_expired()
         results = []
         for pred in self._predictions.values():
             if user_id and pred.user_id != user_id:
                 continue
             # Refresh status
-            if pred.status == "running" and not pred.is_alive:
-                pred.status = "finished"
+            pred.refresh_status()
             results.append({
                 "id": pred.id,
                 "user_id": pred.user_id,
@@ -269,12 +323,49 @@ class PredictionManager:
             })
         return results
 
+    def cleanup_expired(self, settings: Settings | None = None) -> int:
+        """Remove finished and stale predictions from the in-memory dashboard list."""
+        settings = settings or get_settings()
+        now = datetime.now(timezone.utc)
+        finished_cutoff = timedelta(minutes=max(1, settings.FINISHED_MATCH_RETENTION_MINUTES))
+        removed = 0
+
+        with self._predictions_lock:
+            for prediction_id, pred in list(self._predictions.items()):
+                pred.refresh_status()
+                should_remove = False
+
+                if pred.status == "running" and pred.state_indicates_finished():
+                    logger.info("Marking completed prediction %s as finished from state JSON", prediction_id)
+                    if pred.is_alive:
+                        pred.stop()
+                    pred.set_status("finished")
+                elif pred.is_stale_running(now, settings):
+                    logger.info(
+                        "Clearing stale running prediction %s last_activity=%s",
+                        prediction_id,
+                        pred.latest_state_at() or pred.created_at,
+                    )
+                    pred.stop()
+                    should_remove = True
+                elif pred.status in TERMINAL_STATUSES and now - pred.status_updated_at > finished_cutoff:
+                    should_remove = True
+
+                if should_remove:
+                    self._predictions.pop(prediction_id, None)
+                    self._monitor_threads.pop(prediction_id, None)
+                    removed += 1
+
+        return removed
+
     def cleanup_all(self):
         """Stop all running predictions (called on server shutdown)."""
-        for pred in list(self._predictions.values()):
-            if pred.is_alive:
-                pred.stop()
-        self._predictions.clear()
+        with self._predictions_lock:
+            for pred in list(self._predictions.values()):
+                if pred.is_alive:
+                    pred.stop()
+            self._predictions.clear()
+            self._monitor_threads.clear()
         logger.info("All predictions cleaned up")
 
     # -----------------------------------------------------------------------
@@ -287,5 +378,47 @@ class PredictionManager:
             pred.proc.wait()
             code = pred.proc.returncode
             if pred.status == "running":
-                pred.status = "finished" if code == 0 else "error"
+                pred.set_status("finished" if code == 0 else "error")
             logger.info("Prediction %s exited (code %s)", prediction_id, code)
+
+
+def _state_has_result(state: dict[str, Any]) -> bool:
+    """Return true when the predictor JSON implies a match winner is already known."""
+    if not isinstance(state, dict):
+        return False
+    if not state.get("is_second_innings"):
+        return False
+
+    score = _safe_int(state.get("score"))
+    wickets = _safe_int(state.get("wickets"))
+    overs = _safe_float(state.get("overs"))
+    total_overs = _safe_float(state.get("total_overs"), 20.0) or 20.0
+    target = _safe_int(state.get("target"))
+    if target is None or score is None:
+        return False
+
+    if score >= target:
+        return True
+    if wickets is not None and wickets >= 10:
+        return True
+    if overs is not None and overs >= total_overs:
+        return True
+    return False
+
+
+def _safe_float(value: Any, default: float | None = None) -> float | None:
+    try:
+        if value is None or value == "":
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _safe_int(value: Any, default: int | None = None) -> int | None:
+    try:
+        if value is None or value == "":
+            return default
+        return int(float(value))
+    except (TypeError, ValueError):
+        return default

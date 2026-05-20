@@ -57,6 +57,10 @@ class ResourceFeatureCalculator:
         self.RRR_MIDPOINT = config.rrr_midpoint
         self.RRR_MIDPOINT_SLOPE = config.rrr_midpoint_slope
         self.CHASE_WICKET_WEIGHT = config.chase_wicket_weight
+        # Target-category-aware sigmoid params (None = use single sigmoid)
+        self.RRR_PARAMS_BY_TARGET_CAT = config.rrr_params_by_target_cat
+        self.RRR_TARGET_CAT_BELOW = config.rrr_target_cat_below_threshold
+        self.RRR_TARGET_CAT_ABOVE = config.rrr_target_cat_above_threshold
 
         self.WICKET_PENALTY = config.wicket_penalty
 
@@ -953,11 +957,29 @@ class ResourceFeatureCalculator:
             effective_rrr = 50.0  # Effectively impossible
         
         # Base probability from RRR using logistic function
+        # Select sigmoid params based on target category if configured.
         # Per-over adaptive midpoint: midpoint shifts up in later overs
         # (IPL teams sustain higher RRR in death overs)
+        if self.RRR_PARAMS_BY_TARGET_CAT is not None and target_runs is not None:
+            target_above_par = target_runs - self.PAR_SCORE_T20
+            if target_above_par < self.RRR_TARGET_CAT_BELOW:
+                cat = "below_par"
+            elif target_above_par > self.RRR_TARGET_CAT_ABOVE:
+                cat = "above_par"
+            else:
+                cat = "on_par"
+            cat_p = self.RRR_PARAMS_BY_TARGET_CAT[cat]
+            rrr_midpoint       = cat_p["midpoint"]
+            rrr_midpoint_slope = cat_p["slope"]
+            rrr_beta           = cat_p["beta"]
+        else:
+            rrr_midpoint       = self.RRR_MIDPOINT
+            rrr_midpoint_slope = self.RRR_MIDPOINT_SLOPE
+            rrr_beta           = self.RRR_BETA
+
         overs_bowled = self.TOTAL_OVERS - overs_remaining
-        effective_midpoint = self.RRR_MIDPOINT + self.RRR_MIDPOINT_SLOPE * overs_bowled
-        exponent = self.RRR_BETA * (effective_rrr - effective_midpoint)
+        effective_midpoint = rrr_midpoint + rrr_midpoint_slope * overs_bowled
+        exponent = rrr_beta * (effective_rrr - effective_midpoint)
         exponent = np.clip(exponent, -700, 700)
         base_prob = 1.0 / (1.0 + np.exp(exponent))
         
@@ -1041,9 +1063,11 @@ class ResourceFeatureCalculator:
         # Expected score projection
         expected_final_score = self.calculate_expected_score(current_score, overs_bowled, wickets_lost)
         
-        # Pressure index (now using current_run_rate for better CRR vs RRR comparison)
+        # Pressure index - match training (processor.py) by NOT passing current_run_rate.
+        # Training uses absolute RRR-based formula; passing CRR here causes train-serve skew
+        # (early over high CRR makes pressure = 0 even when RRR is very high).
         pressure_index = self.calculate_pressure_index(
-            innings, current_score, overs_bowled, wickets_lost, target_runs, current_run_rate
+            innings, current_score, overs_bowled, wickets_lost, target_runs
         )
         
         # Win probability estimate using the dedicated method

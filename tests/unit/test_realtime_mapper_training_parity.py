@@ -110,6 +110,31 @@ def test_boundary_pct_last_18_uses_training_formula():
     assert math.isclose(stats["boundary_pct_last_18"], boundaries_last_18 / len(runs))
 
 
+def test_set_batter_exposure_infers_missing_partner_from_partnership_counter():
+    mapper = make_mapper()
+    mapper._current_innings = 2
+    mapper._balls_since_wicket = 30
+
+    features = mapper.create_feature_dataframe(
+        {
+            "innings_num": 2,
+            "over_number": 12,
+            "ball_number": 0,
+            "total_score": 120,
+            "total_wickets": 2,
+            "batting_team": "Sunrisers Hyderabad",
+            "bowling_team": "Mumbai Indians",
+            "venue": "Wankhede Stadium, Mumbai",
+            "target_score": 181,
+            "runs_needed": 61,
+            "batsman1_balls": 0,
+            "batsman2_balls": 4,
+        }
+    ).iloc[0]
+
+    assert features["set_batter_exposure"] == 27.0
+
+
 def test_season_overrides_disabled_for_training_parity():
     assert InMemoryFeatureStore.USE_SEASON_OVERRIDES is False
 

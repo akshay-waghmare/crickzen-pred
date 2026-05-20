@@ -1093,8 +1093,19 @@ class InMemoryFeatureStore:
                 'venue_avg_score': 160.0,
                 'venue_avg_wickets': 6.0,
                 'venue_bat_first_win_rate': 0.5,
+                '_venue_found': False,  # signals caller to apply team-based fallback
             }
-        
+            # For unknown venues always use CREX live stats if available —
+            # USE_VENUE_SITUATION_OVERRIDES only gates overriding *known* venues.
+            if self.VENUE_SITUATION_STATS:
+                crex_avg = self.VENUE_SITUATION_STATS.get(
+                    'match_details_avg_1st_inns',
+                    self.VENUE_SITUATION_STATS.get('avg_1st_inns')
+                )
+                if crex_avg is not None:
+                    base_stats['venue_avg_score'] = float(crex_avg)
+                    logger.info(f"Venue '{venue_name}' not in store — using CREX avg_1st_inns={crex_avg}")
+
         # 5. Optionally override with live VENUE_SITUATION_STATS from CREX.
         # Keep disabled for IPL v6 training parity unless explicitly enabled.
         if self.USE_VENUE_SITUATION_OVERRIDES and self.VENUE_SITUATION_STATS:

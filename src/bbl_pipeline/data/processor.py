@@ -313,7 +313,58 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     
     venue_rolling = calc.calculate_venue_stats(venue_base)
     venue_features = pd.concat([venue_base, venue_rolling], axis=1)
-    
+
+    # --- VENUE-OVER PAR FEATURE ---
+    print("Calculating venue-over par...")
+    # Expected cumulative score at end of each over, per venue (inn1 only)
+    inn1_over_end = (
+        df[df['innings'] == 1]
+        .groupby(['match_id', 'venue_id', 'date', 'over'])['current_score']
+        .last()
+        .reset_index()
+    )
+    inn1_over_end.columns = ['match_id', 'venue', 'start_date', 'over', 'over_end_score']
+
+    # Sort by (venue, over, date, match_id) for stable chronological expanding mean
+    inn1_over_end = inn1_over_end.sort_values(
+        ['venue', 'over', 'start_date', 'match_id']
+    ).reset_index(drop=True)
+
+    # Leave-one-out expanding mean: each match sees only prior matches at this venue+over
+    inn1_over_end['venue_over_par'] = inn1_over_end.groupby(['venue', 'over'])['over_end_score'].transform(
+        lambda x: x.shift(1).expanding().mean()
+    )
+
+    # Expanding global league mean per over (no future leakage) as fallback
+    global_sorted = inn1_over_end[['start_date', 'match_id', 'over', 'over_end_score']].sort_values(
+        ['over', 'start_date', 'match_id']
+    )
+    global_sorted['league_over_par'] = global_sorted.groupby('over')['over_end_score'].transform(
+        lambda x: x.shift(1).expanding().mean()
+    )
+    inn1_over_end = inn1_over_end.merge(
+        global_sorted[['match_id', 'over', 'league_over_par']].drop_duplicates(subset=['match_id', 'over']),
+        on=['match_id', 'over'], how='left'
+    )
+    inn1_over_end['venue_over_par'] = (
+        inn1_over_end['venue_over_par']
+        .fillna(inn1_over_end['league_over_par'])
+        .fillna(0.0)
+    )
+
+    # Merge into main df (only inn1 rows get a value; inn2 rows → NaN → set to 0.0)
+    df = df.merge(
+        inn1_over_end[['match_id', 'over', 'venue_over_par']].drop_duplicates(subset=['match_id', 'over']),
+        on=['match_id', 'over'], how='left'
+    )
+    df['score_vs_venue_over_par'] = np.where(
+        df['innings'] == 1,
+        df['current_score'] - df['venue_over_par'].fillna(0.0),
+        0.0
+    )
+    df['score_vs_venue_over_par'] = df['score_vs_venue_over_par'].fillna(0.0)
+    df = df.drop(columns=['venue_over_par'], errors='ignore')
+
     # --- TEAM STRENGTH FEATURES ---
     print("Calculating team strength features...")
     
@@ -700,7 +751,97 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     
     # Combined form score (batting team's batting form vs bowling team's bowling form)
     df['batting_vs_bowling_form'] = df['team_batting_form'].fillna(8.0) - df['team_bowling_form'].fillna(8.0)
-    
+
+    # --- BATTING TEAM VENUE WIN RATE (LOO, match-level → map to ball-level) ---
+    print("Calculating batting team venue win rates...")
+    venue_per_match = df[df['innings'] == 1][['match_id', 'venue_id']].drop_duplicates(subset=['match_id'])
+    inn1_venue = innings1.merge(venue_per_match, on='match_id', how='left')
+
+    rows_t1_v = inn1_venue[['match_id', 'date', 'team1', 'venue_id', 'winner']].copy()
+    rows_t1_v.columns = ['match_id', 'date', 'team', 'venue', 'winner']
+    rows_t1_v['won'] = (rows_t1_v['team'] == rows_t1_v['winner']).astype(int)
+    rows_t2_v = inn1_venue[['match_id', 'date', 'team2', 'venue_id', 'winner']].copy()
+    rows_t2_v.columns = ['match_id', 'date', 'team', 'venue', 'winner']
+    rows_t2_v['won'] = (rows_t2_v['team'] == rows_t2_v['winner']).astype(int)
+
+    team_venue_matches = pd.concat([rows_t1_v, rows_t2_v], ignore_index=True)
+    # Stable sort: team, venue, date, match_id prevents same-day leakage
+    team_venue_matches = team_venue_matches.sort_values(
+        ['team', 'venue', 'date', 'match_id']
+    ).reset_index(drop=True)
+
+    # LOO: expanding win rate using only matches BEFORE this one (min 3 for reliability)
+    team_venue_matches['batting_team_venue_wr'] = (
+        team_venue_matches.groupby(['team', 'venue'])['won']
+        .transform(lambda x: x.shift(1).expanding(min_periods=3).mean())
+        .fillna(0.5)
+    )
+
+    # Map to ball-by-ball df via batting_team_id × venue_id × match_id
+    tv_lookup = team_venue_matches.rename(
+        columns={'team': 'batting_team_id', 'venue': 'venue_id'}
+    )[['match_id', 'batting_team_id', 'venue_id', 'batting_team_venue_wr']]
+    df = df.merge(tv_lookup, on=['match_id', 'batting_team_id', 'venue_id'], how='left')
+    df['batting_team_venue_wr'] = df['batting_team_venue_wr'].fillna(0.5)
+
+    # Full (non-LOO) version saved separately for inference feature store
+    team_venue_full = (
+        team_venue_matches.groupby(['team', 'venue'])
+        .agg(win_rate=('won', 'mean'), n=('won', 'count'))
+        .reset_index()
+        .query('n >= 3')
+    )
+
+    # --- BATTING TEAM RECENT NRR (last 5 matches, LOO, match-level → ball-level) ---
+    print("Calculating batting team recent NRR (last 5)...")
+    inn1_sc = df[df['innings'] == 1].groupby('match_id')['runs_total'].sum().rename('inn1_score')
+    inn1_bl = df[df['innings'] == 1].groupby('match_id')['ball'].count().rename('inn1_balls')
+    inn2_sc = df[df['innings'] == 2].groupby('match_id')['runs_total'].sum().rename('inn2_score')
+    inn2_bl = df[df['innings'] == 2].groupby('match_id')['ball'].count().rename('inn2_balls')
+
+    match_scores = pd.concat([inn1_sc, inn1_bl, inn2_sc, inn2_bl], axis=1).reset_index()
+    match_scores = match_scores.merge(
+        innings1[['match_id', 'date', 'team1', 'team2']], on='match_id', how='left'
+    )
+    match_scores['rr1'] = match_scores['inn1_score'] / (match_scores['inn1_balls'] / 6).clip(lower=1)
+    match_scores['rr2'] = match_scores['inn2_score'] / (match_scores['inn2_balls'] / 6).clip(lower=1)
+    match_scores['nrr_t1'] = match_scores['rr1'] - match_scores['rr2']
+
+    nrr_t1 = match_scores[['match_id', 'date', 'team1', 'nrr_t1']].rename(
+        columns={'team1': 'team', 'nrr_t1': 'nrr'}
+    )
+    nrr_t2 = match_scores[['match_id', 'date', 'team2', 'nrr_t1']].copy()
+    nrr_t2['nrr_t1'] = -nrr_t2['nrr_t1']
+    nrr_t2 = nrr_t2.rename(columns={'team2': 'team', 'nrr_t1': 'nrr'})
+
+    nrr_team = pd.concat([nrr_t1, nrr_t2], ignore_index=True)
+    nrr_team = nrr_team.sort_values(['team', 'date', 'match_id']).reset_index(drop=True)
+
+    # LOO: rolling NRR of last 5 matches BEFORE current match
+    nrr_team['batting_recent_nrr_l5'] = (
+        nrr_team.groupby('team')['nrr']
+        .transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
+        .fillna(0.0)
+    )
+    # Full-data version (including current match) for feature store latest values
+    nrr_team['nrr_l5_full'] = (
+        nrr_team.groupby('team')['nrr']
+        .transform(lambda x: x.rolling(5, min_periods=1).mean())
+    )
+    latest_nrr_map = (
+        nrr_team.sort_values(['team', 'date', 'match_id'])
+        .groupby('team').last()['nrr_l5_full']
+        .fillna(0.0)
+        .to_dict()
+    )
+
+    # Map LOO NRR to ball-by-ball df via batting_team_id × match_id
+    nrr_lookup = nrr_team.rename(columns={'team': 'batting_team_id'})[
+        ['match_id', 'batting_team_id', 'batting_recent_nrr_l5']
+    ]
+    df = df.merge(nrr_lookup, on=['match_id', 'batting_team_id'], how='left')
+    df['batting_recent_nrr_l5'] = df['batting_recent_nrr_l5'].fillna(0.0)
+
     # --- BATTING/BOWLING FIRST ADVANTAGE FEATURES ---
     print("Calculating batting/bowling first advantage features...")
     
@@ -1157,7 +1298,13 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     df['rrr_times_wickets'] = df['required_run_rate'] * df['wickets_lost']
     df['score_per_wicket'] = df['current_score'] / (df['wickets_lost'] + 1)
 
-    # Select columns for training - DLS-enhanced feature set (proven best performance)
+    # is_low_target: explicit flag for chases of sub-140 targets (very hard to defend)
+    # Uses first_innings_score (available after the target merge earlier in the pipeline)
+    df['is_low_target'] = (
+        (df['innings'] == 2) & (df['first_innings_score'] < 140)
+    ).astype(float)
+
+    # Select columns for training- DLS-enhanced feature set (proven best performance)
     # Based on extensive testing: DLS features + original game state features work best
     feature_cols = [
         # Player stats
@@ -1232,6 +1379,12 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         # Context features (toss + venue chase bias)
         'venue_chase_success',
         'batting_won_toss',
+        # Venue-over par (how far ahead/behind expected cumulative score at this venue+over)
+        'score_vs_venue_over_par',
+        # v9: batting team venue WR, recent NRR form, low-target flag
+        'batting_team_venue_wr',
+        'batting_recent_nrr_l5',
+        'is_low_target',
         # Target
         'is_winner'
     ]
@@ -1282,6 +1435,15 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     # Venue Stats
     latest_venue = venue_features.sort_values('start_date').groupby('venue').last()[['venue_avg_score', 'venue_avg_wickets', 'venue_bat_first_win_rate']]
     latest_venue.to_parquet(feature_store_dir / "venue_stats.parquet")
+
+    # Venue-over par lookup (FULL mean — no LOO — for best inference quality)
+    venue_over_par_full = (
+        inn1_over_end
+        .groupby(['venue', 'over'])
+        .agg(venue_over_par=('over_end_score', 'mean'))
+        .reset_index()
+    )
+    venue_over_par_full.to_parquet(feature_store_dir / 'venue_over_par.parquet', index=False)
     
     # Team Stats
     print("Calculating team stats...")
@@ -1315,12 +1477,17 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
             'win_rate': win_rate, 
             'matches': total,
             'bat_first_wr': bat_first_wr,
-            'bowl_first_wr': bowl_first_wr
+            'bowl_first_wr': bowl_first_wr,
+            'recent_nrr': float(latest_nrr_map.get(team, 0.0)),
         })
     
     df_team_stats = pd.DataFrame(team_stats)
     df_team_stats.to_parquet(feature_store_dir / "team_ratings.parquet")
     logger.info(f"Saved team ratings for {len(df_team_stats)} teams")
+
+    # Team × venue win rates for batting_team_venue_wr inference lookup
+    team_venue_full.to_parquet(feature_store_dir / 'team_venue_ratings.parquet', index=False)
+    logger.info(f"Saved team venue ratings: {len(team_venue_full)} (team,venue) combos (n>=3)")
 
     logger.info("Processing complete")
 

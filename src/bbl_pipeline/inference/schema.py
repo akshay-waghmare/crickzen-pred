@@ -34,6 +34,10 @@ class MatchState:
     inn1_pp_runs: Optional[float] = None
     inn1_death_rr: Optional[float] = None
     
+    # Live batter balls faced (for set_batter_exposure feature)
+    batsman1_balls: int = 0
+    batsman2_balls: int = 0
+    
     def get_overs_bowled(self) -> float:
         """Return overs bowled as a float (e.g., 5.3 = 5 overs 3 balls)."""
         return self.over + (self.ball / 6.0)

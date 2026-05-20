@@ -440,6 +440,8 @@ class MatchStateLogger:
             model_calibrated_phase = getattr(predictor, 'last_calibrated_phase', None)
             model_calibrated_per_over = getattr(predictor, 'last_calibrated_per_over', None)
             model_league_calibrated = getattr(predictor, 'last_league_calibrated', None)
+            model_post_calibrated = getattr(predictor, 'last_post_model_calibration_prob', None)
+            model_post_calibration_rule = getattr(predictor, 'last_post_model_calibration_rule', None)
             
             # Final probability (what predictor returns)
             model_final_prob = predictor.last_prediction if hasattr(predictor, 'last_prediction') else model_calibrated_per_over
@@ -532,6 +534,8 @@ class MatchStateLogger:
                 'model_calibrated_phase': model_calibrated_phase,
                 'model_calibrated_per_over': model_calibrated_per_over,
                 'model_league_calibrated': model_league_calibrated,
+                'model_post_calibrated': model_post_calibrated,
+                'model_post_calibration_rule': model_post_calibration_rule,
                 'model_final_prob': model_final_prob,
                 
                 # Market odds
@@ -615,9 +619,14 @@ class MatchStateLogger:
             match_file = self.match_file
 
             if match_file.exists():
-                # Append to existing file
+                # Append to existing file; use promote_options to handle schema evolution
+                # (e.g. old rows have string, new rows have null for optional columns)
                 existing_table = pq.read_table(match_file)
-                combined_table = pa.concat_tables([existing_table, table])
+                try:
+                    combined_table = pa.concat_tables([existing_table, table], promote_options="permissive")
+                except Exception:
+                    # Fallback: unify to common schema by casting to BALL_STATE_SCHEMA
+                    combined_table = pa.concat_tables([existing_table, table], promote_options="default")
                 pq.write_table(combined_table, match_file)
                 self.log.info("buffer_appended_to_existing_file", rows=len(df), file=str(match_file))
             else:

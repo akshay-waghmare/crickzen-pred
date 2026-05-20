@@ -16,6 +16,21 @@
     @apply bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-lg;
   }
   .input-field {
-    @apply bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-brand-500 focus:border-brand-500;
+    @apply rounded-xl border-slate-700 bg-slate-950 text-white placeholder:text-slate-600 focus:border-emerald-400 focus:ring-emerald-400;
+  }
+  .metric-tile {
+    @apply rounded-2xl border border-slate-800 bg-slate-950 p-4;
+  }
+  .metric-label {
+    @apply text-[11px] font-bold uppercase tracking-widest text-slate-500;
+  }
+  .metric-value {
+    @apply mt-2 text-3xl font-black text-white;
+  }
+  .detail-row {
+    @apply flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-slate-400;
+  }
+  .detail-row strong {
+    @apply font-black text-white;
   }
 }

@@ -151,9 +151,16 @@ class Predictor:
         self.last_calibrated_phase_target = None  # Phase×target calibrated probability
         self.last_shadow_prob = None  # Shadow: segment-specific T prediction (not production)
         self.last_t_applied = 1.0  # Production T actually used this prediction (1.0 = no-op)
+        self.post_model_calibration_router = None
+        self.last_post_model_calibration_rule = None
+        self.last_post_model_calibration_input = None
+        self.last_post_model_calibration_prob = None
         # Inn2 phase routing (ipl_v11 architecture — attach via Inn2PhaseRouter.load())
         self.inn2_router = None
         self.last_inn2_router_phase = None  # Which phase the router used ("pp"/"mid"/"death")
+        self.last_inn2_router_source = None
+        self.last_inn2_router_raw_prob = None
+        self.last_inn2_router_output_prob = None
         self._last_full_feature_dict: dict = {}  # Full unfiltered feature dict for router
     
     def reset_innings_prior(self):
@@ -709,9 +716,14 @@ class Predictor:
             'ball_number': state.ball,
             'total_score': state.current_score,
             'total_wickets': state.wickets_lost,
+            'batsman1_name': state.batsman_1,
+            'batsman2_name': state.batsman_2,
+            'bowler1_name': state.bowler,
             'current_batsman': state.batsman_1,
             'non_striker': state.batsman_2,
             'current_bowler': state.bowler,
+            'batsman1_balls': getattr(state, 'batsman1_balls', 0),
+            'batsman2_balls': getattr(state, 'batsman2_balls', 0),
             'batting_team': state.batting_team,
             'bowling_team': state.bowling_team,
             'venue': state.venue,
@@ -797,6 +809,9 @@ class Predictor:
             self.last_calibrated_combined = raw_prob  # For comparison when using innings-specific
             self.last_calibrated_phase = raw_prob  # For innings×phase specific
             self.last_calibrated_per_over = raw_prob  # For per-over (brier_optimized)
+            self.last_post_model_calibration_rule = None
+            self.last_post_model_calibration_input = None
+            self.last_post_model_calibration_prob = None
             
             # Select appropriate calibrator based on innings and phase
             active_calibrator = None
@@ -912,24 +927,43 @@ class Predictor:
             else:
                 base_prob = raw_prob
             
-            # --- INN2 PHASE ROUTING (ipl_v11 architecture) ---
+            # --- INN2 PHASE ROUTING (IPL phase router architecture) ---
             # Replaces base_prob with the phase-model output for inn2.
-            # Per-over isotonic calibration is baked into the router output.
+            # The router config decides raw vs calibrated output and any segment fallback.
             # phase_target_calibrators are skipped when the router is active.
             # Fail-open: any exception falls back to the v7 base_prob unchanged.
             self.last_inn2_router_phase = None
+            self.last_inn2_router_source = None
+            self.last_inn2_router_raw_prob = None
+            self.last_inn2_router_output_prob = None
             if self.inn2_router is not None and state.innings == 2:
                 try:
                     router_prob, router_phase = self.inn2_router.predict(
                         self._last_full_feature_dict, current_over
                     )
+                    router_source = getattr(self.inn2_router, "last_model_source", "router")
+                    router_raw = getattr(self.inn2_router, "last_raw_probability", router_prob)
+                    router_output = getattr(self.inn2_router, "last_output_probability", router_prob)
+                    if router_raw is None:
+                        router_raw = router_prob
+                    if router_output is None:
+                        router_output = router_prob
+
                     self.last_inn2_router_phase = router_phase
-                    base_prob = router_prob
-                    self.last_calibrated_per_over = router_prob
-                    self.last_calibrated_phase = router_prob
+                    self.last_inn2_router_source = router_source
+                    self.last_inn2_router_raw_prob = router_raw
+                    self.last_inn2_router_output_prob = router_output
+                    base_prob = router_output
+                    self.last_raw_prob = router_raw
+                    self.last_smoothed_prob = router_output
+                    self.last_calibrated_prob = router_output
+                    self.last_calibrated_combined = router_output
+                    self.last_calibrated_phase = router_output
+                    self.last_calibrated_per_over = router_output
                     if debug:
                         print(f"[INN2Router] phase={router_phase} over={current_over} "
-                              f"v7_raw={raw_prob:.1%} router_cal={router_prob:.1%}")
+                              f"source={router_source} v7_raw={raw_prob:.1%} "
+                              f"router_raw={router_raw:.1%} router_prob={router_output:.1%}")
                 except Exception as _router_exc:
                     logger.warning(f"Inn2PhaseRouter failed at over={current_over}, "
                                    f"falling back to v7: {_router_exc}")
@@ -1059,6 +1093,8 @@ class Predictor:
                     _seg = 'inn2_death'
             # Apply production T (no-op for segments where T=1.0)
             _prod_t = _PROD_T.get(_seg, 1.0)
+            if state.innings == 2 and self.last_inn2_router_phase:
+                _prod_t = 1.0
             self.last_t_applied = _prod_t
             if _prod_t != 1.0 and 0.001 < prob < 0.999:
                 _logit = np.log(prob / (1 - prob))
@@ -1138,7 +1174,31 @@ class Predictor:
                             print(f"[LEAGUE] League ({league_name}, Platt): {pre_league_prob:.1%} -> {prob:.1%}")
             
             self.last_league_calibrated = float(prob) if self.league_calibrator else None
-            
+
+            if self.post_model_calibration_router is not None:
+                target_above_par_for_router = (
+                    float(X['target_above_par'].iloc[0])
+                    if 'target_above_par' in X.columns
+                    else None
+                )
+                post_input = float(prob)
+                post_prob, post_rule = self.post_model_calibration_router.apply(
+                    post_input,
+                    innings=state.innings,
+                    phase=_seg,
+                    target_above_par=target_above_par_for_router,
+                )
+                self.last_post_model_calibration_rule = post_rule
+                self.last_post_model_calibration_input = post_input
+                self.last_post_model_calibration_prob = post_prob if post_rule else None
+                if post_rule:
+                    prob = post_prob
+                    if debug:
+                        print(
+                            f"[POST_CAL] {post_rule}: "
+                            f"{post_input:.1%} -> {post_prob:.1%}"
+                        )
+             
             # === INNINGS TRANSITION SMOOTHING ===
             # Store inn1 final probability for use as inn2 prior
             self.last_transition_alpha = None
@@ -1174,6 +1234,7 @@ class Predictor:
                         f"{pre_clamp:.1%} -> {prob:.1%}"
                     )
              
+            self.last_prediction = float(prob)
             return float(prob)
         except Exception as e:
             import traceback
@@ -1187,7 +1248,8 @@ class Predictor:
                 wickets_lost=state.wickets_lost,
                 target_runs=state.target_runs
             )
-            return resource_features['resource_win_prob']
+            self.last_prediction = float(resource_features['resource_win_prob'])
+            return self.last_prediction
 
     def explain(self, state: MatchState) -> dict:
         """

@@ -36,6 +36,10 @@ Production pointers are in `models/model_registry.json`, `scripts/launcher.py`, 
 - **Match Analysis**: Pressure metrics, run rate tracking, and situation assessment
 - **Auto Export**: Save all predictions to CSV for post-match analysis
 
+## Codex Notes
+
+Reusable automation notes for this repo live in [docs/CODEX_SKILLS.md](docs/CODEX_SKILLS.md), including the `start-dashboard` skill for launching the dashboard app.
+
 ### Monte Carlo Simulation 🎲 **NEW**
 - **Uncertainty Quantification**: 1-ball and 6-ball forward simulations
 - **Confidence Intervals**: 90% CI (p5-p95) for win probability

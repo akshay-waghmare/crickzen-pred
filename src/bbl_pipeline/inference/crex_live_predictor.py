@@ -571,6 +571,45 @@ class CrexLivePredictor:
             ):
                 return team1, team2
         return None
+
+    @staticmethod
+    def _extract_batter_pair(text: str) -> Optional[tuple[str, int, int, str, int, int]]:
+        """Extract two live batters from CREX title/body text.
+
+        CREX layouts vary; this accepts initials, dots, apostrophes, hyphens,
+        and optional not-out stars in strings like:
+        "S Dube 43*(24), R Jadeja 6(2)".
+        """
+        if not text:
+            return None
+        player = r"([A-Za-z][A-Za-z.'\- ]{0,40}?)\s+(\d+)\*?\s*\((\d+)\)"
+        pair_match = re.search(
+            rf"{player}\s*,\s*{player}",
+            text,
+            re.IGNORECASE,
+        )
+        if not pair_match:
+            return None
+        return (
+            pair_match.group(1).strip(),
+            int(pair_match.group(2)),
+            int(pair_match.group(3)),
+            pair_match.group(4).strip(),
+            int(pair_match.group(5)),
+            int(pair_match.group(6)),
+        )
+
+    def _apply_batter_pair(self, pair: tuple[str, int, int, str, int, int] | None) -> None:
+        if not pair:
+            return
+        (
+            self.match_state.batsman1_name,
+            self.match_state.batsman1_runs,
+            self.match_state.batsman1_balls,
+            self.match_state.batsman2_name,
+            self.match_state.batsman2_runs,
+            self.match_state.batsman2_balls,
+        ) = pair
     
     def _init_match_state_logger(self):
         """Initialize match state logger if recording is enabled."""
@@ -650,6 +689,20 @@ class CrexLivePredictor:
                     # Paths are project-root-relative
                     self.predictor.inn2_router = Inn2PhaseRouter.load(Path(phase_dir))
                     print(f"[OK] Inn2PhaseRouter loaded from {phase_dir}")
+                    post_cfg = routing_cfg.get("post_model_calibration", {})
+                    if post_cfg.get("enabled"):
+                        try:
+                            from bbl_pipeline.inference.post_model_calibration_router import (
+                                PostModelCalibrationRouter,
+                            )
+
+                            artifact_path = Path(post_cfg.get("artifact", "post_model_calibration_router.pkl"))
+                            if not artifact_path.is_absolute():
+                                artifact_path = Path(phase_dir) / artifact_path
+                            self.predictor.post_model_calibration_router = PostModelCalibrationRouter.load(artifact_path)
+                            print(f"[OK] PostModelCalibrationRouter loaded from {artifact_path}")
+                        except Exception as _pe:
+                            print(f"[WARN] Could not load PostModelCalibrationRouter: {_pe} — using raw router output")
                 except Exception as _re:
                     print(f"[WARN] Could not load Inn2PhaseRouter: {_re} — v7 fallback for all innings")
         except Exception as e:
@@ -1771,19 +1824,13 @@ class CrexLivePredictor:
                     if teams:
                         self.match_state.batting_team, self.match_state.bowling_team = teams
             
-            # Extract batsmen names from title: "(Sophie Devine 0(0), Beth Mooney 22(14))"
-            # Pattern: Name Runs(Balls), Name Runs(Balls)
-            batsmen_match = re.search(r'\)\s*\(([A-Za-z\s]+)\s+(\d+)\((\d+)\),\s*([A-Za-z\s]+)\s+(\d+)\((\d+)\)\)', title)
-            if batsmen_match:
-                self.match_state.batsman1_name = batsmen_match.group(1).strip()
-                self.match_state.batsman1_runs = int(batsmen_match.group(2))
-                self.match_state.batsman1_balls = int(batsmen_match.group(3))
-                self.match_state.batsman2_name = batsmen_match.group(4).strip()
-                self.match_state.batsman2_runs = int(batsmen_match.group(5))
-                self.match_state.batsman2_balls = int(batsmen_match.group(6))
+            # Extract live batters from title when CREX includes "Name R(B)" pairs.
+            self._apply_batter_pair(self._extract_batter_pair(title))
             
             # Get page text to detect second innings and extract data
             page_text = await self.page.inner_text("body")
+            if not self.match_state.batsman1_balls or not self.match_state.batsman2_balls:
+                self._apply_batter_pair(self._extract_batter_pair(page_text))
             
             # --- DLS / Reduced-over auto-detection ---
             # Detect revised target (e.g. "Revised Target: 156 (DLS)" or "Target: 156 (D/L)")
@@ -2470,8 +2517,18 @@ class CrexLivePredictor:
             result.update(betx21_stats)
             logger.info(f"Inn1 carryover from betx21: {result}")
             return result
-        
-        logger.warning("No inn1 ball history, cache, or betx21 data — using defaults")
+
+        # Fallback 3: reconstruct from match states parquet (recorded during inn1 live monitoring)
+        parquet_stats = self._load_inn1_stats_from_parquet()
+        if parquet_stats:
+            # Augment with v14 pitch features computed from recovered stats
+            parquet_stats.update(self._compute_v14_pitch_features([], parquet_stats))
+            self._inn1_cached_stats.update(parquet_stats)
+            result.update(parquet_stats)
+            logger.info(f"Inn1 carryover from match states parquet: {result}")
+            return result
+
+        logger.warning("No inn1 ball history, cache, betx21, or parquet data — using defaults")
         return result
 
     def _cache_inn1_stats_from_balls(self):
@@ -2631,7 +2688,67 @@ class CrexLivePredictor:
         except Exception as e:
             logger.warning(f"betx21 fallback failed: {e}")
             return {}
-    
+
+    def _load_inn1_stats_from_parquet(self) -> dict:
+        """Reconstruct inn1 stats from match states parquet recorded during inn1.
+
+        Filters today's Inn1 records then derives pp_runs, pp_wickets,
+        wickets_lost, death_rr, death_wickets from the over-by-over progression.
+        Returns empty dict if parquet unavailable or insufficient data.
+        """
+        try:
+            if not self.states_dir:
+                return {}
+            parquet_path = Path(self.states_dir) / f"{self.match_id if hasattr(self, 'match_id') else self.match_url.split('/')[-2]}.parquet"
+            if not parquet_path.exists():
+                return {}
+
+            import pandas as pd
+            df = pd.read_parquet(parquet_path)
+            if df.empty or "innings" not in df.columns or "total_runs" not in df.columns:
+                return {}
+
+            df["_ts"] = pd.to_datetime(df["timestamp"], errors="coerce")
+            today_str = datetime.now().strftime("%Y-%m-%d")
+            inn1 = df[
+                (df["innings"] == 1.0) &
+                (df["_ts"].dt.strftime("%Y-%m-%d") == today_str)
+            ].copy()
+
+            if len(inn1) < 5:
+                logger.debug(f"Parquet Inn1 fallback: too few records ({len(inn1)}), skipping")
+                return {}
+
+            inn1 = inn1.sort_values("_ts")
+            result = {}
+
+            # PP stats: cumulative score at end of over 6
+            pp_rows = inn1[inn1["over_number"] == 6]
+            if not pp_rows.empty:
+                pp_last = pp_rows.iloc[-1]
+                result["inn1_pp_runs"] = float(pp_last.get("total_runs", 0))
+                result["inn1_pp_wickets"] = int(pp_last.get("wickets", 0))
+
+            # Final wickets and score
+            final_row = inn1.iloc[-1]
+            result["inn1_wickets_lost"] = int(final_row.get("wickets", 4))
+            final_score = float(final_row.get("total_runs", 0))
+
+            # Death RR: runs from end of over 15 to final
+            death_start_rows = inn1[inn1["over_number"] == 15]
+            if not death_start_rows.empty and final_score > 0:
+                death_start_score = float(death_start_rows.iloc[-1].get("total_runs", 0))
+                death_start_wkts = int(death_start_rows.iloc[-1].get("wickets", 0))
+                death_runs = final_score - death_start_score
+                result["inn1_death_rr"] = round((death_runs / 30.0) * 6.0, 2)
+                result["inn1_death_wickets"] = int(final_row.get("wickets", 0)) - death_start_wkts
+
+            logger.info(f"Parquet Inn1 fallback loaded: {result}")
+            return result
+        except Exception as e:
+            logger.warning(f"Parquet Inn1 fallback failed: {e}")
+            return {}
+
     def _build_ball_history_for_mapper(self) -> list:
         """
         Convert scraped ball data to the format expected by RealTimeFeatureMapper.
@@ -2912,8 +3029,13 @@ class CrexLivePredictor:
                 'ball_number': ball,
                 'total_score': self.match_state.total_runs,
                 'total_wickets': self.match_state.wickets,
+                'batsman1_name': self.match_state.batsman1_name,
+                'batsman2_name': self.match_state.batsman2_name,
+                'bowler1_name': self.match_state.bowler1_name,
                 'current_batsman': self.match_state.batsman1_name,
                 'non_striker': self.match_state.batsman2_name,
+                'batsman1_balls': self.match_state.batsman1_balls,
+                'batsman2_balls': self.match_state.batsman2_balls,
                 'batting_team': self.match_state.batting_team,
                 'bowling_team': self.match_state.bowling_team,
                 'venue': self.match_state.venue,
@@ -2922,6 +3044,7 @@ class CrexLivePredictor:
                 **self._get_carryover_scraped_fields(),
             }
             feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
+            feat_df = self._engineer_live_feature_dataframe(feat_df, scraped_data["innings_num"])
             features = {
                 key: (float(value) if isinstance(value, (int, float)) else value)
                 for key, value in feat_df.iloc[0].to_dict().items()
@@ -2931,8 +3054,27 @@ class CrexLivePredictor:
             logger.warning(f"Could not build live feature snapshot: {e}")
             return over, ball, {}
 
-    def _update_odm_prediction(self, features: Dict[str, Any], over: int, ball: int) -> None:
-        """Update ODM advisory output from current raw ML probability and distinct-ball history."""
+    @staticmethod
+    def _engineer_live_feature_dataframe(feat_df, innings_num: int):
+        """Apply the same inn2 engineering used by the phase router to live exports."""
+        if int(innings_num) != 2:
+            return feat_df
+        try:
+            from bbl_pipeline.features.inn2_engineering import engineer_inn2_features
+
+            return engineer_inn2_features(feat_df)
+        except Exception as exc:
+            logger.warning(f"Could not engineer innings-2 live features: {exc}")
+            return feat_df
+
+    def _update_odm_prediction(
+        self,
+        features: Dict[str, Any],
+        over: int,
+        ball: int,
+        current_ml_prob: Optional[float] = None,
+    ) -> None:
+        """Update ODM advisory output from current ML probability and distinct-ball history."""
         if not self.odm_model_dir:
             self.last_odm_prediction = {
                 'status': 'unavailable',
@@ -2966,7 +3108,7 @@ class CrexLivePredictor:
                 over=over,
                 ball=ball,
                 target_score=self.match_state.target,
-                current_ml_prob=getattr(self, 'last_raw_prob', None),
+                current_ml_prob=current_ml_prob if current_ml_prob is not None else getattr(self, 'last_raw_prob', None),
                 history=self._prediction_history,
             )
         except Exception as e:
@@ -3031,7 +3173,7 @@ class CrexLivePredictor:
                 display += f" | Clamp: {terminal_clamp.get('reason')}"
 
             over, ball, live_features = self._build_live_feature_snapshot()
-            self._update_odm_prediction(live_features, over, ball)
+            self._update_odm_prediction(live_features, over, ball, current_ml_prob=win_prob)
             if self.last_odm_prediction.get('status') == 'ready':
                 odm_direction = str(self.last_odm_prediction.get('direction', '')).upper()
                 odm_confidence = float(self.last_odm_prediction.get('direction_confidence', 0.0)) * 100.0
@@ -3078,8 +3220,13 @@ class CrexLivePredictor:
                         'ball_number': ball,
                         'total_score': state.total_runs,
                         'total_wickets': state.wickets,
+                        'batsman1_name': state.batsman1_name,
+                        'batsman2_name': state.batsman2_name,
+                        'bowler1_name': state.bowler1_name,
                         'current_batsman': state.batsman1_name,
                         'non_striker': state.batsman2_name,
+                        'batsman1_balls': state.batsman1_balls,
+                        'batsman2_balls': state.batsman2_balls,
                         'batting_team': state.batting_team,
                         'bowling_team': state.bowling_team,
                         'venue': state.venue,
@@ -3089,6 +3236,7 @@ class CrexLivePredictor:
                     }
                     
                     feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
+                    feat_df = self._engineer_live_feature_dataframe(feat_df, scraped_data["innings_num"])
                     features = {
                         k: (float(v) if isinstance(v, (int, float)) else str(v))
                         for k, v in feat_df.iloc[0].to_dict().items()
@@ -3151,6 +3299,8 @@ class CrexLivePredictor:
                         batsman_2=state.batsman2_name or "Unknown",
                         bowler=state.bowler1_name or "Unknown",
                         target_runs=state.target,
+                        batsman1_balls=state.batsman1_balls,
+                        batsman2_balls=state.batsman2_balls,
                     )
 
                     scraped_data = {
@@ -3159,8 +3309,13 @@ class CrexLivePredictor:
                         'ball_number': ball,
                         'total_score': state.total_runs,
                         'total_wickets': state.wickets,
+                        'batsman1_name': state.batsman1_name,
+                        'batsman2_name': state.batsman2_name,
+                        'bowler1_name': state.bowler1_name,
                         'current_batsman': state.batsman1_name,
                         'non_striker': state.batsman2_name,
+                        'batsman1_balls': state.batsman1_balls,
+                        'batsman2_balls': state.batsman2_balls,
                         'batting_team': state.batting_team,
                         'bowling_team': state.bowling_team,
                         'venue': state.venue,
@@ -3171,6 +3326,7 @@ class CrexLivePredictor:
                     ball_history = self._build_ball_history_for_mapper()
 
                     feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
+                    feat_df = self._engineer_live_feature_dataframe(feat_df, pred_state.innings)
                     features = {
                         k: (float(v) if isinstance(v, (int, float)) else str(v))
                         for k, v in feat_df.iloc[0].to_dict().items()
@@ -3192,6 +3348,11 @@ class CrexLivePredictor:
                 "ball": ball,
                 "target": state.target,
                 "target_runs": state.target,  # alias for external consumers
+                "batsman1_name": state.batsman1_name,
+                "batsman1_runs": state.batsman1_runs,
+                "batsman1_balls": state.batsman1_balls,
+                "batsman2_name": state.batsman2_name,
+                "batsman2_runs": state.batsman2_runs,
                 "batsman2_balls": state.batsman2_balls,
                 "current_run_rate": state.current_run_rate,
                 "required_run_rate": state.required_run_rate,
@@ -3204,9 +3365,19 @@ class CrexLivePredictor:
                 "calibrated_phase_prob": getattr(self, 'last_calibrated_phase', win_prob),
                 "calibrated_per_over_prob": getattr(self, 'last_calibrated_per_over', win_prob),
                 "calibrated_phase_target_prob": getattr(self, 'last_calibrated_phase_target', win_prob),
+                "inn2_router_phase": getattr(self.predictor, 'last_inn2_router_phase', None) if self.predictor else None,
+                "inn2_router_source": getattr(self.predictor, 'last_inn2_router_source', None) if self.predictor else None,
+                "inn2_router_raw_prob": getattr(self.predictor, 'last_inn2_router_raw_prob', None) if self.predictor else None,
+                "inn2_router_output_prob": getattr(self.predictor, 'last_inn2_router_output_prob', None) if self.predictor else None,
+                "post_model_calibration_rule": getattr(self.predictor, 'last_post_model_calibration_rule', None) if self.predictor else None,
+                "post_model_calibration_input_prob": getattr(self.predictor, 'last_post_model_calibration_input', None) if self.predictor else None,
+                "post_model_calibration_prob": getattr(self.predictor, 'last_post_model_calibration_prob', None) if self.predictor else None,
                 "shadow_t_prob": getattr(self, 'last_shadow_prob', None),  # Shadow: segment-specific T
                 "league": self.league,  # League code if --league was specified
-                "league_calibrated_prob": win_prob if self.league else None,  # Final league-calibrated prob
+                "league_calibrated_prob": (
+                    getattr(self.predictor, 'last_league_calibrated', None)
+                    if self.predictor else None
+                ),
                 "features": features,
                 "odm": self.last_odm_prediction,
                 "history": self._prediction_history[-50:],  # Last 50 data points

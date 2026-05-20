@@ -57,22 +57,43 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         'inn1_wickets_lost', 'inn1_death_rr', 'inn1_pp_runs',
         # Context features (toss + venue chase bias)
         'venue_chase_success', 'batting_won_toss',
+        # Venue-over par (how far ahead/behind expected cumulative score)
+        'score_vs_venue_over_par',
+        # v9: team-venue WR, recent NRR form, low-target flag
+        'batting_team_venue_wr',
+        'batting_recent_nrr_l5',
+        'is_low_target',
+        # v10: Inn2 momentum depth features (engineered in build_ipl_v10_features.py)
+        # Inn1 rows receive 0; XGBoost learns the inn1/inn2 boundary via phase flags
+        'momentum_under_pressure',  # crr/dls_pressure — #1 inn2-death feature (gain 0.37)
+        'net_momentum',             # scoring_rate_gap × wicket_cost (corr 0.47)
+        'batting_pair_momentum',    # batting_pair_strength × crr_vs_rrr (consistent all phases)
+        'wicket_adj_momentum',      # momentum_vs_rrr × (1 − recent_wickets/4)
+        'recovery_momentum',        # partnership_length × excess_scoring_rate
+        'recent_surge_flag',        # 1 if last-2-over pace ≥ required rate
+        'momentum_acceleration',    # 1.5×r12 − r18: direction of recent scoring
+        'chase_category',           # ordinal −1/0/+1 (low/par/high chase)
+        'inn1_quality_index',       # composite inn1 performance index
     ]
     
     def __init__(
         self,
         xgb_weight: float = 0.5,
-        n_features: int = 32,
+        n_features: int = 41,
         xgb_params: Optional[Dict[str, Any]] = None,
         logreg_c: float = 0.01,
+        feature_order: Optional[List[str]] = None,
     ):
         """
         Args:
             xgb_weight: Weight for XGBoost predictions (1 - xgb_weight for LogReg)
-            n_features: Number of top features to use (max 25)
+            n_features: Number of ordered features to use.
+            feature_order: Optional custom feature priority list. Falls back to TOP_FEATURES.
         """
         self.xgb_weight = xgb_weight
-        self.n_features = min(n_features, len(self.TOP_FEATURES))
+        self.feature_order = feature_order
+        feature_pool = feature_order if feature_order is not None else self.TOP_FEATURES
+        self.n_features = min(n_features, len(feature_pool))
         self.xgb_params = xgb_params
         self.logreg_c = logreg_c
         self.selected_features_ = None
@@ -80,10 +101,10 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         self.logreg_model_ = None
         self.classes_ = np.array([0, 1])
         
-    def fit(self, X: pd.DataFrame, y: pd.Series):
+    def fit(self, X: pd.DataFrame, y: pd.Series, sample_weight=None):
         """Fit both XGBoost and LogisticRegression models."""
-        # Select features that exist in the data
-        available_features = [f for f in self.TOP_FEATURES[:self.n_features] if f in X.columns]
+        feature_pool = self.feature_order if self.feature_order is not None else self.TOP_FEATURES
+        available_features = [f for f in feature_pool[:self.n_features] if f in X.columns]
         
         if len(available_features) < 10:
             # Fallback: use all features if not enough top features available
@@ -122,9 +143,10 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
             ('clf', LogisticRegression(C=self.logreg_c, max_iter=1000, random_state=42))
         ])
         
-        # Fit both models
-        self.xgb_model_.fit(X_selected, y)
-        self.logreg_model_.fit(X_selected, y)
+        # Fit both models (pass sample_weight if provided)
+        sw = np.asarray(sample_weight) if sample_weight is not None else None
+        self.xgb_model_.fit(X_selected, y, sample_weight=sw)
+        self.logreg_model_.fit(X_selected, y, clf__sample_weight=sw)
         
         logger.info(f"Trained XGBLogRegEnsemble with {len(self.selected_features_)} features")
         
@@ -151,10 +173,10 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
         """Get parameters for this estimator."""
         return {
             'xgb_weight': self.xgb_weight,
-            'n_features': self.n_features
-            ,
+            'n_features': self.n_features,
             'xgb_params': self.xgb_params,
             'logreg_c': self.logreg_c,
+            'feature_order': self.feature_order,
         }
     
     def set_params(self, **params):
@@ -210,7 +232,7 @@ class Trainer:
 
         # Primary model: XGBLogRegEnsemble (Brier 0.1777)
         self.models = {
-            'ensemble': XGBLogRegEnsemble(xgb_weight=0.5, n_features=37),
+            'ensemble': XGBLogRegEnsemble(xgb_weight=0.5, n_features=50),
         }
         
         self.splitter = TimeSeriesCalibrationSplit(n_splits=5, calibration_size=0.30)
@@ -266,7 +288,7 @@ class Trainer:
             
         return results
 
-    def train_final_model(self, model_name: str, X: pd.DataFrame, y: pd.Series, calibration_size: float = 0.30):
+    def train_final_model(self, model_name: str, X: pd.DataFrame, y: pd.Series, calibration_size: float = 0.30, sample_weight=None):
         """
         Trains the final model. If use_calibration=False, trains on full data.
         Returns either a CalibratedModel or the base model.
@@ -275,6 +297,7 @@ class Trainer:
             raise ValueError(f"Unknown model: {model_name}")
         
         base_model = clone(self.models[model_name])
+        sw = np.asarray(sample_weight) if sample_weight is not None else None
         
         if self.use_calibration:
             # Split into Train/Calibration
@@ -285,10 +308,11 @@ class Trainer:
             y_train = y.iloc[:-n_calib]
             X_calib = X.iloc[-n_calib:]
             y_calib = y.iloc[-n_calib:]
+            sw_train = sw[:-n_calib] if sw is not None else None
 
             logger.info(f"Training final {model_name} model. Train size: {len(X_train)}, Calib size: {len(X_calib)}")
 
-            base_model.fit(X_train, y_train)
+            base_model.fit(X_train, y_train, sample_weight=sw_train)
 
             calibrated = CalibratedModel(base_model, method=self.calibration_method)
             calibrated.fit(X_calib, y_calib)
@@ -297,7 +321,7 @@ class Trainer:
         else:
             # No calibration - train on full data
             logger.info(f"Training final {model_name} model (no calibration). Train size: {len(X)}")
-            base_model.fit(X, y)
+            base_model.fit(X, y, sample_weight=sw)
             return base_model
 
     def get_feature_importance(self, model_name: str, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:

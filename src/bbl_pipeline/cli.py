@@ -480,7 +480,7 @@ def train(ctx, input_file, output_dir, calibration):
     
     y = df[target_col]
     X = df.drop(columns=[target_col])
-    
+
     # Default: no calibration (best Brier score)
     trainer = Trainer(use_calibration=calibration)
 
@@ -496,7 +496,7 @@ def train(ctx, input_file, output_dir, calibration):
     
     logger.info(f"Champion selected: {champion_name}")
     
-    # Train final model
+    # Train final model (no sample_weight — recency weighting removed in v9)
     final_model = trainer.train_final_model(champion_name, X, y)
     
     # Save artifacts

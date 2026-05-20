@@ -3,6 +3,14 @@
   "description": "ipl_v14_pitch_features production router: v12 + phase-specific first-innings pitch/venue-relative features.",
   "inn1_model_dir": "models/ipl_v7",
   "inn2_phase_model_dir": "models/ipl_v14_pitch_features",
+  "apply_calibration": false,
+  "post_model_calibration": {
+    "enabled": true,
+    "artifact": "post_model_calibration_router.pkl",
+            "description": "Guardrailed IPL post-model calibration router. Inn1 corrects p<0.50 downward; Inn2 sharpens easy-chase 50-85 and par 50-80 only where OOS supports it: PP full par bucket, MID negative-par bucket. Fit on 2025 OOS, validated on 2026 holdout against raw v14."
+  },
+  "pp_low_fallback_model_dir": "models/ipl_v12",
+  "pp_low_fallback_rule": "phase == pp and target_above_par < -20 uses models/ipl_v12 champion_model_pp raw probability",
   "inn2_changes_vs_v12": {
     "pp": [
       "pp_score_vs_venue",

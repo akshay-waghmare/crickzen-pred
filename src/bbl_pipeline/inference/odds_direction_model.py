@@ -9,6 +9,11 @@ import joblib
 import numpy as np
 import pandas as pd
 
+from bbl_pipeline.inference.odm_delta_point import (
+    DELTA_POINT_MODE_MODEL,
+    apply_delta_point_mode,
+)
+
 
 @dataclass
 class OddsDirectionModel:
@@ -257,16 +262,29 @@ class OddsDirectionModel:
         direction_confidence = max(direction_up_prob, 1.0 - direction_up_prob)
 
         selected_delta_mode = (self.training_manifest or {}).get('selected_delta_mode', 'raw_delta')
+        selected_delta_point_mode = (self.training_manifest or {}).get('selected_delta_point_mode', DELTA_POINT_MODE_MODEL)
+        selected_delta_point_scale = self._safe_float((self.training_manifest or {}).get('selected_delta_point_scale'), 1.0)
         momentum_baseline_12 = self._safe_float(row.get('momentum_baseline_12'), self._safe_float(row.get('ml_prob_delta_12')))
         delta_component = float(self.models['delta_model'].predict(X)[0])
         if selected_delta_mode == 'residual_delta':
-            delta_point = momentum_baseline_12 + delta_component
+            base_delta_point = momentum_baseline_12 + delta_component
             interval_lower = momentum_baseline_12 + float(self.models['delta_interval_lower_model'].predict(X)[0])
             interval_upper = momentum_baseline_12 + float(self.models['delta_interval_upper_model'].predict(X)[0])
         else:
-            delta_point = delta_component
+            base_delta_point = delta_component
             interval_lower = float(self.models['delta_interval_lower_model'].predict(X)[0])
             interval_upper = float(self.models['delta_interval_upper_model'].predict(X)[0])
+        delta_point = apply_delta_point_mode(
+            base_delta_point,
+            direction_up_prob,
+            selected_delta_point_mode,
+            scale=selected_delta_point_scale,
+        )
+        point_estimate_status = 'experimental'
+        point_estimate_note = 'Central delta estimate remains experimental and should not be treated as a primary decision signal.'
+        if selected_delta_point_mode != DELTA_POINT_MODE_MODEL:
+            point_estimate_status = 'direction_guided'
+            point_estimate_note = 'Point estimate is direction-guided and confidence-scaled; use it as secondary magnitude context.'
 
         adjustment = self._phase_adjustment(phase_name)
         ordered_lower = min(interval_lower, interval_upper) - adjustment
@@ -293,10 +311,12 @@ class OddsDirectionModel:
             'direction_confidence': direction_confidence,
             'phase': phase_name,
             'selected_delta_mode': selected_delta_mode,
+            'selected_delta_point_mode': selected_delta_point_mode,
+            'selected_delta_point_scale': selected_delta_point_scale,
             'current_ml_prob': current_ml_prob,
             'delta_12': {
                 'point_estimate': delta_point,
-                'point_estimate_status': 'experimental',
+                'point_estimate_status': point_estimate_status,
                 'lower_90': ordered_lower,
                 'upper_90': ordered_upper,
                 'conformal_adjustment': adjustment,
@@ -306,8 +326,8 @@ class OddsDirectionModel:
                 'direction_signal': direction_label,
                 'use_direction': True,
                 'use_interval': True,
-                'use_point_estimate': False,
-                'point_estimate_note': 'Central delta estimate remains experimental and should not be treated as a primary decision signal.',
+                'use_point_estimate': selected_delta_point_mode != DELTA_POINT_MODE_MODEL,
+                'point_estimate_note': point_estimate_note,
                 'coherence_note': None if interval_coherent else 'Interval widened to include zero because direction confidence is below threshold.',
             },
             'history_points': len(deduped_history),

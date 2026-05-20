@@ -94,6 +94,8 @@ BALL_STATE_SCHEMA = pa.schema([
     ('model_calibrated_phase', pa.float32()),
     ('model_calibrated_per_over', pa.float32()),
     ('model_league_calibrated', pa.float32()),  # nullable
+    ('model_post_calibrated', pa.float32()),  # nullable
+    ('model_post_calibration_rule', pa.string()),  # nullable
     ('model_final_prob', pa.float32()),
     
     # Market Odds

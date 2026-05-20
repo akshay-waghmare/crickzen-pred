@@ -171,6 +171,34 @@ def engineer_inn2_features(df: pd.DataFrame) -> pd.DataFrame:
     df["low_target_strong_venue"] = ((tap < -15).astype(float) * vcs).clip(0, 1)
     df["pp_resources_adj_ease"]   = ((-tap) * res).clip(-300, 300)
 
+    pp_ball = (ov * 6 + df.get("ball", pd.Series(0, index=df.index)).fillna(0) + 1).clip(1, 36)
+    pp_progress = (pp_ball / 36.0).clip(0.03, 1.0)
+    overs_faced = (pp_ball / 6.0).clip(0.2, 6.0)
+    current_score_est = (crr * overs_faced).clip(0, 120)
+    expected_pp_curve = (inn1pp * pp_progress).clip(1, 120)
+    innings_pp_rate = (inn1pp / 6.0).clip(1, 20)
+    gap_rr = (rrr - crr).clip(lower=0)
+
+    df["pp_scoring_trajectory"] = (current_score_est / expected_pp_curve).replace([np.inf, -np.inf], np.nan).fillna(1.0).clip(0, 4)
+    df["pp_wicket_impact_adj"] = (df.get("wickets_lost", pd.Series(0, index=df.index)).fillna(0) * (1.4 - pp_progress)).clip(0, 10)
+    df["over_normalized_score"] = (crr / rrr.replace(0, np.nan)).replace([np.inf, -np.inf], np.nan).fillna(1.0).clip(0, 4)
+    df["pp_survival_score"] = (bsw / pp_ball).replace([np.inf, -np.inf], np.nan).fillna(0.0).clip(0, 3)
+    df["inn1_pp_run_rate"] = innings_pp_rate
+    df["pp_run_rate_vs_inn1_pp"] = (crr / innings_pp_rate).replace([np.inf, -np.inf], np.nan).fillna(1.0).clip(0, 4)
+    df["inn1_pp_runs_x_is_high_chase"] = (inn1pp * hc).clip(0, 150)
+    df["inn1_quality_x_chase_diff"] = (df["inn1_quality_index"] * df["target_difficulty_norm"]).clip(-3, 3)
+    df["set_batter_stability"] = (df.get("set_batter_exposure", pd.Series(0, index=df.index)).fillna(0) * (1 - df.get("wickets_lost", pd.Series(0, index=df.index)).fillna(0) / 10.0)).clip(0, 100)
+    df["recovery_potential"] = (df["recovery_momentum"] * df["wickets_remaining"]).clip(-100, 100)
+    df["dot_pressure_adj"] = (dot12 * rrr / 10.0).clip(0, 10)
+    df["boundary_acceleration"] = (bnd18 * gap_rr).clip(0, 20)
+    df["above_par_wicket_cost"] = (df.get("wickets_lost", pd.Series(0, index=df.index)).fillna(0) * tap.clip(lower=0) / 20.0).clip(0, 50)
+    df["below_par_run_cushion"] = ((-tap).clip(lower=0) * df["wickets_remaining"]).clip(0, 400)
+    df["chase_category_x_balls_since_wkt"] = (cat * bsw).clip(-120, 120)
+    df["runs_per_over_trend"] = ((1.5 * r12 - r18).clip(0, 36) / r18.replace(0, np.nan) * 3.0).replace([np.inf, -np.inf], np.nan).fillna(1.0).clip(0, 6)
+    df["score_vs_rrr_momentum"] = ((crr - rrr) * (6 - ov)).clip(-60, 60)
+    df["pp_score_bin"] = pd.cut(svp, bins=[-300, -20, -10, -3, 3, 10, 20, 300], labels=False, include_lowest=True).fillna(0).astype(int)
+    df["pp_gap_bin"] = pd.cut(crr - rrr, bins=[-50, -6, -3, -1, 1, 3, 6, 50], labels=False, include_lowest=True).fillna(0).astype(int)
+
     df["partnership_solidity"] = (
         df["wicket_free_balls"] / 30 * 0.4
         + df.get("set_batter_exposure", pd.Series(0, index=df.index)).fillna(0) / 60 * 0.3

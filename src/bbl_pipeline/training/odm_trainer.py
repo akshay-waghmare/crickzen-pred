@@ -11,6 +11,13 @@ from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, mean_absolute_error, mean_squared_error, roc_auc_score
 from xgboost import XGBClassifier, XGBRegressor
 
+from bbl_pipeline.inference.odm_delta_point import (
+    DELTA_POINT_MODE_DIRECTION_SIGNED,
+    DELTA_POINT_MODE_DIRECTION_WEIGHTED,
+    DELTA_POINT_MODE_MODEL,
+    apply_delta_point_mode,
+)
+
 TARGET_COLUMNS = [
     'direction',
     'momentum_direction',
@@ -86,7 +93,18 @@ def _delta_metrics(y_true: pd.Series, y_pred: np.ndarray) -> Dict[str, Any]:
         'actual_delta_mean': float(np.mean(y_true)),
         'pred_delta_mean': float(np.mean(y_pred)),
         'sign_accuracy': float(accuracy_score((y_true > 0).astype(int), (y_pred > 0).astype(int))),
+        'tail_abs_delta_mae': float(_tail_abs_delta_mae(y_true, y_pred)),
     }
+
+
+def _tail_abs_delta_mae(y_true: pd.Series, y_pred: np.ndarray, quantile: float = 0.9) -> float:
+    truth = np.asarray(y_true, dtype=float)
+    prediction = np.asarray(y_pred, dtype=float)
+    threshold = np.quantile(np.abs(truth), quantile)
+    mask = np.abs(truth) >= threshold
+    if not np.any(mask):
+        return mean_absolute_error(truth, prediction)
+    return mean_absolute_error(truth[mask], prediction[mask])
 
 
 def _interval_metrics(y_true: pd.Series, lower: np.ndarray, upper: np.ndarray) -> Dict[str, Any]:
@@ -251,7 +269,7 @@ def _train_delta_candidates(
     train_df: pd.DataFrame,
     holdout_df: pd.DataFrame,
     random_state: int,
-) -> Tuple[Dict[str, Any], Dict[str, pd.DataFrame]]:
+) -> Tuple[Dict[str, Any], Dict[str, pd.DataFrame], Dict[str, Any]]:
     raw_model = _make_delta_regressor(random_state)
     raw_model.fit(X_train, train_df['ml_delta_12'])
     raw_pred = raw_model.predict(X_holdout)
@@ -285,6 +303,92 @@ def _train_delta_candidates(
     return chosen, {name: payload['prediction_frame'] for name, payload in candidates.items()}, {
         name: payload['metrics'] for name, payload in candidates.items()
     }
+
+
+def _select_delta_point_candidate(
+    candidate_metrics: Dict[str, Dict[str, Any]],
+    direction_accuracy: float,
+) -> Tuple[str, Dict[str, Any]]:
+    best_mae = min(payload['overall']['mae'] for payload in candidate_metrics.values())
+    sign_floor = direction_accuracy - 0.005
+    mae_ceiling = best_mae * 1.02
+    priority = [
+        DELTA_POINT_MODE_DIRECTION_WEIGHTED,
+        DELTA_POINT_MODE_DIRECTION_SIGNED,
+        DELTA_POINT_MODE_MODEL,
+    ]
+
+    for mode in priority:
+        overall = candidate_metrics[mode]['overall']
+        if overall['sign_accuracy'] >= sign_floor and overall['mae'] <= mae_ceiling:
+            return mode, {
+                'rule': 'direction_sign_within_mae_ceiling',
+                'direction_accuracy': direction_accuracy,
+                'sign_floor': sign_floor,
+                'best_mae': best_mae,
+                'mae_ceiling': mae_ceiling,
+            }
+
+    chosen_mode = min(candidate_metrics, key=lambda mode: candidate_metrics[mode]['overall']['mae'])
+    return chosen_mode, {
+        'rule': 'lowest_mae_fallback',
+        'direction_accuracy': direction_accuracy,
+        'best_mae': best_mae,
+    }
+
+
+def _build_delta_point_candidates(
+    holdout_df: pd.DataFrame,
+    direction_prob: np.ndarray,
+    base_delta_pred: np.ndarray,
+) -> Tuple[str, float, pd.DataFrame, Dict[str, Any], Dict[str, Any]]:
+    direction_accuracy = float(accuracy_score(holdout_df['direction'], (direction_prob >= 0.5).astype(int)))
+    frames: Dict[str, pd.DataFrame] = {}
+    metrics: Dict[str, Any] = {}
+    scales: Dict[str, float] = {
+        DELTA_POINT_MODE_MODEL: 1.0,
+        DELTA_POINT_MODE_DIRECTION_SIGNED: 1.0,
+        DELTA_POINT_MODE_DIRECTION_WEIGHTED: _select_direction_weighted_scale(
+            holdout_df,
+            direction_prob,
+            base_delta_pred,
+        ),
+    }
+    for mode in [
+        DELTA_POINT_MODE_MODEL,
+        DELTA_POINT_MODE_DIRECTION_SIGNED,
+        DELTA_POINT_MODE_DIRECTION_WEIGHTED,
+    ]:
+        point_pred = apply_delta_point_mode(base_delta_pred, direction_prob, mode, scale=scales[mode])
+        _, frame = _build_prediction_frames(holdout_df, np.full(len(holdout_df), 0.5), point_pred)
+        frames[mode] = frame
+        metrics[mode] = _delta_slice_metrics(frame)
+
+    chosen_mode, selection = _select_delta_point_candidate(metrics, direction_accuracy)
+    selection['candidate_scales'] = scales
+    return chosen_mode, scales[chosen_mode], frames[chosen_mode], metrics, selection
+
+
+def _select_direction_weighted_scale(
+    holdout_df: pd.DataFrame,
+    direction_prob: np.ndarray,
+    base_delta_pred: np.ndarray,
+) -> float:
+    y_true = holdout_df['ml_delta_12']
+    best_scale = 1.0
+    best_rmse = np.inf
+    for scale in np.linspace(0.5, 1.75, 26):
+        pred = apply_delta_point_mode(
+            base_delta_pred,
+            direction_prob,
+            DELTA_POINT_MODE_DIRECTION_WEIGHTED,
+            scale=float(scale),
+        )
+        rmse = np.sqrt(mean_squared_error(y_true, pred))
+        if rmse < best_rmse:
+            best_rmse = rmse
+            best_scale = float(scale)
+    return best_scale
 
 
 def _make_quantile_regressor(quantile: float, random_state: int) -> HistGradientBoostingRegressor:
@@ -454,8 +558,13 @@ def train_odm(
     chosen_delta, _candidate_frames, candidate_delta_metrics = _train_delta_candidates(
         X_train, X_holdout, train_df, holdout_df, random_state
     )
-    delta_pred = chosen_delta['prediction_frame']['pred_delta'].to_numpy()
-    direction_frame, delta_frame = _build_prediction_frames(holdout_df, direction_prob, delta_pred)
+    base_delta_pred = chosen_delta['prediction_frame']['pred_delta'].to_numpy()
+    selected_delta_point_mode, selected_delta_point_scale, delta_frame, candidate_delta_point_metrics, delta_point_selection = _build_delta_point_candidates(
+        holdout_df,
+        direction_prob,
+        base_delta_pred,
+    )
+    direction_frame, _ = _build_prediction_frames(holdout_df, direction_prob, base_delta_pred)
     interval_models, interval_frame = _train_interval_models(
         X_interval_train,
         X_interval_calibration,
@@ -472,10 +581,14 @@ def train_odm(
         'delta_model': _delta_slice_metrics(delta_frame),
         'interval_model': _interval_slice_metrics(interval_frame),
         'delta_candidates': candidate_delta_metrics,
+        'delta_point_candidates': candidate_delta_point_metrics,
     }
     baseline_metrics = _baseline_metrics(holdout_df)
     metrics['comparison'] = _build_comparison(metrics, baseline_metrics)
     metrics['comparison']['selected_delta_mode'] = chosen_delta['mode']
+    metrics['comparison']['selected_delta_point_mode'] = selected_delta_point_mode
+    metrics['comparison']['selected_delta_point_scale'] = selected_delta_point_scale
+    metrics['comparison']['delta_point_selection'] = delta_point_selection
 
     training_manifest = {
         'input_file': str(input_file),
@@ -493,9 +606,13 @@ def train_odm(
         'model_types': {
             'direction_model': 'xgboost_classifier_on_direction',
             'delta_model': chosen_delta['target_description'],
+            'delta_point_estimator': selected_delta_point_mode,
             'interval_model': f"hist_gradient_boosting_quantiles_on_{interval_models['target_column']}_with_phase_conditioned_split_conformal_adjustment",
         },
         'selected_delta_mode': chosen_delta['mode'],
+        'selected_delta_point_mode': selected_delta_point_mode,
+        'selected_delta_point_scale': selected_delta_point_scale,
+        'delta_point_selection': delta_point_selection,
         'interval_alpha': interval_models['alpha'],
         'interval_conformal_adjustments': interval_models['conformal_adjustments'],
     }
@@ -540,9 +657,17 @@ def evaluate_odm(input_file: Path, model_dir: Path, holdout_frac: float = 0.2) -
     training_manifest = json.load(open(model_dir / 'training_manifest.json', 'r', encoding='utf-8'))
     selected_delta_mode = training_manifest.get('selected_delta_mode', 'raw_delta')
     if selected_delta_mode == 'residual_delta':
-        delta_pred = holdout_df['momentum_baseline_12'].to_numpy() + models['delta_model'].predict(X_holdout)
+        base_delta_pred = holdout_df['momentum_baseline_12'].to_numpy() + models['delta_model'].predict(X_holdout)
     else:
-        delta_pred = models['delta_model'].predict(X_holdout)
+        base_delta_pred = models['delta_model'].predict(X_holdout)
+    selected_delta_point_mode = training_manifest.get('selected_delta_point_mode', DELTA_POINT_MODE_MODEL)
+    selected_delta_point_scale = float(training_manifest.get('selected_delta_point_scale', 1.0))
+    delta_pred = apply_delta_point_mode(
+        base_delta_pred,
+        direction_prob,
+        selected_delta_point_mode,
+        scale=selected_delta_point_scale,
+    )
     direction_frame, delta_frame = _build_prediction_frames(holdout_df, direction_prob, delta_pred)
 
     lower_pred = models['delta_interval_lower_model'].predict(X_holdout)
@@ -565,6 +690,8 @@ def evaluate_odm(input_file: Path, model_dir: Path, holdout_frac: float = 0.2) -
     baseline_metrics = _baseline_metrics(holdout_df)
     metrics['comparison'] = _build_comparison(metrics, baseline_metrics)
     metrics['comparison']['selected_delta_mode'] = selected_delta_mode
+    metrics['comparison']['selected_delta_point_mode'] = selected_delta_point_mode
+    metrics['comparison']['selected_delta_point_scale'] = selected_delta_point_scale
     return {
         'metrics': metrics,
         'baseline_metrics': baseline_metrics,

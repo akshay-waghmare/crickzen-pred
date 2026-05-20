@@ -37,8 +37,8 @@ WINDOWS_NEW_CONSOLE = getattr(subprocess, "CREATE_NEW_CONSOLE", 0)
 LEAGUE_CONFIGS = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v15_wicket_features",
-        "inn2_model_dir": "models/ipl_v15_wicket_features",
+        "model_dir": "models/ipl_v17_pp_features",
+        "inn2_model_dir": "models/ipl_v17_pp_features",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",

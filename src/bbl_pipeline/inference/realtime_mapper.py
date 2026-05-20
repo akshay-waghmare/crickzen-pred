@@ -385,6 +385,22 @@ class RealTimeFeatureMapper:
         else:
             # Innings 2: Positive = batting team ahead (scoring faster than required)
             run_rate_diff = current_run_rate - required_run_rate
+
+        batsman1_balls = int(scraped_data.get('batsman1_balls', 0) or 0)
+        batsman2_balls = int(scraped_data.get('batsman2_balls', 0) or 0)
+        set_batter_exposure = float(max(batsman1_balls, batsman2_balls))
+        partnership_balls = (
+            total_balls_in_innings
+            if wickets_lost == 0 and total_balls_in_innings > self._balls_since_wicket
+            else self._balls_since_wicket
+        )
+        if partnership_balls > 0:
+            if batsman1_balls > 0 and batsman2_balls == 0:
+                set_batter_exposure = float(max(set_batter_exposure, partnership_balls - batsman1_balls))
+            elif batsman2_balls > 0 and batsman1_balls == 0:
+                set_batter_exposure = float(max(set_batter_exposure, partnership_balls - batsman2_balls))
+            elif batsman1_balls == 0 and batsman2_balls == 0:
+                set_batter_exposure = float(max(set_batter_exposure, partnership_balls / 2.0))
         
         # --- Projected/Expected Scores ---
         # expected_final_score is the DLS/resource projection used in training.
@@ -597,10 +613,7 @@ class RealTimeFeatureMapper:
             'runs_last_18': rolling_stats['runs_last_18'],
             'wickets_last_12': rolling_stats['wickets_last_12'],
             'dot_pct_last_12': rolling_stats['dot_pct_last_12'],
-            'set_batter_exposure': float(max(
-                scraped_data.get('batsman1_balls', 0) or 0,
-                scraped_data.get('batsman2_balls', 0) or 0,
-            )),
+            'set_batter_exposure': set_batter_exposure,
             # Scoreboard correction: if no wickets have fallen, the whole innings
             # is one partnership. Use total balls bowled when the persistent counter
             # is lower (happens on mid-match restart with sparse CREX history).

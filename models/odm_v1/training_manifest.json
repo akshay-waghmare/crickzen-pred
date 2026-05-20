@@ -14,7 +14,8 @@
   "model_types": {
     "direction_model": "xgboost_classifier_on_direction",
     "delta_model": "xgboost_regressor_on_residual_delta_12_plus_momentum_baseline",
-    "interval_model": "hist_gradient_boosting_quantiles_on_residual_delta_12_with_phase_conditioned_split_conformal_adjustment"
+    "interval_model": "hist_gradient_boosting_quantiles_on_residual_delta_12_with_phase_conditioned_split_conformal_adjustment",
+    "delta_point_estimator": "direction_weighted_abs_delta"
   },
   "selected_delta_mode": "residual_delta",
   "interval_alpha": 0.1,
@@ -23,5 +24,17 @@
     "death": 0.0032253147324141362,
     "middle": 0.0073785744400425846,
     "powerplay": 0.0038842999591984506
-  }
+  },
+  "selected_delta_point_mode": "direction_weighted_abs_delta",
+  "delta_point_selection": {
+    "rule": "direction_sign_within_mae_ceiling",
+    "direction_accuracy": 0.5772670125546722,
+    "sign_floor": 0.5722670125546722,
+    "best_mae": 0.07256444281658722,
+    "mae_ceiling": 0.07401573167291897,
+    "selected_scale_source": "inner_validation_rmse",
+    "selected_scale": 1.35,
+    "note": "Scale selected on train-period validation split to improve RMSE while preserving MAE improvement."
+  },
+  "selected_delta_point_scale": 1.35
 }

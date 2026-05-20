@@ -2,6 +2,13 @@
 
 from __future__ import annotations
 
+from sqlmodel import Session, select
+
+from app.auth import verify_password
+from app.config import Settings
+from app.database import seed_admin_user
+from app.models import User
+
 
 class TestLogin:
     def test_login_success(self, client):
@@ -104,3 +111,65 @@ class TestLogout:
             "refresh_token": data["refresh_token"],
         })
         assert resp.status_code == 200
+
+
+class TestAdminBootstrap:
+    def test_existing_admin_password_not_changed_without_force_sync(self, engine):
+        initial = Settings(
+            JWT_SECRET="test-secret-key-for-testing-only",
+            DOMAIN="localhost",
+            ADMIN_EMAIL="admin@test.com",
+            ADMIN_PASSWORD="original-password-123",
+            DATABASE_URL="sqlite://",
+            ADMIN_FORCE_SYNC=False,
+        )
+        updated = Settings(
+            JWT_SECRET="test-secret-key-for-testing-only",
+            DOMAIN="localhost",
+            ADMIN_EMAIL="admin@test.com",
+            ADMIN_PASSWORD="new-password-123",
+            DATABASE_URL="sqlite://",
+            ADMIN_FORCE_SYNC=False,
+        )
+
+        with Session(engine) as session:
+            seed_admin_user(session, initial)
+        with Session(engine) as session:
+            seed_admin_user(session, updated)
+        with Session(engine) as session:
+            admin = session.exec(select(User).where(User.email == "admin@test.com")).first()
+
+        assert admin is not None
+        assert verify_password("original-password-123", admin.hashed_password)
+        assert not verify_password("new-password-123", admin.hashed_password)
+
+    def test_existing_admin_password_is_reset_with_force_sync(self, engine):
+        initial = Settings(
+            JWT_SECRET="test-secret-key-for-testing-only",
+            DOMAIN="localhost",
+            ADMIN_EMAIL="admin@test.com",
+            ADMIN_PASSWORD="original-password-123",
+            DATABASE_URL="sqlite://",
+            ADMIN_FORCE_SYNC=False,
+        )
+        updated = Settings(
+            JWT_SECRET="test-secret-key-for-testing-only",
+            DOMAIN="localhost",
+            ADMIN_EMAIL="admin@test.com",
+            ADMIN_PASSWORD="new-password-123",
+            DATABASE_URL="sqlite://",
+            ADMIN_FORCE_SYNC=True,
+        )
+
+        with Session(engine) as session:
+            seed_admin_user(session, initial)
+        with Session(engine) as session:
+            seed_admin_user(session, updated)
+        with Session(engine) as session:
+            admin = session.exec(select(User).where(User.email == "admin@test.com")).first()
+
+        assert admin is not None
+        assert verify_password("new-password-123", admin.hashed_password)
+        assert admin.is_admin is True
+        assert admin.is_active is True
+        assert admin.plan == "admin"

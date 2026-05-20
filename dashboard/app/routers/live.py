@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
-from app.auth import get_current_user
+from app.auth import get_current_user, require_admin
 from app.config import LEAGUE_CONFIGS, detect_league_from_url, get_settings
 from app.models import User
 from app.prediction_manager import PredictionManager
@@ -257,6 +257,58 @@ def _normalise_ball_commentary(balls: list[Any]) -> list[dict[str, Any]]:
     return list(reversed(entries[-80:]))
 
 
+def _normalise_recent_balls_from_balls(balls: list[Any], limit: int = 6) -> list[dict[str, Any]]:
+    recent: list[dict[str, Any]] = []
+    for idx, ball in enumerate(balls or []):
+        if not isinstance(ball, dict):
+            continue
+        runs = _as_int(ball.get("runs") or ball.get("runs_scored"))
+        is_wicket = bool(ball.get("is_wicket") or ball.get("wicket"))
+        overs = _as_float(ball.get("overs") or ball.get("ball_number") or ball.get("over"))
+        recent.append({
+            "id": str(ball.get("id") or f"recent-ball-{idx}"),
+            "over": f"{overs:.1f}" if overs is not None else "",
+            "label": "W" if is_wicket else str(runs),
+            "runs": runs,
+            "is_wicket": is_wicket,
+            "is_boundary": runs in (4, 6),
+            "text": ball.get("commentary") or ball.get("description") or ball.get("text") or "",
+        })
+    return recent[-limit:]
+
+
+def _derive_recent_balls_from_history(history: list[dict[str, Any]], limit: int = 6) -> list[dict[str, Any]]:
+    points = _dedupe_history(history, limit=limit + 8)
+    recent: list[dict[str, Any]] = []
+    previous: dict[str, Any] | None = None
+    for point in points:
+        if previous is None:
+            previous = point
+            continue
+        overs = _as_float(point.get("overs"), 0.0) or 0.0
+        score = _as_int(point.get("score"))
+        wickets = _as_int(point.get("wickets"))
+        prev_score = _as_int(previous.get("score"))
+        prev_wickets = _as_int(previous.get("wickets"))
+        runs = max(score - prev_score, 0)
+        wicket_delta = max(wickets - prev_wickets, 0)
+        if runs == 0 and wicket_delta == 0:
+            previous = point
+            continue
+        is_wicket = wicket_delta > 0
+        recent.append({
+            "id": f"recent-{overs:.1f}-{score}-{wickets}",
+            "over": f"{overs:.1f}",
+            "label": "W" if is_wicket else str(runs),
+            "runs": runs,
+            "is_wicket": is_wicket,
+            "is_boundary": runs in (4, 6),
+            "text": f"{score}/{wickets}",
+        })
+        previous = point
+    return recent[-limit:]
+
+
 def _derive_commentary_from_history(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Create a readable timeline when CREX has not exposed ball text."""
     points = _dedupe_history(history, limit=120)
@@ -325,9 +377,13 @@ def _enrich_detail_state(state: dict[str, Any] | None, output_json_path: str | N
 
     balls = state.get("balls_data") or state.get("ball_history") or []
     commentary = _normalise_ball_commentary(balls) if isinstance(balls, list) and balls else []
+    recent_balls = _normalise_recent_balls_from_balls(balls) if isinstance(balls, list) and balls else []
     if not commentary:
         commentary = _derive_commentary_from_history(chart_history)
+    if not recent_balls:
+        recent_balls = _derive_recent_balls_from_history(chart_history)
     state["commentary"] = commentary
+    state["recent_balls"] = recent_balls
 
     return _enrich_state(state)
 
@@ -375,7 +431,7 @@ def list_leagues():
 @router.post("/start", response_model=MatchSummary, status_code=201)
 def start_match(
     body: StartMatchRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_admin),
 ):
     manager = PredictionManager.get_instance()
     try:
@@ -461,7 +517,7 @@ def get_match_state(
     state = _enrich_detail_state(pred.read_state(), pred.output_json_path)
     return MatchStateResponse(
         prediction_id=prediction_id,
-        status=pred.status if pred.is_alive else ("finished" if pred.status != "error" else "error"),
+        status=pred.status,
         state=state,
     )
 

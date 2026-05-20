@@ -1,392 +1,353 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — CrickenZen{% endblock %}
+{% block title %}Match Centre - CrickenZen{% endblock %}
 
 {% block content %}
-<div x-data="dashboardPage()" x-init="init()">
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold">Live Predictions</h1>
-      <p class="text-gray-400 text-sm mt-1">
-        Real-time ball-by-ball win probability
-        <span class="text-gray-500">• Refreshing every {{ poll_interval_ms // 1000 }}s</span>
-      </p>
+<div x-data="dashboardPage()" x-init="init()" class="space-y-6">
+  <section class="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-6 shadow-2xl">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(34,197,94,0.20),transparent_32%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.16),transparent_30%)]"></div>
+    <div class="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+      <div>
+        <div class="mb-3 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.28em] text-emerald-300">
+          <span>CrickenZen</span>
+          <span class="h-1 w-1 rounded-full bg-emerald-400"></span>
+          <span>Match Centre</span>
+        </div>
+        <h1 class="max-w-4xl text-4xl font-black tracking-tight text-white md:text-6xl">
+          Live scores, fixtures, and model detail in one cricket desk.
+        </h1>
+        <p class="mt-4 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
+          Auto-discovered CREX matches feed the centre. Select any match to inspect score state, win probability,
+          model blend, projections, and commentary without leaving the page.
+        </p>
+      </div>
+      <div class="grid min-w-[280px] grid-cols-3 gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 text-center backdrop-blur">
+        <div>
+          <div class="text-2xl font-black text-white" x-text="liveCount()"></div>
+          <div class="text-[10px] uppercase tracking-widest text-slate-400">Live</div>
+        </div>
+        <div>
+          <div class="text-2xl font-black text-white" x-text="upcomingCount()"></div>
+          <div class="text-[10px] uppercase tracking-widest text-slate-400">Upcoming</div>
+        </div>
+        <div>
+          <div class="text-2xl font-black text-white" x-text="matches.length"></div>
+          <div class="text-[10px] uppercase tracking-widest text-slate-400">Tracked</div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Start Match Form -->
-  <div class="card mb-6">
-    <h2 class="text-lg font-semibold mb-4">Start a New Prediction</h2>
-    <form @submit.prevent="startMatch()" class="flex flex-wrap gap-4 items-end">
-      <div class="flex-1 min-w-[300px]">
-        <label class="block text-sm font-medium text-gray-300 mb-1">CREX Match URL</label>
-        <input type="url" x-model="newMatchUrl" required
-               @input.debounce.500ms="autoDetectLeague()"
-               class="input-field w-full"
-               placeholder="https://crex.live/scoreboard/..." />
-      </div>
-      <div class="w-48">
-        <label class="block text-sm font-medium text-gray-300 mb-1">League</label>
-        <select x-model="newMatchLeague" class="input-field w-full">
-          <option value="">Auto-detect</option>
-          <template x-for="league in leagues" :key="league.key">
-            <option :value="league.key" x-text="league.key"></option>
-          </template>
-        </select>
-      </div>
-      <button type="submit" class="btn-primary" :disabled="startingMatch">
-        <span x-show="!startingMatch">▶ Start Prediction</span>
-        <span x-show="startingMatch">Starting...</span>
-      </button>
-    </form>
-    <template x-if="startError">
-      <p class="text-red-400 text-sm mt-2" x-text="startError"></p>
-    </template>
-  </div>
-
-  <!-- Active Matches Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <template x-for="match in matches" :key="match.id">
-      <div class="card relative">
-        <!-- League badge & status -->
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-600" x-text="match.league"></span>
-            <span class="text-xs px-2 py-0.5 rounded-full"
-                  :class="match.status === 'running' ? 'bg-green-600' : match.status === 'error' ? 'bg-red-600' : 'bg-gray-600'"
-                  x-text="match.status"></span>
-          </div>
-          <div class="flex items-center gap-3">
-            <button @click="openDetails(match)" class="text-brand-300 hover:text-brand-200 text-sm"
-                    x-show="match.state">
-              Details
-            </button>
-            <button @click="stopMatch(match.id)" class="text-red-400 hover:text-red-300 text-sm"
-                    x-show="match.status === 'running' && !isSystemMatch(match)">
-              ⏹ Stop
-            </button>
-          </div>
+  <section class="grid grid-cols-1 gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+    <aside class="space-y-4">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-3 shadow-xl">
+        <div class="flex rounded-xl bg-slate-950 p-1 text-sm font-semibold">
+          <button type="button" @click="activeTab = 'live'"
+                  class="flex-1 rounded-lg px-3 py-2 transition"
+                  :class="activeTab === 'live' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'">
+            Live
+          </button>
+          <button type="button" @click="activeTab = 'upcoming'"
+                  class="flex-1 rounded-lg px-3 py-2 transition"
+                  :class="activeTab === 'upcoming' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'">
+            Upcoming
+          </button>
+          <button type="button" @click="activeTab = 'all'"
+                  class="flex-1 rounded-lg px-3 py-2 transition"
+                  :class="activeTab === 'all' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'">
+            All
+          </button>
         </div>
+      </div>
 
-        <!-- Match state (populated by polling) -->
-        <div x-show="match.state">
-          <!-- Teams & Score -->
-          <div class="text-center mb-4">
-            <div class="text-lg font-bold" x-text="(match.state?.batting_team || '?') + ' vs ' + (match.state?.bowling_team || '?')"></div>
-            <div class="text-3xl font-bold mt-2">
-              <span x-text="match.state?.score || 0"></span>/<span x-text="match.state?.wickets || 0"></span>
-              <span class="text-lg text-gray-400 ml-2">(<span x-text="match.state?.overs || '0.0'"></span> ov)</span>
+      <div class="space-y-3">
+        <template x-for="match in visibleRows()" :key="match.key">
+          <button type="button" @click="selectRow(match)"
+                  class="group w-full rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:border-emerald-400/70 hover:bg-slate-800"
+                  :class="isSelectedRow(match) ? 'border-emerald-400 bg-slate-800 shadow-lg shadow-emerald-950/40' : 'border-slate-800 bg-slate-900/80'">
+            <div class="mb-3 flex items-center justify-between gap-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-widest"
+                      :class="match.kind === 'live' ? 'bg-emerald-400 text-slate-950' : match.kind === 'upcoming' ? 'bg-sky-400 text-slate-950' : 'bg-slate-700 text-slate-200'"
+                      x-text="match.kind"></span>
+                <span class="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-300" x-text="match.league || 'Cricket'"></span>
+              </div>
+              <span class="text-[11px] text-slate-500" x-text="match.shortTime || ''"></span>
             </div>
-            <div x-show="match.state?.target" class="text-sm text-gray-400 mt-1">
-              Target: <span x-text="match.state?.target"></span>
-              • RRR: <span x-text="(match.state?.required_run_rate || 0).toFixed(2)"></span>
-            </div>
-          </div>
 
-          <!-- ═══ BLEND GAUGE (Primary) ═══ -->
-          <div class="mb-3">
-            <div class="flex justify-between text-xs text-gray-400 mb-1">
-              <span>🔀 Blend 
-                <span class="text-gray-500" x-text="'(ML ' + pct(match.state?.blend?.ml_weight) + ' / MC ' + pct(match.state?.blend?.mc_weight) + ')'"></span>
-              </span>
-              <span x-text="match.state?.blend?.mc_available ? '' : '⚠ MC unavailable'"></span>
-            </div>
-            <div class="w-full bg-gray-700 rounded-full h-8 overflow-hidden flex relative">
-              <div class="h-full bg-gradient-to-r from-violet-600 to-indigo-500 flex items-center justify-center text-sm font-bold transition-all duration-500"
-                   :style="'width: ' + ((match.state?.blend?.blended_prob || 0.5) * 100) + '%'">
-                <span x-text="pct100(match.state?.blend?.blended_prob)"></span>
-              </div>
-              <div class="h-full bg-gray-600 flex items-center justify-center text-xs font-bold flex-1">
-                <span x-text="pct100(1 - (match.state?.blend?.blended_prob || 0.5))"></span>
-              </div>
-            </div>
-            <div class="flex justify-between text-xs text-gray-400 mt-0.5 px-1">
-              <span x-text="match.state?.batting_team"></span>
-              <span x-text="match.state?.bowling_team"></span>
-            </div>
-          </div>
-
-          <!-- ═══ ML / MC / Blend stat row ═══ -->
-          <div class="grid grid-cols-3 gap-2 text-center text-xs mb-3">
-            <!-- ML -->
-            <div class="bg-blue-900/40 border border-blue-700/40 rounded-lg p-2">
-              <div class="text-blue-400 font-medium mb-0.5">🤖 ML Model</div>
-              <div class="text-lg font-bold text-blue-300" x-text="pct100(match.state?.blend?.ml_prob)"></div>
-              <div class="text-gray-500 text-xs" x-text="'wt: ' + pct(match.state?.blend?.ml_weight)"></div>
-            </div>
-            <!-- MC -->
-            <div class="bg-emerald-900/40 border border-emerald-700/40 rounded-lg p-2"
-                 :class="match.state?.blend?.mc_available ? '' : 'opacity-40'">
-              <div class="text-emerald-400 font-medium mb-0.5">🎲 Monte Carlo</div>
-              <template x-if="match.state?.blend?.mc_available">
-                <div class="text-lg font-bold text-emerald-300" x-text="pct100(match.state?.blend?.mc_prob)"></div>
-              </template>
-              <template x-if="!match.state?.blend?.mc_available">
-                <div class="text-gray-500 text-sm">–</div>
-              </template>
-              <div class="text-gray-500 text-xs" x-text="match.state?.blend?.mc_available ? 'wt: ' + pct(match.state?.blend?.mc_weight) : 'not available'"></div>
-            </div>
-            <!-- Blend -->
-            <div class="bg-violet-900/40 border border-violet-700/40 rounded-lg p-2">
-              <div class="text-violet-400 font-medium mb-0.5">🔀 Blend</div>
-              <div class="text-lg font-bold text-violet-300" x-text="pct100(match.state?.blend?.blended_prob)"></div>
-              <div class="text-gray-500 text-xs" x-text="getPhaseLabel(match.state?.blend?.over, match.state?.blend?.is_second_innings)"></div>
-            </div>
-          </div>
-
-          <!-- ═══ ODM Signal ═══ -->
-          <div x-show="match.state?.odm?.status === 'ready'" class="bg-amber-900/30 border border-amber-700/40 rounded-lg p-3 mb-3">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-amber-400 font-medium text-xs">📊 ODM Signal</span>
-                <span class="text-xs px-1.5 py-0.5 rounded bg-amber-800/50 text-amber-300"
-                      x-text="match.state?.odm?.phase || ''"></span>
-              </div>
-              <div class="text-xs text-gray-400" x-text="(match.state?.odm?.batting_team || '') + ' bat'"></div>
-            </div>
-            <div class="flex items-center gap-3 mt-2">
-              <!-- Direction arrow -->
-              <div class="text-2xl font-bold"
-                   :class="match.state?.odm?.direction === 'up' ? 'text-green-400' : 'text-red-400'"
-                   x-text="match.state?.odm?.direction === 'up' ? '↑' : '↓'">
-              </div>
+            <div class="grid grid-cols-[1fr_auto] items-center gap-4">
               <div>
-                <div class="text-sm font-bold"
-                     :class="match.state?.odm?.direction === 'up' ? 'text-green-300' : 'text-red-300'"
-                     x-text="match.state?.odm?.direction === 'up' ? 'Batting team UP' : 'Batting team DOWN'">
-                </div>
-                <div class="text-xs text-gray-400">
-                  Confidence: <span class="font-semibold text-amber-300"
-                    x-text="pct100(match.state?.odm?.direction_confidence)"></span>
-                </div>
+                <div class="text-base font-black text-white" x-text="match.title"></div>
+                <div class="mt-1 line-clamp-2 text-xs leading-5 text-slate-400" x-text="match.subtitle"></div>
               </div>
-              <!-- Delta interval -->
-              <div x-show="match.state?.odm?.delta_12" class="ml-auto text-right">
-                <div class="text-xs text-gray-500">Δ (90% CI)</div>
-                <div class="text-xs font-mono text-amber-300"
-                     x-text="formatDelta(match.state?.odm?.delta_12)">
-                </div>
+              <div class="text-right">
+                <div class="text-xl font-black text-white" x-text="match.score"></div>
+                <div class="text-[11px] uppercase tracking-widest text-slate-500" x-text="match.meta"></div>
               </div>
             </div>
-          </div>
 
-          <!-- Key Metrics -->
-          <div class="grid grid-cols-3 gap-2 text-center text-sm">
-            <div class="bg-gray-700/50 rounded-lg p-2">
-              <div class="text-gray-400">CRR</div>
-              <div class="font-bold" x-text="(match.state?.current_run_rate || 0).toFixed(2)"></div>
+            <div class="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-800">
+              <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-sky-400 transition-all"
+                   :style="'width: ' + rowProgress(match) + '%'"></div>
             </div>
-            <div class="bg-gray-700/50 rounded-lg p-2">
-              <div class="text-gray-400">Phase</div>
-              <div class="font-bold" x-text="getPhase(match.state?.overs)"></div>
-            </div>
-            <div class="bg-gray-700/50 rounded-lg p-2">
-              <div class="text-gray-400">Innings</div>
-              <div class="font-bold" x-text="match.state?.is_second_innings ? '2nd' : '1st'"></div>
-            </div>
-          </div>
+          </button>
+        </template>
 
-          <!-- Projection preview -->
-          <div x-show="match.state?.projection" class="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
-            <div class="bg-gray-700/50 rounded-lg p-2">
-              <div class="text-gray-400">Projected</div>
-              <div class="font-bold" x-text="formatNumber(match.state?.projection?.projected_score, 0)"></div>
-            </div>
-            <div class="bg-gray-700/50 rounded-lg p-2">
-              <div class="text-gray-400">Par Diff</div>
-              <div class="font-bold" x-text="signed(match.state?.projection?.score_vs_par, 0)"></div>
-            </div>
-            <div class="bg-gray-700/50 rounded-lg p-2">
-              <div class="text-gray-400">RWP</div>
-              <div class="font-bold" x-text="pct100(match.state?.projection?.resource_win_prob)"></div>
-            </div>
-          </div>
-
-          <!-- Batsmen -->
-          <div class="mt-3 text-xs text-gray-400 space-y-1">
-            <div x-show="match.state?.batsman1_name">
-              🏏 <span x-text="match.state?.batsman1_name"></span>
-              <span x-text="match.state?.batsman1_runs + '(' + match.state?.batsman1_balls + ')'"></span>
-              •
-              <span x-text="match.state?.batsman2_name"></span>
-              <span x-text="match.state?.batsman2_runs + '(' + match.state?.batsman2_balls + ')'"></span>
-            </div>
-          </div>
-
-          <!-- Timestamp -->
-          <div class="text-right text-xs text-gray-500 mt-3" x-text="'Updated: ' + formatTime(match.state?.timestamp)"></div>
-        </div>
-
-        <!-- Loading state -->
-        <div x-show="!match.state && match.status === 'running'" class="text-center py-8">
-          <div class="animate-pulse text-gray-400">
-            <p class="text-lg">⏳ Waiting for first ball...</p>
-            <p class="text-sm mt-2">The predictor is connecting to the live match</p>
-          </div>
-        </div>
-
-        <!-- Finished/Error state -->
-        <div x-show="match.status === 'finished' || match.status === 'error'" class="text-center py-4">
-          <span class="text-gray-500" x-text="match.status === 'error' ? '❌ Prediction errored' : '✅ Match ended'"></span>
+        <div x-show="visibleRows().length === 0" class="rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 p-8 text-center">
+          <div class="text-sm font-semibold text-slate-300">No matches in this view</div>
+          <div class="mt-2 text-xs leading-5 text-slate-500">CREX discovery runs automatically. Manual start is available below.</div>
         </div>
       </div>
-    </template>
-  </div>
 
-  <!-- Match detail modal -->
-  <template x-if="selectedMatch()">
-    <div x-cloak x-show="selectedMatch()" class="fixed inset-0 z-50 overflow-y-auto bg-black/70 px-4 py-6" @keydown.escape.window="closeDetails()">
-      <div class="mx-auto max-w-6xl">
-        <div class="card p-0 overflow-hidden">
-          <div class="flex items-start justify-between border-b border-gray-700 px-5 py-4">
-            <div>
-              <div class="flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                <span class="font-bold px-2 py-0.5 rounded-full bg-brand-600 text-white" x-text="selectedMatch()?.league"></span>
-                <span x-text="selectedMatch()?.state?.venue || 'Venue not available'"></span>
+      <div x-show="isAdmin" class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+        <button type="button" @click="manualOpen = !manualOpen" class="flex w-full items-center justify-between text-left">
+          <span class="text-sm font-bold text-white">Manual CREX start</span>
+          <span class="text-xs text-slate-500" x-text="manualOpen ? 'Hide' : 'Show'"></span>
+        </button>
+        <form x-show="manualOpen" @submit.prevent="startMatch()" class="mt-4 space-y-3">
+          <input type="url" x-model="newMatchUrl" required @input.debounce.500ms="autoDetectLeague()"
+                 class="input-field w-full text-sm" placeholder="https://crex.com/cricket-live-score/..." />
+          <div class="flex gap-2">
+            <select x-model="newMatchLeague" class="input-field min-w-0 flex-1 text-sm">
+              <option value="">Auto-detect</option>
+              <template x-for="league in leagues" :key="league.key">
+                <option :value="league.key" x-text="league.key"></option>
+              </template>
+            </select>
+            <button type="submit" class="btn-primary whitespace-nowrap text-sm" :disabled="startingMatch">
+              <span x-show="!startingMatch">Start</span>
+              <span x-show="startingMatch">Starting</span>
+            </button>
+          </div>
+          <p x-show="startError" class="text-xs text-red-300" x-text="startError"></p>
+        </form>
+      </div>
+    </aside>
+
+    <main class="min-w-0">
+      <template x-if="selectedMatch()">
+        <section class="overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-900 shadow-2xl">
+          <div class="border-b border-slate-800 bg-slate-950/70 p-5 md:p-6">
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                  <span class="rounded-full bg-emerald-400 px-2 py-1 text-slate-950" x-text="selectedMatch()?.league"></span>
+                  <span x-text="selectedMatch()?.status || selectedMatch()?.kind"></span>
+                  <span x-text="selectedMatch()?.state?.venue || 'Venue TBC'"></span>
+                </div>
+                <h2 class="mt-3 text-3xl font-black tracking-tight text-white md:text-5xl" x-text="matchTitle(selectedMatch())"></h2>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-400" x-text="selectedSubtitle()"></p>
               </div>
-              <h2 class="mt-2 text-xl font-bold" x-text="matchTitle(selectedMatch())"></h2>
-              <div class="mt-1 text-sm text-gray-400">
-                <span x-text="scoreLine(selectedMatch())"></span>
-                <span x-show="selectedMatch()?.state?.target"> • Target <span x-text="selectedMatch()?.state?.target"></span></span>
+              <div class="min-w-[220px] rounded-2xl border border-slate-800 bg-slate-950 p-4 text-right">
+                <div class="text-[11px] uppercase tracking-widest text-slate-500" x-text="scoreOwnerLabel(selectedMatch())"></div>
+                <div class="mt-1 text-4xl font-black text-white" x-text="scoreLine(selectedMatch())"></div>
+                <div class="mt-2 text-sm text-slate-400" x-show="selectedMatch()?.state?.target">
+                  Target <span x-text="selectedMatch()?.state?.target"></span>
+                  <span class="text-slate-600">/</span>
+                  RRR <span x-text="formatNumber(selectedMatch()?.state?.required_run_rate, 2)"></span>
+                </div>
               </div>
             </div>
-            <button @click="closeDetails()" class="rounded-md px-3 py-1 text-gray-400 hover:bg-gray-700 hover:text-white" aria-label="Close details">&times;</button>
           </div>
 
-          <div class="grid grid-cols-1 xl:grid-cols-3 gap-0">
-            <div class="xl:col-span-2 p-5 border-b xl:border-b-0 xl:border-r border-gray-700">
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-                <div class="bg-gray-700/50 rounded-lg p-3">
-                  <div class="text-xs text-gray-400">Blend Win Prob</div>
-                  <div class="text-2xl font-bold text-violet-300" x-text="pct100(selectedMatch()?.state?.blend?.blended_prob)"></div>
+          <div class="grid grid-cols-1 gap-0 2xl:grid-cols-[minmax(0,1fr)_360px]">
+            <div class="space-y-5 p-5 md:p-6">
+              <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <div class="metric-tile">
+                  <div class="metric-label" x-text="probabilityOwner(selectedMatch()) + ' win probability'"></div>
+                  <div class="metric-value text-emerald-300" x-text="pct100(selectedMatch()?.state?.blend?.blended_prob)"></div>
                 </div>
-                <div class="bg-gray-700/50 rounded-lg p-3">
-                  <div class="text-xs text-gray-400" x-text="selectedMatch()?.state?.target ? 'Runs Required' : 'Projected Score'"></div>
-                  <div class="text-2xl font-bold" x-text="selectedMatch()?.state?.target ? formatNumber(selectedMatch()?.state?.projection?.runs_required, 0) : formatNumber(selectedMatch()?.state?.projection?.projected_score, 0)"></div>
+                <div class="metric-tile">
+                  <div class="metric-label" x-text="selectedMatch()?.state?.target ? 'Runs required' : 'Projected'"></div>
+                  <div class="metric-value" x-text="selectedMatch()?.state?.target ? formatNumber(selectedMatch()?.state?.projection?.runs_required, 0) : formatNumber(selectedMatch()?.state?.projection?.projected_score, 0)"></div>
                 </div>
-                <div class="bg-gray-700/50 rounded-lg p-3">
-                  <div class="text-xs text-gray-400">Score vs Par</div>
-                  <div class="text-2xl font-bold" x-text="signed(selectedMatch()?.state?.projection?.score_vs_par, 0)"></div>
+                <div class="metric-tile">
+                  <div class="metric-label">Score vs par</div>
+                  <div class="metric-value" x-text="signed(selectedMatch()?.state?.projection?.score_vs_par, 0)"></div>
                 </div>
-                <div class="bg-gray-700/50 rounded-lg p-3">
-                  <div class="text-xs text-gray-400">Resource Win Prob</div>
-                  <div class="text-2xl font-bold text-emerald-300" x-text="pct100(selectedMatch()?.state?.projection?.resource_win_prob)"></div>
-                </div>
-              </div>
-
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <h3 class="text-lg font-semibold">Win Probability</h3>
-                  <div class="text-xs text-gray-400">
-                    <span x-text="historyCount(selectedMatch())"></span> points
-                  </div>
-                </div>
-                <div class="rounded-lg bg-gray-950 border border-gray-700 p-3">
-                  <template x-if="probabilitySeries(selectedMatch()).length > 1">
-                    <svg viewBox="0 0 600 240" class="h-72 w-full" role="img" aria-label="Win probability chart">
-                      <line x1="36" y1="114" x2="588" y2="114" stroke="#4b5563" stroke-width="1" stroke-dasharray="5 5"></line>
-                      <line x1="36" y1="16" x2="36" y2="212" stroke="#374151" stroke-width="1"></line>
-                      <line x1="36" y1="212" x2="588" y2="212" stroke="#374151" stroke-width="1"></line>
-                      <line x1="312" y1="16" x2="312" y2="212" stroke="#374151" stroke-width="1" stroke-dasharray="4 4"></line>
-                      <path :d="chartAreaPath(selectedMatch())" fill="rgba(124, 58, 237, 0.20)"></path>
-                      <path :d="chartPath(selectedMatch())" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
-                      <template x-for="point in chartMarkers(selectedMatch())" :key="point.key">
-                        <circle :cx="point.x" :cy="point.y" r="3" fill="#c4b5fd"></circle>
-                      </template>
-                      <text x="36" y="232" fill="#9ca3af" font-size="11">0</text>
-                      <text x="302" y="232" fill="#9ca3af" font-size="11">20</text>
-                      <text x="572" y="232" fill="#9ca3af" font-size="11">40</text>
-                      <text x="4" y="20" fill="#9ca3af" font-size="11">100%</text>
-                      <text x="10" y="118" fill="#9ca3af" font-size="11">50%</text>
-                      <text x="16" y="212" fill="#9ca3af" font-size="11">0%</text>
-                    </svg>
-                  </template>
-                  <div x-show="probabilitySeries(selectedMatch()).length <= 1" class="h-72 flex items-center justify-center text-gray-500">
-                    Waiting for enough timeline points
-                  </div>
+                <div class="metric-tile">
+                  <div class="metric-label">Pressure</div>
+                  <div class="metric-value" x-text="formatNumber(selectedMatch()?.state?.projection?.pressure_index, 2)"></div>
                 </div>
               </div>
 
-              <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="rounded-lg bg-gray-700/40 border border-gray-700 p-4">
-                  <h3 class="font-semibold mb-3">Score Projection</h3>
-                  <div class="space-y-3 text-sm">
-                    <div class="flex justify-between"><span class="text-gray-400">Current score</span><span class="font-semibold" x-text="scoreLine(selectedMatch())"></span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">Expected final</span><span class="font-semibold" x-text="formatNumber(selectedMatch()?.state?.projection?.expected_final_score, 1)"></span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">Venue average</span><span class="font-semibold" x-text="formatNumber(selectedMatch()?.state?.projection?.venue_avg_score, 1)"></span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">Projected vs venue</span><span class="font-semibold" x-text="signed(selectedMatch()?.state?.projection?.projected_vs_venue_avg, 1)"></span></div>
+              <div class="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+                <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-black text-white">Crease & Over</h3>
+                    <p class="text-xs text-slate-500" x-text="scoreOwnerLabel(selectedMatch()) + ' against ' + (selectedMatch()?.state?.bowling_team || 'fielding side')"></p>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5">
+                    <template x-for="ball in recentBalls(selectedMatch())" :key="ball.id">
+                      <span class="flex h-9 min-w-9 items-center justify-center rounded-full border px-2 text-sm font-black"
+                            :class="ballChipClass(ball)"
+                            :title="ballTitle(ball)"
+                            x-text="ball.label"></span>
+                    </template>
+                    <span x-show="recentBalls(selectedMatch()).length === 0"
+                          class="rounded-full border border-dashed border-slate-700 px-3 py-2 text-xs font-semibold text-slate-500">
+                      Waiting for ball data
+                    </span>
                   </div>
                 </div>
-                <div class="rounded-lg bg-gray-700/40 border border-gray-700 p-4">
-                  <h3 class="font-semibold mb-3">Match Context</h3>
-                  <div class="space-y-3 text-sm">
-                    <div class="flex justify-between"><span class="text-gray-400">Innings</span><span class="font-semibold" x-text="selectedMatch()?.state?.is_second_innings ? '2nd' : '1st'"></span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">CRR</span><span class="font-semibold" x-text="formatNumber(selectedMatch()?.state?.projection?.current_run_rate, 2)"></span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">RRR</span><span class="font-semibold" x-text="formatNumber(selectedMatch()?.state?.projection?.required_run_rate, 2)"></span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">Pressure</span><span class="font-semibold" x-text="formatNumber(selectedMatch()?.state?.projection?.pressure_index, 2)"></span></div>
+
+                <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+                  <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+                    <div class="text-[11px] font-bold uppercase tracking-widest text-emerald-300">Striker</div>
+                    <div class="mt-2 truncate text-xl font-black text-white" x-text="batterName(selectedMatch(), 1)"></div>
+                    <div class="mt-1 text-sm text-slate-400" x-text="batterLine(selectedMatch(), 1)"></div>
                   </div>
+                  <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+                    <div class="text-[11px] font-bold uppercase tracking-widest text-sky-300">Non-striker</div>
+                    <div class="mt-2 truncate text-xl font-black text-white" x-text="batterName(selectedMatch(), 2)"></div>
+                    <div class="mt-1 text-sm text-slate-400" x-text="batterLine(selectedMatch(), 2)"></div>
+                  </div>
+                  <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+                    <div class="text-[11px] font-bold uppercase tracking-widest text-amber-300">Current bowler</div>
+                    <div class="mt-2 truncate text-xl font-black text-white" x-text="bowlerName(selectedMatch())"></div>
+                    <div class="mt-1 text-sm text-slate-400" x-text="bowlerLine(selectedMatch())"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+                <div class="mb-4 flex items-center justify-between">
+                  <div>
+                    <h3 class="text-lg font-black text-white">Win Probability Timeline</h3>
+                    <p class="text-xs text-slate-500"><span x-text="historyCount(selectedMatch())"></span> model points across innings</p>
+                  </div>
+                  <div class="text-right text-xs text-slate-500">
+                    <div x-text="selectedMatch()?.state?.batting_team || 'Batting'"></div>
+                    <div x-text="selectedMatch()?.state?.bowling_team || 'Bowling'"></div>
+                  </div>
+                </div>
+                <template x-if="probabilitySeries(selectedMatch()).length > 1">
+                  <svg viewBox="0 0 720 300" class="h-[320px] w-full" role="img" aria-label="Win probability chart">
+                    <defs>
+                      <linearGradient id="probFill" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#34d399" stop-opacity="0.34"></stop>
+                        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.03"></stop>
+                      </linearGradient>
+                    </defs>
+                    <line x1="44" y1="144" x2="696" y2="144" stroke="#334155" stroke-width="1" stroke-dasharray="5 6"></line>
+                    <line x1="44" y1="24" x2="44" y2="264" stroke="#1e293b" stroke-width="1"></line>
+                    <line x1="44" y1="264" x2="696" y2="264" stroke="#1e293b" stroke-width="1"></line>
+                    <line x1="370" y1="24" x2="370" y2="264" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 6"></line>
+                    <path :d="chartAreaPath(selectedMatch())" fill="url(#probFill)"></path>
+                    <path :d="chartPath(selectedMatch())" fill="none" stroke="#34d399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <template x-for="point in chartMarkers(selectedMatch())" :key="point.key">
+                      <circle :cx="point.x" :cy="point.y" r="3.5" fill="#e2e8f0"></circle>
+                    </template>
+                    <text x="44" y="286" fill="#64748b" font-size="12">0</text>
+                    <text x="360" y="286" fill="#64748b" font-size="12">20</text>
+                    <text x="674" y="286" fill="#64748b" font-size="12">40</text>
+                    <text x="4" y="30" fill="#64748b" font-size="12">100%</text>
+                    <text x="12" y="148" fill="#64748b" font-size="12">50%</text>
+                    <text x="20" y="264" fill="#64748b" font-size="12">0%</text>
+                  </svg>
+                </template>
+                <div x-show="probabilitySeries(selectedMatch()).length <= 1" class="flex h-[320px] items-center justify-center rounded-xl border border-dashed border-slate-800 text-sm text-slate-500">
+                  Waiting for enough live state to draw the model timeline.
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <div class="rounded-2xl border border-blue-900/50 bg-blue-950/30 p-4">
+                  <div class="text-xs font-bold uppercase tracking-widest text-blue-300" x-text="'ML: ' + probabilityOwner(selectedMatch())"></div>
+                  <div class="mt-2 text-3xl font-black text-white" x-text="pct100(selectedMatch()?.state?.blend?.ml_prob)"></div>
+                  <div class="mt-1 text-xs text-slate-400" x-text="'Weight ' + pct(selectedMatch()?.state?.blend?.ml_weight)"></div>
+                </div>
+                <div class="rounded-2xl border border-emerald-900/50 bg-emerald-950/30 p-4">
+                  <div class="text-xs font-bold uppercase tracking-widest text-emerald-300" x-text="'MC: ' + probabilityOwner(selectedMatch())"></div>
+                  <div class="mt-2 text-3xl font-black text-white" x-text="pct100(selectedMatch()?.state?.blend?.mc_prob)"></div>
+                  <div class="mt-1 text-xs text-slate-400" x-text="selectedMatch()?.state?.blend?.mc_available ? 'Weight ' + pct(selectedMatch()?.state?.blend?.mc_weight) : 'Unavailable'"></div>
+                </div>
+                <div class="rounded-2xl border border-amber-900/50 bg-amber-950/30 p-4">
+                  <div class="text-xs font-bold uppercase tracking-widest text-amber-300">ODM Signal</div>
+                  <div class="mt-2 text-2xl font-black text-white" x-text="odmLabel(selectedMatch())"></div>
+                  <div class="mt-1 text-xs text-slate-400" x-text="selectedMatch()?.state?.odm?.phase || 'Waiting for signal'"></div>
                 </div>
               </div>
             </div>
 
-            <div class="p-5">
-              <h3 class="text-lg font-semibold mb-3">Commentary Timeline</h3>
-              <div class="max-h-[640px] overflow-y-auto pr-1 space-y-3">
+            <aside class="border-t border-slate-800 bg-slate-950/60 p-5 2xl:border-l 2xl:border-t-0">
+              <h3 class="text-lg font-black text-white">Match Detail</h3>
+              <div class="mt-4 space-y-3 text-sm">
+                <div class="detail-row"><span>Batting</span><strong x-text="selectedMatch()?.state?.batting_team || '-'"></strong></div>
+                <div class="detail-row"><span>Bowling</span><strong x-text="selectedMatch()?.state?.bowling_team || '-'"></strong></div>
+                <div class="detail-row"><span>Innings</span><strong x-text="selectedMatch()?.state?.is_second_innings ? '2nd' : '1st'"></strong></div>
+                <div class="detail-row"><span>CRR</span><strong x-text="formatNumber(selectedMatch()?.state?.projection?.current_run_rate, 2)"></strong></div>
+                <div class="detail-row"><span>RRR</span><strong x-text="formatNumber(selectedMatch()?.state?.projection?.required_run_rate, 2)"></strong></div>
+                <div class="detail-row"><span>Expected final</span><strong x-text="formatNumber(selectedMatch()?.state?.projection?.expected_final_score, 1)"></strong></div>
+                <div class="detail-row"><span>Venue average</span><strong x-text="formatNumber(selectedMatch()?.state?.projection?.venue_avg_score, 1)"></strong></div>
+                <div class="detail-row"><span>Resource WP</span><strong x-text="pct100(selectedMatch()?.state?.projection?.resource_win_prob)"></strong></div>
+              </div>
+
+              <h3 class="mt-7 text-lg font-black text-white">Commentary</h3>
+              <div class="mt-4 max-h-[540px] space-y-3 overflow-y-auto pr-1">
                 <template x-for="entry in detailCommentary(selectedMatch())" :key="entry.id">
-                  <div class="rounded-lg border border-gray-700 bg-gray-900/70 p-3">
+                  <div class="rounded-xl border border-slate-800 bg-slate-900 p-3">
                     <div class="flex items-center justify-between gap-3">
-                      <span class="text-xs font-semibold text-brand-300" x-text="'Over ' + (entry.over || '-')"></span>
-                      <span class="text-xs text-gray-500" x-text="entry.score"></span>
+                      <span class="text-xs font-black text-emerald-300" x-text="'Over ' + (entry.over || '-')"></span>
+                      <span class="text-xs text-slate-500" x-text="entry.score"></span>
                     </div>
-                    <div class="mt-1 text-sm" x-text="entry.text"></div>
-                    <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
+                    <p class="mt-2 text-sm leading-5 text-slate-200" x-text="entry.text"></p>
+                    <div class="mt-2 flex items-center justify-between text-[11px] uppercase tracking-widest text-slate-500">
                       <span x-text="entry.event"></span>
                       <span x-text="entry.bat_prob !== null && entry.bat_prob !== undefined ? pct100(entry.bat_prob) : ''"></span>
                     </div>
                   </div>
                 </template>
-                <div x-show="detailCommentary(selectedMatch()).length === 0" class="py-12 text-center text-gray-500">
-                  Commentary will appear when the predictor receives live updates.
+                <div x-show="detailCommentary(selectedMatch()).length === 0" class="rounded-xl border border-dashed border-slate-800 p-6 text-center text-sm text-slate-500">
+                  Commentary appears once live ball history is available.
                 </div>
               </div>
-            </div>
+            </aside>
           </div>
-        </div>
-      </div>
-    </div>
-  </template>
+        </section>
+      </template>
 
-  <!-- Empty state -->
-  <div x-show="matches.length === 0" class="text-center py-16">
-    <div class="text-6xl mb-4">🏏</div>
-    <h2 class="text-xl font-bold text-gray-400">No Active Predictions</h2>
-    <p class="text-gray-500 mt-2">Paste a CREX match URL above to start predicting</p>
-  </div>
+      <section x-show="!selectedMatch()" class="flex min-h-[560px] items-center justify-center rounded-[2rem] border border-dashed border-slate-700 bg-slate-900/50 p-8 text-center">
+        <div>
+          <div class="text-sm font-black uppercase tracking-[0.28em] text-emerald-300">Match Centre</div>
+          <h2 class="mt-3 text-3xl font-black text-white">Select a match</h2>
+          <p class="mt-2 max-w-md text-sm leading-6 text-slate-500">Live and upcoming CREX matches will appear in the left rail as discovery runs.</p>
+        </div>
+      </section>
+    </main>
+  </section>
 </div>
 
 <script>
 function dashboardPage() {
   return {
     matches: [],
+    candidates: [],
     leagues: [],
+    activeTab: 'live',
+    selectedMatchId: null,
+    selectedCandidateKey: null,
+    manualOpen: false,
     newMatchUrl: '',
     newMatchLeague: '',
     startingMatch: false,
     startError: null,
     pollTimers: {},
-    selectedMatchId: null,
+    isAdmin: false,
 
     async init() {
-      // Load leagues
-      try {
-        this.leagues = await czFetch('/api/matches/leagues');
-      } catch {}
-
-      // Load existing matches
+      try { this.leagues = await czFetch('/api/matches/leagues'); } catch {}
+      await this.checkAdminStatus();
       await this.refreshMatches();
-
-      // Poll for match list updates every 10s
       setInterval(() => this.refreshMatches(), 10000);
+    },
+
+    async checkAdminStatus() {
+      const token = localStorage.getItem('cz_token');
+      if (!token) return;
+      try {
+        const user = await czFetch('/auth/me', { token });
+        this.isAdmin = user?.is_admin === true;
+      } catch {}
     },
 
     async refreshMatches() {
@@ -399,24 +360,29 @@ function dashboardPage() {
         for (const active of allRunning) {
           if (!summaries.some(s => s.id === active.id)) summaries.push(active);
         }
-        // Merge with existing state data
         for (const s of summaries) {
           const existing = this.matches.find(m => m.id === s.id);
           if (existing) {
             existing.status = s.status;
+            existing.user_id = s.user_id;
           } else {
             this.matches.push({ ...s, state: null });
             this.startPolling(s.id);
           }
         }
-        // Remove matches no longer in list
-        this.matches = this.matches.filter(m =>
-          summaries.some(s => s.id === m.id) || m.status === 'running'
-        );
-        if (this.selectedMatchId && !this.matches.some(m => m.id === this.selectedMatchId)) {
-          this.closeDetails();
-        }
+        this.matches = this.matches.filter(m => summaries.some(s => s.id === m.id));
+        await this.refreshAutoStatus(token);
+        if (!this.selectedMatchId && this.matches.length) this.selectedMatchId = this.matches[0].id;
       } catch {}
+    },
+
+    async refreshAutoStatus(token) {
+      try {
+        const status = await czFetch('/api/matches/auto/status', { token });
+        this.candidates = status.last_candidates || [];
+      } catch {
+        this.candidates = [];
+      }
     },
 
     startPolling(matchId) {
@@ -441,6 +407,129 @@ function dashboardPage() {
       this.pollTimers[matchId] = setInterval(poll, {{ poll_interval_ms }});
     },
 
+    rows() {
+      const active = this.matches.map(match => this.matchToRow(match));
+      const activeUrls = new Set(this.matches.map(m => this.normalizeUrl(m.match_url)));
+      const discovered = this.candidates
+        .filter(c => !activeUrls.has(this.normalizeUrl(c.url)))
+        .map((candidate, index) => this.candidateToRow(candidate, index));
+      return [...active, ...discovered];
+    },
+
+    visibleRows() {
+      const rows = this.rows();
+      if (this.activeTab === 'live') return rows.filter(row => row.kind === 'live');
+      if (this.activeTab === 'upcoming') return rows.filter(row => row.kind === 'upcoming');
+      return rows;
+    },
+
+    matchToRow(match) {
+      const state = match.state || {};
+      const title = this.matchTitle(match);
+      const score = match.state ? this.scoreLine(match) : 'Starting';
+      return {
+        key: `match:${match.id}`,
+        kind: match.status === 'running' ? 'live' : match.status,
+        match,
+        league: match.league,
+        title,
+        subtitle: state.venue || match.match_url,
+        score,
+        meta: state.overs ? `${state.overs} ov` : match.status,
+        shortTime: this.formatTime(state.timestamp),
+        progress: this.progressFromState(state),
+      };
+    },
+
+    candidateToRow(candidate, index) {
+      const parsed = this.parseCandidateLabel(candidate.label || candidate.url);
+      return {
+        key: `candidate:${index}:${candidate.url}`,
+        kind: candidate.is_live ? 'live' : 'upcoming',
+        candidate,
+        league: candidate.league,
+        title: parsed.title,
+        subtitle: parsed.subtitle || candidate.source || candidate.url,
+        score: parsed.score,
+        meta: candidate.is_live ? 'CREX live' : 'Fixture',
+        shortTime: parsed.time,
+        progress: candidate.is_live ? 18 : 0,
+      };
+    },
+
+    parseCandidateLabel(label) {
+      const clean = String(label || '').replace(/\s+/g, ' ').trim();
+      const scoreMatch = clean.match(/^([A-Z][A-Z-]*)\s+([0-9]+[\/-][0-9]+)\s+([0-9.]+)\s+Live\s+([A-Z][A-Z-]*)\s+([0-9]+[\/-][0-9]+)?\s*([0-9.]*)?/);
+      if (scoreMatch) {
+        return {
+          title: `${scoreMatch[1]} vs ${scoreMatch[4]}`,
+          subtitle: clean,
+          score: `${scoreMatch[4]} ${scoreMatch[5] || ''}`.trim(),
+          time: scoreMatch[6] ? `${scoreMatch[6]} ov` : '',
+        };
+      }
+      const fixtureMatch = clean.match(/^(.+?)\s+on\s+([A-Za-z]{3}\s+\d{1,2},\s+[0-9:]+\s+[AP]M)\s+(.+)$/);
+      if (fixtureMatch) {
+        return {
+          title: `${fixtureMatch[1].trim()} vs ${fixtureMatch[3].trim()}`,
+          subtitle: clean,
+          score: 'Scheduled',
+          time: fixtureMatch[2],
+        };
+      }
+      return { title: clean.slice(0, 56) || 'CREX match', subtitle: clean, score: 'CREX', time: '' };
+    },
+
+    selectRow(row) {
+      if (row.match) {
+        this.selectedMatchId = row.match.id;
+        this.selectedCandidateKey = null;
+      } else {
+        this.selectedMatchId = null;
+        this.selectedCandidateKey = row.key;
+      }
+    },
+
+    selectedMatch() {
+      return this.matches.find(m => m.id === this.selectedMatchId) || null;
+    },
+
+    selectedSubtitle() {
+      const match = this.selectedMatch();
+      if (!match) return '';
+      const state = match.state || {};
+      const bits = [];
+      if (state.batsman1_name) bits.push(`${state.batsman1_name} ${state.batsman1_runs || 0}(${state.batsman1_balls || 0})`);
+      if (state.batsman2_name) bits.push(`${state.batsman2_name} ${state.batsman2_runs || 0}(${state.batsman2_balls || 0})`);
+      return bits.length ? bits.join(' / ') : match.match_url;
+    },
+
+    isSelectedRow(row) {
+      return row.match ? row.match.id === this.selectedMatchId : row.key === this.selectedCandidateKey;
+    },
+
+    liveCount() {
+      return this.rows().filter(row => row.kind === 'live').length;
+    },
+
+    upcomingCount() {
+      return this.rows().filter(row => row.kind === 'upcoming').length;
+    },
+
+    rowProgress(row) {
+      return Math.max(4, Math.min(100, row.progress || 0));
+    },
+
+    progressFromState(state) {
+      const overs = Number(state?.overs || 0);
+      const inningsOffset = state?.is_second_innings ? 50 : 0;
+      return inningsOffset + Math.min(50, (overs / 20) * 50);
+    },
+
+    normalizeUrl(url) {
+      return String(url || '').replace(/\/$/, '').toLowerCase();
+    },
+
     async autoDetectLeague() {
       if (!this.newMatchUrl) return;
       try {
@@ -457,12 +546,10 @@ function dashboardPage() {
         const match = await czFetch('/api/matches/start', {
           method: 'POST',
           token,
-          body: {
-            match_url: this.newMatchUrl,
-            league: this.newMatchLeague || null,
-          },
+          body: { match_url: this.newMatchUrl, league: this.newMatchLeague || null },
         });
         this.matches.push({ ...match, state: null });
+        this.selectedMatchId = match.id;
         this.startPolling(match.id);
         this.newMatchUrl = '';
         this.newMatchLeague = '';
@@ -473,48 +560,25 @@ function dashboardPage() {
       }
     },
 
-    async stopMatch(matchId) {
-      const token = localStorage.getItem('cz_token');
-      try {
-        await czFetch(`/api/matches/${matchId}/stop`, { method: 'DELETE', token });
-        const match = this.matches.find(m => m.id === matchId);
-        if (match) match.status = 'stopped';
-        if (this.pollTimers[matchId]) {
-          clearInterval(this.pollTimers[matchId]);
-          delete this.pollTimers[matchId];
-        }
-      } catch {}
-    },
-
-    isSystemMatch(match) {
-      return String(match?.user_id || '').startsWith('system:');
-    },
-
-    openDetails(match) {
-      this.selectedMatchId = match?.id || null;
-      document.body.classList.add('overflow-hidden');
-    },
-
-    closeDetails() {
-      this.selectedMatchId = null;
-      document.body.classList.remove('overflow-hidden');
-    },
-
-    selectedMatch() {
-      return this.matches.find(m => m.id === this.selectedMatchId) || null;
-    },
-
     matchTitle(match) {
       const state = match?.state || {};
-      return (state.batting_team || '?') + ' vs ' + (state.bowling_team || '?');
+      if (state.batting_team || state.bowling_team) return `${state.batting_team || '?'} vs ${state.bowling_team || '?'}`;
+      const fromUrl = String(match?.match_url || '').match(/cricket-live-score\/([^/]+?)-match-updates/i);
+      return fromUrl ? fromUrl[1].split('-').slice(0, 5).join(' ').toUpperCase() : 'Live match';
     },
 
     scoreLine(match) {
       const state = match?.state || {};
-      const score = state.score ?? 0;
-      const wickets = state.wickets ?? 0;
-      const overs = state.overs ?? '0.0';
-      return `${score}/${wickets} (${overs} ov)`;
+      if (!match?.state) return 'Waiting';
+      return `${state.score ?? 0}/${state.wickets ?? 0} (${state.overs ?? '0.0'} ov)`;
+    },
+
+    probabilityOwner(match) {
+      return match?.state?.batting_team || 'Batting side';
+    },
+
+    scoreOwnerLabel(match) {
+      return (match?.state?.batting_team || 'Batting side') + ' score';
     },
 
     detailHistory(match) {
@@ -528,6 +592,51 @@ function dashboardPage() {
 
     detailCommentary(match) {
       return match?.state?.commentary || [];
+    },
+
+    recentBalls(match) {
+      return match?.state?.recent_balls || [];
+    },
+
+    batterName(match, slot) {
+      const state = match?.state || {};
+      return state[`batsman${slot}_name`] || '-';
+    },
+
+    batterLine(match, slot) {
+      const state = match?.state || {};
+      const runs = state[`batsman${slot}_runs`];
+      const balls = state[`batsman${slot}_balls`];
+      if (runs === undefined || runs === null || runs === '') return 'No batting data';
+      return `${runs} (${balls ?? 0})`;
+    },
+
+    bowlerName(match) {
+      return match?.state?.bowler1_name || '-';
+    },
+
+    bowlerLine(match) {
+      const state = match?.state || {};
+      const overs = state.bowler1_overs;
+      const runs = state.bowler1_runs;
+      const wickets = state.bowler1_wickets;
+      if (overs === undefined || overs === null || overs === '') return 'No bowling data';
+      return `${overs}-${wickets ?? 0}-${runs ?? 0}`;
+    },
+
+    ballChipClass(ball) {
+      if (ball?.is_wicket) return 'border-red-400/70 bg-red-500 text-white';
+      if (Number(ball?.runs) === 6) return 'border-amber-300/70 bg-amber-400 text-slate-950';
+      if (Number(ball?.runs) === 4) return 'border-emerald-300/70 bg-emerald-400 text-slate-950';
+      if (Number(ball?.runs) === 0) return 'border-slate-700 bg-slate-800 text-slate-300';
+      return 'border-sky-400/60 bg-sky-500/20 text-sky-100';
+    },
+
+    ballTitle(ball) {
+      const bits = [];
+      if (ball?.over) bits.push(`Over ${ball.over}`);
+      if (ball?.text) bits.push(ball.text);
+      return bits.join(' - ');
     },
 
     probabilitySeries(match) {
@@ -545,32 +654,24 @@ function dashboardPage() {
         const key = `${innings}:${overs}:${score}:${wickets}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        points.push({
-          xValue: (innings >= 2 ? 20 : 0) + Math.max(0, Math.min(20, overs)),
-          prob,
-          key,
-        });
+        points.push({ xValue: (innings >= 2 ? 20 : 0) + Math.max(0, Math.min(20, overs)), prob, key });
       }
       if (!points.length && match?.state) {
         const state = match.state;
         const innings = state.is_second_innings ? 2 : 1;
         const overs = Number(state.overs || 0);
         const prob = Number(state.blend?.blended_prob ?? state.bat_win_prob ?? 0.5);
-        points.push({
-          xValue: (innings >= 2 ? 20 : 0) + Math.max(0, Math.min(20, overs)),
-          prob: Math.max(0, Math.min(1, prob)),
-          key: 'current',
-        });
+        points.push({ xValue: (innings >= 2 ? 20 : 0) + Math.max(0, Math.min(20, overs)), prob: Math.max(0, Math.min(1, prob)), key: 'current' });
       }
       return points.sort((a, b) => a.xValue - b.xValue);
     },
 
     chartX(xValue) {
-      return 36 + (Math.max(0, Math.min(40, xValue)) / 40) * 552;
+      return 44 + (Math.max(0, Math.min(40, xValue)) / 40) * 652;
     },
 
     chartY(prob) {
-      return 212 - Math.max(0, Math.min(1, prob)) * 196;
+      return 264 - Math.max(0, Math.min(1, prob)) * 240;
     },
 
     chartPath(match) {
@@ -582,77 +683,50 @@ function dashboardPage() {
     chartAreaPath(match) {
       const series = this.probabilitySeries(match);
       if (series.length < 2) return '';
-      const baseline = this.chartY(0.5);
       const first = series[0];
       const last = series[series.length - 1];
       const line = series.map((p, i) => `${i === 0 ? 'M' : 'L'} ${this.chartX(p.xValue).toFixed(1)} ${this.chartY(p.prob).toFixed(1)}`).join(' ');
-      return `${line} L ${this.chartX(last.xValue).toFixed(1)} ${baseline.toFixed(1)} L ${this.chartX(first.xValue).toFixed(1)} ${baseline.toFixed(1)} Z`;
+      return `${line} L ${this.chartX(last.xValue).toFixed(1)} 264 L ${this.chartX(first.xValue).toFixed(1)} 264 Z`;
     },
 
     chartMarkers(match) {
       const series = this.probabilitySeries(match);
-      if (series.length <= 18) {
-        return series.map(p => ({ ...p, x: this.chartX(p.xValue), y: this.chartY(p.prob) }));
-      }
-      const step = Math.ceil(series.length / 18);
+      const step = series.length <= 18 ? 1 : Math.ceil(series.length / 18);
       return series
         .filter((_, index) => index % step === 0 || index === series.length - 1)
         .map(p => ({ ...p, x: this.chartX(p.xValue), y: this.chartY(p.prob) }));
     },
 
-    getPhase(overs) {
-      if (!overs) return '-';
-      const o = parseFloat(overs);
-      if (o <= 6) return 'PP';
-      if (o <= 15) return 'Middle';
-      return 'Death';
-    },
-
-    getPhaseLabel(over, isSecond) {
-      if (over === undefined || over === null) return '';
-      if (!isSecond) {
-        if (over <= 15) return '90% MC / 10% ML';
-        return '50% MC / 50% ML';
-      } else {
-        if (over <= 2) return '90% MC / 10% ML';
-        if (over <= 16) return '70% ML / 30% MC';
-        return '50% ML / 50% MC';
-      }
+    odmLabel(match) {
+      const odm = match?.state?.odm || {};
+      if (odm.status !== 'ready') return 'Pending';
+      return odm.direction === 'up' ? 'Batting up' : 'Batting down';
     },
 
     pct(weight) {
-      if (weight === undefined || weight === null) return '';
-      return Math.round(weight * 100) + '%';
+      if (weight === undefined || weight === null || weight === '') return '-';
+      return Math.round(Number(weight) * 100) + '%';
     },
 
     pct100(prob) {
-      if (prob === undefined || prob === null || prob === '') return '–';
-      return (parseFloat(prob) * 100).toFixed(1) + '%';
+      if (prob === undefined || prob === null || prob === '' || Number.isNaN(Number(prob))) return '-';
+      return (Number(prob) * 100).toFixed(1) + '%';
     },
 
     formatNumber(value, decimals = 0) {
-      if (value === undefined || value === null || value === '' || Number.isNaN(Number(value))) return '–';
+      if (value === undefined || value === null || value === '' || Number.isNaN(Number(value))) return '-';
       return Number(value).toFixed(decimals);
     },
 
     signed(value, decimals = 0) {
-      if (value === undefined || value === null || value === '' || Number.isNaN(Number(value))) return '–';
+      if (value === undefined || value === null || value === '' || Number.isNaN(Number(value))) return '-';
       const num = Number(value);
       return `${num >= 0 ? '+' : ''}${num.toFixed(decimals)}`;
     },
 
-    formatDelta(delta12) {
-      if (!delta12) return '';
-      const lo = (delta12.lower_90 * 100).toFixed(1);
-      const hi = (delta12.upper_90 * 100).toFixed(1);
-      return `[${lo >= 0 ? '+' : ''}${lo}%, ${hi >= 0 ? '+' : ''}${hi}%]`;
-    },
-
     formatTime(ts) {
       if (!ts) return '';
-      try {
-        return new Date(ts).toLocaleTimeString();
-      } catch { return ts; }
+      try { return new Date(ts).toLocaleTimeString(); } catch { return ts; }
     },
   };
 }
