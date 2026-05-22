@@ -471,7 +471,7 @@ PREDICTOR_CONFIGS = {
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",
         "mc_only": False,
-        "model_dir": "models/ipl_v14_pitch_features",
+        "model_dir": "models/ipl_v17_pp_features",
         "odm_model_dir": "models/odm_v1",
         "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v9",
@@ -481,7 +481,7 @@ PREDICTOR_CONFIGS = {
     "IPL MC-only": {
         "output_json": "data/ipl_live_mc.json",
         "mc_only": True,
-        "model_dir": "models/ipl_v14_pitch_features",
+        "model_dir": "models/ipl_v17_pp_features",
         "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "league": "ipl",
@@ -1832,7 +1832,7 @@ def main():
             " Post-Cal is loaded but no gate fired for this ball."
         )
         st.caption(
-            "🟢 **ipl_v14 router active (Inn2)** — "
+            "🟢 **ipl_v17 router active (Inn2)** — "
             f"using **{_source_label}**. "
             "Current base rule is raw phase output; PP easy chases use **v12 PP raw**."
             + _post_note
@@ -1845,7 +1845,7 @@ def main():
             ""
         )
         st.caption(
-            f"ℹ️ All base cards use **ipl_v7** ({_inn_label} base model) — ipl_v14 raw router activates in Inn2."
+            f"ℹ️ All base cards use **ipl_v7** ({_inn_label} base model) — ipl_v17 raw router activates in Inn2."
             + _post_note
         )
 
