@@ -274,6 +274,19 @@ class TestDetailState:
         assert projection["balls_remaining"] == 44
         assert projection["resource_win_prob"] == 0.63
 
+    def test_projection_falls_back_to_run_rate_when_features_missing(self):
+        projection = _build_projection({
+            "score": 106,
+            "wickets": 3,
+            "overs": 10.2,
+            "current_run_rate": 10.26,
+            "features": {},
+        })
+
+        assert projection["balls_remaining"] == 58
+        assert round(projection["projected_score"], 1) == 205.2
+        assert round(projection["expected_final_score"], 1) == 205.2
+
     def test_synthesises_commentary_from_distinct_history(self):
         commentary = _derive_commentary_from_history([
             {"innings": 1, "overs": 4.1, "score": 37, "wickets": 1, "bat_prob": 0.52, "batting_team": "Team A"},

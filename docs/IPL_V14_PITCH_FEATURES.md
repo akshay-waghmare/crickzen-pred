@@ -1,46 +1,58 @@
-# IPL v14 Pitch Features
+# IPL Inn2 Hybrid Router
 
-IPL production now uses `models/ipl_v14_pitch_features` as the active innings-2 phase router. Innings 1 remains the existing `models/ipl_v7` base model via `routing_config.json`; innings 2 routes to v14 PP/MID/DEATH phase models.
+IPL production now uses `models/ipl_v17_raw_pp_v14_hybrid` as the active innings-2 phase router. Innings 1 remains the existing `models/ipl_v7` base model via `routing_config.json`; innings 2 uses the **v17 raw PP model/features** for powerplay and keeps **v14 raw MID/DEATH** plus the **v14 post-model correction path**.
 
-This model does not replace or rewrite the resource calculator. The resource calculator still produces stable base columns such as `resource_win_prob`, `score_vs_par`, `dls_pressure_index`, `resources_remaining`, and `chase_difficulty`. v14 retrains the innings-2 ML phase models so they can learn how to adjust those resource/scoreboard signals using first-innings pitch context.
+This model does not replace or rewrite the resource calculator. The resource calculator still produces stable base columns such as `resource_win_prob`, `score_vs_par`, `dls_pressure_index`, `resources_remaining`, and `chase_difficulty`. The current hybrid only swaps which innings-2 phase model consumes those features:
+
+1. **PP (overs 1-6):** v17 raw PP model
+2. **MID (overs 7-15):** v14 raw MID model
+3. **DEATH (overs 16-20):** v14 raw DEATH model
+
+`routing_config.json` keeps `apply_calibration=false`, so the phase-router outputs stay raw. The separate v14 post-model router remains available for its guarded correction windows.
 
 ## Active production model
 
 | Surface | Active value |
 |---|---|
 | Registry key | `active_models.IPL` and lowercase `active_models.ipl` |
-| Router directory | `models/ipl_v14_pitch_features` |
+| Router directory | `models/ipl_v17_raw_pp_v14_hybrid` |
 | Innings 1 model | `models/ipl_v7` |
-| Innings 2 router | `models/ipl_v14_pitch_features` |
+| Innings 2 router | `models/ipl_v17_raw_pp_v14_hybrid` |
 | Feature store | `data/ipl_feature_store_v9` |
-| Build script | `scripts/build_ipl_v14_pitch_features.py` |
+| Build source artifacts | `models/ipl_v17_pp_features` for PP, `models/ipl_v14_pitch_features` for MID/DEATH + post-model router |
 | Main docs | `docs/IPL_V14_PITCH_FEATURES.md` |
 
 The router artifacts are:
 
 | Artifact | Purpose |
 |---|---|
-| `routing_config.json` | Declares v7 for innings 1 and v14 phase routing for innings 2 |
-| `champion_model_pp.joblib` | Innings-2 powerplay model |
-| `champion_model_mid.joblib` | Innings-2 middle-overs model |
-| `champion_model_death.joblib` | Innings-2 death-overs model |
-| `phase_features.json` | Exact feature list per phase |
-| `phase_oof_calibrators.pkl` | Phase/per-over OOF calibration bundles |
+| `routing_config.json` | Declares v7 for innings 1, v17 raw PP for innings-2 powerplay, and v14 MID/DEATH for innings 2 |
+| `champion_model_pp.joblib` | Innings-2 powerplay model copied from `models/ipl_v17_pp_features` |
+| `champion_model_mid.joblib` | Innings-2 middle-overs model copied from `models/ipl_v14_pitch_features` |
+| `champion_model_death.joblib` | Innings-2 death-overs model copied from `models/ipl_v14_pitch_features` |
+| `phase_features.json` | Exact hybrid feature list per phase (v17 PP, v14 MID/DEATH) |
+| `phase_oof_calibrators.pkl` | Retained compatibility artifact from v14; phase-router calibration is disabled in production |
 | `venue_pitch_baselines.json` | Venue baselines used live to create relative first-innings pitch features |
-| `oos_comparison.csv` | v12 vs v14 OOS comparison |
-| `oof_results.csv` | v14 OOF phase metrics |
-| `pitch_partnership_eda_correlations.csv` | EDA correlations for extra pitch/partnership candidates |
-| `pitch_partnership_eda_groups.csv` | EDA group summary used to choose the selective death features |
-| `post_model_calibration_router.pkl` | Guardrailed post-model probability router for IPL v14 production display/output |
+| `oos_comparison.csv` | Historical v14 OOS comparison retained for reference |
+| `oof_results_pp_source_v17.csv` | Source v17 PP OOF summary retained for reference |
+| `post_model_calibration_router.pkl` | Guardrailed post-model probability router retained from v14 production |
 | `post_model_calibration_router_validation.json` | 2025-fit / 2026-holdout audit for the post-model router |
+
+## Current innings-2 phase sources
+
+| Phase | Active source | Output mode | Notes |
+|---|---|---|---|
+| PP | `models/ipl_v17_pp_features/champion_model_pp.joblib` | Raw | Uses v17 PP feature list; low/easy chases still fall back to v12 raw PP |
+| MID | `models/ipl_v14_pitch_features/champion_model_mid.joblib` | Raw | v14 middle-overs model kept unchanged |
+| DEATH | `models/ipl_v14_pitch_features/champion_model_death.joblib` | Raw | v14 death model kept unchanged |
 
 ## Feature changes vs v12
 
 | Phase | Added features | Purpose |
 |---|---|---|
-| PP | `pp_score_vs_venue`, `pp_wkts_vs_venue`, `death_rr_vs_venue`, `death_wkts_vs_venue` | First-innings pitch read versus venue baseline |
-| MID | `pp_wkts_vs_venue` | Venue-normalized PP damage signal |
-| DEATH | `inn1_pp_wickets`, `mid_avg_boundary18_vs_venue`, `avg_boundary18_vs_venue` | PP wicket damage plus boundary-freedom pitch read |
+| PP | v14 pitch features + v15 wicket-context features + v17 PP additions such as `late_mid_urgency`, `finish_quality_zone`, `chase_on_track_score`, `required_rpb`, `wickets_times_balls`, `wickets_last_30`, `balls_since_wicket` | Promote the stronger raw v17 PP model while preserving existing live carryover inputs |
+| MID | `pp_wkts_vs_venue` | Venue-normalized PP damage signal from v14 |
+| DEATH | `inn1_pp_wickets`, `mid_avg_boundary18_vs_venue`, `avg_boundary18_vs_venue` | PP wicket damage plus boundary-freedom pitch read from v14 |
 
 `avg_boundary18_vs_venue` and `mid_avg_boundary18_vs_venue` measure how boundary-friendly the first innings was compared with normal conditions at the same venue. Positive values mean boundaries were easier than venue average; negative values mean the pitch/conditions suppressed boundaries.
 
@@ -49,26 +61,33 @@ These features are ML inputs, not resource-calculator inputs:
 1. `crex_live_predictor` computes first-innings carryover and venue-relative pitch fields.
 2. `realtime_mapper` forwards those fields into the live feature dataframe.
 3. `Inn2PhaseRouter` selects the PP/MID/DEATH model and fills its phase-specific feature list.
-4. The phase model combines resource features plus v14 pitch features to produce the innings-2 probability.
+4. The active phase model combines resource features plus the relevant carryover/context fields to produce the innings-2 probability.
 
 This separation is intentional. The resource model remains stable and interpretable; the retrained ML router learns when to move above or below the resource baseline based on pitch/venue evidence from the first innings.
 
-## OOS comparison
+## Production selection rationale
 
 Standard split: train seasons `<2025`, test seasons `2025` and `2026`.
 
-| Phase | v12 calibrated Brier | v14 calibrated Brier | Change |
-|---|---:|---:|---:|
-| PP | 0.14589 | 0.14382 | -1.42% |
-| MID | 0.10412 | 0.10370 | -0.41% |
-| DEATH | 0.06809 | 0.06493 | -4.63% |
-| Overall | 0.11316 | 0.11175 | -1.24% |
+Raw v17 PP was promoted only because it improved PP slightly without taking on the v17 calibration failure. MID and DEATH stayed on v14 because raw v17 did not improve those phases.
 
-Raw Brier also improved overall: `0.11188 -> 0.10988`.
+| Phase | Raw v14 OOS Brier | Raw v17 OOS Brier | Change |
+|---|---:|---:|---:|
+| PP | 0.14040 | 0.13957 | -0.59% |
+| MID | 0.10268 | 0.10380 | +1.09% |
+| DEATH | 0.06377 | 0.06335 | -0.66% |
+| Overall | 0.10988 | 0.11009 | +0.19% |
+
+Key decision:
+
+- promote **v17 raw PP**
+- keep **v14 raw MID/DEATH**
+- keep `apply_calibration=false`
+- retain the **v14 post-model router**
 
 ## Post-model calibration router
 
-Raw v14 remains the production base. `routing_config.json` still has `apply_calibration=false`, because the broad OOF calibrators were not better than raw v14 for this production path. The new correction is a separate post-model router that only fires in the failure regions found in the OOS bucket analysis.
+The hybrid router still has `apply_calibration=false`, so phase outputs remain raw. The separate post-model router retained from v14 only fires in the bounded correction regions found in the OOS bucket analysis.
 
 | Rule | Gate | Intent |
 |---|---|---|
@@ -123,7 +142,7 @@ Production integration:
 
 ## Failed post-v14 experiments
 
-v14 remains the IPL champion. Two follow-up context-resource experiments were run to address the favourite/underdog compression problem:
+Before the current hybrid, v14 was the production champion. Two follow-up context-resource experiments were run to address the favourite/underdog compression problem:
 
 - true 85-88% favourites were often shown around 70-75%
 - true 12-15% underdogs were often shown around 25-30%
@@ -198,24 +217,24 @@ Finding: v16 improved the 70-80 favourite bucket more than v15, and PP ECE impro
 
 ### Conclusion for future work
 
-Keep `models/ipl_v14_pitch_features` as champion. Archive v15/v16 as useful failed experiments. The bounded specialist correction path is now implemented as the post-model calibration router above, rather than another global resource-context prior.
+Current production champion is `models/ipl_v17_raw_pp_v14_hybrid`. It promotes the v17 raw PP model into the v14 router, keeps v14 MID/DEATH and the bounded post-model correction path, and leaves v15/v16 archived as useful failed experiments.
 
 ## What changed in this stage
 
-This stage promoted the selective v15 death improvement into v14 and kept only v14 as the production model.
+This stage now keeps the v14 base router but promotes only the v17 raw PP model/features into a dedicated hybrid production directory.
 
 | Area | Change |
 |---|---|
-| Model artifacts | Rebuilt `models/ipl_v14_pitch_features` with PP/MID v14 pitch features plus the selective death boundary features from v15 |
+| Model artifacts | Built `models/ipl_v17_raw_pp_v14_hybrid` with v17 raw PP artifacts and v14 MID/DEATH plus the v14 post-model router |
 | v15 cleanup | Removed separate v15 candidate artifacts/scripts after merging useful death features into v14 |
-| Registry | Updated `models/model_registry.json` so IPL active model paths point to `models/ipl_v14_pitch_features` |
-| Desktop launcher | Updated IPL `model_dir` and `inn2_model_dir` to `models/ipl_v14_pitch_features` |
-| Dashboard config | Updated IPL `model_dir` to `models/ipl_v14_pitch_features` |
-| Streamlit app | Updated IPL prediction configs and user-facing router note to v14 |
+| Registry | Updated `models/model_registry.json` so IPL active model paths point to `models/ipl_v17_raw_pp_v14_hybrid` |
+| Desktop launcher | Updated IPL `model_dir` and `inn2_model_dir` to `models/ipl_v17_raw_pp_v14_hybrid` |
+| Dashboard config | Updated IPL `model_dir` to `models/ipl_v17_raw_pp_v14_hybrid` |
+| Streamlit app | Updated IPL prediction configs to `models/ipl_v17_raw_pp_v14_hybrid` |
 | Live predictor | Added live calculation of PP/death venue-relative features and boundary-freedom features from first-innings ball history |
 | betx21 fallback | Added PP/death wicket extraction so mid-chase starts can still populate v14 carryover fields when score snapshots are available |
-| Realtime mapper | Added v14 carryover columns to the live feature dictionary |
-| Router docs | Updated `Inn2PhaseRouter` docstring/example to reference v14 |
+| Realtime mapper | Supplies the carryover/context columns needed by the hybrid router feature lists |
+| Router docs | Updated `Inn2PhaseRouter` references to the hybrid production path |
 | Tests | Updated realtime mapper parity test for the training boundary-rate definition |
 | Post-model router | Added guarded Inn1 low-side, Inn2 easy-chase, and Inn2 par-powerplay probability correction without enabling global calibration |
 | Live display | Added separate Streamlit `Post-Cal` card and live JSON fields, while keeping Shadow T separate |
@@ -223,21 +242,24 @@ This stage promoted the selective v15 death improvement into v14 and kept only v
 
 ## Production wiring
 
-- Desktop launcher IPL config points `model_dir` to `models/ipl_v14_pitch_features`.
-- Dashboard IPL config points `model_dir` to `models/ipl_v14_pitch_features`.
-- Streamlit IPL configs point `model_dir` to `models/ipl_v14_pitch_features`.
-- `model_registry.json` marks `IPL` and lowercase `ipl` as `v14_pitch_features`.
+- Desktop launcher IPL config points `model_dir` to `models/ipl_v17_raw_pp_v14_hybrid`.
+- Dashboard IPL config points `model_dir` to `models/ipl_v17_raw_pp_v14_hybrid`.
+- Streamlit IPL configs point `model_dir` to `models/ipl_v17_raw_pp_v14_hybrid`.
+- `model_registry.json` marks `IPL` and lowercase `ipl` as `v17_raw_pp_v14_hybrid`.
 - `crex_live_predictor` loads `venue_pitch_baselines.json` from the active router directory and computes the live venue-relative carryover features from first-innings ball history.
-- `realtime_mapper` forwards the v14 feature fields into the router feature dictionary.
+- `realtime_mapper` forwards the hybrid feature fields into the router feature dictionary.
 - If ball history is unavailable after starting mid-chase, `fetch_betx21_inn1_stats.py` can recover first-innings PP/death score and wicket fields from betx21 score progression where available.
 
 ## Rebuild command
 
 ```bash
-python scripts/build_ipl_v14_pitch_features.py
+# No single rebuild script exists yet for the hybrid.
+# Rebuild/update source artifact dirs first, then assemble:
+#   - PP from models/ipl_v17_pp_features
+#   - MID/DEATH + post-model router from models/ipl_v14_pitch_features
 ```
 
-The build writes:
+The active hybrid directory contains:
 
 - `champion_model_pp.joblib`
 - `champion_model_mid.joblib`
@@ -246,4 +268,6 @@ The build writes:
 - `phase_oof_calibrators.pkl`
 - `venue_pitch_baselines.json`
 - `oos_comparison.csv`
-- `oof_results.csv`
+- `oof_results_pp_source_v17.csv`
+- `post_model_calibration_router.pkl`
+- `post_model_calibration_router_validation.json`

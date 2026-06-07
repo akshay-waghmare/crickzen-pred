@@ -71,7 +71,7 @@ class Settings(BaseSettings):
 LEAGUE_CONFIGS: dict[str, dict] = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v17_pp_features",
+        "model_dir": "models/ipl_v17_raw_pp_v14_hybrid",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "series_url": "https://crex.com/series/indian-premier-league-2026-1PW",
     },
@@ -80,6 +80,11 @@ LEAGUE_CONFIGS: dict[str, dict] = {
         "model_dir": "models/t20_male_v2",
         "feature_store_dir": "data/psl_feature_store_v1",
         "series_url": "https://crex.com/series/pakistan-super-league-2026-2BK",
+    },
+    "NTB": {
+        "league": "ntb",
+        "model_dir": "models/ntb_v1_phase",
+        "feature_store_dir": "data/ntb_feature_store_v1",
     },
     "BBL": {
         "league": "bbl",
@@ -127,6 +132,7 @@ LEAGUE_CONFIGS: dict[str, dict] = {
 _URL_LEAGUE_PATTERNS: list[tuple[str, str]] = [
     (r"indian-premier-league", "IPL"),
     (r"pakistan-super-league", "PSL"),
+    (r"vitality-blast|natwest-t20-blast|t20-blast", "NTB"),
     (r"big-bash-league", "BBL"),
     (r"betway-sa20|sa20-league|sa20", "SA20"),
     (r"international-league-t20|ilt20", "ILT20"),

@@ -38,6 +38,29 @@ def engineer_inn2_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = df.copy()
 
+    # ── training-only league phase features used by NTB / generic phase routers ──
+    # These were added in league phase build scripts before calling this helper.
+    # Runtime router inference also needs them so phase-model feature lists don't
+    # silently fall back to 0.0 for these columns.
+    tap = df.get("target_above_par", pd.Series(0.0, index=df.index)).fillna(0.0)
+    overs_remaining = df.get("overs_remaining", pd.Series(0.0, index=df.index)).fillna(0.0)
+    wickets_lost = df.get("wickets_lost", pd.Series(0.0, index=df.index)).fillna(0.0)
+    wickets_remaining_base = df.get(
+        "wickets_remaining",
+        10 - wickets_lost,
+    ).fillna(10 - wickets_lost)
+    required_run_rate = df.get("required_run_rate", pd.Series(0.0, index=df.index)).fillna(0.0)
+    score_vs_par = df.get("score_vs_par", pd.Series(0.0, index=df.index)).fillna(0.0)
+    resources_remaining = df.get("resources_remaining", pd.Series(0.0, index=df.index)).fillna(0.0)
+    runs_last_12 = df.get("runs_last_12", pd.Series(0.0, index=df.index)).fillna(0.0)
+    wickets_last_6_base = df.get("wickets_last_6", pd.Series(0.0, index=df.index)).fillna(0.0)
+
+    # Populate the training-script features that are not otherwise engineered here.
+    df["target_clarity_index"] = tap / (overs_remaining + 1.0)
+    df["wicket_budget_remaining"] = wickets_remaining_base - (overs_remaining * 0.4)
+    df["early_settle_flag"] = ((wickets_lost <= 2) & (score_vs_par >= 0)).astype(float)
+    df["late_mid_run_gap"] = runs_last_12 - (required_run_rate * 2.0)
+
     # ── 0. Derived team-adjusted features (missing from RealTimeFeatureMapper) ──
     rwp = df.get("resource_win_prob", pd.Series(0.5, index=df.index)).fillna(0.5)
     tsd = df.get("team_strength_diff", pd.Series(0.0, index=df.index)).fillna(0.0)
@@ -116,6 +139,9 @@ def engineer_inn2_features(df: pd.DataFrame) -> pd.DataFrame:
     df["recovery_momentum"]    = (bsw / 6 * (df["crr_vs_rrr_ratio"] - 1).clip(-2, 2)).clip(-20, 20)
     df["wicket_cluster_flag"]  = (wl6 >= 2).astype(float)
     df["recent_surge_flag"]    = (pace2 >= rrr).astype(float)
+    df["momentum_shift_flag"] = ((df["momentum_score"] > 0.5) & (df["scoring_rate_gap"] < 0)).astype(float)
+    df["acceleration_zone"] = ((overs_remaining <= 4) & (df["crr_vs_rrr_ratio"] >= 0.9)).astype(float)
+    df["late_wkt_collapse_risk"] = ((wickets_last_6_base >= 2) & (rrr > 9)).astype(float)
 
     dls_p = df.get("dls_pressure_index", pd.Series(0, index=df.index)).fillna(0).clip(0, 1)
     df["pressure_momentum_gap"]   = (dls_p - (1 - df["crr_vs_rrr_ratio"].clip(0, 2))).clip(-1, 1)
@@ -224,6 +250,32 @@ def engineer_inn2_features(df: pd.DataFrame) -> pd.DataFrame:
         df.get("venue_chase_success", pd.Series(0.5, index=df.index)).fillna(0.5)
         * (1 + df.get("batting_won_toss", pd.Series(0, index=df.index)).fillna(0) * 0.1)
     ).clip(0, 1)
+
+    # ── 10. v17 PP Chase Tracking Features ────────────────────────────────────
+    # NOTE: These features were listed in phase_features.json / routing_config.json
+    # but were missing from training (ipl_features_v16).  They are implemented here
+    # consistently with the gap_rr / innings_pp_rate / dls_p variables defined above.
+    # They will produce meaningful non-zero values; retrain model to get full benefit.
+
+    overs_rem = df.get("overs_remaining", pd.Series(0, index=df.index)).fillna(0).clip(0, 20)
+
+    # How much urgency has built up in the late-middle window: deficit × innings_progress
+    df["late_mid_urgency"] = (
+        gap_rr * (1 - (overs_rem / 20.0).clip(0, 1))
+    ).clip(0, 20)
+
+    # Composite "comfortable finish" zone: ahead-of-par AND wickets in hand
+    df["finish_quality_zone"] = (
+        (svp.clip(-50, 30) + 50) / 80.0 * (df["wickets_remaining"] / 10.0)
+    ).clip(0, 1)
+
+    # How on-track is the chase: RR parity × wickets × inverse DLS pressure
+    df["chase_on_track_score"] = (
+        df["crr_vs_rrr_ratio"] * (df["wickets_remaining"] / 10.0) * (1 - dls_p.clip(0, 0.8))
+    ).clip(0, 5)
+
+    # RRR relative to the inn1 PP run-rate (proxy for venue/match expected pace)
+    df["early_mid_rrr_vs_venue_avg"] = (rrr - innings_pp_rate).clip(-15, 15)
 
     return df
 

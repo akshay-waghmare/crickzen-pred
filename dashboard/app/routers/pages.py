@@ -8,6 +8,11 @@ from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
 from app.config import get_settings
+from app.prematch_page import (
+    build_prematch_detail_context,
+    build_prematch_list_context,
+)
+from app.proof_page import build_proof_page_context
 from app.public import public_payload, service_from_request
 
 router = APIRouter(tags=["Pages"])
@@ -30,6 +35,23 @@ def index(request: Request):
             "title": "CrickenZen | Live Cricket Win Probability",
             "description": "Live cricket prediction engine with public win probability, projected score, and model insights.",
             "canonical": "/",
+            "noindex": False,
+        },
+    })
+
+
+@router.get("/proof", response_class=HTMLResponse)
+def proof_page(request: Request):
+    settings = get_settings()
+    league = request.query_params.get("league", "ipl")
+    ctx = build_proof_page_context(league=league)
+    return templates.TemplateResponse(request, "proof.html", {
+        "settings": settings,
+        "ctx": ctx,
+        "seo": {
+            "title": "Model Proof & Performance | CrickenZen",
+            "description": "Transparent model performance: Brier score, ECE, accuracy, proof ledger, and segment performance for CrickenZen predictions.",
+            "canonical": "/proof",
             "noindex": False,
         },
     })
@@ -132,5 +154,39 @@ def public_prediction_alias_page(league: str, teams: str, request: Request):
             "description": "Public cricket prediction cards with live win probability and model insight.",
             "canonical": f"/prediction/{league}/{teams}",
             "noindex": not bool(matches),
+        },
+    })
+
+
+@router.get("/ipl-match-brief-today", response_class=HTMLResponse)
+def prematch_list_page(request: Request):
+    settings = get_settings()
+    ctx = build_prematch_list_context(request)
+    return templates.TemplateResponse(request, "ipl_match_brief_today.html", {
+        "settings": settings,
+        "ctx": ctx,
+        "seo": {
+            "title": "IPL Pre-Match Brief Today | Before-Toss Model Insight — CrickenZen",
+            "description": "Today's IPL pre-match briefs with win probability, venue context, toss sensitivity, and 3-5 reasons for the model lean before toss.",
+            "canonical": "/ipl-match-brief-today",
+            "noindex": False,
+        },
+    })
+
+
+@router.get("/pre-match/{slug}", response_class=HTMLResponse)
+def prematch_detail_page(slug: str, request: Request):
+    settings = get_settings()
+    league = request.query_params.get("league", "ipl")
+    ctx = build_prematch_detail_context(request, slug, league=league)
+    title = ctx.title or "Pre-Match Brief"
+    return templates.TemplateResponse(request, "prematch_brief.html", {
+        "settings": settings,
+        "ctx": ctx,
+        "seo": {
+            "title": f"{title} | Pre-Match Brief — CrickenZen",
+            "description": f"Pre-match brief for {title}: win probability, projected score, venue context, toss sensitivity, and model reasons before toss.",
+            "canonical": f"/pre-match/{slug}",
+            "noindex": ctx.status == "not_ready",
         },
     })

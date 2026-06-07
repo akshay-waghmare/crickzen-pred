@@ -1,0 +1,213 @@
+openapi: 3.1.0
+info:
+  title: IPL State Embeddings Offline Pilot Contract
+  version: 0.1.0
+  description: |
+    Planning contract for the offline IPL regime-aware state embeddings pilot.
+    These interfaces describe internal job boundaries for corpus build, regime discovery,
+    analogue retrieval, and baseline evaluation.
+servers:
+  - url: local://offline
+paths:
+  /corpus/build:
+    post:
+      summary: Build the IPL embedding corpus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildCorpusRequest'
+      responses:
+        '200':
+          description: Corpus build completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildCorpusResponse'
+  /regimes/discover:
+    post:
+      summary: Fit PCA and KMeans, then assign regimes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscoverRegimesRequest'
+      responses:
+        '200':
+          description: Regime discovery completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoverRegimesResponse'
+  /retrieval/query:
+    post:
+      summary: Retrieve historical analogues for held-out queries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetrievalQueryRequest'
+      responses:
+        '200':
+          description: Retrieval evaluation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievalQueryResponse'
+  /evaluation/run:
+    post:
+      summary: Compare regime-aware variants against the current IPL baseline
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunEvaluationRequest'
+      responses:
+        '200':
+          description: Baseline comparison completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunEvaluationResponse'
+components:
+  schemas:
+    BuildCorpusRequest:
+      type: object
+      required: [input_path, output_dir, seed]
+      properties:
+        input_path:
+          type: string
+        raw_backfill_dir:
+          type: string
+          nullable: true
+        output_dir:
+          type: string
+        mode:
+          type: string
+          enum: [pilot, full]
+        window_size_balls:
+          type: integer
+          default: 6
+        seed:
+          type: integer
+    BuildCorpusResponse:
+      type: object
+      required: [corpus_manifest_path, embedding_corpus_path, eligible_rows, excluded_rows]
+      properties:
+        corpus_manifest_path:
+          type: string
+        embedding_corpus_path:
+          type: string
+        window_corpus_path:
+          type: string
+          nullable: true
+        eligible_rows:
+          type: integer
+        excluded_rows:
+          type: integer
+    DiscoverRegimesRequest:
+      type: object
+      required: [embedding_corpus_path, output_dir, seed]
+      properties:
+        embedding_corpus_path:
+          type: string
+        output_dir:
+          type: string
+        pca_components:
+          type: integer
+        n_clusters:
+          type: integer
+        seed:
+          type: integer
+    DiscoverRegimesResponse:
+      type: object
+      required: [assignment_path, summary_path]
+      properties:
+        scaler_path:
+          type: string
+        pca_path:
+          type: string
+        kmeans_path:
+          type: string
+        assignment_path:
+          type: string
+        summary_path:
+          type: string
+    RetrievalQueryRequest:
+      type: object
+      required: [assignment_path, output_dir]
+      properties:
+        assignment_path:
+          type: string
+        output_dir:
+          type: string
+        top_k:
+          type: integer
+          default: 25
+        exclude_same_match:
+          type: boolean
+          default: true
+        exclude_future_rows:
+          type: boolean
+          default: true
+    RetrievalQueryResponse:
+      type: object
+      required: [results_path, coverage]
+      properties:
+        neighbors_path:
+          type: string
+        results_path:
+          type: string
+        coverage:
+          type: number
+          format: float
+        filtered_for_leakage:
+          type: integer
+    RunEvaluationRequest:
+      type: object
+      required: [features_input_path, output_dir, baseline_variant]
+      properties:
+        features_input_path:
+          type: string
+        output_dir:
+          type: string
+        baseline_variant:
+          type: string
+          enum: [baseline_ipl_v6_features]
+        candidate_variants:
+          type: array
+          items:
+            type: string
+            enum:
+              - regime_retrieval_features
+              - regime_cluster_features
+              - regime_hybrid_features
+        require_brier_improvement:
+          type: boolean
+          default: true
+        require_logloss_improvement:
+          type: boolean
+          default: true
+        allow_ece_regression:
+          type: boolean
+          default: false
+    RunEvaluationResponse:
+      type: object
+      required: [metrics_path, report_path, recommendation]
+      properties:
+        metrics_path:
+          type: string
+        segment_metrics_path:
+          type: string
+        report_path:
+          type: string
+        recommendation:
+          type: string
+          enum: [go, no_go, interpretability_only]
+        winning_variant:
+          type: string
+          nullable: true

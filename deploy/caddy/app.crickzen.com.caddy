@@ -1,4 +1,4 @@
-app.crickzen.com {
+app.crickzen.com, prediction.crickzen.com {
   encode zstd gzip
 
   reverse_proxy crickzen-dashboard:8000 {

@@ -38,7 +38,25 @@ Production pointers are in `models/model_registry.json`, `scripts/launcher.py`, 
 
 ## Codex Notes
 
-Reusable automation notes for this repo live in [docs/CODEX_SKILLS.md](docs/CODEX_SKILLS.md), including the `start-dashboard` skill for launching the dashboard app.
+Reusable automation notes for this repo live in [docs/CODEX_SKILLS.md](docs/CODEX_SKILLS.md), including the `start-dashboard` skill for launching the dashboard app and the `add-new-league` skill for adding new T20 league models.
+
+### Adding New Leagues 🆕
+
+The pipeline is tournament-agnostic by design. To add a new T20 league:
+
+```bash
+# 1. Register league in src/bbl_pipeline/cli.py (4 entries, see docs)
+# 2. Train base model
+python -m bbl_pipeline.cli retrain --league <slug> --version v1
+# 3. Extract league distributions
+python scripts/extract_league_phase_distributions.py --league <slug>
+# 4. Build phase-split model
+python scripts/build_league_phase_features.py --league <slug> --version v1
+```
+
+Full guide: [docs/ADD_NEW_LEAGUE.md](docs/ADD_NEW_LEAGUE.md).  
+Reusable scripts: `scripts/build_league_phase_features.py`, `scripts/extract_league_phase_distributions.py`.  
+Opencode skill: `.opencode/skills/add-new-league.md`.
 
 ### Monte Carlo Simulation 🎲 **NEW**
 - **Uncertainty Quantification**: 1-ball and 6-ball forward simulations

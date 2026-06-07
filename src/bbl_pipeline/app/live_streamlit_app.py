@@ -452,6 +452,10 @@ JSON_SOURCES = {
     "PSL ML+MC (odm mirror)": "data/psl_live_ml_odm.json",
     "PSL ML+MC (psl_live_ml.json)": "data/psl_live_ml.json",
     "PSL MC-only (psl_live_mc.json)": "data/psl_live_mc.json",
+    "NTB ML+MC (ntb_live_ml.json)": "data/ntb_live_ml.json",
+    "NTB ML+MC (ntb_live_ml_1.json)": "data/ntb_live_ml_1.json",
+    "NTB MC-only (ntb_live_mc.json)": "data/ntb_live_mc.json",
+    "NTB MC-only (ntb_live_mc_1.json)": "data/ntb_live_mc_1.json",
     "T20 WC ML+MC (wc_live_ml.json)": "data/wc_live_ml.json",
     "T20 WC MC-only (wc_live_mc.json)": "data/wc_live_mc.json",
     "Default (live_state.json)": "data/live_state.json",
@@ -471,7 +475,7 @@ PREDICTOR_CONFIGS = {
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",
         "mc_only": False,
-        "model_dir": "models/ipl_v17_pp_features",
+        "model_dir": "models/ipl_v17_raw_pp_v14_hybrid",
         "odm_model_dir": "models/odm_v1",
         "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v9",
@@ -481,7 +485,7 @@ PREDICTOR_CONFIGS = {
     "IPL MC-only": {
         "output_json": "data/ipl_live_mc.json",
         "mc_only": True,
-        "model_dir": "models/ipl_v17_pp_features",
+        "model_dir": "models/ipl_v17_raw_pp_v14_hybrid",
         "market_stack_model_dir": "models/ipl_v7_inn2_market_stack_candidate",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "league": "ipl",
@@ -504,6 +508,22 @@ PREDICTOR_CONFIGS = {
         "feature_store_dir": "data/psl_feature_store_v4",
         "league": "psl",
         "states_dir": "data/match_states/psl",
+    },
+    "NTB ML+MC": {
+        "output_json": "data/ntb_live_ml.json",
+        "mc_only": False,
+        "model_dir": "models/ntb_v1_phase",
+        "feature_store_dir": "data/ntb_feature_store_v1",
+        "league": "ntb",
+        "states_dir": "data/match_states/ntb",
+    },
+    "NTB MC-only": {
+        "output_json": "data/ntb_live_mc.json",
+        "mc_only": True,
+        "model_dir": "models/ntb_v1_phase",
+        "feature_store_dir": "data/ntb_feature_store_v1",
+        "league": "ntb",
+        "states_dir": "data/match_states/ntb",
     },
     "T20 WC ML+MC": {
         "output_json": "data/wc_live_ml.json",
@@ -1483,6 +1503,16 @@ def main():
             --feature-store-dir data/sat_feature_store_v2 `
             --output-json data/sa20_live_state.json
         ```
+
+        **NTB (Blast):**
+        ```powershell
+        python -m src.bbl_pipeline.inference.crex_live_predictor `
+            --match-url "https://crex.com/scoreboard/.../live" `
+            --model-dir models/ntb_v1_phase `
+            --feature-store-dir data/ntb_feature_store_v1 `
+            --league ntb `
+            --output-json data/ntb_live_ml.json
+        ```
         """)
         if auto:
             time.sleep(3)
@@ -1825,7 +1855,11 @@ def main():
 
     # Model routing note — shows which cards use the IPL raw router vs v7 inn1 base
     if _router_active:
-        _source_label = inn2_router_source or f"v14_{inn2_router_phase}_raw"
+        _source_label = inn2_router_source or {
+            "pp": "v17_pp_raw",
+            "mid": "v14_mid_raw",
+            "death": "v14_death_raw",
+        }.get(inn2_router_phase, "inn2_router_raw")
         _post_note = (
             f" Post-Cal rule **{post_cal_rule}** is active."
             if has_post_cal else
@@ -1834,7 +1868,7 @@ def main():
         st.caption(
             "🟢 **ipl_v17 router active (Inn2)** — "
             f"using **{_source_label}**. "
-            "Current base rule is raw phase output; PP easy chases use **v12 PP raw**."
+            "Hybrid raw routing: **PP = v17 raw**, **Mid/Death = v14 raw**; PP easy chases use **v12 PP raw**."
             + _post_note
         )
     else:
@@ -2214,6 +2248,8 @@ def main():
                   'Papua New Guinea', 'PNG', 'Hong Kong', 'HK', 'Uganda', 'UGA'}
     
     batting_team = d.get("batting_team", "")
+    league_code = (d.get("league") or "").lower()
+    model_dir_lower = (d.get("model_dir") or "").lower()
     is_bbl = batting_team in bbl_teams
     is_sa20 = batting_team in sa20_teams
     is_ssm = batting_team in ssm_teams
@@ -2221,6 +2257,7 @@ def main():
     is_wpl = batting_team in wpl_teams
     is_t20i = batting_team in t20i_teams
     is_ipl = batting_team in ipl_teams
+    is_ntb = league_code == "ntb" or "models/ntb_v1" in model_dir_lower
     
     # Calculate ECE-optimized probability (for calibration display)
     ece_optimized_prob = None
@@ -2611,7 +2648,7 @@ def main():
             t20i_brier_prob = np.clip(t20i_brier_prob, 0.01, 0.99)
 
     # ECE-Optimized Decision Probabilities section
-    league_name = "🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else ("�🇿 SSM Women" if is_ssm_female else ("🇮🇳 WPL" if is_wpl else ("🌍 T20I" if is_t20i else "🏏 T20")))))
+    league_name = "🏏 NTB Blast" if is_ntb else ("🏏 BBL" if is_bbl else ("🇿🇦 SA20" if is_sa20 else ("🇳🇿 SSM" if is_ssm else ("�🇿 SSM Women" if is_ssm_female else ("🇮🇳 WPL" if is_wpl else ("🌍 T20I" if is_t20i else "🏏 T20"))))))
     st.markdown("---")
     st.subheader(f"{league_name} Decision Probabilities")
     method_label = "Platt" if cal_method == "platt" else "Isotonic"
@@ -2834,7 +2871,7 @@ def main():
                     if inn_num_local == 2 and per_over_prob is not None and (inn2_router_source or per_over_prob != raw_prob):
                         brier_prob = per_over_prob
                         brier_label = "IPL Raw Phase Router (Inn2)"
-                        brier_desc = inn2_router_source or "v14 raw; PP-low falls back to v12 raw"
+                        brier_desc = inn2_router_source or "v17 PP raw; v14 Mid/Death raw; PP-low falls back to v12 raw"
                     elif per_over_prob is not None and per_over_prob != raw_prob:
                         brier_prob = per_over_prob
                         brier_label = "Per-Over Calibrated (Inn1)"

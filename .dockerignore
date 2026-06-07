@@ -16,8 +16,12 @@ env/
 .vscode/
 .idea/
 
+# Source control / local dependencies
+node_modules/
+
 # Logs
 *.log
+*.log*
 logs/
 
 # Environment files

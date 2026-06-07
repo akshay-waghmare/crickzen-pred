@@ -1242,6 +1242,8 @@ def generate_oof(input_file, model_dir, n_splits, target_col, total_overs):
             
             # Check active models
             for league, model_info in registry.get('active_models', {}).items():
+                if not isinstance(model_info, dict):
+                    continue
                 if model_info.get('path') == model_dir_rel:
                     model_info['calibrator'] = {
                         'path': f"{model_dir_rel}/isotonic_calibrator.pkl",
@@ -1263,6 +1265,8 @@ def generate_oof(input_file, model_dir, n_splits, target_col, total_overs):
             # Check archived models if not found in active
             if not updated:
                 for league, model_info in registry.get('archived_models', {}).items():
+                    if not isinstance(model_info, dict):
+                        continue
                     if model_info.get('path') == model_dir_rel:
                         model_info['calibrator'] = {
                             'path': f"{model_dir_rel}/isotonic_calibrator.pkl",
@@ -1298,7 +1302,7 @@ def generate_oof(input_file, model_dir, n_splits, target_col, total_overs):
 @main.command()
 @click.option('--source-dir', type=click.Path(exists=True), default='recently_played_30_male',
               help='Source directory containing recently played JSON files (default: recently_played_30_male)')
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'odi', 'odm_male', 'odm_female', 'all']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'ntb', 'odi', 'odm_male', 'odm_female', 'all']), required=True,
               help='League to extract matches for')
 @click.option('--dry-run', is_flag=True, help='Show which files would be copied without actually copying')
 @click.pass_context  
@@ -1329,6 +1333,7 @@ def update_matches(ctx, source_dir, league, dry_run):
         'wpl': ['Women\'s Premier League', 'WPL'],
         'ipl': ['Indian Premier League', 'IPL'],
         'psl': ['Pakistan Super League', 'PSL'],
+        'ntb': ['T20 Blast', 'NatWest T20 Blast', 'Vitality Blast'],
         'odm_male': ['Royal London One-Day Cup', 'Marsh One-Day Cup', 'One-Day Cup', 'Ford Trophy'],
         'odm_female': ['Rachael Heyhoe Flint Trophy', 'ECB Women\'s One-Day Cup'],
     }
@@ -1343,6 +1348,7 @@ def update_matches(ctx, source_dir, league, dry_run):
         'wpl': 'wpl_female_json',
         'ipl': 'ipl_male_json',
         'psl': 'psl_json',
+        'ntb': 'data/ntb_json',
         'odm_male': 'data/odm_male_json',
         'odm_female': 'data/odm_female_json',
     }
@@ -1416,7 +1422,7 @@ def update_matches(ctx, source_dir, league, dry_run):
 
 
 @main.command()
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'odi', 'odi_female', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_male', 't20i_female']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'ntb', 'odi', 'odi_female', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_male', 't20i_female']), required=True,
               help='League to retrain model for')
 @click.option('--version', type=str, required=True,
               help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
@@ -1506,6 +1512,14 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'features_dir': 'data/psl_features',
             'feature_store_dir': 'data/psl_feature_store',
             'model_prefix': 'psl',
+            'format_type': 't20',
+        },
+        'ntb': {
+            'json_dir': 'data/ntb_json',
+            'raw_dir': 'data/ntb_raw',
+            'features_dir': 'data/ntb_features',
+            'feature_store_dir': 'data/ntb_feature_store',
+            'model_prefix': 'ntb',
             'format_type': 't20',
         },
         't20_male': {
@@ -1717,6 +1731,7 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
         'bpl': 'BPL',
         'ssm': 'SSM',
         'wpl': 'WPL',
+        'ntb': 'NTB',
         't20_male': 'T20_MALE',
         't20_female': 'T20_FEMALE',
         't20i_male': 'T20_INTERNATIONAL_MALE',

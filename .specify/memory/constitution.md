@@ -1,8 +1,8 @@
 <!--
 SYNC IMPACT REPORT
-Version: 1.3.0 -> 1.4.0
+Version: 1.4.0 -> 1.5.0
 Modified Principles:
-- Refined PRINCIPLE_5 (Model Calibration & Observability) to enforce a strict Expected Calibration Error (ECE) threshold of < 0.0021 for betting-grade production readiness.
+- Refined PRINCIPLE_1 (Scalability & Reusability) to document the 4-CLI-config + 3-reusable-script pattern for adding new T20 leagues, with links to docs/ADD_NEW_LEAGUE.md, scripts/build_league_phase_features.py, scripts/extract_league_phase_distributions.py, and the opencode skill at .opencode/skills/add-new-league.md.
 Added Sections: None
 Removed Sections: None
 Templates requiring updates: None
@@ -15,6 +15,8 @@ Follow-up TODOs: None
 
 ### I. Scalability & Reusability
 The architecture MUST be tournament-agnostic. While the initial focus is the Big Bash League (BBL), the codebase MUST be structured so that adding a new tournament (e.g., IPL) requires configuration changes rather than code rewrites. Hardcoding of tournament-specific logic should be minimized and isolated in configuration files or specific adapters. **The architecture MUST robustly handle edge cases (e.g., rain-outs, DLS method, super overs) through configurable business logic rather than ad-hoc fixes.**
+
+**Implementation**: Adding a new T20 league requires 4 CLI config entries in `src/bbl_pipeline/cli.py` plus running 3 reusable scripts. See `docs/ADD_NEW_LEAGUE.md` and `scripts/build_league_phase_features.py`.
 
 ### II. Pipeline-Driven Architecture & Rapid Retraining
 All data processing and modeling steps MUST be implemented as modular pipelines using state-of-the-art libraries (e.g., scikit-learn pipelines, Kedro, or similar). Each stage (ingestion, cleaning, feature engineering, training, evaluation) MUST be a distinct, composable unit. **Crucially, the pipeline MUST be designed for rapid iteration. It MUST be possible to ingest new data (e.g., recent matches) and retrain the model with a single command. The system MUST support a "continuous learning" workflow where models are updated frequently (e.g., every few matches) OR triggered by automated detection of data drift or performance degradation.**
@@ -70,4 +72,4 @@ This constitution is the supreme law of the project. Amendments require a Pull R
 ### Compliance
 All Pull Requests MUST be checked against these principles. Non-compliant code (e.g., hardcoded tournament logic, monolithic scripts) MUST be rejected.
 
-**Version**: 1.4.0 | **Ratified**: 2025-12-09 | **Last Amended**: 2025-12-14
+**Version**: 1.5.0 | **Ratified**: 2025-12-09 | **Last Amended**: 2026-06-07

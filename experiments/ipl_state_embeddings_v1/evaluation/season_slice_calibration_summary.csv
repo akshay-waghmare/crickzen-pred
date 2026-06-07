@@ -1,0 +1,4 @@
+method,split,min_samples,min_unique_probs,candidate_slices,fitted_slices,skipped_slices,applied_rows,applied_share,fallback_rows,fallback_share,skip_reason_counts
+guarded_regime_phase_calibration,season_2024,200,10,25,20,5,2490,0.994408945686901,14,0.005591054313099041,min_samples<200:5
+guarded_regime_phase_calibration,season_2025,200,10,25,20,5,2446,0.9963340122199593,9,0.0036659877800407333,min_samples<200:5
+guarded_regime_phase_calibration,season_2026,200,10,25,20,5,791,0.9912280701754386,7,0.008771929824561403,min_samples<200:5

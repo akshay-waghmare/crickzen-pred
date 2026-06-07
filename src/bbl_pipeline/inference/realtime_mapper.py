@@ -495,9 +495,13 @@ class RealTimeFeatureMapper:
         b2_avg = batsman_2_stats.get('batsman_rolling_avg', 25.0) if batsman_2_stats else 25.0
         batting_pair_strength = b1_avg + b2_avg  # ~50 for two average batters
         
-        # Acceleration potential (how much faster can they score)
-        # Typically SR - CRR, capped at reasonable value
-        acceleration_potential = max(0, batsman_rolling_sr - current_run_rate * 16.67) if current_run_rate > 0 else 0
+        # Acceleration potential — matches training formula in processor.py:
+        # ((10 - wickets_lost) * balls_remaining) / (total_balls * 10)
+        # Previous SR-based formula was a training/inference mismatch (always 0 in inference)
+        total_balls = self.format_config.total_balls
+        acceleration_potential = (
+            (10 - wickets_lost) * balls_remaining / (total_balls * 10)
+        ) if total_balls > 0 else 0.0
         
         # wickets_last_30: wickets in last 30 balls (5 overs)
         wickets_last_30 = 0.0

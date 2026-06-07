@@ -45,7 +45,7 @@ def test_router_uses_raw_probability_when_calibration_disabled():
 
     assert phase == "pp"
     assert probability == 0.40
-    assert router.last_model_source == "v14_pp_raw"
+    assert router.last_model_source == "v17_pp_raw"
 
 
 def test_router_can_still_apply_calibration_when_enabled():
@@ -55,7 +55,7 @@ def test_router_can_still_apply_calibration_when_enabled():
 
     assert phase == "pp"
     assert probability == 0.90
-    assert router.last_model_source == "v14_pp_raw"
+    assert router.last_model_source == "v17_pp_raw"
 
 
 def test_pp_low_chase_uses_v12_raw_fallback():

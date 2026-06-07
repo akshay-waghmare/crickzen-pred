@@ -132,6 +132,24 @@ def _overs_to_balls(overs: float | None) -> int:
     return whole_overs * 6 + balls
 
 
+def _fallback_projected_total(
+    *,
+    score: float,
+    overs: float | None,
+    current_run_rate: float | None,
+    total_overs: int,
+) -> float | None:
+    """Estimate a first-innings final score when predictor features are missing."""
+    if overs in (None, 0) or current_run_rate in (None, 0):
+        return None
+
+    balls_remaining = max(total_overs * 6 - _overs_to_balls(overs), 0)
+    if balls_remaining <= 0:
+        return score
+
+    return score + (float(current_run_rate) * (balls_remaining / 6.0))
+
+
 def _history_key(point: dict[str, Any]) -> tuple[int, float, int, int]:
     return (
         _as_int(point.get("innings"), 1),
@@ -199,33 +217,65 @@ def _build_projection(state: dict[str, Any]) -> dict[str, Any]:
     features = state.get("features") or {}
     score = _as_float(state.get("score"), 0.0) or 0.0
     wickets = _as_int(state.get("wickets"))
-    projected = _as_float(features.get("projected_score"), _as_float(features.get("expected_final_score"), score))
+    overs = _as_float(state.get("overs"), 0.0)
+    total_overs = _as_int(state.get("total_overs") or (state.get("pred_state") or {}).get("total_overs"), 20)
+    current_run_rate = _as_float(
+        features.get("current_run_rate"),
+        _as_float(state.get("current_run_rate"), 0.0),
+    )
+    target = _as_float(state.get("target"))
+    balls_remaining = max(total_overs * 6 - _overs_to_balls(overs), 0)
+
+    projected = _as_float(features.get("projected_score"))
+    expected_final = _as_float(features.get("expected_final_score"))
+    fallback_projected = _fallback_projected_total(
+        score=score,
+        overs=overs,
+        current_run_rate=current_run_rate,
+        total_overs=total_overs,
+    )
+
+    if projected is None:
+        projected = expected_final
+    if expected_final is None:
+        expected_final = projected
+
+    # When live feature projection is missing, avoid showing the current score
+    # as the "expected final" while the innings is still in progress.
+    if balls_remaining > 0 and target in (None, 0):
+        if projected is None or projected <= score:
+            projected = fallback_projected or score
+        if expected_final is None or expected_final <= score:
+            expected_final = fallback_projected or projected or score
+
+    if projected is None:
+        projected = fallback_projected or score
+    if expected_final is None:
+        expected_final = projected
 
     projection = {
         "score": score,
         "wickets": wickets,
-        "overs": _as_float(state.get("overs"), 0.0),
-        "target": _as_float(state.get("target")),
+        "overs": overs,
+        "target": target,
         "projected_score": projected,
-        "expected_final_score": _as_float(features.get("expected_final_score"), projected),
+        "expected_final_score": expected_final,
         "par_score": _as_float(features.get("par_score")),
         "venue_avg_score": _as_float(features.get("venue_avg_score")),
         "score_vs_par": _as_float(features.get("score_vs_par")),
         "projected_vs_venue_avg": _as_float(features.get("projected_vs_venue_avg")),
         "resource_win_prob": _as_float(features.get("resource_win_prob")),
         "resources_remaining": _as_float(features.get("resources_remaining")),
-        "current_run_rate": _as_float(features.get("current_run_rate"), _as_float(state.get("current_run_rate"), 0.0)),
+        "current_run_rate": current_run_rate,
         "required_run_rate": _as_float(features.get("required_run_rate"), _as_float(state.get("required_run_rate"), 0.0)),
         "pressure_index": _as_float(features.get("pressure_index")),
         "runs_required": None,
         "balls_remaining": None,
     }
 
-    target = projection["target"]
-    overs = projection["overs"] or 0.0
     if target:
         projection["runs_required"] = max(int(target - score), 0)
-    projection["balls_remaining"] = max(120 - _overs_to_balls(overs), 0)
+    projection["balls_remaining"] = balls_remaining
     return projection
 
 

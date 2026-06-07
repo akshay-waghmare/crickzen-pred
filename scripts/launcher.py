@@ -37,8 +37,8 @@ WINDOWS_NEW_CONSOLE = getattr(subprocess, "CREATE_NEW_CONSOLE", 0)
 LEAGUE_CONFIGS = {
     "IPL": {
         "league": "ipl",
-        "model_dir": "models/ipl_v17_pp_features",
-        "inn2_model_dir": "models/ipl_v17_pp_features",
+        "model_dir": "models/ipl_v17_raw_pp_v14_hybrid",
+        "inn2_model_dir": "models/ipl_v17_raw_pp_v14_hybrid",
         "feature_store_dir": "data/ipl_feature_store_v9",
         "output_json": "data/ipl_live_ml.json",
         "display_json": "data/ipl_live_ml_odm.json",
@@ -54,6 +54,13 @@ LEAGUE_CONFIGS = {
         "display_json": "data/psl_live_ml_odm.json",
         "odm_model_dir": "models/odm_v1",
         "states_dir": "data/match_states/psl",
+    },
+    "NTB": {
+        "league": "ntb",
+        "model_dir": "models/ntb_v1_phase",
+        "feature_store_dir": "data/ntb_feature_store_v1",
+        "output_json": "data/ntb_live_ml.json",
+        "states_dir": "data/match_states/ntb",
     },
     "BBL": {
         "league": "bbl",
@@ -110,6 +117,7 @@ LEAGUE_CONFIGS = {
 _URL_LEAGUE_PATTERNS: list[tuple[str, str]] = [
     (r"indian-premier-league", "IPL"),
     (r"pakistan-super-league", "PSL"),
+    (r"vitality-blast|natwest-t20-blast|t20-blast", "NTB"),
     (r"big-bash-league", "BBL"),
     (r"betway-sa20|sa20-league|sa20", "SA20"),
     (r"international-league-t20|ilt20", "ILT20"),

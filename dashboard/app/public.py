@@ -117,12 +117,34 @@ def match_title(state: dict[str, Any] | None, match_url: str = "", label: str = 
 
 
 def title_from_label(label: str) -> str | None:
+    """Derive a clean 'TEAM1 vs TEAM2' title from a CREX label.
+
+    Handles the common CREX label format:
+      'MI vs CSK on Jun 07, 2026 at 14:30 PM T20'
+    where the trailing word after the date/time is the format (T20, ODI, etc.),
+    not a second team.
+    """
     clean = re.sub(r"\s+", " ", label or "").strip()
     if not clean:
         return None
-    fixture = re.match(r"^(.+?)\s+on\s+[A-Za-z]{3}\s+\d{1,2},\s+[0-9:]+\s+[AP]M\s+(.+)$", clean)
+    fixture = re.match(
+        r"^(.+?)\s+on\s+[A-Za-z]{3}\s+\d{1,2},\s+\d{4}\s+at\s+[0-9:]+\s+[AP]M\s+([A-Za-z0-9]+)$",
+        clean,
+    )
     if fixture:
-        return f"{_clean_team_label(fixture.group(1))} vs {_clean_team_label(fixture.group(2))}"
+        team_part = fixture.group(1)
+        format_part = fixture.group(2).upper()
+        if " vs " in team_part.lower():
+            return team_part
+        if format_part in ("T20", "ODI", "TEST", "T10", "T20I"):
+            return _clean_team_label(team_part)
+        return f"{_clean_team_label(team_part)} vs {format_part}"
+    fixture_no_fmt = re.match(
+        r"^(.+?)\s+on\s+[A-Za-z]{3}\s+\d{1,2},\s+\d{4}\s+at\s+[0-9:]+\s+[AP]M$",
+        clean,
+    )
+    if fixture_no_fmt:
+        return _clean_team_label(fixture_no_fmt.group(1))
     live = re.match(r"^([A-Z][A-Z-]*)\s+[0-9]+[/-][0-9]+.*?\b([A-Z][A-Z-]*)\b", clean)
     if live:
         return f"{live.group(1)} vs {live.group(2)}"

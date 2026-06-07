@@ -236,7 +236,12 @@ class Inn2PhaseRouter:
                     "v12_pp_low_raw",
                 )
 
-        return self._models[phase], self._features[phase], f"v14_{phase}_raw"
+        phase_source = {
+            "pp": "v17_pp_raw",
+            "mid": "v14_mid_raw",
+            "death": "v14_death_raw",
+        }[phase]
+        return self._models[phase], self._features[phase], phase_source
 
     # ── main predict ──────────────────────────────────────────────────────────
 
@@ -283,7 +288,7 @@ class Inn2PhaseRouter:
 
             raw = float(model.predict_proba(X)[0, 1])
             output = raw
-            if self._use_calibration and model_source.startswith("v14_"):
+            if self._use_calibration and not model_source.startswith("v12_"):
                 chase_category = int(row["chase_category"].iloc[0]) if "chase_category" in row.columns else 0
                 output = self._calibrate(raw, phase, over_1indexed, chase_category)
 

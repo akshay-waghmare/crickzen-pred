@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-21",
+  "last_updated": "2026-06-06",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -807,155 +807,37 @@
       }
     },
     "IPL": {
-      "path": "models/ipl_v17_pp_features",
-      "version": "v17_pp_features",
-      "description": "Active IPL production model. Hybrid routing: ipl_v7 for inn1, v17 phase router for inn2. v17 adds 14 high-signal PP features + per-cell calibration (18: 6 overs × 3 chase_categories). PP XGB tuned: depth=4, minwt=15.",
+      "path": "models/ipl_v17_raw_pp_v14_hybrid",
+      "version": "v17_raw_pp_v14_hybrid",
+      "description": "Active IPL production model. Hybrid routing: ipl_v7 for inn1, v17 raw PP for inn2 powerplay, v14 MID/DEATH for inn2, and the v14 post-model correction path retained.",
       "training": {
-        "date": "2026-05-21",
-        "architecture": "ipl_v17_pp_router",
+        "date": "2026-05-26",
+        "architecture": "ipl_v17_raw_pp_v14_hybrid",
         "inn1_model": "models/ipl_v7",
-        "inn2_model": "models/ipl_v17_pp_features",
-        "resource_calculator_usage": "Unchanged. v17 adds PP feature expansion and per-cell calibration.",
-        "stage_summary": "v17 adds 14 chase-difficulty/momentum features to PP (70→84). MID and DEATH unchanged from v15. Per-cell calibration replaces PostModelCalibrationRouter.",
-        "motivation": "v15 PP still showed systematic underprediction in par chases. Per-cell calibration (over × chase_category) addresses residual bias per segment. 14 new features add direct chase-difficulty signal.",
-        "phase_added_features_vs_v15": {
-          "pp": [
-            "late_mid_urgency", "death_feasibility", "finish_quality_zone",
-            "chase_on_track_score", "chase_run_buffer", "svp_x_chase_cat",
-            "momentum_under_pressure", "required_rpb", "early_mid_rrr_vs_venue_avg",
-            "chase_difficulty", "score_per_wicket", "wickets_times_balls",
-            "wickets_last_30", "balls_since_wicket"
-          ],
-          "mid": [],
-          "death": []
+        "inn2_model": "models/ipl_v17_raw_pp_v14_hybrid",
+        "resource_calculator_usage": "Unchanged. Hybrid keeps the v14 pitch/death carryover features and promotes only the v17 raw PP model/features.",
+        "stage_summary": "Hybrid promotes the v17 raw PP model into the v14 router. MID/DEATH remain v14. apply_calibration stays false; v17 PP per-cell calibration is not used.",
+        "motivation": "Raw v17 PP improved OOS slightly over raw v14, while raw v17 MID regressed and v17 PP per-cell calibration overfit OOS badly.",
+        "phase_model_sources": {
+          "pp_model": "models/ipl_v17_pp_features/champion_model_pp.joblib",
+          "mid_model": "models/ipl_v14_pitch_features/champion_model_mid.joblib",
+          "death_model": "models/ipl_v14_pitch_features/champion_model_death.joblib"
         },
-        "inn2_brier_oof_cal": {
-          "pp_v15_baseline": 0.17032,
-          "pp_v17_std_cal": 0.16991,
-          "pp_v17_cell_cal": 0.16663,
-          "pp_v17_improvement_pct": "-2.17%",
-          "mid": 0.1332,
-          "death": 0.07796
+        "raw_phase_comparison": {
+          "oof_pp_v14_brier": 0.17379,
+          "oof_pp_v17_brier": 0.17266,
+          "oos_pp_v14_brier": 0.1404,
+          "oos_pp_v17_brier": 0.13957
         },
-        "oos_2025_2026": {
-          "pp_v15_brier": 0.14239,
-          "pp_v17_brier": 0.16016,
-          "note": "OOS uses pre-2025 training only; production uses all seasons so OOF is a better estimate"
-        },
-        "calibration_note": "apply_calibration=True. Per-cell isotonic (18 cells: over 1-6 × cat {-1,0,1}). PostModelCalibrationRouter disabled (per-cell replaces it).",
-        "replaced_model": "models/ipl_v15_wicket_features"
+        "calibration_note": "apply_calibration=false. Keep the v14 post-model calibration router; do not use v17 PP per-cell isotonic in production.",
+        "replaced_model": "models/ipl_v17_pp_features"
       },
-      "routing_config": "models/ipl_v17_pp_features/routing_config.json",
+      "routing_config": "models/ipl_v17_raw_pp_v14_hybrid/routing_config.json",
       "artifacts": {
-        "phase_features": "models/ipl_v17_pp_features/phase_features.json",
-        "phase_oof_calibrators": "models/ipl_v17_pp_features/phase_oof_calibrators.pkl",
-        "venue_pitch_baselines": "models/ipl_v17_pp_features/venue_pitch_baselines.json",
-        "oof_results": "models/ipl_v17_pp_features/oof_results.csv"
-      },
-      "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
-      "feature_store": {
-        "path": "data/ipl_feature_store_v9",
-        "version": "v9",
-        "generated_date": "2026-05-03",
-        "training_data_samples": 278954
-      }
-    },
-      "training": {
-        "date": "2026-05-20",
-        "architecture": "ipl_v15_wicket_router",
-        "inn1_model": "models/ipl_v7",
-        "inn2_model": "models/ipl_v15_wicket_features",
-        "resource_calculator_usage": "Unchanged. v15 adds wicket-context features on top of v14 pitch features.",
-        "stage_summary": "v15 adds wicket x chase interactions to all phases on top of v14 pitch features. PP: +6 features, MID: +4, DEATH: +3.",
-        "motivation": "v14 PP underestimated win probability for high-chase PP scenarios because resource_win_prob (DLS wicket-blind) dominated. wickets_x_high_chase and wicket_resource_buffer explicitly encode wicket buffer vs DLS shortfall.",
-        "phase_added_features_vs_v14": {
-          "pp": [
-            "runs_per_wkt_rem",
-            "wr_x_rrr",
-            "comfortable_wicket_zone",
-            "wickets_x_high_chase",
-            "wicket_resource_buffer",
-            "high_chase_wickets_flag"
-          ],
-          "mid": [
-            "wickets_x_high_chase",
-            "wicket_resource_buffer",
-            "high_chase_wickets_flag",
-            "runs_per_wkt_rem"
-          ],
-          "death": [
-            "wickets_x_high_chase",
-            "wicket_resource_buffer",
-            "high_chase_wickets_flag"
-          ]
-        },
-        "inn2_v15_brier_oof_cal": {
-          "pp": 0.17032,
-          "mid": 0.1332,
-          "death": 0.07796
-        },
-        "inn2_v14_brier_oof_cal": {
-          "pp": 0.1704,
-          "mid": 0.13327,
-          "death": 0.0779
-        },
-        "oos_2025_2026_vs_v14": {
-          "pp_brier_cal": 0.14239,
-          "mid_brier_cal": 0.1048,
-          "death_brier_cal": 0.06438,
-          "overall_brier_cal": 0.11173,
-          "pp_delta_pct": -1.0,
-          "mid_delta_pct": 1.07,
-          "mid_delta_pvalue": 0.856,
-          "death_delta_pct": -0.86,
-          "overall_delta_pct": -0.02
-        },
-        "oos_2025_2026_vs_v12": {
-          "overall_brier_cal": 0.11173,
-          "overall_vs_v12_pct": -0.0179
-        },
-        "post_model_calibration_note": "Copied from v14. Inn2 high-chase guardrail (tap>20) passes through uncorrected -- v15 raw improvements apply directly to the original failure scenario.",
-        "replaced_model": "models/ipl_v14_pitch_features",
-        "failed_post_v14_experiments": {
-          "status": "archived_useful_failures",
-          "conclusion": "Keep v14 as IPL champion. v15/v16 improved the 70-80 favourite compression bucket but worsened overall OOS Brier/LogLoss or guardrails. Next path is a bounded specialist correction for the exact failure region, not broader global resource context.",
-          "v15_context_resource": {
-            "path": "models/ipl_v15_context_resource",
-            "script": "scripts/ipl_v15_context_resource_experiment.py",
-            "formula": "logit(resource_context_win_prob)=logit(resource_win_prob)+contextual_adjustment",
-            "best_candidate": "v15_add_context_resource",
-            "oos_brier": 0.11189616061780804,
-            "oos_brier_delta_pct": 0.13065401522045306,
-            "oos_logloss": 0.37621920614388604,
-            "oos_logloss_delta_pct": 0.5097647466191939,
-            "bucket_70_80_improved": true,
-            "guardrails_passed": false,
-            "promoted": false
-          },
-          "v16_context_interactions": {
-            "path": "models/ipl_v16_context_interactions",
-            "script": "scripts/ipl_v16_context_interactions_experiment.py",
-            "formula": "logit(resource_context_interaction_prob)=logit(resource_win_prob)+phase+venue_regime+phase_x_venue_regime+target_bucket_x_venue_regime",
-            "best_candidate": "v16_C_both_plus_regimes",
-            "oos_brier": 0.11308286957209449,
-            "oos_brier_delta_pct": 1.1925844966806873,
-            "oos_logloss": 0.3769055187413359,
-            "oos_logloss_delta_pct": 0.6931182718667646,
-            "bucket_70_80_improved": true,
-            "pp_ece": 0.11830690176935924,
-            "guardrails_passed": false,
-            "promoted": false
-          }
-        }
-      },
-      "routing_config": "models/ipl_v15_wicket_features/routing_config.json",
-      "artifacts": {
-        "phase_features": "models/ipl_v15_wicket_features/phase_features.json",
-        "phase_oof_calibrators": "models/ipl_v15_wicket_features/phase_oof_calibrators.pkl",
-        "post_model_calibration_router": "models/ipl_v15_wicket_features/post_model_calibration_router.pkl",
-        "venue_pitch_baselines": "models/ipl_v15_wicket_features/venue_pitch_baselines.json",
-        "oos_comparison": "models/ipl_v15_wicket_features/oos_comparison.csv",
-        "oof_results": "models/ipl_v15_wicket_features/oof_results.csv"
+        "phase_features": "models/ipl_v17_raw_pp_v14_hybrid/phase_features.json",
+        "phase_oof_calibrators": "models/ipl_v17_raw_pp_v14_hybrid/phase_oof_calibrators.pkl",
+        "venue_pitch_baselines": "models/ipl_v17_raw_pp_v14_hybrid/venue_pitch_baselines.json",
+        "post_model_calibration_router": "models/ipl_v17_raw_pp_v14_hybrid/post_model_calibration_router.pkl"
       },
       "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
       "feature_store": {
@@ -983,23 +865,53 @@
       }
     },
     "ipl": {
-      "version": "v17_pp_features",
-      "model_dir": "models/ipl_v17_pp_features",
-      "champion_model": "models/ipl_v17_pp_features/champion_model_pp.joblib",
+      "version": "v17_raw_pp_v14_hybrid",
+      "model_dir": "models/ipl_v17_raw_pp_v14_hybrid",
+      "champion_model": "models/ipl_v17_raw_pp_v14_hybrid/champion_model_pp.joblib",
       "phase_models": {
-        "pp": "models/ipl_v17_pp_features/champion_model_pp.joblib",
-        "mid": "models/ipl_v17_pp_features/champion_model_mid.joblib",
-        "death": "models/ipl_v17_pp_features/champion_model_death.joblib"
+        "pp": "models/ipl_v17_raw_pp_v14_hybrid/champion_model_pp.joblib",
+        "mid": "models/ipl_v17_raw_pp_v14_hybrid/champion_model_mid.joblib",
+        "death": "models/ipl_v17_raw_pp_v14_hybrid/champion_model_death.joblib"
       },
-      "oof_calibrators": "models/ipl_v17_pp_features/phase_oof_calibrators.pkl",
-      "routing_config": "models/ipl_v17_pp_features/routing_config.json",
+      "oof_calibrators": "models/ipl_v17_raw_pp_v14_hybrid/phase_oof_calibrators.pkl",
+      "routing_config": "models/ipl_v17_raw_pp_v14_hybrid/routing_config.json",
       "documentation": "docs/IPL_V14_PITCH_FEATURES.md",
-      "resource_calculator_usage": "Unchanged. v17 adds 14 PP chase-difficulty features and per-cell calibration.",
+      "resource_calculator_usage": "Unchanged. Hybrid keeps v14 carryover features and uses only the v17 raw PP model/features for innings-2 powerplay.",
       "training_data": "data/ipl_features_v10/training.parquet",
-      "oof_brier_pp_cell_cal": 0.16663,
-      "oof_brier_pp_v15_baseline": 0.17032,
-      "pp_improvement_pct": "-2.17%",
-      "updated": "2026-05-21"
+      "oof_brier_pp_raw_v17": 0.17266,
+      "oof_brier_pp_raw_v14": 0.17379,
+      "oos_brier_pp_raw_v17": 0.13957,
+      "oos_brier_pp_raw_v14": 0.1404,
+      "updated": "2026-05-26"
+    },
+    "NTB": {
+      "path": "models/ntb_v1",
+      "version": "v1",
+      "description": "XGBLogRegEnsemble (41 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1754, ECE: 0.0000)",
+      "training": {
+        "samples": 332156,
+        "date": "2026-06-06",
+        "brier_score": 0.1754141542433663
+      },
+      "calibrator": {
+        "path": "models/ntb_v1/isotonic_calibrator.pkl",
+        "type": "innings_phase_specific",
+        "generated_date": "2026-06-06T22:43:27.736810",
+        "oof_metrics": {
+          "brier_raw": 0.17848486661575935,
+          "brier_calibrated": 0.17792131801745556,
+          "ece_raw": 0.00939383757484811,
+          "ece_calibrated": 0.0002507556690229985
+        },
+        "n_features": 41,
+        "feature_hash": "be0509c996a4ce3162f794456b55450b"
+      },
+      "feature_store": {
+        "path": "data/ntb_feature_store_v1",
+        "version": "v1",
+        "generated_date": "2026-06-06",
+        "training_data_samples": 332156
+      }
     }
   },
   "archived_models": {

@@ -1,4 +1,4 @@
-﻿# machine_learning Development Guidelines
+# machine_learning Development Guidelines
 
 Auto-generated from all feature plans. Last updated: 2025-12-09
 
@@ -19,6 +19,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-09
 - Parquet datasets in `data/`, model artifacts in `models/`, JSON metadata/metrics sidecars (010-odds-direction-model)
 - Python 3.10+ (pyproject.toml requires ≥3.10) + XGBoost ≥2.0, scikit-learn ≥1.3, pandas ≥2.0, NumPy, structlog, Pandera, joblib (001-ipl-market-gap)
 - Parquet files (feature store: `data/ipl_feature_store_v1/`, training: `data/ipl_features_v1/training.parquet`) (001-ipl-market-gap)
+- Python >=3.10 (from `pyproject.toml`), Markdown/YAML for plan artefacts + pandas, numpy, pyarrow, scikit-learn (`StandardScaler`, `PCA`, `KMeans`, `NearestNeighbors`), joblib, structlog, existing `bbl_pipeline` modules (016-ipl-state-embeddings)
+- Parquet/CSV/JSON/Markdown artefacts under `experiments/ipl_state_embeddings_v1/`; spec artefacts under `specs/016-ipl-state-embeddings/`; no new database or service (016-ipl-state-embeddings)
 
 - Python 3.10+ (001-bbl-data-pipeline)
 
@@ -38,9 +40,9 @@ cd src; pytest; ruff check .
 Python 3.10+: Follow standard conventions
 
 ## Recent Changes
+- 016-ipl-state-embeddings: Added Python >=3.10 (from `pyproject.toml`), Markdown/YAML for plan artefacts + pandas, numpy, pyarrow, scikit-learn (`StandardScaler`, `PCA`, `KMeans`, `NearestNeighbors`), joblib, structlog, existing `bbl_pipeline` modules
 - 001-ipl-market-gap: Added Python 3.10+ (pyproject.toml requires ≥3.10) + XGBoost ≥2.0, scikit-learn ≥1.3, pandas ≥2.0, NumPy, structlog, Pandera, joblib
 - 010-odds-direction-model: Added Python 3.10+ project; current configured workspace environment is Python 3.13.7 + pandas, pyarrow, scikit-learn, xgboost, joblib, click, structlog
-- 009-odi-mc-predictor: Added Python 3.13.7 (`requires-python = ">=3.10"`) + pandas>=2.0, numpy, scikit-learn>=1.3, xgboost>=2.0, joblib>=1.3, structlog>=23.0, playwright (for CREX scraping)
 
 
 <!-- MANUAL ADDITIONS START -->

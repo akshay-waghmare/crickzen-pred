@@ -133,6 +133,7 @@ def create_app(
     from app.routers.admin import router as admin_router
     from app.routers.live import router as live_router
     from app.routers.public import router as public_router
+    from app.routers.proof import router as proof_router
     from app.routers.pages import router as pages_router
     from app.health import router as health_router
 
@@ -140,6 +141,7 @@ def create_app(
     application.include_router(admin_router)
     application.include_router(live_router)
     application.include_router(public_router)
+    application.include_router(proof_router)
     application.include_router(health_router)
     # Pages router last (catch-all "/" route)
     application.include_router(pages_router)

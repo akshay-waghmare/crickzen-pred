@@ -1,0 +1,2 @@
+method,split,min_samples,min_unique_probs,candidate_slices,fitted_slices,skipped_slices,applied_rows,applied_share,fallback_rows,fallback_share,skip_reason_counts
+guarded_regime_phase_calibration,holdout,200,10,26,19,7,8033,0.9744056283357594,211,0.02559437166424066,min_samples<200:7
