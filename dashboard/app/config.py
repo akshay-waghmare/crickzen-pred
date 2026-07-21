@@ -40,10 +40,14 @@ class Settings(BaseSettings):
     # Automatic match discovery/start
     AUTO_PREDICTIONS_ENABLED: bool = False
     AUTO_LEAGUE_KEY: str = "IPL"
+    AUTO_LEAGUE_KEYS: str = ""
+    AUTO_EXCLUDE_LEAGUES: str = ""
     AUTO_MATCH_URLS: str = ""
     AUTO_DISCOVERY_URLS: str = ""
     AUTO_DISCOVER_FROM_CREX: bool = True
+    AUTO_SCRAPER_URL: str = "http://127.0.0.1:5000"
     AUTO_DISCOVERY_RENDER_JS: bool = True
+    PLAYWRIGHT_EXECUTABLE_PATH: str = ""
     AUTO_DISCOVERY_INTERVAL_SECONDS: int = 300
     AUTO_START_NOT_BEFORE_LOCAL: str = "17:00"
     AUTO_START_NOT_AFTER_LOCAL: str = "23:59"
@@ -116,6 +120,18 @@ LEAGUE_CONFIGS: dict[str, dict] = {
         "model_dir": "models/t20_female_v4",
         "feature_store_dir": "data/t20_female_feature_store_v4",
     },
+    "ODI Women": {
+        "league": "odi_female",
+        "model_dir": "models/odi_mc_v1",
+        "feature_store_dir": None,
+        "mc_only": True,
+    },
+    "ODI Male": {
+        "league": "odi_male",
+        "model_dir": "models/odi_mc_v1",
+        "feature_store_dir": None,
+        "mc_only": True,
+    },
     "SSM": {
         "league": "ssm",
         "model_dir": "models/t20_male_v2",
@@ -126,10 +142,39 @@ LEAGUE_CONFIGS: dict[str, dict] = {
         "model_dir": "models/t20_male_v2",
         "feature_store_dir": "data/bbl_feature_store_v2",
     },
+    "Shpageeza": {
+    "league": "shpageeza",
+    "model_dir": "models/t20_male_v2",
+    "feature_store_dir": "data/bbl_feature_store_v2",
+        "prefer_combined_model": True,
+    },
+    "MLC": {
+        "league": "mlc",
+        "model_dir": "models/t20_male_v2",
+        "feature_store_dir": "data/bbl_feature_store_v2",
+        "prefer_combined_model": True,
+    },
+    # Generic competition fallback. This intentionally has no series URL;
+    # unknown T20 competitions can use the combined gender-aware T20 model
+    # without requiring a new league preset for every tournament.
+    "T20": {
+        "league": "t20_all",
+        "model_dir": "models/t20_all_v2",
+        "feature_store_dir": "data/t20_all_feature_store_v2",
+        "prefer_combined_model": True,
+    },
 }
+
+# League names remain useful for URL discovery and format/gender classification,
+# but the public prediction brain is the combined gender-aware model family.
+for _league_config in LEAGUE_CONFIGS.values():
+    _league_config["prefer_combined_model"] = True
 
 # URL patterns → league key (for auto-detection)
 _URL_LEAGUE_PATTERNS: list[tuple[str, str]] = [
+    (r"women.*odi|odi.*women|women.*tour.*odi", "ODI Women"),
+    (r"(?:\d+(?:st|nd|rd|th)-)?odi(?:-|/)|-odi-", "ODI Male"),
+    (r"major-league-cricket|\bmlc\b", "MLC"),
     (r"indian-premier-league", "IPL"),
     (r"pakistan-super-league", "PSL"),
     (r"vitality-blast|natwest-t20-blast|t20-blast", "NTB"),
@@ -141,6 +186,7 @@ _URL_LEAGUE_PATTERNS: list[tuple[str, str]] = [
     (r"t20-world-cup|icc-mens-t20", "T20 World Cup"),
     (r"super-smash", "SSM"),
     (r"bangladesh-premier-league|bpl", "BPL"),
+    (r"shpageeza|shpageeza-cricket-league", "Shpageeza"),
 ]
 
 
@@ -150,6 +196,20 @@ def detect_league_from_url(url: str) -> str | None:
     for pattern, league_key in _URL_LEAGUE_PATTERNS:
         if re.search(pattern, url_lower):
             return league_key
+    return None
+
+
+def detect_generic_format_from_url(url: str) -> str | None:
+    """Infer a safe generic format when a competition has no league preset."""
+    url_lower = url.lower()
+    if re.search(
+        r"(?:\d+(?:st|nd|rd|th)-)?odi(?:-|/)|-odi-|women.*odi|odi.*women|"
+        r"one-day|cwc-league|world-cup-league",
+        url_lower,
+    ):
+        return "ODI Women" if re.search(r"women|womens|women-s", url_lower) else "ODI Male"
+    if re.search(r"t20|20-over|twenty20|premier-league|the-hundred|hundred-\d", url_lower):
+        return "T20"
     return None
 
 

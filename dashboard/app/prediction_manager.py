@@ -26,6 +26,7 @@ from app.config import (
     get_python_executable,
     get_settings,
 )
+from app.model_resolution import resolve_model_config
 
 logger = logging.getLogger(__name__)
 
@@ -195,10 +196,14 @@ class PredictionManager:
         if existing is not None:
             return existing
 
-        # Enforce per-user limit
-        user_matches = [p for p in self._predictions.values() if p.user_id == user_id and p.is_alive]
-        if len(user_matches) >= settings.MAX_USER_MATCHES:
-            raise ValueError(f"You can only run {settings.MAX_USER_MATCHES} matches at a time")
+        # Enforce the per-user limit for interactive users. The automatic
+        # scheduler is a service account and must be able to cover the full
+        # system capacity; applying the normal user quota to it silently
+        # prevents multi-match prediction coverage.
+        if user_id != "system:auto-scheduler":
+            user_matches = [p for p in self._predictions.values() if p.user_id == user_id and p.is_alive]
+            if len(user_matches) >= settings.MAX_USER_MATCHES:
+                raise ValueError(f"You can only run {settings.MAX_USER_MATCHES} matches at a time")
 
         # Enforce system-wide limit
         active = [p for p in self._predictions.values() if p.is_alive]
@@ -206,7 +211,7 @@ class PredictionManager:
             raise ValueError(f"System limit of {settings.MAX_TOTAL_MATCHES} concurrent matches reached")
 
         # Prepare paths
-        cfg = LEAGUE_CONFIGS[league_key]
+        cfg = resolve_model_config(league_key, LEAGUE_CONFIGS[league_key], get_project_root())
         prediction_id = uuid.uuid4().hex[:12]
         project_root = get_project_root()
         state_dir = project_root / settings.STATE_DIR
@@ -220,10 +225,15 @@ class PredictionManager:
             "-m", "src.bbl_pipeline.inference.crex_live_predictor",
             "--match-url", match_url,
             "--model-dir", str(project_root / cfg["model_dir"]),
-            "--feature-store-dir", str(project_root / cfg["feature_store_dir"]),
             "--league", cfg["league"],
             "--output-json", output_json,
         ]
+        if cfg.get("feature_store_dir"):
+            cmd[cmd.index("--league"):cmd.index("--league")] = [
+                "--feature-store-dir", str(project_root / cfg["feature_store_dir"])
+            ]
+        if cfg.get("mc_only"):
+            cmd.append("--mc-only")
 
         logger.info("Starting prediction %s: %s → %s", prediction_id, cfg["league"], match_url[:80])
 
