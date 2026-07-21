@@ -1,0 +1,187 @@
+{
+  "status": "SHADOW_ONLY",
+  "gates": {
+    "1_data_contract_and_inference_parity": {
+      "passed": true,
+      "evidence": "focused Hundred contract and mapper suite: 10 passed"
+    },
+    "2_holdout_brier_beats_resource_and_t20": {
+      "passed": false,
+      "candidate_brier": 0.16341162710668622,
+      "resource_brier": 0.171424120906201,
+      "t20_brier": 0.15366594122441862
+    },
+    "3_log_loss_improved_or_non_inferior": {
+      "passed": false,
+      "margin": 0.005
+    },
+    "4_open_state_directional_result": {
+      "passed": false
+    },
+    "5_gender_match_equal_tolerance": {
+      "passed": false,
+      "details": {
+        "male": {
+          "resource": {
+            "delta": 0.03248553928893763,
+            "tolerance": 0.007401682343553387,
+            "passed": false
+          },
+          "t20_production": {
+            "delta": 0.01687613056177595,
+            "tolerance": 0.008182152779911472,
+            "passed": false
+          }
+        },
+        "female": {
+          "resource": {
+            "delta": -0.04204915699628581,
+            "tolerance": 0.009229032602229667,
+            "passed": true
+          },
+          "t20_production": {
+            "delta": 0.002081028322163364,
+            "tolerance": 0.007022523336307209,
+            "passed": true
+          }
+        }
+      }
+    },
+    "6_no_severe_innings_or_phase_regression": {
+      "passed": false,
+      "details": {
+        "innings_1": {
+          "resource": {
+            "delta": -0.02038260517732382,
+            "tolerance": 0.02213810531669913,
+            "passed": true
+          },
+          "t20_production": {
+            "delta": 0.014289516442695271,
+            "tolerance": 0.01867089315469722,
+            "passed": true
+          }
+        },
+        "innings_2": {
+          "resource": {
+            "delta": 0.005653341192336431,
+            "tolerance": 0.011623438395688275,
+            "passed": true
+          },
+          "t20_production": {
+            "delta": 0.004725905803235425,
+            "tolerance": 0.011716181934598377,
+            "passed": true
+          }
+        },
+        "phase_powerplay": {
+          "resource": {
+            "delta": -0.002424128082516047,
+            "tolerance": 0.020252346717446367,
+            "passed": true
+          },
+          "t20_production": {
+            "delta": 0.004857004369967222,
+            "tolerance": 0.01952423347219804,
+            "passed": true
+          }
+        },
+        "phase_middle": {
+          "resource": {
+            "delta": -0.003456035012666475,
+            "tolerance": 0.01636160437689746,
+            "passed": true
+          },
+          "t20_production": {
+            "delta": 0.014801253763566946,
+            "tolerance": 0.014535875499274119,
+            "passed": false
+          }
+        },
+        "phase_death": {
+          "resource": {
+            "delta": -0.009551061058608756,
+            "tolerance": 0.015120572021395252,
+            "passed": true
+          },
+          "t20_production": {
+            "delta": 0.014400605237004122,
+            "tolerance": 0.012725405391833963,
+            "passed": false
+          }
+        },
+        "phase_final": {
+          "resource": {
+            "delta": -0.031339782584765385,
+            "tolerance": 0.016644010850303714,
+            "passed": true
+          },
+          "t20_production": {
+            "delta": -0.004149099913704601,
+            "tolerance": 0.013924942583197633,
+            "passed": true
+          }
+        }
+      }
+    },
+    "7_calibration_thresholds": {
+      "passed": false
+    },
+    "8_match_block_bootstrap_support": {
+      "passed": false
+    },
+    "9_rolling_origin_stability": {
+      "passed": false,
+      "details": {
+        "resource": [
+          {
+            "test_season": 2022,
+            "delta": -0.0027548021559759273,
+            "passed": true
+          },
+          {
+            "test_season": 2023,
+            "delta": -0.03471012780090438,
+            "passed": true
+          },
+          {
+            "test_season": 2024,
+            "delta": -0.040009652643176796,
+            "passed": true
+          },
+          {
+            "test_season": 2025,
+            "delta": -0.00801249379951477,
+            "passed": true
+          }
+        ],
+        "t20_production": [
+          {
+            "test_season": 2022,
+            "delta": 0.03775607949995596,
+            "passed": false
+          },
+          {
+            "test_season": 2023,
+            "delta": 0.02393002143964945,
+            "passed": false
+          },
+          {
+            "test_season": 2024,
+            "delta": -0.007391125565722689,
+            "passed": true
+          },
+          {
+            "test_season": 2025,
+            "delta": 0.009745685882267596,
+            "passed": true
+          }
+        ]
+      }
+    },
+    "10_runtime_loading_order_missing_and_state_mapping": {
+      "passed": true,
+      "evidence": "focused Hundred mapper tests passed"
+    }
+  }
+}

@@ -1302,7 +1302,7 @@ def generate_oof(input_file, model_dir, n_splits, target_col, total_overs):
 @main.command()
 @click.option('--source-dir', type=click.Path(exists=True), default='recently_played_30_male',
               help='Source directory containing recently played JSON files (default: recently_played_30_male)')
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'ntb', 'odi', 'odm_male', 'odm_female', 'all']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'ntb', 'odi', 'odi_all', 'odm_male', 'odm_female', 't20_all', 'all']), required=True,
               help='League to extract matches for')
 @click.option('--dry-run', is_flag=True, help='Show which files would be copied without actually copying')
 @click.pass_context  
@@ -1422,7 +1422,7 @@ def update_matches(ctx, source_dir, league, dry_run):
 
 
 @main.command()
-@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'ntb', 'odi', 'odi_female', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20i_male', 't20i_female']), required=True,
+@click.option('--league', type=click.Choice(['bbl', 'sa20', 'ilt20', 'bpl', 'ssm', 'wpl', 'ipl', 'psl', 'ntb', 'odi', 'odi_female', 'odi_all', 'odm_male', 'odm_female', 't20_male', 't20_female', 't20_all', 't20i_male', 't20i_female', 'hundred_all']), required=True,
               help='League to retrain model for')
 @click.option('--version', type=str, required=True,
               help='Model version (e.g., v2, v3). Creates models/<league>_<version>')
@@ -1586,6 +1586,30 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
             'model_prefix': 'odm_female',
             'format_type': 'odi',
         },
+        't20_all': {
+            'json_dir': 't20s_json',
+            'raw_dir': 'data/t20_all_raw',
+            'features_dir': 'data/t20_all_features',
+            'feature_store_dir': 'data/t20_all_feature_store',
+            'model_prefix': 't20_all',
+            'format_type': 't20',
+        },
+        'odi_all': {
+            'json_dir': 'odis_json',
+            'raw_dir': 'data/odi_all_raw',
+            'features_dir': 'data/odi_all_features',
+            'feature_store_dir': 'data/odi_all_feature_store',
+            'model_prefix': 'odi_all',
+            'format_type': 'odi',
+        },
+        'hundred_all': {
+            'json_dir': 'hnd_json',
+            'raw_dir': 'data/hundred_all_raw',
+            'features_dir': 'data/hundred_all_features',
+            'feature_store_dir': 'data/hundred_all_feature_store',
+            'model_prefix': 'hundred_all',
+            'format_type': 'hundred',
+        },
     }
     
     cfg = league_config[league]
@@ -1739,6 +1763,8 @@ def retrain(ctx, league, version, clean, skip_ingest, skip_process, n_splits):
         'odi_female': 'ODI_FEMALE',
         'odm_male': 'ODM_MALE',
         'odm_female': 'ODM_FEMALE',
+        't20_all': 'T20_ALL',
+        'odi_all': 'ODI_ALL',
     }
     
     registry_path = Path('models/model_registry.json')

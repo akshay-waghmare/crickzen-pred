@@ -150,6 +150,16 @@ class FormatConfig:
     rrr_target_cat_below_threshold: float = -15.0  # target < par-15 → below_par
     rrr_target_cat_above_threshold: float = 15.0   # target > par+15 → above_par
 
+    # --- Hundred structural semantics (None for legacy formats) ------------
+    # These fields make the non-standard five-ball clock explicit without
+    # changing the constructor contract of existing T20/ODI configurations.
+    total_legal_balls: Optional[int] = None
+    scoring_set_size: Optional[int] = None
+    end_change_interval: Optional[int] = None
+    powerplay_balls: Optional[int] = None
+    max_balls_per_bowler: Optional[int] = None
+    innings_feature_config: Optional[Dict[str, Dict[str, bool]]] = None
+
     # ── Validation ──────────────────────────────────────────────────────────
 
     def __post_init__(self) -> None:
@@ -181,6 +191,24 @@ class FormatConfig:
                 f"score_cap_min ({self.score_cap_min}) < par_score ({self.par_score}) "
                 f"< score_cap_max ({self.score_cap_max}) violated"
             )
+        structural = {
+            "total_legal_balls": self.total_legal_balls,
+            "scoring_set_size": self.scoring_set_size,
+            "end_change_interval": self.end_change_interval,
+            "powerplay_balls": self.powerplay_balls,
+            "max_balls_per_bowler": self.max_balls_per_bowler,
+        }
+        if any(value is not None for value in structural.values()):
+            if self.total_legal_balls != self.total_balls:
+                raise ValueError("total_legal_balls must equal total_balls when specified")
+            if not self.scoring_set_size or self.scoring_set_size != self.balls_per_over:
+                raise ValueError("scoring_set_size must equal balls_per_over when specified")
+            if not self.end_change_interval or self.end_change_interval <= 0:
+                raise ValueError("end_change_interval must be positive when specified")
+            if not self.powerplay_balls or not 0 < self.powerplay_balls <= self.total_balls:
+                raise ValueError("powerplay_balls must be within the innings horizon")
+            if not self.max_balls_per_bowler or not 0 < self.max_balls_per_bowler <= self.total_balls:
+                raise ValueError("max_balls_per_bowler must be within the innings horizon")
 
     # ── Factory methods ─────────────────────────────────────────────────────
 
@@ -342,6 +370,61 @@ class FormatConfig:
             endgame_balls=12,
             pressure_rrr_min=7.0,
             pressure_rrr_max=15.0,
+        )
+
+    @classmethod
+    def hundred(cls, gender: str = "male") -> FormatConfig:
+        """Return the format configuration for The Hundred.
+
+        The Hundred uses 100 legal balls split into twenty five-ball scoring
+        sets.  The structural fields are intentionally explicit because a
+        generic T20 configuration would silently reintroduce six-ball clock
+        arithmetic into processing, calibration, or live inference.
+
+        ``gender`` remains a format-config default for resource priors; the
+        combined ``hundred_all`` model carries the actual match gender through
+        the ``gender_female`` feature.
+        """
+        if gender not in {"male", "female"}:
+            raise ValueError(f"gender must be 'male' or 'female', got {gender!r}")
+
+        base = cls.t20()
+        return replace(
+            base,
+            format_name="hundred",
+            gender=gender,
+            total_overs=20,
+            total_balls=100,
+            balls_per_over=5,
+            total_legal_balls=100,
+            scoring_set_size=5,
+            end_change_interval=10,
+            powerplay_balls=25,
+            max_balls_per_bowler=20,
+            par_score=139.4 if gender == "male" else 122.8,
+            league_avg_score=131.3,
+            bat_first_win_rate=0.48185,
+            phase_thresholds={
+                "powerplay": 5,
+                "middle": 12,
+                "death": 17,
+                "final": 20,
+            },
+            phase_names=["powerplay", "middle", "death", "final"],
+            expected_run_rates={
+                "powerplay": 7.0,
+                "middle": 6.5,
+                "death": 7.5,
+                "final": 9.0,
+            },
+            endgame_balls=10,
+            score_cap_min=40.0,
+            score_cap_max=240.0,
+            confidence_full_overs=10.0,
+            innings_feature_config={
+                "innings_1": {"target_features": False, "chase_features": False},
+                "innings_2": {"target_features": True, "chase_features": True},
+            },
         )
 
     @classmethod
@@ -1006,7 +1089,7 @@ class FormatConfig:
         -------
         FormatConfig
         """
-        _ODI_LEAGUES = {"odi", "odis", "odi_male", "odi_female", "odm", "odm_male", "odm_female"}
+        _ODI_LEAGUES = {"odi", "odis", "odi_male", "odi_female", "odi_all", "odm", "odm_male", "odm_female"}
         if league in _ODI_LEAGUES:
             gender = "female" if "female" in league else "male"
             return cls.odi(gender=gender)
@@ -1014,5 +1097,8 @@ class FormatConfig:
             return cls.ipl()
         if league == "psl":
             return cls.psl()
+        if league in {"hundred", "hundred_all", "hundred_male", "hundred_female"}:
+            gender = "female" if league.endswith("_female") else "male"
+            return cls.hundred(gender=gender)
         # All other leagues are T20
         return cls.t20()

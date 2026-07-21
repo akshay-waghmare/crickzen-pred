@@ -1,0 +1,189 @@
+[
+  {
+    "match_id": "1252684",
+    "season": "2021",
+    "gender": "male",
+    "reason_codes": [
+      "missing_required_metadata",
+      "missing_winner",
+      "no_result"
+    ]
+  },
+  {
+    "match_id": "1252718",
+    "season": "2021",
+    "gender": "female",
+    "reason_codes": [
+      "dls_target_not_supported"
+    ]
+  },
+  {
+    "match_id": "1252720",
+    "season": "2021",
+    "gender": "female",
+    "reason_codes": [
+      "dls_target_not_supported"
+    ]
+  },
+  {
+    "match_id": "1299152",
+    "season": "2022",
+    "gender": "female",
+    "reason_codes": [
+      "legal_ball_overflow"
+    ]
+  },
+  {
+    "match_id": "1299160",
+    "season": "2022",
+    "gender": "female",
+    "reason_codes": [
+      "legal_ball_overflow"
+    ]
+  },
+  {
+    "match_id": "1355589",
+    "season": "2023",
+    "gender": "female",
+    "reason_codes": [
+      "dls_target_not_supported"
+    ]
+  },
+  {
+    "match_id": "1355604",
+    "season": "2023",
+    "gender": "female",
+    "reason_codes": [
+      "missing_required_metadata",
+      "missing_winner",
+      "no_result"
+    ]
+  },
+  {
+    "match_id": "1355609",
+    "season": "2023",
+    "gender": "male",
+    "reason_codes": [
+      "missing_required_metadata",
+      "missing_winner",
+      "no_result"
+    ]
+  },
+  {
+    "match_id": "1355611",
+    "season": "2023",
+    "gender": "male",
+    "reason_codes": [
+      "missing_required_metadata",
+      "missing_winner",
+      "no_result"
+    ]
+  },
+  {
+    "match_id": "1355614",
+    "season": "2023",
+    "gender": "male",
+    "reason_codes": [
+      "missing_winner",
+      "tie_or_super_five"
+    ]
+  },
+  {
+    "match_id": "1355616",
+    "season": "2023",
+    "gender": "male",
+    "reason_codes": [
+      "missing_required_metadata",
+      "missing_winner",
+      "no_result"
+    ]
+  },
+  {
+    "match_id": "1355623",
+    "season": "2023",
+    "gender": "male",
+    "reason_codes": [
+      "dls_target_not_supported"
+    ]
+  },
+  {
+    "match_id": "1417810",
+    "season": "2024",
+    "gender": "male",
+    "reason_codes": [
+      "missing_winner",
+      "no_result"
+    ]
+  },
+  {
+    "match_id": "1417818",
+    "season": "2024",
+    "gender": "male",
+    "reason_codes": [
+      "dls_target_not_supported"
+    ]
+  },
+  {
+    "match_id": "1417819",
+    "season": "2024",
+    "gender": "male",
+    "reason_codes": [
+      "missing_winner",
+      "no_result"
+    ]
+  },
+  {
+    "match_id": "1417822",
+    "season": "2024",
+    "gender": "male",
+    "reason_codes": [
+      "missing_winner",
+      "tie_or_super_five"
+    ]
+  },
+  {
+    "match_id": "1417831",
+    "season": "2024",
+    "gender": "female",
+    "reason_codes": [
+      "missing_winner",
+      "tie_or_super_five"
+    ]
+  },
+  {
+    "match_id": "1417838",
+    "season": "2024",
+    "gender": "female",
+    "reason_codes": [
+      "missing_winner",
+      "tie_or_super_five"
+    ]
+  },
+  {
+    "match_id": "1417845",
+    "season": "2024",
+    "gender": "female",
+    "reason_codes": [
+      "dls_target_not_supported"
+    ]
+  },
+  {
+    "match_id": "1417855",
+    "season": "2024",
+    "gender": "female",
+    "reason_codes": [
+      "missing_required_metadata",
+      "missing_winner",
+      "no_result"
+    ]
+  },
+  {
+    "match_id": "1471034",
+    "season": "2025",
+    "gender": "male",
+    "reason_codes": [
+      "missing_winner",
+      "no_result"
+    ]
+  }
+]

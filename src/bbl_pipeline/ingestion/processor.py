@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from bbl_pipeline.processing.resolution import EntityResolver
 
+from .hundred_normalizer import HundredNormalizer
+
 logger = structlog.get_logger()
 
 def extract_match_metadata(match_data: Dict[str, Any], match_id: str, league_slug: Optional[str] = None) -> Dict[str, Any]:
@@ -72,6 +74,7 @@ def _infer_league_from_event(event_name: str) -> str:
         "women's big bash league": 'wbbl',
         "women's premier league": 'wpl',
         "women's caribbean premier league": 'wcpl',
+        'the hundred': 'hundred',
     }
     for key, slug in league_mapping.items():
         if key in event_lower:
@@ -228,7 +231,19 @@ def process_match(
         return [], []
     
     meta = extract_match_metadata(match_data, match_id, league_slug)
-    
+
+    # The initial Hundred v1 contract is for normal 100-ball matches.  D/L
+    # targets require a separate target-reconstruction path and are retained
+    # in the audit manifest rather than silently entering the standard cohort.
+    if meta['league'] in {'hundred', 'hundred_all'}:
+        outcome = (match_data.get('info') or {}).get('outcome') or {}
+        if outcome.get('method') == 'D/L':
+            logger.info(
+                "Skipping Hundred D/L match from standard v1 cohort",
+                match_id=match_id,
+            )
+            return [], []
+
     main_records = []
     super_over_records = []
     
@@ -246,6 +261,25 @@ def process_match(
             'innings_num': i + 1,
             'is_super_over': is_super_over
         }
+
+        hundred_normalization = None
+        hundred_row_index = 0
+        if meta['league'] in {'hundred', 'hundred_all'}:
+            hundred_normalization = HundredNormalizer().normalize_innings(
+                inning,
+                match_id=match_id,
+                innings_number=i + 1,
+                gender=meta.get('gender'),
+                winner=meta.get('winner'),
+                is_super_five=is_super_over,
+            )
+            if not is_super_over and 'legal_ball_overflow' in hundred_normalization.anomaly_flags:
+                logger.info(
+                    "Skipping Hundred match with main-innings legal-ball overflow",
+                    match_id=match_id,
+                    innings=i + 1,
+                )
+                return [], []
         
         for over_data in inning.get('overs', []):
             over_num = over_data.get('over')
@@ -254,6 +288,38 @@ def process_match(
                 ball_num = j + 1
                 
                 row = flatten_delivery(delivery, meta, inning_meta, over_num, ball_num, resolver)
+
+                if hundred_normalization is not None:
+                    normalized = hundred_normalization.rows[hundred_row_index]
+                    hundred_row_index += 1
+                    legal_balls_bowled = normalized['legal_balls_bowled']
+                    if normalized['five_index'] is not None:
+                        canonical_over = normalized['five_index'] - 1
+                        canonical_ball = normalized['ball_within_five']
+                    else:
+                        canonical_over = 0
+                        canonical_ball = 0
+                    row.update({
+                        # Preserve the source coordinates for audit/debugging,
+                        # while exposing the legal-ball clock to downstream
+                        # training and live-inference code through the common
+                        # over/ball fields.
+                        'raw_over': normalized['raw_over'],
+                        'raw_delivery_label': normalized['raw_delivery_label'],
+                        'over': canonical_over,
+                        'ball': canonical_ball,
+                        'raw_delivery_index': normalized['raw_delivery_index'],
+                        'is_legal_delivery': normalized['is_legal_delivery'],
+                        'legal_ball_index': normalized['legal_ball_index'],
+                        'legal_balls_bowled': legal_balls_bowled,
+                        'balls_remaining': normalized['balls_remaining'],
+                        'five_index': normalized['five_index'],
+                        'ball_within_five': normalized['ball_within_five'],
+                        'end_block_index': normalized['end_block_index'],
+                        'match_phase_name': normalized['phase'],
+                        'powerplay_active': normalized['powerplay_active'],
+                        'hundred_anomaly_flags': normalized['anomaly_flags'],
+                    })
                 
                 if is_super_over:
                     super_over_records.append(row)

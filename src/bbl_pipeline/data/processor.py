@@ -52,6 +52,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     
     total_balls = format_config.total_balls
     total_overs = format_config.total_overs
+    balls_per_over = format_config.balls_per_over
     par_score = format_config.par_score
     
     logger.info("Starting BBL data processing", input_dir=str(input_dir))
@@ -102,6 +103,13 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     # Create target: is_winner (1 if batting team won, 0 otherwise)
     # If the batting team is the winner, then is_winner = 1
     df['is_winner'] = (df['batting_team'] == df['winner']).astype(int)
+
+    # Combined men/women models must retain match gender as a model input.
+    # Encode male=0, female=1 so the same feature contract works for T20 and ODI.
+    if 'gender' in df.columns:
+        df['gender_female'] = df['gender'].astype(str).str.lower().eq('female').astype(int)
+    else:
+        df['gender_female'] = 0
     
     # Calculate cumulative runs and wickets for current_score and wickets_lost
     # Sort by match, innings, over, ball
@@ -238,7 +246,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     )
     bowling_venue_agg['bowler_venue_econ'] = np.where(
         bowling_venue_agg['bowler_venue_balls_cum'] > 0,
-        (bowling_venue_agg['bowler_venue_runs_cum'] / bowling_venue_agg['bowler_venue_balls_cum']) * 6,
+        (bowling_venue_agg['bowler_venue_runs_cum'] / bowling_venue_agg['bowler_venue_balls_cum']) * balls_per_over,
         0.0
     )
     bowling_venue_agg['bowler_venue_sr'] = np.where(
@@ -275,7 +283,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     )
     bowling_vs_team['bowler_vs_team_econ'] = np.where(
         bowling_vs_team['bowler_vs_team_balls_cum'] > 0,
-        (bowling_vs_team['bowler_vs_team_runs_cum'] / bowling_vs_team['bowler_vs_team_balls_cum']) * 6,
+        (bowling_vs_team['bowler_vs_team_runs_cum'] / bowling_vs_team['bowler_vs_team_balls_cum']) * balls_per_over,
         0.0
     )
     
@@ -530,7 +538,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         'ball': 'count'
     }).reset_index()
     team_batting.columns = ['match_id', 'date', 'team', 'innings', 'runs', 'balls']
-    team_batting['run_rate'] = (team_batting['runs'] / team_batting['balls']) * 6
+    team_batting['run_rate'] = (team_batting['runs'] / team_batting['balls']) * balls_per_over
     team_batting = team_batting.sort_values(['team', 'date'])
     
     # Rolling team batting run rate (last 5 innings)
@@ -545,7 +553,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         'wicket_type': lambda x: x.notna().sum()
     }).reset_index()
     team_bowling.columns = ['match_id', 'date', 'team', 'innings', 'runs_conceded', 'balls', 'wickets']
-    team_bowling['economy'] = (team_bowling['runs_conceded'] / team_bowling['balls']) * 6
+    team_bowling['economy'] = (team_bowling['runs_conceded'] / team_bowling['balls']) * balls_per_over
     team_bowling = team_bowling.sort_values(['team', 'date'])
     
     # Rolling team bowling economy (last 5 innings)
@@ -803,8 +811,8 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     match_scores = match_scores.merge(
         innings1[['match_id', 'date', 'team1', 'team2']], on='match_id', how='left'
     )
-    match_scores['rr1'] = match_scores['inn1_score'] / (match_scores['inn1_balls'] / 6).clip(lower=1)
-    match_scores['rr2'] = match_scores['inn2_score'] / (match_scores['inn2_balls'] / 6).clip(lower=1)
+    match_scores['rr1'] = match_scores['inn1_score'] / (match_scores['inn1_balls'] / balls_per_over).clip(lower=1)
+    match_scores['rr2'] = match_scores['inn2_score'] / (match_scores['inn2_balls'] / balls_per_over).clip(lower=1)
     match_scores['nrr_t1'] = match_scores['rr1'] - match_scores['rr2']
 
     nrr_t1 = match_scores[['match_id', 'date', 'team1', 'nrr_t1']].rename(
@@ -892,9 +900,12 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     df = df.merge(target_map, on='match_id', how='left')
     
     # 2. Balls Remaining
-    # ball is 1-6 (usually). over is 0-19.
-    # balls_bowled = over * 6 + ball
-    df['balls_bowled'] = df['over'] * 6 + df['ball']
+    # Hundred rows carry a legal-ball clock from HundredNormalizer. Legacy
+    # formats retain their historical over/ball calculation.
+    if format_config.format_name == 'hundred' and 'legal_balls_bowled' in df.columns:
+        df['balls_bowled'] = pd.to_numeric(df['legal_balls_bowled'], errors='coerce').fillna(0)
+    else:
+        df['balls_bowled'] = df['over'] * balls_per_over + df['ball']
     df['balls_remaining'] = total_balls - df['balls_bowled']
     
     # 3. Required Run Rate (RRR)
@@ -906,14 +917,14 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     # Avoid division by zero for last ball
     df['required_run_rate'] = np.where(
         (df['innings'] == 2) & (df['balls_remaining'] > 0),
-        (df['runs_needed'] / df['balls_remaining']) * 6,
+        (df['runs_needed'] / df['balls_remaining']) * balls_per_over,
         0.0 # Default for innings 1 or end of match
     )
     
     # 4. Current Run Rate (CRR)
     df['current_run_rate'] = np.where(
         df['balls_bowled'] > 0,
-        (df['current_score'] / df['balls_bowled']) * 6,
+        (df['current_score'] / df['balls_bowled']) * balls_per_over,
         0.0
     )
     
@@ -934,13 +945,29 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     # Middle: overs 6-14 (36-89 balls)
     # Death: overs 15-19 (90-119 balls)
     # Phase boundaries derived from config
-    pp_balls = format_config.phase_thresholds[format_config.phase_names[0]] * format_config.balls_per_over  # T20: 36, ODI: 60
-    mid_end_balls = (format_config.phase_thresholds[format_config.phase_names[1]] + 1) * format_config.balls_per_over  # T20: 90, ODI: 210
-    df['match_phase'] = pd.cut(
-        df['balls_bowled'],
-        bins=[-1, pp_balls, mid_end_balls, total_balls],
-        labels=[1, 2, 3]
-    ).astype(float)
+    pp_balls = format_config.phase_thresholds[format_config.phase_names[0]] * balls_per_over
+    mid_end_balls = (format_config.phase_thresholds[format_config.phase_names[1]] + 1) * balls_per_over
+    if format_config.format_name == 'hundred':
+        phase_bounds = [-1] + [
+            format_config.phase_thresholds[name] * balls_per_over
+            for name in format_config.phase_names
+        ]
+        df['match_phase'] = pd.cut(
+            df['balls_bowled'],
+            bins=phase_bounds,
+            labels=list(range(1, len(format_config.phase_names) + 1)),
+        ).astype(float)
+        df['match_phase_name'] = pd.cut(
+            df['balls_bowled'],
+            bins=phase_bounds,
+            labels=format_config.phase_names,
+        ).astype(object)
+    else:
+        df['match_phase'] = pd.cut(
+            df['balls_bowled'],
+            bins=[-1, pp_balls, mid_end_balls, total_balls],
+            labels=[1, 2, 3]
+        ).astype(float)
     
     # 7. Pressure Index (combination of RRR and wickets)
     # Higher RRR + more wickets = more pressure
@@ -960,7 +987,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     resource_calc = ResourceFeatureCalculator(config=format_config)
     
     # Calculate proper DLS resource percentage
-    df['overs_remaining'] = (total_balls - df['balls_bowled']) / 6
+    df['overs_remaining'] = (total_balls - df['balls_bowled']) / balls_per_over
     
     # Vectorized DLS resource calculation
     def get_dls_resource_pct(row):
@@ -977,18 +1004,29 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
             return par_score  # PAR_SCORE default
         return resource_calc.calculate_expected_score(
             int(row['current_score']),
-            row['balls_bowled'] / 6,  # overs_bowled
+            row['balls_bowled'] / balls_per_over,  # overs_bowled
             int(row['wickets_lost'])
         )
     
     df['expected_final_score'] = df.apply(get_expected_score, axis=1)
+    df['expected_final_vs_venue_avg'] = df['expected_final_score'] - df['venue_avg_score']
     
     # Phase indicators (3-phase: powerplay/middle/death, boundaries from config)
     pp_boundary = format_config.phase_thresholds[format_config.phase_names[0]]
     mid_boundary = format_config.phase_thresholds[format_config.phase_names[1]] + 1
-    df['is_powerplay'] = (df['over'] < pp_boundary).astype(int)
-    df['is_middle_overs'] = ((df['over'] >= pp_boundary) & (df['over'] < mid_boundary)).astype(int)
-    df['is_death_overs'] = (df['over'] >= mid_boundary).astype(int)
+    if format_config.format_name == 'hundred':
+        df['is_powerplay'] = (df['balls_bowled'] <= format_config.powerplay_balls).astype(int)
+        df['is_middle_overs'] = (
+            (df['balls_bowled'] > format_config.powerplay_balls)
+            & (df['balls_bowled'] <= format_config.phase_thresholds['middle'] * balls_per_over)
+        ).astype(int)
+        df['is_death_overs'] = (
+            df['balls_bowled'] > format_config.phase_thresholds['middle'] * balls_per_over
+        ).astype(int)
+    else:
+        df['is_powerplay'] = (df['over'] < pp_boundary).astype(int)
+        df['is_middle_overs'] = ((df['over'] >= pp_boundary) & (df['over'] < mid_boundary)).astype(int)
+        df['is_death_overs'] = (df['over'] >= mid_boundary).astype(int)
     
     # DLS-based pressure index (more accurate than simplified version)
     def get_dls_pressure(row):
@@ -996,7 +1034,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         return resource_calc.calculate_pressure_index(
             int(row['innings']),
             int(row['current_score']),
-            row['balls_bowled'] / 6,
+            row['balls_bowled'] / balls_per_over,
             int(row['wickets_lost']),
             target_runs=target if pd.notna(target) else None
         )
@@ -1006,10 +1044,16 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     # DLS-based win probability (structural cricket knowledge)
     def get_dls_win_prob(row):
         target = row.get('first_innings_score', 0) + 1 if row['innings'] == 2 else None
+        balls_bowled = int(max(0, row['balls_bowled']))
+        if balls_bowled <= 0:
+            resource_over, resource_ball = 0, 0
+        else:
+            resource_over = (balls_bowled - 1) // balls_per_over
+            resource_ball = ((balls_bowled - 1) % balls_per_over) + 1
         features = resource_calc.calculate_all_features(
             int(row['innings']),
-            int(row['over']),
-            int(row['ball']),
+            int(resource_over),
+            int(resource_ball),
             int(row['current_score']),
             int(row['wickets_lost']),
             target_runs=target if pd.notna(target) else None
@@ -1076,12 +1120,12 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     # Compare recent scoring rate to earlier scoring rate
     df['rr_last_12'] = np.where(
         df['balls_bowled'] >= 12,
-        df['runs_last_12'] / 12 * 6,  # Run rate in last 12 balls
+        df['runs_last_12'] / 12 * balls_per_over,  # Run rate in last 12 legal balls
         df['current_run_rate']
     )
     df['rr_earlier'] = np.where(
         df['balls_bowled'] > 18,
-        ((df['current_score'] - df['runs_last_12']) / (df['balls_bowled'] - 12)) * 6,
+        ((df['current_score'] - df['runs_last_12']) / (df['balls_bowled'] - 12)) * balls_per_over,
         df['current_run_rate']
     )
     df['scoring_acceleration'] = df['rr_last_12'] - df['rr_earlier']
@@ -1090,7 +1134,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     # Based on current run rate and resources remaining
     df['projected_score'] = np.where(
         df['innings'] == 1,
-        df['current_score'] + (df['current_run_rate'] * df['balls_remaining'] / 6),
+        df['current_score'] + (df['current_run_rate'] * df['balls_remaining'] / balls_per_over),
         0.0
     )
     
@@ -1279,7 +1323,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
 
     # Death overs run rate (overs 16-20) — finish momentum
     inn1_death = inn1_data[inn1_data['over'] > 15]
-    death_rr = inn1_death.groupby('match_id')['runs_total'].mean() * 6  # per-ball avg × 6 = RR
+    death_rr = inn1_death.groupby('match_id')['runs_total'].mean() * balls_per_over  # per-ball avg × configured set size = RR
     df['inn1_death_rr'] = df['match_id'].map(death_rr)
     df['inn1_death_rr'] = np.where(df['innings'] == 2, df['inn1_death_rr'], 9.0)
     df['inn1_death_rr'] = df['inn1_death_rr'].fillna(9.0)
@@ -1329,6 +1373,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         'resources_remaining',      
         'wickets_lost',             
         'projected_vs_venue_avg',   
+        'expected_final_vs_venue_avg',
         'team_strength_diff',       
         # Momentum
         'runs_last_12',             
@@ -1364,6 +1409,7 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
         'is_middle_overs',          
         'is_death_overs',           
         'innings',
+        'gender_female',
         # Team-score interaction features (help model learn team context)
         'score_adjusted_by_team',
         'projected_adjusted',
@@ -1402,15 +1448,19 @@ def process_bbl_data(input_dir: Path, output_dir: Path, feature_store_dir: Path,
     training_data.to_parquet(training_path)
     
     # --- ALSO CREATE SAMPLED TRAINING DATA ---
-    # Sample key moments: end of each over (every 6 balls) for more balanced data
+    # Sample key moments: end of each scoring set for more balanced data.
+    # The Hundred has five-ball sets; T20/ODI retain their configured six-ball
+    # over semantics.
     print("Creating sampled training data (end of each over)...")
     
-    # Filter to last ball of each over (ball == 6 or last ball in data)
-    sampled = df[df['ball'] == 6].copy()
+    # Filter to last ball of each scoring set (or last ball in data).
+    sampled = df[df['ball'] == balls_per_over].copy()
     
     # Also include innings 2 final balls for chase scenarios
     final_balls = df.groupby(['match_id', 'innings']).tail(1)
-    sampled = pd.concat([sampled, final_balls]).drop_duplicates()
+    sampled = pd.concat([sampled, final_balls]).drop_duplicates(
+        subset=['match_id', 'innings', 'over', 'ball']
+    )
     
     sampled_data = sampled[feature_cols].copy()
     sampled_path = output_dir / "training_sampled.parquet"

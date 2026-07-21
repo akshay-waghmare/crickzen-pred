@@ -209,6 +209,16 @@ class RealTimeFeatureMapper:
         innings = scraped_data.get('innings_num', 1)
         over = scraped_data.get('over_number', 0)
         ball = scraped_data.get('ball_number', 0)
+        if self.format_config.format_name == 'hundred':
+            balls_per_over = self.format_config.balls_per_over
+            legal_balls_bowled = scraped_data.get('legal_balls_bowled')
+            if legal_balls_bowled is not None:
+                legal_balls_bowled = max(0, min(int(legal_balls_bowled), self.format_config.total_balls))
+                if legal_balls_bowled > 0:
+                    over = (legal_balls_bowled - 1) // balls_per_over
+                    ball = ((legal_balls_bowled - 1) % balls_per_over) + 1
+                else:
+                    over, ball = 0, 0
         current_score = scraped_data.get('total_score', 0)
         wickets_lost = scraped_data.get('total_wickets', 0)
         
@@ -266,8 +276,26 @@ class RealTimeFeatureMapper:
         
         # --- Calculated Basic Features ---
         total_overs = self.format_config.total_overs
-        overs_remaining = total_overs - over - (ball / 6.0)
-        balls_remaining = (total_overs * 6) - (over * 6 + ball)
+        balls_per_over = self.format_config.balls_per_over
+        if self.format_config.format_name == 'hundred':
+            # Prefer the canonical legal-ball clock supplied by a Hundred
+            # scraper/normalizer.  Raw over/ball coordinates remain a
+            # fallback for sources that do not yet expose it.
+            legal_balls_bowled = scraped_data.get('legal_balls_bowled')
+            if legal_balls_bowled is None:
+                legal_balls_bowled = over * balls_per_over + ball
+            legal_balls_bowled = max(0, min(int(legal_balls_bowled), self.format_config.total_balls))
+            if legal_balls_bowled > 0:
+                resource_over = (legal_balls_bowled - 1) // balls_per_over
+                resource_ball = ((legal_balls_bowled - 1) % balls_per_over) + 1
+            else:
+                resource_over, resource_ball = 0, 0
+            balls_bowled = legal_balls_bowled
+        else:
+            resource_over, resource_ball = over, ball
+            balls_bowled = over * balls_per_over + ball
+        overs_remaining = total_overs - (balls_bowled / balls_per_over)
+        balls_remaining = self.format_config.total_balls - balls_bowled
         wickets_remaining = 10 - wickets_lost
         
         # --- Historical Player/Venue Stats (from FeatureStore) ---
@@ -351,8 +379,8 @@ class RealTimeFeatureMapper:
         
         resource_features = self.resource_calculator.calculate_all_features(
             innings=innings,
-            over=over,
-            ball=ball,
+            over=resource_over,
+            ball=resource_ball,
             current_score=current_score,
             wickets_lost=wickets_lost,
             target_runs=target_runs
@@ -360,7 +388,7 @@ class RealTimeFeatureMapper:
         
         # --- Rolling Stats ---
         # Calculate total balls bowled in current innings
-        total_balls_in_innings = over * 6 + ball
+        total_balls_in_innings = balls_bowled
         # Pass current innings and total balls to detect incomplete ball history
         rolling_stats = self._calculate_rolling_stats(
             current_innings=innings,
@@ -405,16 +433,23 @@ class RealTimeFeatureMapper:
         # --- Projected/Expected Scores ---
         # expected_final_score is the DLS/resource projection used in training.
         expected_final_score = resource_features['expected_final_score']
+        expected_final_vs_venue_avg = expected_final_score - venue_avg_score
         runs_required = scraped_data.get('runs_needed', 0) if innings == 2 else 0
         
         # --- Phase Features ---
         thresholds = self.format_config.phase_thresholds
-        pp_limit = thresholds.get('powerplay', 6)
-        mid_limit = thresholds.get('middle', 15)
-        death_limit = thresholds.get('death', total_overs)
-        is_powerplay = int(scraped_data.get('powerplay', over < pp_limit))
-        is_middle_overs = int(scraped_data.get('middle_overs', (over >= pp_limit and over < mid_limit)))
-        is_death_overs = int(scraped_data.get('death_overs', over >= mid_limit))
+        if self.format_config.format_name == 'hundred':
+            pp_limit_balls = self.format_config.powerplay_balls
+            mid_limit_balls = thresholds['middle'] * balls_per_over
+            is_powerplay = int(scraped_data.get('powerplay', balls_bowled <= pp_limit_balls))
+            is_middle_overs = int(scraped_data.get('middle_overs', pp_limit_balls < balls_bowled <= mid_limit_balls))
+            is_death_overs = int(scraped_data.get('death_overs', balls_bowled > mid_limit_balls))
+        else:
+            pp_limit = thresholds.get('powerplay', 6)
+            mid_limit = thresholds.get('middle', 15)
+            is_powerplay = int(scraped_data.get('powerplay', over < pp_limit))
+            is_middle_overs = int(scraped_data.get('middle_overs', (over >= pp_limit and over < mid_limit)))
+            is_death_overs = int(scraped_data.get('death_overs', over >= mid_limit))
         
         # --- Pressure Index ---
         # Match training calculation: RRR * (1 + wickets_lost * 0.15) for innings 2
@@ -432,7 +467,7 @@ class RealTimeFeatureMapper:
         # Match processor.py: projected_score is a simple innings-1 linear
         # projection and is zero for innings 2.
         if innings == 1:
-            projected_score = current_score + (current_run_rate * balls_remaining / 6.0)
+            projected_score = current_score + (current_run_rate * balls_remaining / balls_per_over)
             projected_vs_venue_avg = projected_score - venue_avg_score
         else:
             projected_score = 0.0
@@ -569,7 +604,7 @@ class RealTimeFeatureMapper:
         if innings == 2 and first_innings_score is not None:
             inn1_wkts_for_defend = int(inn1_wickets_lost) if inn1_wickets_lost != 5.0 else 5
             defend_features = self.resource_calculator.calculate_all_features(
-                innings=1, over=19, ball=5,
+                innings=1, over=total_overs - 1, ball=balls_per_over,
                 current_score=first_innings_score,
                 wickets_lost=inn1_wkts_for_defend,
                 target_runs=None
@@ -592,6 +627,7 @@ class RealTimeFeatureMapper:
         features = {
             # Top 25 Features
             'expected_final_score': expected_final_score,
+            'expected_final_vs_venue_avg': expected_final_vs_venue_avg,
             'resource_win_prob': resource_win_prob,
             'score_vs_par': score_vs_par,
             'dls_pressure_index': dls_pressure_index,  # DLS-based pressure
