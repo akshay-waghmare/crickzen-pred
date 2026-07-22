@@ -1,8 +1,16 @@
 # Dashboard Execution Tracker
 
-Last updated: 2026-06-08
+Last updated: 2026-07-22
 Owner: CrickenZen dashboard workstream
 Status: Active (3 of 4 planned phases implemented)
+
+## 2026-07-22 runtime checkpoint
+
+- Calibrated live model routing is committed as `0a25cd6`; public pending-prediction cards are suppressed by `41256c4`.
+- Hundred v1 implementation is committed as `32f4d27` and resolves through the dedicated `hundred_all_v1` model/feature-store path, but remains shadow-only for promotion because the frozen T20 comparison and calibration/stability gates are not met.
+- The production dashboard and public feed require fresh state JSON before a model row is shown; a healthy dashboard alone is not proof of prediction availability.
+- Production verification must report the exact model label, probability, state timestamp, and public Match Intelligence route for a real fixture.
+- Keep local `auth.db`, WAL/SHM files, raw generated datasets, and experiment archives outside release commits unless a release explicitly requires them.
 
 ## Purpose
 
