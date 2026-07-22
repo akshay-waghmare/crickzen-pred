@@ -172,8 +172,9 @@ def safe_X(df_s: pd.DataFrame, feats: list[str]) -> tuple[np.ndarray, list[str]]
     avail = [f for f in feats if f in df_s.columns]
     if not avail:
         raise ValueError("No requested features are available")
-    med = df_s[avail].median(numeric_only=True)
-    return df_s[avail].fillna(med).values, avail
+    values = df_s[avail].replace([np.inf, -np.inf], np.nan)
+    med = values.median(numeric_only=True)
+    return values.fillna(med).fillna(0.0).values, avail
 
 
 def season_folds(seasons: list[str], n_folds: int = 5) -> list[list[str]]:
@@ -254,7 +255,7 @@ def train_champion_models(df: pd.DataFrame, phase_features: dict[str, list[str]]
     return models
 
 
-def evaluate_oos(df: pd.DataFrame, phase_features: dict[str, list[str]]) -> dict[str, Any]:
+def evaluate_oos(df: pd.DataFrame, phase_features: dict[str, list[str]], n_folds: int = 5) -> dict[str, Any]:
     train_seasons = {s for s in sorted(df["season"].unique()) if s < "2025"}
     test_seasons = {s for s in sorted(df["season"].unique()) if s >= "2025"}
     phase_outputs: dict[str, Any] = {}
@@ -266,7 +267,7 @@ def evaluate_oos(df: pd.DataFrame, phase_features: dict[str, list[str]]) -> dict
         pf_te = pf[pf["season"].isin(test_seasons)].copy().reset_index(drop=True)
         if pf_te.empty:
             continue
-        train_oof = oof_phase_predictions(pf_tr, phase_features[phase])
+        train_oof = oof_phase_predictions(pf_tr, phase_features[phase], n_folds=n_folds)
         bundle = fit_calibrator_bundle(train_oof["raw"], train_oof["y"], train_oof["over"], CAL_METHODS[phase])
         X_tr, avail = safe_X(pf_tr, phase_features[phase])
         X_te, _ = safe_X(pf_te, phase_features[phase])
@@ -303,7 +304,19 @@ def main() -> None:
     parser.add_argument("--version", required=True, help="Model version (e.g., v1, v2)")
     parser.add_argument("--features-version", default=None,
                         help="Features data version (defaults to same as --version)")
+    parser.add_argument("--format", choices=["t20", "odi"], default="t20",
+                        help="Match format; ODI uses PP/MID/SETUP/DEATH phase boundaries")
+    parser.add_argument("--folds", type=int, default=5,
+                        help="Chronological folds for phase OOF evaluation (use 3 for very large ODI data)")
     args = parser.parse_args()
+
+    global PHASE_RANGES, CAL_METHODS
+    if args.format == "odi":
+        PHASE_RANGES = {"pp": (1, 10), "mid": (11, 34), "setup": (35, 40), "death": (41, 50)}
+        CAL_METHODS = {"pp": "isotonic", "mid": "platt", "setup": "isotonic", "death": "isotonic"}
+        # ODI setup is a short transition phase; start conservatively with
+        # the shared middle-phase candidate set and let OOS gating decide.
+        CORE_FEATURES["setup"] = ordered_unique(CORE_FEATURES["mid"] + CORE_FEATURES["death"])
 
     league = args.league
     version = args.version
@@ -350,7 +363,7 @@ def main() -> None:
 
     for phase, over_range in PHASE_RANGES.items():
         pf = phase_slice(df, over_range)
-        oof = oof_phase_predictions(pf, phase_feats[phase])
+        oof = oof_phase_predictions(pf, phase_feats[phase], n_folds=args.folds)
         bundle = fit_calibrator_bundle(oof["raw"], oof["y"], oof["over"], CAL_METHODS[phase])
         cal = apply_calibrator_bundle(oof["raw"], oof["over"], bundle)
         oof_brier_cal = float(brier_score_loss(oof["y"], cal))
@@ -378,12 +391,14 @@ def main() -> None:
     # ── Routing config ─────────────────────────────────────────────────────────
     routing_config = {
         "type": "inn2_phase_router",
-        "description": f"{league}_{version}_phase: Phase-split innings-2 model (PP/MID/DEATH) via XGBLRBlend + per-over calibration.",
+        "description": f"{league}_{version}_phase: Format-aware innings-2 phase router via XGBLRBlend + per-over calibration.",
+        "format": args.format,
+        "phase_ranges": {k: list(v) for k, v in PHASE_RANGES.items()},
         "inn1_model_dir": str(base_model_dir).replace("\\", "/"),
         "inn2_phase_model_dir": str(out_dir).replace("\\", "/"),
         "apply_calibration": True,
         "post_model_calibration": {"enabled": False},
-        "calibration": {"pp": "per_over_isotonic", "mid": "per_over_platt", "death": "per_over_isotonic"},
+        "calibration": {phase: ("per_over_platt" if CAL_METHODS.get(phase) == "platt" else "per_over_isotonic") for phase in PHASE_RANGES},
     }
     with open(out_dir / "routing_config.json", "w", encoding="utf-8") as f:
         json.dump(routing_config, f, indent=2)
@@ -391,14 +406,14 @@ def main() -> None:
 
     # ── Step 3: OOS evaluation ─────────────────────────────────────────────────
     print("\nStep 3: True OOS evaluation (train<2025, test=2025+)...")
-    oos = evaluate_oos(df, phase_feats)
+    oos = evaluate_oos(df, phase_feats, n_folds=args.folds)
 
     print(f"\nTrain seasons: {oos['train_seasons']}")
     print(f"Test seasons : {oos['test_seasons']}")
     print(f"\n{'Phase':<10} {'raw':>10} {'cal':>10} {'n':>8}")
     print("-" * 50)
     oos_rows = []
-    for phase in ["pp", "mid", "death"]:
+    for phase in PHASE_RANGES:
         if phase in oos["phases"]:
             p = oos["phases"][phase]
             oos_rows.append({"phase": phase, "oos_brier_raw": round(p["brier_raw"], 5),

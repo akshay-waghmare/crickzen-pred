@@ -36,6 +36,33 @@ def test_clean_team_text_removes_crex_section_labels():
     assert CrexLivePredictor._clean_team_text("Punjab Kings Team Form") == "Punjab Kings"
 
 
+def test_capture_first_innings_summary_accepts_current_crex_slash_format():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.match_state = CrexMatchState(target=234, is_second_innings=True)
+    predictor._inn1_page_stats = {}
+
+    predictor._capture_first_innings_summary(
+        'India 233/10(44.0) England 96/4 (19.3)'
+    )
+
+    assert predictor._inn1_page_stats == {
+        "inn1_wickets_lost": 10,
+        "inn1_summary_score": 233,
+        "inn1_summary_overs": 44.0,
+        "inn1_stats_source": "crex_summary",
+    }
+
+
+def test_capture_first_innings_summary_rejects_score_not_matching_target():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.match_state = CrexMatchState(target=240, is_second_innings=True)
+    predictor._inn1_page_stats = {}
+
+    predictor._capture_first_innings_summary('India 233/10 (44.0) England 96/4 (19.3)')
+
+    assert predictor._inn1_page_stats == {}
+
+
 class _CapturingOdmModel:
     def __init__(self):
         self.current_ml_prob = None
@@ -218,6 +245,26 @@ def test_repair_match_teams_replaces_article_snippet():
     predictor._repair_match_teams_from_url()
 
     assert predictor.match_state.bowling_team == "Mumbai Indians"
+
+
+def test_repair_match_teams_replaces_a_valid_but_unrelated_page_snippet():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.local_storage = {}
+    predictor.league = "t20_all"
+    predictor.predictor = None
+    predictor.match_url = (
+        "https://crex.com/cricket-live-score/ck-vs-jk-12th-match-lanka-"
+        "premier-league-2026-match-updates-TEST"
+    )
+    predictor.original_match_url = predictor.match_url
+    predictor.match_state = type("State", (), {})()
+    predictor.match_state.batting_team = "Canterbury"
+    predictor.match_state.bowling_team = "Jammu & Kashmir"
+
+    predictor._repair_match_teams_from_url()
+
+    assert predictor.match_state.batting_team == "Colombo Kaps"
+    assert predictor.match_state.bowling_team == "Jaffna Kings"
 
 
 def test_clean_venue_text_removes_broadcast_tail():

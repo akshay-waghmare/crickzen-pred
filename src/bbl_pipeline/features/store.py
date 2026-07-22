@@ -747,6 +747,8 @@ class InMemoryFeatureStore:
     # which creates team_strength_diff=0.60 (6x larger than training distribution).
     # Use historical feature store data only for consistency.
     USE_SEASON_OVERRIDES = False
+    # Training and offline inference retain feature-store parity. Live CREX
+    # predictors opt into match-specific venue stats on their instance.
     USE_VENUE_SITUATION_OVERRIDES = False
     
     # =====================================================================

@@ -40,7 +40,7 @@ class XGBLogRegEnsemble(BaseEstimator, ClassifierMixin):
     # Top 25 features by importance (determined empirically on training data)
     TOP_FEATURES = [
         'expected_final_score', 'resource_win_prob', 'score_vs_par', 
-        'dls_pressure_index', 'projected_vs_venue_avg', 'projected_score',
+        'dls_pressure_index', 'expected_final_vs_venue_avg',
         'is_powerplay', 'score_per_wicket', 'run_rate_diff', 'current_run_rate', 'required_run_rate',
         'chase_difficulty', 'wickets_times_balls', 'pressure_index', 
         'team_strength_diff', 'rrr_times_wickets', 'overs_remaining',

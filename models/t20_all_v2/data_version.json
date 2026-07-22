@@ -1,0 +1,9 @@
+{
+  "dataset_hash": "61dc0f68ada14f294c30e31e45a0dd8a85059f72196e0f231c935120faa8fc68",
+  "source_files": [
+    "C:\\Users\\ADMINS\\Documents\\projects\\machine_learning_bbl_009-odi-mc-predictor\\data\\t20_all_features_v2\\training.parquet"
+  ],
+  "date_range": "",
+  "row_count": 1226834,
+  "created": "2026-07-10T18:33:17.988304Z"
+}

@@ -46,6 +46,15 @@ class PublicSwingPoint:
 
 
 @dataclass
+class PublicPredictionPoint:
+    over: str
+    score: str
+    win_probability_pct: int | None
+    expected_final_score: int | None
+    projected_score: int | None
+
+
+@dataclass
 class PublicMatchSummary:
     slug: str
     title: str
@@ -60,14 +69,126 @@ class PublicMatchSummary:
     insight: str = "Model probability will appear once live ball data is available."
     updated_at: str | None = None
     detail_url: str | None = None
+    format_label: str | None = None
+    model_mode: str | None = None
+    model_source: str | None = None
+    model_label: str | None = None
+    expected_final_score: int | None = None
+    projected_score: int | None = None
+    innings: int | None = None
+    current_run_rate: float | None = None
+    required_run_rate: float | None = None
+    venue_average_score: float | None = None
+    resource_pct: float | None = None
+    resource_win_probability_pct: int | None = None
+    score_vs_par: float | None = None
+    pressure_index: float | None = None
+    last_swings: list[PublicSwingPoint] = field(default_factory=list)
+    prediction_history: list[PublicPredictionPoint] = field(default_factory=list)
+    reasons: list[str] = field(default_factory=list)
+    explanation_pack: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class PublicMatchDetail(PublicMatchSummary):
     venue: str | None = None
     target: int | None = None
-    last_swings: list[PublicSwingPoint] = field(default_factory=list)
     dashboard_url: str = "/dashboard"
+
+
+def model_source_label(state: dict[str, Any] | None) -> str | None:
+    model_dir = str((state or {}).get("model_dir") or "").replace("\\", "/")
+    if "hundred_all_v1" in model_dir:
+        return "hundred_specific"
+    if "t20_all_v2" in model_dir:
+        return "combined_gender_aware_fallback"
+    if "odi_all_v3_feature_pruned_candidate" in model_dir or "odi_all_v2" in model_dir:
+        return "combined_gender_aware_fallback"
+    if model_dir:
+        return "league_specific"
+    return None
+
+
+def model_label(state: dict[str, Any] | None) -> str | None:
+    model_dir = str((state or {}).get("model_dir") or "").replace("\\", "/")
+    if "hundred_all_v1" in model_dir:
+        return "The Hundred all-gender v1"
+    if "t20_all_v2" in model_dir:
+        return "T20 all-gender v2"
+    if "odi_all_v3_feature_pruned_candidate" in model_dir:
+        return "ODI all-gender v3 feature-pruned"
+    if "odi_all_v2" in model_dir:
+        return "ODI all-gender v2"
+    return model_dir.rsplit("/", 1)[-1] if model_dir else None
+
+
+def model_mode_label(state: dict[str, Any] | None) -> str:
+    model_dir = str((state or {}).get("model_dir") or "").replace("\\", "/")
+    if "hundred_all_v1" in model_dir:
+        return "ML"
+    if "t20_all_v2" in model_dir or "odi_all_v2" in model_dir or "odi_all_v3_feature_pruned_candidate" in model_dir:
+        return "ML + calibrated"
+    return "MC-only" if (state or {}).get("mc_only") else "ML + calibrated"
+
+
+def state_feature(state: dict[str, Any] | None, key: str) -> float | None:
+    state = state or {}
+    features = state.get("features") or {}
+    return as_float(features.get(key) if features.get(key) is not None else state.get(key))
+
+
+def metric_float(state: dict[str, Any] | None, key: str, digits: int = 2) -> float | None:
+    value = state_feature(state, key)
+    return round(value, digits) if value is not None else None
+
+
+def public_reasons(state: dict[str, Any] | None) -> list[str]:
+    """Return short, number-backed reasons without exposing raw features."""
+    expected = expected_final_score(state)
+    venue = metric_float(state, "venue_avg_score", 1)
+    score_vs_par = metric_float(state, "score_vs_par", 1)
+    required = metric_float(state, "required_run_rate", 1)
+    current = metric_float(state, "current_run_rate", 1)
+    pressure = metric_float(state, "pressure_index", 1)
+    reasons: list[str] = []
+    if expected is not None and venue is not None:
+        delta = round(expected - venue, 1)
+        direction = "above" if delta >= 0 else "below"
+        reasons.append(f"Expected final {expected:g}, {abs(delta):g} {direction} the venue average.")
+    if score_vs_par is not None:
+        direction = "above" if score_vs_par >= 0 else "below"
+        reasons.append(f"Current score is {abs(score_vs_par):g} runs {direction} resource-adjusted par.")
+    if required is not None and required > 0:
+        reasons.append(f"Chase pressure is {required:g} required runs per over from here.")
+    elif current is not None:
+        reasons.append(f"Current scoring rate is {current:g} runs per over.")
+    if pressure is not None and pressure > 0:
+        reasons.append(f"Pressure index is {pressure:g} on the public model scale.")
+    return reasons[:3]
+
+
+def public_explanation_pack(state: dict[str, Any] | None, swings: list[PublicSwingPoint]) -> dict[str, Any]:
+    """Expose the video-studio explanation shape without private player/model data."""
+    expected = expected_final_score(state)
+    venue = metric_float(state, "venue_avg_score", 1)
+    pack: dict[str, Any] = {
+        "venue_behaviour": None,
+        "toss_impact": "Toss impact will appear when toss context is available.",
+        "expected_score": expected,
+        "expected_wickets": metric_float(state, "expected_wickets", 1),
+        "turning_point": None,
+        "probability_swing": None,
+    }
+    if expected is not None and venue is not None:
+        pack["venue_behaviour"] = "Tracking above the venue baseline." if expected >= venue else "Tracking below the venue baseline."
+    if swings:
+        largest = max(swings, key=lambda point: abs(point.win_probability_pct or 0))
+        pack["turning_point"] = {"over": largest.over, "score": largest.score, "label": largest.label}
+        if len(swings) >= 2:
+            before = swings[-2].win_probability_pct
+            after = swings[-1].win_probability_pct
+            pack["probability_swing"] = {"before": before, "after": after, "delta": (after - before) if before is not None and after is not None else None}
+    return pack
 
 
 def public_payload(obj: PublicMatchSummary | PublicMatchDetail) -> dict[str, Any]:
@@ -240,6 +361,18 @@ def projection_label(state: dict[str, Any] | None) -> str | None:
     return None
 
 
+def expected_final_score(state: dict[str, Any] | None) -> int | None:
+    features = (state or {}).get("features") or {}
+    value = as_float(features.get("expected_final_score") or (state or {}).get("expected_final_score"))
+    return int(round(value)) if value is not None else None
+
+
+def projected_score(state: dict[str, Any] | None) -> int | None:
+    features = (state or {}).get("features") or {}
+    value = as_float(features.get("projected_score") or (state or {}).get("projected_score"))
+    return int(round(value)) if value is not None else None
+
+
 def _history_probability_pct(point: dict[str, Any]) -> int | None:
     for key in ("bat_prob", "bat_win_prob", "league_calibrated_prob"):
         prob = as_float(point.get(key))
@@ -276,6 +409,34 @@ def public_swings(state: dict[str, Any] | None, *, limit: int = 5) -> list[Publi
             )
         )
         previous_pct = pct
+    return points[-limit:]
+
+
+def public_prediction_history(state: dict[str, Any] | None, *, limit: int = 24) -> list[PublicPredictionPoint]:
+    """Expose a capped chart derivative, never the raw predictor history."""
+    state = state or {}
+    history = state.get("chart_history") or state.get("history") or []
+    if not isinstance(history, list):
+        return []
+
+    points: list[PublicPredictionPoint] = []
+    for point in history:
+        if not isinstance(point, dict):
+            continue
+        expected = as_float(point.get("expected_final_score") or point.get("expected_score"))
+        projected = as_float(point.get("projected_score"))
+        if expected is None and projected is None:
+            continue
+        score = point.get("score")
+        wickets = point.get("wickets")
+        score_text = f"{as_int(score, 0)}/{as_int(wickets, 0)}" if score not in (None, "") else ""
+        points.append(PublicPredictionPoint(
+            over=str(point.get("overs") or point.get("over") or ""),
+            score=score_text,
+            win_probability_pct=_history_probability_pct(point),
+            expected_final_score=int(round(expected)) if expected is not None else None,
+            projected_score=int(round(projected)) if projected is not None else None,
+        ))
     return points[-limit:]
 
 
@@ -371,6 +532,7 @@ def serialize_prediction(
     title = match_title(state, match_url)
     slug = slug_for_match(title, league, match_url)
     swings = public_swings(state)
+    prediction_history = public_prediction_history(state)
     summary_kwargs = {
         "slug": slug,
         "title": title,
@@ -385,6 +547,30 @@ def serialize_prediction(
         "insight": build_public_insight(state, swings),
         "updated_at": (state or {}).get("timestamp") or datetime.now(timezone.utc).isoformat(),
         "detail_url": f"/match/{slug}",
+        "format_label": (state or {}).get("format"),
+        "model_mode": model_mode_label(state),
+        "model_source": model_source_label(state),
+        "model_label": model_label(state),
+        "expected_final_score": expected_final_score(state),
+        "projected_score": projected_score(state),
+        "innings": as_int(
+            (state or {}).get("innings")
+            or (state or {}).get("current_innings")
+            or (state or {}).get("innings_number")
+            or ((state or {}).get("projection") or {}).get("innings")
+        ),
+        "current_run_rate": metric_float(state, "current_run_rate"),
+        "required_run_rate": metric_float(state, "required_run_rate"),
+        "venue_average_score": metric_float(state, "venue_avg_score"),
+        "resource_pct": metric_float(state, "resource_pct"),
+        "resource_win_probability_pct": (int(round(state_feature(state, "resource_win_prob") * 100))
+                                          if state_feature(state, "resource_win_prob") is not None else None),
+        "score_vs_par": metric_float(state, "score_vs_par"),
+        "pressure_index": metric_float(state, "pressure_index"),
+        "last_swings": swings,
+        "prediction_history": prediction_history,
+        "reasons": public_reasons(state),
+        "explanation_pack": public_explanation_pack(state, swings),
     }
     if not detail:
         return PublicMatchSummary(**summary_kwargs)
@@ -393,7 +579,6 @@ def serialize_prediction(
         **summary_kwargs,
         venue=(state or {}).get("venue"),
         target=as_int(projection.get("target") or (state or {}).get("target")),
-        last_swings=swings,
         dashboard_url="/dashboard",
     )
 
@@ -430,6 +615,11 @@ class PublicMatchService:
             )
 
         for candidate in self._scheduler_candidates():
+            # A live candidate without a running predictor has no probability
+            # yet.  Do not expose it as a blank Match Intelligence card; it is
+            # either being started by the scheduler or is not model-supported.
+            if candidate.get("is_live"):
+                continue
             url = str(candidate.get("url") or "")
             if normalize_match_url(url) in seen_urls:
                 continue
@@ -465,6 +655,8 @@ class PublicMatchService:
 
         for candidate in self._scheduler_candidates():
             if not is_ipl_candidate(candidate):
+                continue
+            if candidate.get("is_live"):
                 continue
             url = str(candidate.get("url") or "")
             if normalize_match_url(url) in seen_urls:

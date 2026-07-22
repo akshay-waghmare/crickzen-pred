@@ -354,3 +354,10 @@ If priorities change, update this section and the `Current Priority` section tog
 - Conditions (dew, rain) are V1 `not_ready` — data framework exists for future integration
 - Snapshot build script must be run to generate `data/dashboard_metrics/latest/` before `/proof` shows data
 - 6 test skips in `test_proof_metrics.py` when `sqlalchemy` is not installed — expected, not a regression
+# Unified Men/Women T20 + ODI model track
+
+The supplied all-match datasets are now wired into the canonical retraining workflow as `t20_all` (`t20s_json/`, 5,524 matches: 3,444 male and 2,080 female) and `odi_all` (`odis_json/`, 3,146 matches: 2,548 male and 598 female). The durable implementation spec is `specs/021-all-men-women-t20-odi-models/`.
+
+Current state: CLI/config wiring and dataset audit complete. Full ingestion, feature generation, v1 training, OOF calibration, segmented evaluation, and live/dashboard registration remain to be run as the compute-heavy execution phase.
+
+CrickZen fallback contract: league-specific model first; otherwise `t20_all_v2` for T20 or `odi_all_v2` for ODI. Both use `gender_female`; resolver implementation is `dashboard/app/model_resolution.py` and documentation is `docs/ALL_FORMAT_GLOBAL_MODELS.md`.

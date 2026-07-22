@@ -1,0 +1,12 @@
+{
+  "model_name": "ensemble",
+  "brier_score": 0.15142112239306868,
+  "base_model_params": {
+    "xgb_weight": 0.5,
+    "n_features": 50,
+    "xgb_params": null,
+    "logreg_c": 0.01,
+    "feature_order": null
+  },
+  "data_version_hash": "61dc0f68ada14f294c30e31e45a0dd8a85059f72196e0f231c935120faa8fc68"
+}

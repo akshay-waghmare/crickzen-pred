@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-06",
+  "last_updated": "2026-07-11",
   "active_models": {
     "BBL": {
       "path": "models/bbl_v12",
@@ -911,6 +911,40 @@
         "version": "v1",
         "generated_date": "2026-06-06",
         "training_data_samples": 332156
+      }
+    },
+    "T20_ALL": {
+      "path": "models/t20_all_v2",
+      "version": "v2",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1503, ECE: 0.0000)",
+      "training": {
+        "samples": 1226834,
+        "date": "2026-07-11",
+        "brier_score": 0.1503453027879049
+      },
+      "calibrator": {},
+      "feature_store": {
+        "path": "data/t20_all_feature_store_v2",
+        "version": "v2",
+        "generated_date": "2026-07-11",
+        "training_data_samples": 1226834
+      }
+    },
+    "ODI_ALL": {
+      "path": "models/odi_all_v2",
+      "version": "v2",
+      "description": "XGBLogRegEnsemble (25 features) + Per-Over Brier-Optimized Calibration (Brier: 0.1583, ECE: 0.0000)",
+      "training": {
+        "samples": 1618829,
+        "date": "2026-07-11",
+        "brier_score": 0.1583111226685923
+      },
+      "calibrator": {},
+      "feature_store": {
+        "path": "data/odi_all_feature_store_v2",
+        "version": "v2",
+        "generated_date": "2026-07-11",
+        "training_data_samples": 1618829
       }
     }
   },

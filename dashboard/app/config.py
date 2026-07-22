@@ -132,6 +132,11 @@ LEAGUE_CONFIGS: dict[str, dict] = {
         "feature_store_dir": None,
         "mc_only": True,
     },
+    "Hundred": {
+        "league": "hundred_all",
+        "model_dir": "models/hundred_all_v1",
+        "feature_store_dir": "data/hundred_all_feature_store_v1",
+    },
     "SSM": {
         "league": "ssm",
         "model_dir": "models/t20_male_v2",
@@ -172,6 +177,7 @@ for _league_config in LEAGUE_CONFIGS.values():
 
 # URL patterns → league key (for auto-detection)
 _URL_LEAGUE_PATTERNS: list[tuple[str, str]] = [
+    (r"the[\s-]?hundred|100[\s-]?balls?|hundred[\s-]?balls?", "Hundred"),
     (r"women.*odi|odi.*women|women.*tour.*odi", "ODI Women"),
     (r"(?:\d+(?:st|nd|rd|th)-)?odi(?:-|/)|-odi-", "ODI Male"),
     (r"major-league-cricket|\bmlc\b", "MLC"),
@@ -202,13 +208,15 @@ def detect_league_from_url(url: str) -> str | None:
 def detect_generic_format_from_url(url: str) -> str | None:
     """Infer a safe generic format when a competition has no league preset."""
     url_lower = url.lower()
+    if re.search(r"the[\s-]?hundred|100[\s-]?balls?|hundred[\s-]?balls?", url_lower):
+        return "Hundred"
     if re.search(
         r"(?:\d+(?:st|nd|rd|th)-)?odi(?:-|/)|-odi-|women.*odi|odi.*women|"
         r"one-day|cwc-league|world-cup-league",
         url_lower,
     ):
         return "ODI Women" if re.search(r"women|womens|women-s", url_lower) else "ODI Male"
-    if re.search(r"t20|20-over|twenty20|premier-league|the-hundred|hundred-\d", url_lower):
+    if re.search(r"t20|20-over|twenty20|premier-league", url_lower):
         return "T20"
     return None
 

@@ -315,6 +315,7 @@ class Predictor:
         calibrator_inn1 = None
         calibrator_inn2 = None
         phase_calibrators = None
+        per_over_calibrators = {}
         calibrator_type = 'none'
         calibrator_path = path / "isotonic_calibrator.pkl"
         if calibrator_path.exists():
@@ -1565,13 +1566,18 @@ class Predictor:
         # Score vs par - use calculator-derived resource_pct for consistency
         resources_used = 100 - resource_pct
         par_at_point_inn2 = np.where(nt_targets > 0, nt_targets * (resources_used / 100.0), 0.0)
+        # Keep this feature on the training contract: score_vs_par uses the
+        # balls-and-wickets resource proxy, not the separate DLS percentage.
+        training_resources_remaining = (nt_balls_remaining / self.format_config.total_balls) * ((10 - nt_wickets) / 10.0)
+        training_resources_used = 1.0 - training_resources_remaining
+        par_at_point_inn2 = np.where(nt_targets > 0, nt_targets * training_resources_used, 0.0)
         score_vs_par_inn2 = nt_scores - par_at_point_inn2
-        score_vs_par_inn1 = nt_scores - (venue_avg_score * (1 - resource_pct/100.0))
+        score_vs_par_inn1 = nt_scores - (venue_avg_score * training_resources_used)
         score_vs_par = np.where(nt_innings == 2, score_vs_par_inn2, score_vs_par_inn1)
         
         # Computed resources
-        crr_times_res = current_run_rate * resource_pct / 100.0
-        resources_remaining = resource_pct / 100.0
+        crr_times_res = current_run_rate * training_resources_remaining
+        resources_remaining = training_resources_remaining
         
         # =========================================================================
         # TEAM STATS - Use FeatureContext if provided, else fall back to state attrs/defaults
@@ -1631,8 +1637,8 @@ class Predictor:
         batting_team_venue_wr = 0.5
         batting_recent_nrr_l5 = 0.0
         is_low_target = 0.0
-        crr_times_res = current_run_rate * resource_pct / 100.0
-        resources_remaining = resource_pct / 100.0
+        crr_times_res = current_run_rate * training_resources_remaining
+        resources_remaining = training_resources_remaining
         
         # Build feature DataFrame (vectorized)
         feature_dict = {

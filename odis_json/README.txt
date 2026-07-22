@@ -1,13 +1,13 @@
 This zip archive contains data files from Cricsheet in JSON format. This
-archive contains 3085 ODI matches. A further 152 matches have been withheld
+archive contains 3146 ODI matches. A further 155 matches have been withheld
 due to either featuring the Afghanistan men's team or being played in the
 Afghanistan Premier League, due to the Cricsheet policy to no longer feature
 matches involving Afghanistan men or played in Afghanistan Premier League (see
 https://cricsheet.org/withheld-matches for more information).
 
 
-The JSON data files contained in this zip file are version 1.0.0, and 1.1.0
-files. You can learn about the structure of these files at
+The JSON data files contained in this zip file are version 1.2.0 files. You
+can learn about the structure of these files at
 https://cricsheet.org/format/json/
 
 
@@ -26,6 +26,67 @@ as IPL). The 4th field is the gender of the players involved in the match. The
 teams involved in the match.
 
 
+2026-06-16 - international - ODI - male - 1538430 - Netherlands vs Canada
+2026-06-14 - international - ODI - male - 1532482 - Bangladesh vs Australia
+2026-06-12 - international - ODI - male - 1538428 - Canada vs United States of America
+2026-06-11 - international - ODI - male - 1532481 - Australia vs Bangladesh
+2026-06-10 - international - ODI - male - 1538427 - Netherlands vs Canada
+2026-06-09 - international - ODI - male - 1532480 - Bangladesh vs Australia
+2026-06-08 - international - ODI - male - 1538426 - Netherlands vs United States of America
+2026-06-06 - international - ODI - male - 1538425 - Canada vs United States of America
+2026-06-04 - international - ODI - male - 1535647 - Australia vs Pakistan
+2026-06-03 - international - ODI - male - 1538304 - Sri Lanka vs West Indies
+2026-06-02 - international - ODI - male - 1535646 - Australia vs Pakistan
+2026-05-30 - international - ODI - male - 1535645 - Australia vs Pakistan
+2026-05-22 - international - ODI - male - 1531707 - Nepal vs United States of America
+2026-05-20 - international - ODI - male - 1531706 - Scotland vs United States of America
+2026-05-18 - international - ODI - male - 1531705 - Scotland vs Nepal
+2026-05-16 - international - ODI - male - 1531704 - United States of America vs Nepal
+2026-05-16 - international - ODI - female - 1496544 - England vs New Zealand
+2026-05-14 - international - ODI - male - 1531703 - Scotland vs United States of America
+2026-05-12 - international - ODI - male - 1531702 - Scotland vs Nepal
+2026-05-10 - international - ODI - female - 1496542 - New Zealand vs England
+2026-05-09 - international - ODI - female - 1534073 - Zimbabwe vs Pakistan
+2026-05-06 - international - ODI - female - 1534072 - Pakistan vs Zimbabwe
+2026-05-05 - international - ODI - male - 1531701 - Nepal vs Oman
+2026-05-04 - international - ODI - female - 1534071 - Pakistan vs Zimbabwe
+2026-05-03 - international - ODI - male - 1531700 - United Arab Emirates vs Oman
+2026-05-01 - international - ODI - male - 1531699 - Nepal vs United Arab Emirates
+2026-04-29 - international - ODI - male - 1531698 - Oman vs Nepal
+2026-04-27 - international - ODI - male - 1531697 - United Arab Emirates vs Oman
+2026-04-25 - international - ODI - male - 1531696 - Nepal vs United Arab Emirates
+2026-04-25 - international - ODI - female - 1528281 - Bangladesh vs Sri Lanka
+2026-04-23 - international - ODI - male - 1528274 - Bangladesh vs New Zealand
+2026-04-22 - international - ODI - female - 1528280 - Bangladesh vs Sri Lanka
+2026-04-20 - international - ODI - male - 1528273 - New Zealand vs Bangladesh
+2026-04-20 - international - ODI - female - 1528279 - Sri Lanka vs Bangladesh
+2026-04-17 - international - ODI - male - 1528272 - New Zealand vs Bangladesh
+2026-04-12 - international - ODI - male - 1529144 - Namibia vs Scotland
+2026-04-10 - international - ODI - male - 1529143 - Oman vs Namibia
+2026-04-08 - international - ODI - male - 1529142 - Oman vs Scotland
+2026-04-06 - international - ODI - male - 1529141 - Namibia vs Scotland
+2026-04-04 - international - ODI - male - 1529140 - Namibia vs Oman
+2026-04-04 - international - ODI - female - 1491712 - New Zealand vs South Africa
+2026-04-02 - international - ODI - female - 1526569 - West Indies vs Australia
+2026-04-01 - international - ODI - female - 1491711 - South Africa vs New Zealand
+2026-03-29 - international - ODI - female - 1526568 - Australia vs West Indies
+2026-03-29 - international - ODI - female - 1491710 - New Zealand vs South Africa
+2026-03-27 - international - ODI - female - 1526567 - Australia vs West Indies
+2026-03-15 - international - ODI - male - 1525654 - Bangladesh vs Pakistan
+2026-03-13 - international - ODI - male - 1525653 - Pakistan vs Bangladesh
+2026-03-11 - international - ODI - male - 1525652 - Pakistan vs Bangladesh
+2026-03-11 - international - ODI - female - 1491704 - New Zealand vs Zimbabwe
+2026-03-08 - international - ODI - female - 1491703 - Zimbabwe vs New Zealand
+2026-03-05 - international - ODI - female - 1491702 - New Zealand vs Zimbabwe
+2026-03-01 - international - ODI - female - 1478917 - Australia vs India
+2026-03-01 - international - ODI - female - 1477603 - Pakistan vs South Africa
+2026-02-27 - international - ODI - female - 1478916 - India vs Australia
+2026-02-25 - international - ODI - female - 1523980 - Sri Lanka vs West Indies
+2026-02-25 - international - ODI - female - 1477602 - South Africa vs Pakistan
+2026-02-24 - international - ODI - female - 1478915 - India vs Australia
+2026-02-22 - international - ODI - female - 1523979 - Sri Lanka vs West Indies
+2026-02-22 - international - ODI - female - 1477601 - South Africa vs Pakistan
+2026-02-20 - international - ODI - female - 1523978 - Sri Lanka vs West Indies
 2026-01-27 - international - ODI - male - 1507718 - England vs Sri Lanka
 2026-01-24 - international - ODI - male - 1507717 - Sri Lanka vs England
 2026-01-22 - international - ODI - male - 1507716 - Sri Lanka vs England

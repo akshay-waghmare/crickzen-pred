@@ -110,6 +110,7 @@ class AutoPredictionScheduler:
             self.manager.cleanup_expired(self.settings)
             candidates = await self.discover_candidates()
             self._last_candidates = candidates
+            self._retire_predictions_outside_scraper_slate(candidates)
             for candidate in candidates:
                 if not self._should_start(candidate):
                     continue
@@ -138,6 +139,36 @@ class AutoPredictionScheduler:
             self._last_error = str(exc)
             logger.warning("Auto scheduler check failed: %s", exc)
             return []
+
+    def _retire_predictions_outside_scraper_slate(self, candidates: list[MatchCandidate]) -> None:
+        """Stop system predictions that are no longer in the scraper-owned slate.
+
+        A scraper response is authoritative: retaining a previous match merely
+        because its predictor is still emitting a fresh JSON state exhausts the
+        finite prediction pool and leaves public Match Intelligence on stale
+        fixtures.  Do not reconcile fallback discovery results, since those are
+        intentionally incomplete.
+        """
+        selected = [candidate for candidate in candidates if candidate.source == "scraper:selected"]
+        if not selected:
+            return
+
+        allowed = {
+            (candidate.league_key, _normalize_crex_url(candidate.url).lower())
+            for candidate in selected
+        }
+        for prediction in self.manager.list_predictions(user_id=SYSTEM_USER_ID):
+            if prediction.get("status") != "running":
+                continue
+            key = (
+                str(prediction.get("league") or ""),
+                _normalize_crex_url(str(prediction.get("match_url") or "")).lower(),
+            )
+            if key in allowed:
+                continue
+            prediction_id = str(prediction.get("id") or "")
+            if prediction_id and self.manager.stop_match(prediction_id, user_id=SYSTEM_USER_ID):
+                logger.info("Retired prediction %s outside current scraper slate", prediction_id)
 
     async def discover_candidates(self) -> list[MatchCandidate]:
         candidates: list[MatchCandidate] = []

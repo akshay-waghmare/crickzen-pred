@@ -232,6 +232,12 @@ class CrexLivePredictor:
         self.local_storage = {}  # CREX localStorage for resolving team/player codes
         self._poll_count = 0  # Used to trigger periodic localStorage refresh
         self._inn1_cached_stats = {}  # Cache inn1 stats (PP runs, death RR, wickets) at innings break
+        # Some CREX pages expose only innings summaries after a restart. Keep
+        # the best summary so carryover features do not silently use defaults.
+        self._inn1_page_stats = {}
+        self._inn1_stats_source = "default"
+        self._prediction_guard = None
+        self._crex_inn1_api_attempted = False
         self._venue_pitch_baselines = None  # Loaded lazily from v14 router artifacts
         
         # Persist history to separate file for Streamlit page refresh resilience
@@ -357,7 +363,7 @@ class CrexLivePredictor:
         """Return normalized team codes that may appear in CREX URL slugs."""
         codes = {
             'mi', 'csk', 'rcb', 'kkr', 'srh', 'dc', 'pbks', 'pk', 'rr', 'gt', 'lsg',
-            'ind', 'aus', 'eng', 'nz', 'wi', 'sa', 'pak', 'sl', 'ban', 'afg',
+            'ind', 'aus', 'eng', 'nz', 'wi', 'sa', 'pak', 'sl', 'ban', 'afg', 'ck', 'jk',
         }
         try:
             from bbl_pipeline.features.store import InMemoryFeatureStore
@@ -439,6 +445,13 @@ class CrexLivePredictor:
             self.match_state.batting_team = team1
             batting_key = team1_key
 
+        # A valid-looking pair can still come from an unrelated article or
+        # scorecard embedded on the target page.  When both URL teams resolve,
+        # they are the match identity and must win over that snippet.
+        if batting_key not in {team1_key, team2_key}:
+            self.match_state.batting_team = team1
+            batting_key = team1_key
+
         if (
             not self._looks_like_valid_team_name(bowling)
             or self._normalize_team_key(bowling) == batting_key
@@ -449,6 +462,8 @@ class CrexLivePredictor:
                 self.match_state.bowling_team = team1
             else:
                 self.match_state.bowling_team = team2
+        elif self._normalize_team_key(bowling) not in {team1_key, team2_key}:
+            self.match_state.bowling_team = team2 if batting_key == team1_key else team1
 
     def _resolve_team_name(self, team_name: str) -> str:
         """Resolve CREX team codes into displayable team names when possible."""
@@ -479,6 +494,14 @@ class CrexLivePredictor:
                 'RR': 'Rajasthan Royals',
                 'GT': 'Gujarat Titans',
                 'LSG': 'Lucknow Super Giants',
+            },
+            't20_all': {
+                # Lanka Premier League abbreviations are not present in the
+                # historical feature-store maps.  Without these, CREX page
+                # body snippets can replace the live CK/Jaffna fixture with
+                # an unrelated domestic game mentioned lower on the page.
+                'CK': 'Colombo Kaps',
+                'JK': 'Jaffna Kings',
             },
         }
         league_map = static_league_maps.get(league)
@@ -678,6 +701,11 @@ class CrexLivePredictor:
             print(f"[OK] Model loaded from {self.model_dir}")
             if self.feature_store_dir:
                 print(f"[INFO] Feature store: {self.feature_store_dir}")
+            # Live inference may use the current CREX match-info venue prior;
+            # keep the class default disabled so training-parity paths remain
+            # unchanged.
+            if getattr(self.predictor, 'feature_store', None) is not None:
+                self.predictor.feature_store.USE_VENUE_SITUATION_OVERRIDES = True
             if self.league:
                 print(f"[INFO] League calibrator: {self.league}")
 
@@ -918,6 +946,20 @@ class CrexLivePredictor:
         except Exception as e:
             logger.warning(f"Could not save history: {e}")
     
+    def _balls_bowled_from_overs(self, overs: float | int | None) -> int:
+        """Convert cricket over notation into the active format's legal balls."""
+        try:
+            value = float(overs or 0)
+        except (TypeError, ValueError):
+            return 0
+        over_number = max(0, int(value))
+        ball_number = max(0, int(round((value - over_number) * 10)))
+        balls_per_over = int(self.format_config.balls_per_over or 6)
+        return min(
+            int(self.format_config.total_balls),
+            over_number * balls_per_over + min(balls_per_over, ball_number),
+        )
+
     def _run_monte_carlo_simulation(self, model_prob: Optional[float] = None, use_ml_model: bool = False) -> Optional[Dict[str, Any]]:
         """
         Run Monte Carlo simulation for uncertainty quantification.
@@ -932,6 +974,12 @@ class CrexLivePredictor:
         
         Returns dict with simulation results or None if unavailable.
         """
+        # The shared simulation engine currently models six-ball innings and
+        # rejects Hundred's 100-ball format. Keep the trained Hundred model
+        # probability available while the dedicated 100-ball simulator is
+        # still being completed.
+        if self.format_config.format_name == "hundred":
+            return None
         if not SIMULATION_AVAILABLE:
             return None
         
@@ -940,7 +988,7 @@ class CrexLivePredictor:
             
             # Calculate balls remaining
             overs_float = state.overs
-            balls_bowled = int(overs_float) * 6 + int(round((overs_float - int(overs_float)) * 10))
+            balls_bowled = self._balls_bowled_from_overs(overs_float)
             balls_remaining = self.format_config.total_balls - balls_bowled
             
             if balls_remaining <= 0:
@@ -1304,6 +1352,30 @@ class CrexLivePredictor:
             bowl_first_match = re.search(bowl_first_pattern, page_text, re.IGNORECASE)
             avg_1st_match = re.search(avg_1st_inns_pattern, page_text, re.IGNORECASE)
             avg_2nd_match = re.search(avg_2nd_inns_pattern, page_text, re.IGNORECASE)
+
+            # CREX renders these values as separate labelled DOM elements;
+            # inner_text can place the label and number apart or reverse the
+            # visual order. Read the labels from the page markup as the
+            # authoritative mapping, with text parsing as the fallback.
+            try:
+                page_markup = await self.page.content()
+                dom_avg_1st = re.search(
+                    r'class="venue-avg-text"[^>]*>\s*Avg\s*1st\s*Inns.*?'
+                    r'class="venue-avg-val"[^>]*>\s*(\d+)',
+                    page_markup, re.IGNORECASE | re.DOTALL
+                )
+                dom_avg_2nd = re.search(
+                    r'class="venue-avg-wrap[^>]*venue-avg-sec-inn[^>]*".*?'
+                    r'Avg\s*2(?:st|nd)\s*Inns.*?'
+                    r'class="venue-avg-val"[^>]*>\s*(\d+)',
+                    page_markup, re.IGNORECASE | re.DOTALL
+                )
+                if dom_avg_1st:
+                    avg_1st_match = dom_avg_1st
+                if dom_avg_2nd:
+                    avg_2nd_match = dom_avg_2nd
+            except Exception as e:
+                logger.debug("Could not read labelled CREX venue elements", error=str(e))
             
             if bat_first_match and bowl_first_match:
                 bat_first_wr = int(bat_first_match.group(1)) / 100
@@ -1329,11 +1401,11 @@ class CrexLivePredictor:
 
     async def _extract_on_venue_avg(self, team1: str, team2: str):
         """
-        Click the 'On Venue' tab in Team Comparison and extract both teams' avg scores
-        at this venue. Averages them to produce a realistic match-day scoring estimate,
-        which overrides the all-time venue avg in VENUE_SITUATION_STATS.
-        
-        Priority: on-venue combined avg > Venue Stats section avg > feature store prior.
+        Read the optional 'On Venue' team context for diagnostics only.
+
+        The team-specific on-venue average is not the venue first-innings
+        average and must not replace the official CREX Venue Stats value used
+        by inference.  The latter is extracted by _extract_venue_stats().
         """
         try:
             import re
@@ -1386,20 +1458,9 @@ class CrexLivePredictor:
             print(f"[ON-VENUE] {left_abbrev}: {left_avg} avg ({left_matches} venue matches), "
                   f"{right_abbrev}: {right_avg} avg ({right_matches} venue matches)")
 
-            # Simple average of both teams' on-venue scores
-            combined_avg = (left_avg + right_avg) / 2
-
-            # Only override venue avg if both teams have at least 2 venue matches
-            if left_matches >= 2 and right_matches >= 2:
-                old_avg = InMemoryFeatureStore.VENUE_SITUATION_STATS.get('avg_1st_inns', 'N/A')
-                InMemoryFeatureStore.VENUE_SITUATION_STATS['avg_1st_inns'] = round(combined_avg)
-                print(f"[ON-VENUE] Combined on-venue avg: ({left_avg}+{right_avg})/2 = {combined_avg:.1f} -> {round(combined_avg)} "
-                      f"(was {old_avg}). Overriding venue_avg_score.")
-                logger.info(f"On-venue simple avg = {combined_avg:.1f} "
-                            f"({left_avg}+{right_avg})/2 -> overrides avg_1st_inns")
-            else:
-                print(f"[ON-VENUE] Insufficient venue matches (left={left_matches}, right={right_matches}), "
-                      f"keeping existing venue avg")
+            print(f"[ON-VENUE] Diagnostic only: {left_abbrev} {left_avg}, {right_abbrev} {right_avg}; "
+                  "keeping official Venue Stats average for inference")
+            logger.info("On-venue team averages are diagnostic only; official CREX venue average remains authoritative")
 
         except Exception as e:
             logger.warning(f"Could not extract on-venue avg: {e}")
@@ -1543,6 +1604,11 @@ class CrexLivePredictor:
                                 logger.info(f"Extracted venue from page: '{venue}'")
                                 print(f"[VENUE] Venue: {self.match_state.venue}")
                                 break
+
+            # Venue Stats are independent of team-code resolution. Extract
+            # them before the team-comparison branch so an unfamiliar code
+            # (for example UGN) cannot force the inference baseline to 160.
+            await self._extract_venue_stats(page_text)
             
             # Extract teams from URL first. CREX info text can include match-preview
             # article snippets directly after "CSK vs MI", which are not team names.
@@ -1553,9 +1619,6 @@ class CrexLivePredictor:
                 self._team1 = team1
                 self._team2 = team2
                 print(f"[TEAMS] Teams: {team1} vs {team2}")
-                
-                # Extract venue stats FIRST (bat/bowl first win rates)
-                await self._extract_venue_stats(page_text)
                 
                 # Extract team comparison stats (season form) and inject into feature store
                 # This will use venue stats for situation rates if available
@@ -1829,6 +1892,13 @@ class CrexLivePredictor:
             
             # Get page text to detect second innings and extract data
             page_text = await self.page.inner_text("body")
+            self._capture_first_innings_summary(page_text)
+            try:
+                # Historical innings summaries may be present only in the SSR
+                # payload, not in the hydrated visible body.
+                page_html = await self.page.content()
+            except Exception:
+                page_html = ""
             if not self.match_state.batsman1_balls or not self.match_state.batsman2_balls:
                 self._apply_batter_pair(self._extract_batter_pair(page_text))
             
@@ -1894,6 +1964,11 @@ class CrexLivePredictor:
                     
                 if rrr_match:
                     self.match_state.required_run_rate = float(rrr_match.group(1))
+
+            # Run once more after target/innings detection so a restarted
+            # second-innings page can validate its first-innings summary.
+            self._capture_first_innings_summary(f"{page_text}\n{page_html}")
+            await self._hydrate_inn1_from_crex_over_api()
             
             # Extract bowling team from page text if not already set
             if not self.match_state.bowling_team or self.match_state.bowling_team == self.match_state.batting_team:
@@ -2303,7 +2378,7 @@ class CrexLivePredictor:
                     reason = "no_balls_remaining"
                 overs_int = int(state.overs)
                 balls_part = int(round((state.overs - overs_int) * 10))
-                balls_bowled = overs_int * 6 + min(5, max(0, balls_part))
+                balls_bowled = self._balls_bowled_from_overs(state.overs)
                 self._last_terminal_clamp = {
                     "applied": True,
                     "reason": reason,
@@ -2368,7 +2443,7 @@ class CrexLivePredictor:
             ball_history = self._build_ball_history_for_mapper()
 
             # If CREX gave sparse ball history, try betx21 recordings for richer data
-            total_balls_bowled = int(self.match_state.overs) * 6 + int(round((self.match_state.overs % 1) * 10))
+            total_balls_bowled = self._balls_bowled_from_overs(self.match_state.overs)
             if total_balls_bowled > 0:
                 completeness = len(ball_history) / total_balls_bowled
                 if completeness < 0.3:
@@ -2389,6 +2464,39 @@ class CrexLivePredictor:
                 debug=True,  # Always show debug output
                 ball_history=ball_history
             )
+
+            # The ODI model was trained with match-specific PP/death carryover
+            # features. Do not expose an ML probability as primary when only a
+            # summary (for example wickets) was recovered after restart.
+            required_inn1_stats = ("inn1_wickets_lost", "inn1_pp_runs", "inn1_death_rr")
+            carryover = self._inn1_cached_stats
+            missing_carryover = [key for key in required_inn1_stats if key not in carryover]
+            if pred_state.innings == 2 and missing_carryover:
+                mc_result = self._run_monte_carlo_simulation(model_prob=None, use_ml_model=False)
+                if mc_result and mc_result.get("available"):
+                    ml_prob = float(win_prob)
+                    win_prob = float(mc_result["simulation_6ball"]["mean_prob"])
+                    self._prediction_guard = {
+                        "applied": True,
+                        "mode": "mc_fallback",
+                        "reason": "incomplete_inn1_carryover",
+                        "missing_features": missing_carryover,
+                        "ml_probability_shadow": ml_prob,
+                    }
+                    logger.warning(
+                        "ODI ML guarded: missing first-innings features %s; using MC primary %.4f",
+                        missing_carryover,
+                        win_prob,
+                    )
+                else:
+                    self._prediction_guard = {
+                        "applied": False,
+                        "mode": "ml_unverified",
+                        "reason": "incomplete_inn1_carryover_and_mc_unavailable",
+                        "missing_features": missing_carryover,
+                    }
+            else:
+                self._prediction_guard = None
             
             # Store the detailed probabilities for JSON output
             self.last_raw_prob = getattr(self.predictor, 'last_raw_prob', win_prob)
@@ -2400,6 +2508,16 @@ class CrexLivePredictor:
             self.last_calibrated_phase_target = getattr(self.predictor, 'last_calibrated_phase_target', win_prob)
             self._last_terminal_clamp = getattr(self.predictor, 'last_terminal_clamp', None)
             self.last_shadow_prob = getattr(self.predictor, 'last_shadow_prob', win_prob)
+            if self._prediction_guard and self._prediction_guard.get("applied"):
+                # Keep raw ML diagnostics above, but make all displayed
+                # calibrated probability fields agree with the MC primary.
+                self.last_smoothed_prob = win_prob
+                self.last_calibrated_prob = win_prob
+                self.last_calibrated_combined = win_prob
+                self.last_calibrated_phase = win_prob
+                self.last_calibrated_per_over = win_prob
+                self.last_calibrated_phase_target = win_prob
+                self._last_ensemble_source = "mc_fallback"
 
             # Log shadow vs production when they differ (segment-specific T in shadow mode)
             if self.last_shadow_prob is not None and abs(self.last_shadow_prob - win_prob) > 0.002:
@@ -2495,19 +2613,30 @@ class CrexLivePredictor:
                 death_balls = [b for b in inn1_balls if b.over_number >= 15]
                 if death_balls:
                     death_runs = sum(b.runs for b in death_balls)
-                    result['inn1_death_rr'] = (death_runs / len(death_balls)) * 6
+                    result['inn1_death_rr'] = (death_runs / len(death_balls)) * self.format_config.balls_per_over
                     result['inn1_death_wickets'] = sum(1 for b in death_balls if b.is_wicket)
                 result.update(self._compute_v14_pitch_features(inn1_balls, result))
                 
                 # Update cache with computed values
                 self._inn1_cached_stats.update(result)
+                self._inn1_stats_source = "ball_history"
                 logger.info(f"Inn1 carryover from ball history: {result}")
                 return result
         
         # Fallback 1: use cached stats from when inn1 was live
         if self._inn1_cached_stats:
             result.update(self._inn1_cached_stats)
+            self._inn1_stats_source = self._inn1_cached_stats.get("inn1_stats_source", "cache")
             logger.info(f"Inn1 carryover from cache: {result}")
+            return result
+
+        # A restarted predictor may have no ball history, while the current
+        # CREX page still exposes the completed first-innings summary.
+        if self._inn1_page_stats:
+            result.update(self._inn1_page_stats)
+            self._inn1_cached_stats.update(result)
+            self._inn1_stats_source = "crex_summary"
+            logger.info(f"Inn1 carryover from CREX innings summary: {result}")
             return result
         
         # Fallback 2: try betx21 production recordings
@@ -2515,6 +2644,7 @@ class CrexLivePredictor:
         if betx21_stats:
             self._inn1_cached_stats.update(betx21_stats)  # Cache for subsequent calls
             result.update(betx21_stats)
+            self._inn1_stats_source = "betx21"
             logger.info(f"Inn1 carryover from betx21: {result}")
             return result
 
@@ -2525,11 +2655,128 @@ class CrexLivePredictor:
             parquet_stats.update(self._compute_v14_pitch_features([], parquet_stats))
             self._inn1_cached_stats.update(parquet_stats)
             result.update(parquet_stats)
+            self._inn1_stats_source = "parquet"
             logger.info(f"Inn1 carryover from match states parquet: {result}")
             return result
 
         logger.warning("No inn1 ball history, cache, betx21, or parquet data — using defaults")
         return result
+
+    def _capture_first_innings_summary(self, page_text: str) -> None:
+        """Recover first-innings wickets from current CREX summary text.
+
+        CREX has used both ``233-10 ((44.0))`` and ``233/10 (44.0)``
+        representations. We select the longest completed innings summary,
+        which avoids mistaking the early second-innings score for innings one.
+        """
+        if not self.match_state.is_second_innings or not page_text:
+            return
+
+        patterns = (
+            r"(?<!\d)(\d{1,3})\s*/\s*(\d{1,2})\s*\(?\s*\(?\s*(\d{1,2}(?:\.\d+)?)\s*\)?\s*\)?",
+            r"(?<!\d)(\d{1,3})\s*-\s*(\d{1,2})\s*\(\(\s*(\d{1,2}(?:\.\d+)?)\s*\)\)",
+        )
+        candidates = []
+        for pattern in patterns:
+            for match in re.finditer(pattern, page_text):
+                runs, wickets, overs = int(match.group(1)), int(match.group(2)), float(match.group(3))
+                if 0 <= wickets <= 10 and 0 < overs <= 50 and runs >= 0:
+                    candidates.append((overs, runs, wickets))
+
+        if not candidates:
+            return
+
+        overs, runs, wickets = max(candidates)
+        target_score = self.match_state.target
+        if target_score is not None and runs + 1 != int(target_score):
+            return
+        self._inn1_page_stats = {
+            "inn1_wickets_lost": wickets,
+            "inn1_summary_score": runs,
+            "inn1_summary_overs": overs,
+            "inn1_stats_source": "crex_summary",
+        }
+
+    async def _hydrate_inn1_from_crex_over_api(self) -> None:
+        """Recover full first-innings phase stats from CREX over summaries.
+
+        CREX labels the first innings as ``0`` and the chase as ``1`` in its
+        commentary feed. The visible page often contains only the latest ten
+        balls, so query each first-innings over once after a restart.
+        """
+        if self._crex_inn1_api_attempted or not self.match_state.is_second_innings:
+            return
+        self._crex_inn1_api_attempted = True
+
+        match_key_match = re.search(r"match-updates-([^/?#]+)", self.match_url or "")
+        if not match_key_match:
+            return
+        match_key = match_key_match.group(1)
+
+        try:
+            summaries = []
+            for over_number in range(50):
+                response = await self.page.request.post(
+                    "https://content.crickapi.com/commentary/v3/getBallFeeds",
+                    data={
+                        "matchKey": match_key,
+                        "lastDocId": "",
+                        "filters": {"inning": 0, "overNumber": over_number},
+                    },
+                    headers={"Origin": "https://crex.com", "Referer": "https://crex.com/"},
+                    timeout=15_000,
+                )
+                if not response.ok:
+                    continue
+                payload = await response.json()
+                summaries.extend(item for item in (payload or []) if item.get("type") == "o")
+
+            summaries.sort(key=lambda item: int(item.get("on", -1)))
+            if not summaries:
+                return
+
+            # Avoid accepting a feed for another match or innings.
+            if self.match_state.target is not None:
+                final_score = str(summaries[-1].get("s", ""))
+                score_match = re.match(r"(\d+)\s*/\s*(\d+)", final_score)
+                if not score_match or int(score_match.group(1)) + 1 != int(self.match_state.target):
+                    return
+
+            pp_runs = sum(float(item.get("runs", 0) or 0) for item in summaries if int(item.get("on", -1)) <= 5)
+            def score_wickets(item: dict) -> int:
+                match = re.match(r"\d+\s*/\s*(\d+)", str(item.get("s", "")))
+                return int(match.group(1)) if match else 0
+
+            pp_summaries = [item for item in summaries if int(item.get("on", -1)) <= 5]
+            mid_summaries = [item for item in summaries if int(item.get("on", -1)) <= 15]
+            pp_wickets = score_wickets(pp_summaries[-1]) if pp_summaries else 0
+            death_items = [item for item in summaries if int(item.get("on", -1)) > 15]
+            death_runs = sum(float(item.get("runs", 0) or 0) for item in death_items)
+            final_wickets = score_wickets(summaries[-1])
+            wickets_at_end_of_setup = score_wickets(mid_summaries[-1]) if mid_summaries else 0
+            death_wickets = max(0, final_wickets - wickets_at_end_of_setup)
+            death_rr = (death_runs / len(death_items)) if death_items else None
+
+            final_score = str(summaries[-1].get("s", ""))
+            score_match = re.match(r"(\d+)\s*/\s*(\d+)", final_score)
+            if not score_match:
+                return
+
+            stats = {
+                "inn1_wickets_lost": int(score_match.group(2)),
+                "inn1_pp_runs": pp_runs,
+                "inn1_pp_wickets": pp_wickets,
+                "inn1_death_rr": death_rr if death_rr is not None else 9.0,
+                "inn1_death_wickets": death_wickets,
+                "inn1_stats_source": "crex_over_api",
+            }
+            stats.update(self._compute_v14_pitch_features([], stats))
+            self._inn1_page_stats.update(stats)
+            self._inn1_cached_stats.update(stats)
+            self._inn1_stats_source = "crex_over_api"
+            logger.info(f"Inn1 carryover from CREX over API: {stats}")
+        except Exception as exc:
+            logger.warning(f"CREX first-innings over API unavailable: {exc}")
 
     def _cache_inn1_stats_from_balls(self):
         """Cache inn1 stats from current ball data (called during inn1)."""
@@ -2550,7 +2797,7 @@ class CrexLivePredictor:
         death_balls = [b for b in balls if b.over_number >= 15]
         if death_balls:
             death_runs = sum(b.runs for b in death_balls)
-            self._inn1_cached_stats['inn1_death_rr'] = (death_runs / len(death_balls)) * 6
+            self._inn1_cached_stats['inn1_death_rr'] = (death_runs / len(death_balls)) * self.format_config.balls_per_over
             self._inn1_cached_stats['inn1_death_wickets'] = sum(1 for b in death_balls if b.is_wicket)
         self._inn1_cached_stats.update(
             self._compute_v14_pitch_features(balls, self._inn1_cached_stats)
@@ -2740,7 +2987,8 @@ class CrexLivePredictor:
                 death_start_score = float(death_start_rows.iloc[-1].get("total_runs", 0))
                 death_start_wkts = int(death_start_rows.iloc[-1].get("wickets", 0))
                 death_runs = final_score - death_start_score
-                result["inn1_death_rr"] = round((death_runs / 30.0) * 6.0, 2)
+                death_window_balls = max(1, 5 * self.format_config.balls_per_over)
+                result["inn1_death_rr"] = round((death_runs / death_window_balls) * self.format_config.balls_per_over, 2)
                 result["inn1_death_wickets"] = int(final_row.get("wickets", 0)) - death_start_wkts
 
             logger.info(f"Parquet Inn1 fallback loaded: {result}")
@@ -2908,7 +3156,7 @@ class CrexLivePredictor:
         """Build feature dictionary from match state for model input."""
         try:
             # Calculate derived features
-            total_balls = int(self.match_state.overs) * 6 + int((self.match_state.overs % 1) * 10)
+            total_balls = self._balls_bowled_from_overs(self.match_state.overs)
             balls_remaining = self.format_config.total_balls - total_balls
             
             # Determine phase from format config thresholds
@@ -2948,7 +3196,10 @@ class CrexLivePredictor:
             if self.match_state.is_second_innings and self.match_state.target:
                 features['target'] = self.match_state.target
                 features['runs_required'] = self.match_state.target - self.match_state.total_runs
-                features['required_run_rate'] = features['runs_required'] / (balls_remaining / 6) if balls_remaining > 0 else 0
+                features['required_run_rate'] = (
+                    features['runs_required'] / (balls_remaining / self.format_config.balls_per_over)
+                    if balls_remaining > 0 else 0
+                )
             
             return features
             
@@ -3154,6 +3405,9 @@ class CrexLivePredictor:
             self._last_ensemble_prob = ensemble_prob
             self._last_ensemble_source = ensemble_source
             self._last_ensemble_alpha = ensemble_alpha
+            if self._prediction_guard and self._prediction_guard.get("applied"):
+                self._last_ensemble_prob = win_prob
+                self._last_ensemble_source = "mc_fallback"
 
             if ensemble_source == "ensemble":
                 display += f" | Ens: {ensemble_prob*100:.1f}%"
@@ -3184,6 +3438,10 @@ class CrexLivePredictor:
                 "overs": state.overs,
                 "bat_prob": win_prob,
                 "bowl_prob": bowling_prob,
+                # Keep the same model-derived score views as the current JSON
+                # snapshot so public charts can show prediction movement over time.
+                "expected_final_score": live_features.get("expected_final_score"),
+                "projected_score": live_features.get("projected_score"),
                 "score": state.total_runs,
                 "wickets": state.wickets,
                 "innings": 2 if state.is_second_innings else 1,
@@ -3374,6 +3632,8 @@ class CrexLivePredictor:
                 "post_model_calibration_prob": getattr(self.predictor, 'last_post_model_calibration_prob', None) if self.predictor else None,
                 "shadow_t_prob": getattr(self, 'last_shadow_prob', None),  # Shadow: segment-specific T
                 "league": self.league,  # League code if --league was specified
+                "inn1_stats_source": getattr(self, "_inn1_stats_source", "default"),
+                "prediction_guard": getattr(self, "_prediction_guard", None),
                 "league_calibrated_prob": (
                     getattr(self.predictor, 'last_league_calibrated', None)
                     if self.predictor else None

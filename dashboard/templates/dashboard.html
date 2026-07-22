@@ -645,7 +645,7 @@ function dashboardPage() {
       const seen = new Set();
       for (const point of history) {
         const innings = Number(point.innings || 1);
-        const overs = Number(point.overs ?? point.over ?? 0);
+        const overs = this.oversToDecimal(point.overs ?? point.over ?? 0);
         const score = Number(point.score ?? 0);
         const wickets = Number(point.wickets ?? 0);
         if (!Number.isFinite(overs)) continue;
@@ -659,11 +659,22 @@ function dashboardPage() {
       if (!points.length && match?.state) {
         const state = match.state;
         const innings = state.is_second_innings ? 2 : 1;
-        const overs = Number(state.overs || 0);
+        const overs = this.oversToDecimal(state.overs || 0);
         const prob = Number(state.blend?.blended_prob ?? state.bat_win_prob ?? 0.5);
         points.push({ xValue: (innings >= 2 ? 20 : 0) + Math.max(0, Math.min(20, overs)), prob: Math.max(0, Math.min(1, prob)), key: 'current' });
       }
       return points.sort((a, b) => a.xValue - b.xValue);
+    },
+
+    // CREX uses cricket notation (11.3 means 11 overs and 3 balls), not a
+    // decimal number. Convert balls to sixths so chart points sit over the
+    // correct over position on the timeline.
+    oversToDecimal(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return NaN;
+      const completedOvers = Math.floor(numeric);
+      const balls = Math.max(0, Math.min(5, Math.round((numeric - completedOvers) * 10)));
+      return completedOvers + (balls / 6);
     },
 
     chartX(xValue) {

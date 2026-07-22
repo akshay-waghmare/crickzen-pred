@@ -93,6 +93,7 @@ class Inn2PhaseRouter:
         self._calibrators = calibrators
         self._use_calibration = use_calibration
         self._pp_low_fallback = pp_low_fallback
+        self._phase_ranges = {"pp": (1, 6), "mid": (7, 15), "death": (16, 20)}
         self.last_model_source: Optional[str] = None
         self.last_raw_probability: Optional[float] = None
         self.last_output_probability: Optional[float] = None
@@ -117,12 +118,15 @@ class Inn2PhaseRouter:
 
         if use_calibration is None:
             use_calibration = bool(routing_cfg.get("apply_calibration", True))
+        phase_ranges = routing_cfg.get("phase_ranges")
         if pp_low_fallback_model_dir is None:
             pp_low_fallback_model_dir = routing_cfg.get("pp_low_fallback_model_dir")
 
+        phase_names = list((phase_ranges or {"pp": (1, 6), "mid": (7, 15), "death": (16, 20)}).keys())
+
         # Phase models
         models = {}
-        for phase in ("pp", "mid", "death"):
+        for phase in phase_names:
             path = model_dir / f"champion_model_{phase}.joblib"
             if not path.exists():
                 raise FileNotFoundError(f"Phase model not found: {path}")
@@ -179,18 +183,18 @@ class Inn2PhaseRouter:
         else:
             logger.info("[INN2Router] Calibration disabled — using raw phase probabilities")
 
-        return cls(models, features, calibrators, use_calibration, pp_low_fallback)
+        router = cls(models, features, calibrators, use_calibration, pp_low_fallback)
+        if phase_ranges:
+            router._phase_ranges = {k: tuple(v) for k, v in phase_ranges.items()}
+        return router
 
     # ── phase detection ───────────────────────────────────────────────────────
 
-    @staticmethod
-    def phase_for_over(over_1indexed: int) -> str:
-        if over_1indexed <= 6:
-            return "pp"
-        elif over_1indexed <= 15:
-            return "mid"
-        else:
-            return "death"
+    def phase_for_over(self, over_1indexed: int) -> str:
+        for phase, (lo, hi) in self._phase_ranges.items():
+            if lo <= over_1indexed <= hi:
+                return phase
+        return next(reversed(self._phase_ranges))
 
     # ── calibration helper ────────────────────────────────────────────────────
 
@@ -240,7 +244,7 @@ class Inn2PhaseRouter:
             "pp": "v17_pp_raw",
             "mid": "v14_mid_raw",
             "death": "v14_death_raw",
-        }[phase]
+        }.get(phase, f"{phase}_candidate_raw")
         return self._models[phase], self._features[phase], phase_source
 
     # ── main predict ──────────────────────────────────────────────────────────
