@@ -97,3 +97,22 @@ def test_live_candidate_without_a_running_predictor_is_not_publicly_listed():
     rows = PublicMatchService(manager=Manager(), scheduler=Scheduler()).list_matches()
 
     assert [row.title for row in rows] == ["C vs D"]
+
+
+def test_running_prediction_without_state_is_not_publicly_listed():
+    class Prediction:
+        output_json_path = "unused.json"
+
+        def read_state(self):
+            return None
+
+    class Manager:
+        def list_predictions(self):
+            return [{"id": "pending", "status": "running", "match_url": "https://crex.com/cricket-live-score/a-vs-b-match-updates-1"}]
+
+        def get_prediction(self, prediction_id):
+            return Prediction()
+
+    rows = PublicMatchService(manager=Manager()).list_matches()
+
+    assert rows == []

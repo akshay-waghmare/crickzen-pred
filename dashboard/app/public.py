@@ -601,6 +601,12 @@ class PublicMatchService:
             prediction = self.manager.get_prediction(pred["id"])
             raw_state = prediction.read_state() if prediction else None
             state = _enrich_detail_state(raw_state, prediction.output_json_path) if prediction else None
+            if not state:
+                # Startup processes may be alive while CREX is still loading.
+                # A no-state process is not actionable Match Intelligence and
+                # must not become a blank public card.
+                seen_urls.discard(normalize_match_url(match_url))
+                continue
             if prediction and _is_publicly_stale_prediction(prediction, state):
                 seen_urls.discard(normalize_match_url(match_url))
                 continue
@@ -640,6 +646,9 @@ class PublicMatchService:
             prediction = self.manager.get_prediction(pred["id"])
             raw_state = prediction.read_state() if prediction else None
             state = _enrich_detail_state(raw_state, prediction.output_json_path) if prediction else None
+            if not state:
+                seen_urls.discard(normalize_match_url(match_url))
+                continue
             if prediction and _is_publicly_stale_prediction(prediction, state):
                 seen_urls.discard(normalize_match_url(match_url))
                 continue
