@@ -69,6 +69,48 @@ def test_public_payload_handles_unavailable_model_state():
     assert payload.reasons == []
 
 
+def test_public_detail_keeps_full_probability_history_without_inflating_match_list():
+    history = [
+        {
+            "overs": f"{index // 6}.{index % 6}",
+            "score": index,
+            "wickets": 0,
+            "bat_win_prob": 0.45 + (index / 1000),
+            "innings": 1,
+        }
+        for index in range(40)
+    ]
+    state = {
+        "format": "t20",
+        "score": 39,
+        "wickets": 0,
+        "overs": 6.3,
+        "batting_team": "A",
+        "bowling_team": "B",
+        "history": history,
+    }
+
+    summary = serialize_prediction(
+        prediction_id="history-summary",
+        match_url="https://crex.com/cricket-live-score/a-vs-b-match-updates-HISTORY",
+        league="T20",
+        status="running",
+        state=state,
+    )
+    detail = serialize_prediction(
+        prediction_id="history-detail",
+        match_url="https://crex.com/cricket-live-score/a-vs-b-match-updates-HISTORY",
+        league="T20",
+        status="running",
+        state=state,
+        detail=True,
+    )
+
+    assert len(summary.prediction_history) == 24
+    assert len(detail.prediction_history) == 40
+    assert detail.prediction_history[0].win_probability_pct == 45
+
+
 def test_live_candidate_without_a_running_predictor_is_not_publicly_listed():
     class Manager:
         def list_predictions(self):

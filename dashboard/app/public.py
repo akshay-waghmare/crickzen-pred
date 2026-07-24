@@ -445,7 +445,8 @@ def public_prediction_history(state: dict[str, Any] | None, *, limit: int = 24) 
             continue
         expected = as_float(point.get("expected_final_score") or point.get("expected_score"))
         projected = as_float(point.get("projected_score"))
-        if expected is None and projected is None:
+        probability_pct = _history_probability_pct(point)
+        if probability_pct is None and expected is None and projected is None:
             continue
         score = point.get("score")
         wickets = point.get("wickets")
@@ -453,7 +454,7 @@ def public_prediction_history(state: dict[str, Any] | None, *, limit: int = 24) 
         points.append(PublicPredictionPoint(
             over=str(point.get("overs") or point.get("over") or ""),
             score=score_text,
-            win_probability_pct=_history_probability_pct(point),
+            win_probability_pct=probability_pct,
             expected_final_score=int(round(expected)) if expected is not None else None,
             projected_score=int(round(projected)) if projected is not None else None,
             innings=as_int(
@@ -559,7 +560,9 @@ def serialize_prediction(
     title = match_title(state, match_url)
     slug = slug_for_match(title, league, match_url)
     swings = public_swings(state)
-    prediction_history = public_prediction_history(state)
+    # Keep list responses compact, but let the selected-match detail endpoint
+    # expose the persisted full-match derivative used by the dashboard chart.
+    prediction_history = public_prediction_history(state, limit=240 if detail else 24)
     summary_kwargs = {
         "slug": slug,
         "title": title,
