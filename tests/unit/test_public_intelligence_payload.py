@@ -49,6 +49,7 @@ def test_public_payload_exposes_safe_intelligence_metrics():
     assert any("below" in reason for reason in payload.reasons)
     assert payload.explanation_pack["expected_score"] == 296
     assert payload.explanation_pack["turning_point"]["over"] == "40"
+    assert payload.match_url == "https://crex.com/cricket-live-score/nz-vs-wi-1st-odi-match-updates-TEST"
     assert not hasattr(payload, "features")
 
 

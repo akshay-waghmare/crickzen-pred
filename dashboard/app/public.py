@@ -69,6 +69,9 @@ class PublicMatchSummary:
     insight: str = "Model probability will appear once live ball data is available."
     updated_at: str | None = None
     detail_url: str | None = None
+    # Stable source identity for public consumers. Team labels in a live state
+    # may be abbreviated, while the CREX route remains the canonical match key.
+    match_url: str | None = None
     format_label: str | None = None
     model_mode: str | None = None
     model_source: str | None = None
@@ -516,6 +519,7 @@ def _candidate_summary(candidate: dict[str, Any]) -> PublicMatchSummary:
         insight="Model probability will appear once live ball data is available.",
         updated_at=None,
         detail_url=f"/match/{slug}",
+        match_url=url or None,
     )
     return summary
 
@@ -547,6 +551,7 @@ def serialize_prediction(
         "insight": build_public_insight(state, swings),
         "updated_at": (state or {}).get("timestamp") or datetime.now(timezone.utc).isoformat(),
         "detail_url": f"/match/{slug}",
+        "match_url": match_url or None,
         "format_label": (state or {}).get("format"),
         "model_mode": model_mode_label(state),
         "model_source": model_source_label(state),
