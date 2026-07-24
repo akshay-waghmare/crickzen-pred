@@ -89,3 +89,22 @@ def test_public_serializer_redacts_premium_keys():
     for key in PUBLIC_FORBIDDEN_KEYS:
         assert f'"{key}"' not in text
     assert payload["win_probability_pct"] == 61
+
+
+def test_public_history_preserves_innings_and_summary_derives_a_chase():
+    payload = public_payload(serialize_prediction(
+        prediction_id="tan-ugn",
+        match_url="https://crex.com/cricket-live-score/tan-w-vs-ugn-w-match-updates-131D",
+        league="T20",
+        status="running",
+        state={
+            "is_second_innings": True,
+            "history": [
+                {"innings": 1, "overs": 20.0, "score": 132, "wickets": 6, "bat_prob": 0.54, "expected_score": 132},
+                {"innings": 2, "overs": 1.2, "score": 8, "wickets": 0, "bat_prob": 0.78, "expected_score": 160},
+            ],
+        },
+    ))
+
+    assert payload["innings"] == 2
+    assert [point["innings"] for point in payload["prediction_history"]] == [1, 2]

@@ -52,6 +52,7 @@ class PublicPredictionPoint:
     win_probability_pct: int | None
     expected_final_score: int | None
     projected_score: int | None
+    innings: int | None
 
 
 @dataclass
@@ -313,6 +314,22 @@ def as_int(value: Any, default: int | None = None) -> int | None:
         return default
 
 
+def public_innings(state: dict[str, Any] | None) -> int | None:
+    """Return the live innings number without requiring a legacy numeric field."""
+    state = state or {}
+    innings = as_int(
+        state.get("innings")
+        or state.get("current_innings")
+        or state.get("innings_number")
+        or (state.get("projection") or {}).get("innings")
+    )
+    if innings in (1, 2):
+        return innings
+    if state.get("is_second_innings"):
+        return 2
+    return 1 if state else None
+
+
 def public_probability_pct(state: dict[str, Any] | None) -> int | None:
     state = state or {}
     candidates = [
@@ -439,6 +456,12 @@ def public_prediction_history(state: dict[str, Any] | None, *, limit: int = 24) 
             win_probability_pct=_history_probability_pct(point),
             expected_final_score=int(round(expected)) if expected is not None else None,
             projected_score=int(round(projected)) if projected is not None else None,
+            innings=as_int(
+                point.get("innings")
+                or point.get("current_innings")
+                or point.get("innings_number")
+                or (2 if point.get("is_second_innings") else None)
+            ),
         ))
     return points[-limit:]
 
@@ -558,12 +581,7 @@ def serialize_prediction(
         "model_label": model_label(state),
         "expected_final_score": expected_final_score(state),
         "projected_score": projected_score(state),
-        "innings": as_int(
-            (state or {}).get("innings")
-            or (state or {}).get("current_innings")
-            or (state or {}).get("innings_number")
-            or ((state or {}).get("projection") or {}).get("innings")
-        ),
+        "innings": public_innings(state),
         "current_run_rate": metric_float(state, "current_run_rate"),
         "required_run_rate": metric_float(state, "required_run_rate"),
         "venue_average_score": metric_float(state, "venue_avg_score"),
