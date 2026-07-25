@@ -29,6 +29,14 @@ def public_ipl_today(request: Request):
     }
 
 
+@router.get("/matches/resolve")
+def public_match_by_source(match_url: str, request: Request):
+    match = service_from_request(request).get_match_by_source_url(match_url)
+    if match is None:
+        raise HTTPException(status_code=404, detail={"message": "Match not found"})
+    return {"match": public_payload(match)}
+
+
 @router.get("/matches/{slug}")
 def public_match_detail(slug: str, request: Request):
     service = service_from_request(request)

@@ -7,14 +7,16 @@ construct a new payload and never pass through raw predictor state.
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 
-from app.config import get_settings
-from app.prediction_manager import PredictionManager
+from app.config import get_project_root, get_settings
+from app.prediction_manager import PredictionManager, _state_has_result
 from app.routers.live import _enrich_detail_state
 
 
@@ -562,7 +564,10 @@ def serialize_prediction(
     swings = public_swings(state)
     # Keep list responses compact, but let the selected-match detail endpoint
     # expose the persisted full-match derivative used by the dashboard chart.
-    prediction_history = public_prediction_history(state, limit=240 if detail else 24)
+    # Two complete innings are at most 600 legal-ball states in ODI cricket.
+    # Keep list payloads small, but do not silently remove the first innings
+    # from a selected match's history replay.
+    prediction_history = public_prediction_history(state, limit=600 if detail else 24)
     summary_kwargs = {
         "slug": slug,
         "title": title,
@@ -719,6 +724,14 @@ class PublicMatchService:
             if detail.slug == target:
                 return detail
 
+        # Finished predictors leave the in-memory manager by design, but their
+        # public-safe state and full history sidecars remain on disk. Direct
+        # Match Intelligence routes must keep resolving those completed match
+        # replays without adding them back into the live match list.
+        for detail in self._completed_archive_details():
+            if detail.slug == target:
+                return detail
+
         for candidate in self._scheduler_candidates():
             summary = _candidate_summary(candidate)
             if summary.slug == target:
@@ -730,6 +743,43 @@ class PublicMatchService:
                     dashboard_url="/dashboard",
                 )
         return None
+
+    def get_match_by_source_url(self, match_url: str) -> PublicMatchDetail | None:
+        target = normalize_match_url(match_url)
+        if not target:
+            return None
+        for pred in self.manager.list_predictions():
+            if normalize_match_url(pred.get("match_url", "")) != target:
+                continue
+            prediction = self.manager.get_prediction(pred["id"])
+            state = _enrich_detail_state(prediction.read_state(), prediction.output_json_path) if prediction else None
+            if state:
+                return serialize_prediction(prediction_id=pred["id"], match_url=pred.get("match_url", ""), league=pred.get("league") or pred.get("league_code") or "Cricket", status=pred.get("status") or "running", state=state, detail=True)
+        for detail in self._completed_archive_details():
+            if normalize_match_url(detail.match_url or "") == target:
+                return detail
+        return None
+
+    def _completed_archive_details(self) -> list[PublicMatchDetail]:
+        state_dir = Path(get_project_root()) / get_settings().STATE_DIR
+        if not state_dir.exists():
+            return []
+        details: list[PublicMatchDetail] = []
+        for live_path in sorted(state_dir.glob("*_livematch.json"), key=lambda item: item.stat().st_mtime, reverse=True)[:240]:
+            try:
+                raw_state = json.loads(live_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if not _state_has_result(raw_state):
+                continue
+            prediction_id = live_path.name.replace("_livematch.json", "")
+            output_path = str(state_dir / (prediction_id + ".json"))
+            state = _enrich_detail_state(raw_state, output_path)
+            match_url = str((state or {}).get("match_url") or "")
+            if not match_url:
+                continue
+            details.append(serialize_prediction(prediction_id=prediction_id, match_url=match_url, league=str((state or {}).get("league") or (state or {}).get("format") or "Cricket"), status="completed", state=state, detail=True))
+        return details
 
     def _scheduler_candidates(self) -> list[dict[str, Any]]:
         if self.scheduler is None:

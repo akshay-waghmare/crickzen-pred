@@ -176,7 +176,8 @@ class Predictor:
             return None
 
         runs_needed = state.target_runs - state.current_score
-        balls_remaining = (self.format_config.total_overs - state.over) * 6 - state.ball
+        balls_per_over = self.format_config.balls_per_over
+        balls_remaining = (self.format_config.total_overs - state.over) * balls_per_over - state.ball
 
         if runs_needed <= 0:
             return {
@@ -1006,9 +1007,10 @@ class Predictor:
             # This preserves calibration integrity and makes evaluation straightforward.
             if state.innings == 2 and state.target_runs:
                 runs_needed = state.target_runs - state.current_score
-                balls_remaining = (self.format_config.total_overs - state.over) * 6 - state.ball
+                balls_per_over = self.format_config.balls_per_over
+                balls_remaining = (self.format_config.total_overs - state.over) * balls_per_over - state.ball
                 wickets_remaining = 10 - state.wickets_lost
-                rrr = runs_needed / (balls_remaining / 6) if balls_remaining > 0 else float('inf')
+                rrr = runs_needed / (balls_remaining / balls_per_over) if balls_remaining > 0 else float('inf')
                 
                 # === MATHEMATICAL CONSTRAINTS (non-controversial) ===
                 # Match already won
@@ -1207,7 +1209,7 @@ class Predictor:
                 self._inn1_final_prob = float(prob)
                 self._inn1_batting_team = state.batting_team
             elif state.innings == 2 and self._inn1_final_prob is not None:
-                overs_bowled = state.over + state.ball / 6.0
+                overs_bowled = state.over + state.ball / self.format_config.balls_per_over
                 if overs_bowled < self.INNINGS_TRANSITION_OVERS:
                     # Inn2 batting team is inn1 bowling team, so prior = 1 - inn1_prob
                     if self._inn1_batting_team == state.batting_team:
@@ -1421,16 +1423,20 @@ class Predictor:
                 scores[i] = state.current_score
                 overs[i] = state.over
                 balls[i] = state.ball
-                balls_remaining[i] = (self.format_config.total_overs - state.over) * 6 - state.ball
+                balls_remaining[i] = (
+                    (self.format_config.total_overs - state.over) * self.format_config.balls_per_over
+                    - state.ball
+                )
             else:
                 # Simulation MatchState
                 scores[i] = state.score
                 balls_remaining[i] = state.balls_remaining
                 balls_bowled = self.format_config.total_balls - state.balls_remaining
-                overs[i] = balls_bowled // 6
-                balls[i] = balls_bowled % 6
+                balls_per_over = self.format_config.balls_per_over
+                overs[i] = balls_bowled // balls_per_over
+                balls[i] = balls_bowled % balls_per_over
                 if balls[i] == 0 and overs[i] > 0:
-                    balls[i] = 6
+                    balls[i] = balls_per_over
                     overs[i] -= 1
                 elif balls[i] == 0:
                     balls[i] = 1
@@ -1781,7 +1787,11 @@ class Predictor:
                 # Formula: base_cap = max(0.02, 0.5 * (1 - (rrr - 6) / 10) * (1 - wickets/10))
                 rpb = runs_per_ball[high_rrr]
                 wkts = nt_wickets[high_rrr]
-                rrr_factor = np.clip(1.0 - (rpb * 6 - 8.0) / 10.0, 0.0, 1.0)
+                rrr_factor = np.clip(
+                    1.0 - (rpb * self.format_config.balls_per_over - 8.0) / 10.0,
+                    0.0,
+                    1.0,
+                )
                 wicket_factor = 1.0 - 0.08 * wkts
                 max_cap = np.clip(rrr_factor * wicket_factor * 0.2, 0.01, 0.15)  # Conservative cap
                 calibrated_probs[high_rrr] = np.minimum(calibrated_probs[high_rrr], max_cap)

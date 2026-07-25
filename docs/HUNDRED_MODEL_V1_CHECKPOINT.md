@@ -2,11 +2,12 @@
 
 Date: 2026-07-22  
 Status: `SHADOW_ONLY`  
-Production routing: unchanged
+Production routing: enabled only for `hundred_all`; it is never a T20 or ODI fallback.
 
 ## Outcome
 
-The Hundred pipeline is implemented end to end, but `hundred_all_v1` is not promoted.
+The Hundred pipeline is implemented end to end and `hundred_all_v1` is selected for
+The Hundred only. It is not statistically promoted beyond that format-isolated route.
 The untouched 2025 evaluation rejects the candidate under the frozen promotion protocol.
 This is an intentional research/shadow result, not a production failure.
 
@@ -46,6 +47,9 @@ ingestion and independently recorded in `experiments/hundred_v1/audit/`.
   powerplay state, phase, gender, and anomaly flags while retaining raw coordinates.
 - Shared feature processing and live mapping use configured `balls_per_over`; Hundred
   inference prefers the explicit normalized legal-ball count over raw coordinates.
+- The live predictor, terminal clamp, chase constraints, transition clock, and batch
+  inference all use the active format's balls-per-set. A 100-ball innings therefore
+  finishes at `19.5`, not at a synthetic 120-ball T20 boundary.
 - `hundred_all` has isolated raw data, feature, feature-store, model, and evaluation paths.
 - OOF calibrators, per-over/innings-phase reports, reliability tables, match-block bootstrap
   intervals, and rolling-origin season metrics are written as research artifacts.
@@ -75,3 +79,32 @@ they are outside the Hundred contract and do not change the shadow decision.
 2. Improve calibration using only pre-2025 chronological calibration data.
 3. Add explicit D/L and Super Five handling as separate tracks rather than broadening v1.
 4. Re-run the frozen evaluator; promotion remains forbidden unless every gate passes.
+
+## Runtime verification plan
+
+1. Before a Hundred fixture, confirm `resolve_model_config()` resolves the match to
+   `models/hundred_all_v1`, `league=hundred_all`, and `fallback_format=hundred`.
+2. On the first live state, verify the output JSON reports `format=hundred`,
+   `total_overs=20`, and a 100-ball feature clock. The public feed must label it
+   `The Hundred all-gender v1`.
+3. During both innings, sample states around balls 25, 50, 75, and 100. Confirm
+   `balls_remaining` is respectively 75, 50, 25, and 0, and that the terminal
+   probability is applied at ball 100.
+4. Keep the route enabled only while the state JSON has a non-null probability and
+   fresh timestamp. Roll back the route to the prior dashboard revision if either
+   condition fails; do not redirect The Hundred to T20 as a silent fallback.
+
+## Match Intelligence history and Monte Carlo boundary
+
+- The public selected-match endpoint must merge the retained `*_history.json`
+  sidecar, de-duplicate it safely, and retain both innings for the visual chart.
+  List responses remain compact; direct Match Intelligence routes resolve the
+  selected match by its canonical CREX URL, including after predictor shutdown.
+- The public chart uses the Hundred's native `0–20` five-ball-set clock per
+  innings, not a converted six-ball `16.4` scale. Its second innings is plotted
+  after the first rather than being mistaken for the same timeline.
+- Monte Carlo is **not** enabled for The Hundred in this release. The shared
+  simulator currently requires a six-ball-divisible innings length and the live
+  predictor deliberately returns no MC result for `format_name == "hundred"`.
+  A dedicated 100-ball simulator plus separate calibration and regression tests
+  is required before that can be promoted.

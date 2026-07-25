@@ -159,7 +159,7 @@ def _history_key(point: dict[str, Any]) -> tuple[int, float, int, int]:
     )
 
 
-def _dedupe_history(history: list[dict[str, Any]], limit: int = 240) -> list[dict[str, Any]]:
+def _dedupe_history(history: list[dict[str, Any]], limit: int = 600) -> list[dict[str, Any]]:
     """Keep the latest distinct score state for each innings/over/score/wicket point."""
     deduped: list[dict[str, Any]] = []
     seen: set[tuple[int, float, int, int]] = set()

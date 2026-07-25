@@ -2404,7 +2404,7 @@ class CrexLivePredictor:
             overs_float = self.match_state.overs
             over = int(overs_float)
             ball = int(round((overs_float - over) * 10))  # 12.3 -> 3 balls
-            if ball >= 6:  # Handle edge case
+            if ball >= self.format_config.balls_per_over:  # Handle edge case
                 ball = 0
             
             # Build MatchState for predictor using its schema
@@ -2428,6 +2428,7 @@ class CrexLivePredictor:
                 "target_runs": self.match_state.target,
                 "first_innings_score": self.match_state.target - 1 if self.match_state.target else None,
                 "total_overs": self.format_config.total_overs,
+                "balls_per_over": self.format_config.balls_per_over,
                 "toss_winner": self._resolve_toss_winner_full_name() or None,
                 "toss_decision": self.match_state.toss_decision or None,
                 **self._compute_inn1_carryover_stats(),
