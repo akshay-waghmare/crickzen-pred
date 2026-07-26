@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     AUTO_DISCOVERY_RENDER_JS: bool = True
     PLAYWRIGHT_EXECUTABLE_PATH: str = ""
     AUTO_DISCOVERY_INTERVAL_SECONDS: int = 300
-    AUTO_START_NOT_BEFORE_LOCAL: str = "17:00"
+    AUTO_START_NOT_BEFORE_LOCAL: str = "00:00"
     AUTO_START_NOT_AFTER_LOCAL: str = "23:59"
     AUTO_TIMEZONE: str = "Asia/Kolkata"
 
