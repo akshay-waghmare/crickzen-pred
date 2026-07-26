@@ -1,0 +1,14 @@
+{
+  "name": "crickenzen-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:css": "npx tailwindcss -i static/css/input.css -o static/css/app.css --minify",
+    "dev:css": "npx tailwindcss -i static/css/input.css -o static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "playwright": "^1.59.1",
+    "tailwindcss": "^3.4.0"
+  }
+}
