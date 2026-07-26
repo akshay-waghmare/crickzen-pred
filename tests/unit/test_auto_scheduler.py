@@ -1,3 +1,5 @@
+import asyncio
+
 from app.auto_scheduler import AutoPredictionScheduler, MatchCandidate, SYSTEM_USER_ID, extract_crex_match_candidates
 from app.auto_scheduler import _browser_executable, _looks_live
 from app.config import Settings
@@ -142,3 +144,46 @@ def test_scraper_slate_retires_only_system_predictions_that_are_no_longer_select
     ])
 
     assert manager.stopped == ["obsolete"]
+
+
+def test_scraper_slate_classifies_t20_from_crex_page_title_when_slug_lacks_format(monkeypatch):
+    class FakeResponse:
+        def __init__(self, *, payload=None, text="", status_code=200):
+            self._payload = payload
+            self.text = text
+            self.status_code = status_code
+
+        def json(self):
+            return self._payload
+
+        def raise_for_status(self):
+            assert self.status_code < 400
+
+    class FakeClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, traceback):
+            return False
+
+        async def get(self, url):
+            if url.endswith("/prediction-candidates"):
+                return FakeResponse(payload={
+                    "matches": [{
+                        "url": "https://crex.com/cricket-live-score/aut-vs-rom-3rd-match-eca-mens-european-cup-2026-match-updates-138I",
+                        "is_live": True,
+                    }]
+                })
+            return FakeResponse(text="<title>AUT vs ROM, 3rd T20, European Cup 2026 Live</title>")
+
+    monkeypatch.setattr("app.auto_scheduler.httpx.AsyncClient", lambda **kwargs: FakeClient())
+    scheduler = AutoPredictionScheduler(
+        manager=object(),
+        settings=Settings(AUTO_SCRAPER_URL="http://scraper", AUTO_LEAGUE_KEYS="ALL"),
+    )
+
+    candidates = asyncio.run(scheduler._discover_from_scraper())
+
+    assert len(candidates) == 1
+    assert candidates[0].league_key == "T20"
+    assert candidates[0].source == "scraper:selected"

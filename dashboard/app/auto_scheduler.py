@@ -238,11 +238,24 @@ class AutoPredictionScheduler:
                 response = await client.get(f"{base}/prediction-candidates")
                 response.raise_for_status()
                 payload = response.json()
+                return await self._build_scraper_candidates(payload, client)
         except Exception as exc:
             logger.debug("Could not fetch scraper prediction candidates: %s", exc)
             return []
 
+    async def _build_scraper_candidates(
+        self,
+        payload: Any,
+        client: httpx.AsyncClient,
+    ) -> list[MatchCandidate]:
+        """Classify the scraper's selected slate without guessing unknown formats.
+
+        Some CREX match slugs name only the competition.  For those candidates,
+        the page title carries the explicit match format (for example, "3rd T20").
+        We fetch that title only when slug and scraper label classification fail.
+        """
         candidates: list[MatchCandidate] = []
+        target_leagues = set(self._target_leagues())
         for item in payload.get("matches", []) if isinstance(payload, dict) else []:
             if isinstance(item, str):
                 url, is_live, label = item, True, ""
@@ -252,8 +265,28 @@ class AutoPredictionScheduler:
                 label = str(item.get("label") or "")
             else:
                 continue
-            league_key = detect_league_from_url(url or "") or detect_generic_format_from_url(url or "")
-            if not url or not league_key or league_key not in self._target_leagues():
+            if not url:
+                continue
+            classification_text = f"{url} {label}"
+            league_key = (
+                detect_league_from_url(classification_text)
+                or detect_generic_format_from_url(classification_text)
+            )
+            if not league_key:
+                try:
+                    response = await client.get(url)
+                    if response.status_code < 400:
+                        page_label = _page_title_or_text(response.text)
+                        if page_label:
+                            label = label or page_label
+                            classification_text = f"{url} {page_label}"
+                            league_key = (
+                                detect_league_from_url(classification_text)
+                                or detect_generic_format_from_url(classification_text)
+                            )
+                except Exception as exc:
+                    logger.debug("Could not classify scraper candidate %s: %s", url, exc)
+            if not league_key or league_key not in target_leagues:
                 continue
             candidates.append(MatchCandidate(
                 url=_normalize_crex_url(url),
