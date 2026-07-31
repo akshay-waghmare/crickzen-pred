@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 from app.prediction_manager import Prediction, PredictionManager
 from app.public import PublicMatchService, is_ipl_candidate, public_payload
@@ -176,3 +177,45 @@ def test_public_service_skips_stale_running_prediction(tmp_path):
     rows = PublicMatchService(manager=manager).list_matches()
 
     assert rows == []
+
+
+def test_completed_archive_rehydrates_nested_livematch_state(monkeypatch, tmp_path):
+    state_dir = tmp_path / "dashboard_states"
+    state_dir.mkdir()
+    prediction_id = "completed-archive"
+    match_url = "https://crex.com/cricket-live-score/msg-vs-tr-match-updates-ZKN"
+    (state_dir / f"{prediction_id}_livematch.json").write_text(json.dumps({
+        "match_url": match_url,
+        "model_dir": "models/t20_all_v2",
+        "bat_win_prob": 1.0,
+        "history": [{
+            "overs": 17.2,
+            "score": 140,
+            "wickets": 4,
+            "innings": 2,
+            "bat_prob": 1.0,
+            "batting_team": "MSG",
+            "bowling_team": "TR",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }],
+        "state": {
+            "is_second_innings": True,
+            "score": 140,
+            "wickets": 4,
+            "overs": 17.2,
+            "total_overs": 20,
+            "target": 140,
+            "batting_team": "MSG",
+            "bowling_team": "TR",
+        },
+    }), encoding="utf-8")
+    monkeypatch.setattr("app.public.get_project_root", lambda: tmp_path)
+    monkeypatch.setattr("app.public.get_settings", lambda: SimpleNamespace(STATE_DIR="dashboard_states"))
+
+    detail = PublicMatchService(manager=PredictionManager()).get_match_by_source_url(match_url)
+
+    assert detail is not None
+    assert detail.status == "completed"
+    assert detail.match_url == match_url
+    assert detail.win_probability_pct == 100
+    assert detail.prediction_history

@@ -770,11 +770,15 @@ class PublicMatchService:
                 raw_state = json.loads(live_path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
                 continue
-            if not _state_has_result(raw_state):
-                continue
             prediction_id = live_path.name.replace("_livematch.json", "")
             output_path = str(state_dir / (prediction_id + ".json"))
-            state = _enrich_detail_state(raw_state, output_path)
+            # Predictor sidecars retain the terminal match snapshot under a
+            # nested ``state`` key.  Rehydrate that wrapper before checking
+            # completion; testing the raw wrapper silently excluded every
+            # completed prediction from the public archive.
+            state = _enrich_detail_state(dict(raw_state), output_path)
+            if not state or not _state_has_result(state):
+                continue
             match_url = str((state or {}).get("match_url") or "")
             if not match_url:
                 continue
