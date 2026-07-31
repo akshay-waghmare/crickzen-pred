@@ -755,9 +755,21 @@ class PublicMatchService:
             state = _enrich_detail_state(prediction.read_state(), prediction.output_json_path) if prediction else None
             if state:
                 return serialize_prediction(prediction_id=pred["id"], match_url=pred.get("match_url", ""), league=pred.get("league") or pred.get("league_code") or "Cricket", status=pred.get("status") or "running", state=state, detail=True)
-        for detail in self._completed_archive_details():
-            if normalize_match_url(detail.match_url or "") == target:
-                return detail
+        return self._completed_archive_detail_by_source_url(target)
+
+    def _completed_archive_detail_by_source_url(self, target: str) -> PublicMatchDetail | None:
+        """Resolve one retained completed match without hydrating the full archive."""
+        state_dir = Path(get_project_root()) / get_settings().STATE_DIR
+        if not state_dir.exists():
+            return None
+        for live_path in sorted(state_dir.glob("*_livematch.json"), key=lambda item: item.stat().st_mtime, reverse=True)[:240]:
+            raw_state = self._read_completed_archive_state(live_path)
+            if raw_state is None:
+                continue
+            source_url = str(raw_state.get("match_url") or (raw_state.get("state") or {}).get("match_url") or "")
+            if normalize_match_url(source_url) != target:
+                continue
+            return self._serialize_completed_archive_state(live_path, raw_state)
         return None
 
     def _completed_archive_details(self) -> list[PublicMatchDetail]:
@@ -766,24 +778,42 @@ class PublicMatchService:
             return []
         details: list[PublicMatchDetail] = []
         for live_path in sorted(state_dir.glob("*_livematch.json"), key=lambda item: item.stat().st_mtime, reverse=True)[:240]:
-            try:
-                raw_state = json.loads(live_path.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError):
+            raw_state = self._read_completed_archive_state(live_path)
+            if raw_state is None:
                 continue
-            prediction_id = live_path.name.replace("_livematch.json", "")
-            output_path = str(state_dir / (prediction_id + ".json"))
-            # Predictor sidecars retain the terminal match snapshot under a
-            # nested ``state`` key.  Rehydrate that wrapper before checking
-            # completion; testing the raw wrapper silently excluded every
-            # completed prediction from the public archive.
-            state = _enrich_detail_state(dict(raw_state), output_path)
-            if not state or not _state_has_result(state):
-                continue
-            match_url = str((state or {}).get("match_url") or "")
-            if not match_url:
-                continue
-            details.append(serialize_prediction(prediction_id=prediction_id, match_url=match_url, league=str((state or {}).get("league") or (state or {}).get("format") or "Cricket"), status="completed", state=state, detail=True))
+            detail = self._serialize_completed_archive_state(live_path, raw_state)
+            if detail is not None:
+                details.append(detail)
         return details
+
+    @staticmethod
+    def _read_completed_archive_state(live_path: Path) -> dict[str, Any] | None:
+        try:
+            raw_state = json.loads(live_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return None
+        return raw_state if isinstance(raw_state, dict) else None
+
+    @staticmethod
+    def _serialize_completed_archive_state(live_path: Path, raw_state: dict[str, Any]) -> PublicMatchDetail | None:
+        prediction_id = live_path.name.replace("_livematch.json", "")
+        output_path = str(live_path.parent / (prediction_id + ".json"))
+        # Predictor sidecars retain the terminal match snapshot under a nested
+        # ``state`` key. Rehydrate that wrapper before checking completion.
+        state = _enrich_detail_state(dict(raw_state), output_path)
+        if not state or not _state_has_result(state):
+            return None
+        match_url = str(state.get("match_url") or "")
+        if not match_url:
+            return None
+        return serialize_prediction(
+            prediction_id=prediction_id,
+            match_url=match_url,
+            league=str(state.get("league") or state.get("format") or "Cricket"),
+            status="completed",
+            state=state,
+            detail=True,
+        )
 
     def _scheduler_candidates(self) -> list[dict[str, Any]]:
         if self.scheduler is None:
