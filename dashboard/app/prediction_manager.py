@@ -125,19 +125,39 @@ class Prediction:
         return _state_has_result(state)
 
     def stop(self):
-        """Kill the subprocess."""
+        """Stop the predictor and all of its browser descendants."""
         if self.proc and self.proc.poll() is None:
+            stopped = False
             try:
                 if os.name == "nt":
                     self.proc.send_signal(signal.CTRL_BREAK_EVENT)
                 else:
-                    os.killpg(os.getpgid(self.proc.pid), signal.SIGTERM)
+                    process_group = os.getpgid(self.proc.pid)
+                    os.killpg(process_group, signal.SIGTERM)
+                    try:
+                        self.proc.wait(timeout=5)
+                        stopped = True
+                    except subprocess.TimeoutExpired:
+                        logger.warning(
+                            "Predictor %s ignored SIGTERM; killing its process group",
+                            self.id,
+                        )
+                        os.killpg(process_group, signal.SIGKILL)
+                        try:
+                            self.proc.wait(timeout=5)
+                            stopped = True
+                        except subprocess.TimeoutExpired:
+                            logger.error(
+                                "Predictor %s process group did not exit after SIGKILL",
+                                self.id,
+                            )
             except (OSError, ProcessLookupError):
-                pass
-            try:
-                self.proc.kill()
-            except (OSError, ProcessLookupError):
-                pass
+                stopped = self.proc.poll() is not None
+            if not stopped:
+                try:
+                    self.proc.kill()
+                except (OSError, ProcessLookupError):
+                    pass
         self.set_status("stopped")
 
 

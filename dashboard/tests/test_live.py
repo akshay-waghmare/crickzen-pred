@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import os
+import signal
+import subprocess
 from datetime import datetime, timedelta, timezone
 
 from app.config import Settings
@@ -21,7 +23,7 @@ class FakeProc:
     def poll(self):
         return self.returncode
 
-    def wait(self):
+    def wait(self, timeout=None):
         return self.returncode
 
     def send_signal(self, signal):
@@ -118,6 +120,38 @@ class TestMatchList:
         assert removed == 1
         assert proc.killed is True
         assert manager.list_predictions() == []
+
+    def test_stop_escalates_to_group_sigkill_when_predictor_ignores_sigterm(self, tmp_path, monkeypatch):
+        class StubbornProc(FakeProc):
+            def wait(self, timeout=None):
+                raise subprocess.TimeoutExpired("predictor", timeout)
+
+        proc = StubbornProc(returncode=None)
+        pred = Prediction(
+            prediction_id="stubborn-predictor",
+            user_id="user-1",
+            match_url="https://crex.com/scoreboard/example/live",
+            league_key="IPL",
+            league_code="ipl",
+            output_json_path=str(tmp_path / "stubborn-predictor.json"),
+            proc=proc,
+        )
+        signals = []
+        monkeypatch.setattr(os, "name", "posix")
+        monkeypatch.setattr(signal, "SIGKILL", 9, raising=False)
+        monkeypatch.setattr(os, "getpgid", lambda _: 4321, raising=False)
+        monkeypatch.setattr(
+            os,
+            "killpg",
+            lambda pgid, signum: signals.append((pgid, signum)),
+            raising=False,
+        )
+
+        pred.stop()
+
+        assert signals == [(4321, signal.SIGTERM), (4321, signal.SIGKILL)]
+        assert proc.killed is True
+        assert pred.status == "stopped"
 
     def test_find_active_by_url_ignores_stale_running_prediction(self, tmp_path):
         manager = PredictionManager()
