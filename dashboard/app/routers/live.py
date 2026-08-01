@@ -549,6 +549,7 @@ def auto_scheduler_status(
             "last_checked_at": None,
             "last_error": None,
             "last_candidates": [],
+            "last_prematch_candidates": [],
             "last_started": [],
         }
     return scheduler.status()

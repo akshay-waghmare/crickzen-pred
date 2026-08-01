@@ -187,3 +187,81 @@ def test_scraper_slate_classifies_t20_from_crex_page_title_when_slug_lacks_forma
     assert len(candidates) == 1
     assert candidates[0].league_key == "T20"
     assert candidates[0].source == "scraper:selected"
+
+
+def test_prematch_slate_is_visible_but_never_enters_live_start_or_retirement(monkeypatch):
+    class FakeResponse:
+        status_code = 200
+
+        def __init__(self, payload):
+            self.payload = payload
+
+        def json(self):
+            return self.payload
+
+        def raise_for_status(self):
+            return None
+
+    prematch_payload = {
+        "matches": [{
+                    "url": "https://crex.com/cricket-live-score/arg-w-vs-can-w-4th-t20-match-updates-12YR",
+                    "is_live": False,
+                    "match_format": "T20",
+                    "label": "Argentina Women vs Canada Women, 4th T20",
+        }]
+    }
+
+    class FakeClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, traceback):
+            return False
+
+        async def get(self, url):
+            if url.endswith("/prematch-candidates"):
+                return FakeResponse(prematch_payload)
+            return FakeResponse({"matches": []})
+
+    class Manager:
+        def __init__(self):
+            self.starts = []
+            self.stops = []
+
+        def cleanup_expired(self, settings):
+            return None
+
+        def list_predictions(self, user_id=None):
+            return []
+
+        def start_match(self, **kwargs):
+            self.starts.append(kwargs)
+            raise AssertionError("pre-match observation must not start a live prediction")
+
+        def stop_match(self, prediction_id, user_id=None):
+            self.stops.append(prediction_id)
+            raise AssertionError("pre-match observation must not retire a live prediction")
+
+    monkeypatch.setattr("app.auto_scheduler.httpx.AsyncClient", lambda **kwargs: FakeClient())
+    manager = Manager()
+    scheduler = AutoPredictionScheduler(
+        manager=manager,
+        settings=Settings(
+            AUTO_SCRAPER_URL="http://scraper",
+            AUTO_LEAGUE_KEYS="ALL",
+            AUTO_DISCOVER_FROM_CREX=False,
+        ),
+    )
+
+    assert asyncio.run(scheduler.check_once()) == []
+    status = scheduler.status()
+    assert status["last_candidates"] == []
+    assert status["last_prematch_candidates"] == [{
+        "url": "https://crex.com/cricket-live-score/arg-w-vs-can-w-4th-t20-match-updates-12YR",
+        "league": "T20",
+        "source": "scraper:prematch",
+        "label": "Argentina Women vs Canada Women, 4th T20",
+        "is_live": False,
+    }]
+    assert manager.starts == []
+    assert manager.stops == []

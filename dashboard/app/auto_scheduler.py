@@ -48,7 +48,7 @@ class MatchCandidate:
 
 
 class AutoPredictionScheduler:
-    """Poll CREX/current configured URLs and start live prediction processes."""
+    """Poll live candidates and observe a separate pre-match opening slate."""
 
     def __init__(self, manager: PredictionManager, settings: Settings):
         self.manager = manager
@@ -57,6 +57,7 @@ class AutoPredictionScheduler:
         self._last_checked_at: datetime | None = None
         self._last_error: str | None = None
         self._last_candidates: list[MatchCandidate] = []
+        self._last_prematch_candidates: list[MatchCandidate] = []
         self._last_started: list[dict[str, Any]] = []
 
     async def run_forever(self) -> None:
@@ -81,6 +82,15 @@ class AutoPredictionScheduler:
         self._stop_event.set()
 
     def status(self) -> dict[str, Any]:
+        def serialize(candidate: MatchCandidate) -> dict[str, Any]:
+            return {
+                "url": candidate.url,
+                "league": candidate.league_key,
+                "source": candidate.source,
+                "label": candidate.label,
+                "is_live": candidate.is_live,
+            }
+
         return {
             "enabled": self.settings.AUTO_PREDICTIONS_ENABLED,
             "league": self.settings.AUTO_LEAGUE_KEY,
@@ -88,15 +98,9 @@ class AutoPredictionScheduler:
             "running": not self._stop_event.is_set(),
             "last_checked_at": self._last_checked_at.isoformat() if self._last_checked_at else None,
             "last_error": self._last_error,
-            "last_candidates": [
-                {
-                    "url": c.url,
-                    "league": c.league_key,
-                    "source": c.source,
-                    "label": c.label,
-                    "is_live": c.is_live,
-                }
-                for c in self._last_candidates
+            "last_candidates": [serialize(candidate) for candidate in self._last_candidates],
+            "last_prematch_candidates": [
+                serialize(candidate) for candidate in self._last_prematch_candidates
             ],
             "last_started": self._last_started[-10:],
         }
@@ -108,6 +112,9 @@ class AutoPredictionScheduler:
 
         try:
             self.manager.cleanup_expired(self.settings)
+            # This is observation only until the opening serializer/TTL has
+            # its own promotion proof. Never feed it into live lifecycle work.
+            self._last_prematch_candidates = await self._discover_prematch_from_scraper()
             candidates = await self.discover_candidates()
             self._last_candidates = candidates
             self._retire_predictions_outside_scraper_slate(candidates)
@@ -247,6 +254,8 @@ class AutoPredictionScheduler:
         self,
         payload: Any,
         client: httpx.AsyncClient,
+        *,
+        source: str = "scraper:selected",
     ) -> list[MatchCandidate]:
         """Classify the scraper's selected slate without guessing unknown formats.
 
@@ -291,11 +300,27 @@ class AutoPredictionScheduler:
             candidates.append(MatchCandidate(
                 url=_normalize_crex_url(url),
                 league_key=league_key,
-                source="scraper:selected",
+                source=source,
                 label=label or url,
                 is_live=is_live,
             ))
         return candidates
+
+    async def _discover_prematch_from_scraper(self) -> list[MatchCandidate]:
+        """Read the bounded opening slate without invoking live prediction work."""
+        base = (self.settings.AUTO_SCRAPER_URL or "").strip().rstrip("/")
+        if not base:
+            return []
+        try:
+            async with httpx.AsyncClient(headers=CREX_HEADERS, timeout=httpx.Timeout(10.0)) as client:
+                response = await client.get(f"{base}/prematch-candidates")
+                response.raise_for_status()
+                return await self._build_scraper_candidates(
+                    response.json(), client, source="scraper:prematch"
+                )
+        except Exception as exc:
+            logger.debug("Could not fetch scraper pre-match candidates: %s", exc)
+            return []
 
     async def _candidate_for_direct_url(
         self,

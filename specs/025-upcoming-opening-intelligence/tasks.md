@@ -23,11 +23,18 @@ Status: `[ ]` queued, `[-]` in progress, `[x]` verified, `[!]` blocked by eviden
 
 ## Phase 1
 
-- [-] T005 Add a bounded scraper `/prematch-candidates` endpoint.
-- [ ] T006 Add contract tests for exact URL, 12–48-hour window, supported format,
+- [x] T005 Add a bounded scraper `/prematch-candidates` endpoint.
+  Evidence: VictoryLine scraper commit `1a7ded6`; it reads the authoritative
+  upcoming backend catalogue and caps the separate result at three fixtures.
+- [x] T006 Add contract tests for exact URL, 12–48-hour window, supported format,
   and no live-selector mutation.
-- [ ] T007 Add dashboard pre-match candidate status separate from live
+  Evidence: scraper tests `test_prematch_selection.py` and
+  `test_prematch_candidates.py` cover boundary inclusion, T20-only filtering,
+  source URL preservation, bounded ordering, and `is_live: false` output.
+- [x] T007 Add dashboard pre-match candidate status separate from live
   `last_candidates` and retirement logic.
+  Evidence: `last_prematch_candidates` consumes only `/prematch-candidates`;
+  it is never passed to live auto-start or retirement code.
 
 ## Phase 2
 
