@@ -1,6 +1,6 @@
 # Dashboard Execution Tracker
 
-Last updated: 2026-07-22
+Last updated: 2026-08-01
 Owner: CrickenZen dashboard workstream
 Status: Active (3 of 4 planned phases implemented)
 
@@ -39,6 +39,37 @@ Current dashboard gap:
 - No ranked player or matchup recommendation layer yet
 - Conditions data (dew, rain) is V1 not-ready — wired but awaiting data feed integration
 - Pre-match win probability requires model integration (currently resolved from running predictions only)
+
+### Phase 5: Upcoming Opening Intelligence (Spec 025)
+
+Why this phase exists:
+
+- Canonical upcoming Crickzen match pages need an honest, exact-source
+  before-toss answer before they can own prediction intent early in discovery.
+- The current pre-match brief is valuable context, but its probability lookup
+  is a live-predictor lookup and must not be represented as an opening model.
+
+Priority: High — prerequisite for the canonical SEO three-lifecycle cohort
+Status: In progress; Phase 0 source inventory complete, time-safe feature
+contract and leakage tests next
+
+Spec path:
+
+- `specs/025-upcoming-opening-intelligence/spec.md`
+- `specs/025-upcoming-opening-intelligence/plan.md`
+- `specs/025-upcoming-opening-intelligence/tasks.md`
+
+Non-negotiable decision:
+
+- `/prediction-candidates` remains the scraper-owned, finite **live** slate.
+  Upcoming fixtures require a separate bounded ingress contract; mixing them
+  into the live scheduler can retire healthy live predictions.
+- Never publish `50%`, a venue prior, or a fixture placeholder as a model
+  opening probability. Low coverage is `not_ready`.
+- The raw T20/ODI inputs contain dated team-pair outcomes, but the existing
+  `team_ratings.parquet` files are full-history aggregates with no as-of date.
+  They must not be used in chronological OOF evaluation; see
+  `specs/025-upcoming-opening-intelligence/research.md`.
 
 ## Execution Order
 
@@ -286,13 +317,15 @@ Starter scope:
 
 ## Current Priority
 
-As of 2026-06-08, the active execution order is:
+As of 2026-08-01, the active execution order is:
 
 1. ~~Phase 0: Metrics Foundation~~ — DONE
 2. ~~Phase 1: Proof Page~~ — DONE
 3. ~~Phase 3: Pre-Match Match Brief~~ — DONE (with bug fixes)
-4. Phase 4: Ranked Recommendations — next
-5. Phase 2: Ask CrickenZen — deferred
+4. Phase 5: Upcoming Opening Intelligence — next, because it unblocks the
+   canonical SEO cohort and makes the pre-match surface truthful
+5. Phase 4: Ranked Recommendations
+6. Phase 2: Ask CrickenZen — deferred
 
 ## Architecture Notes
 
