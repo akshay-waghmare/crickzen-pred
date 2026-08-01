@@ -1,0 +1,17 @@
+# Controlled production overlay for the isolated upcoming-opening model.
+#
+# Combine this with docker-compose.dashboard-prod.yml only after the clean
+# release directory and its fresh artifact have been verified.  It deliberately
+# leaves the live predictor state and model directories mounted from the
+# existing production workspace; only application source and the opening
+# artifact move to the immutable release directory.
+services:
+  dashboard:
+    image: "${OPENING_DASHBOARD_IMAGE:?set the immutable dashboard image tag}"
+    volumes:
+      - /home/administrator/projects/machine_learning_bbl/models:/app/models:ro
+      - /home/administrator/projects/machine_learning_bbl/data:/app/data
+      - ${OPENING_RELEASE_DIR:?set the clean release directory}/src:/app/src:ro
+      - ${OPENING_RELEASE_DIR}/artifacts:/app/artifacts:ro
+    environment:
+      OPENING_MODEL_ARTIFACT_PATH: artifacts/opening-baseline/t20_all_elo64_runtime_20260801.json
