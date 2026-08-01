@@ -54,3 +54,42 @@ The first experiment can be a time-safe team-strength baseline with:
 - explicit low-history/non-resolved-team fallback.
 
 It cannot reuse the live state predictor or its terminal feature store directly.
+
+## Initial chronological baseline (2026-08-01)
+
+The first T20 experiment is an expanding, smoothed team-strength baseline. It
+forms a deterministic unordered team pair from raw fixture rows, scores every
+fixture from only prior dates, and waits until all fixtures on a date have been
+scored before recording that date's outcomes. It requires at least five prior
+matches for each team.
+
+The final test reserves the newest 20% of whole fixture dates. A Platt
+calibrator is fit only on the earlier eligible OOF predictions, then applied
+once to the untouched holdout. This is a model-quality experiment, not a
+public-model artifact or a claim of production readiness.
+
+| Evaluation | Rows | Brier | Log loss | ECE | Historical-rate Brier | Historical-rate log loss |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Eligible chronological OOF | 4,935 | 0.2327 | 0.6574 | 0.0454 | 0.2433 | 0.6803 |
+| Final holdout, raw | 1,491 | 0.2301 | 0.6522 | 0.0588 | 0.2444 | 0.6819 |
+| Final holdout, Platt-calibrated | 1,491 | 0.2258 | 0.6430 | 0.0251 | 0.2444 | 0.6819 |
+
+The calibrated final holdout beats the neutral 0.50 baseline (Brier 0.2500,
+log loss 0.6931) and the simple historical-rate baseline overall. Its learned
+parameters are intercept `0.02996` and slope `1.61391`, fit on 3,444 earlier
+eligible rows; its final holdout starts at `2025-01-22`.
+
+### Promotion gate and decision
+
+The current offline gate requires at least 1,000 overall holdout rows, 500 for
+each female and male segment, Brier improvement of at least 0.002 against both
+baselines, lower log loss against both, ECE at or below 0.050, and a named
+competition holdout segment. The calibrated male segment passes its measured
+gate (811 rows, Brier 0.2253, ECE 0.0486), but the female segment does not
+(680 rows, Brier 0.2265, ECE 0.0705). The raw T20 source also reports every
+league as `unknown`, so there is no competition-level evidence.
+
+Decision: **shadow-only revise**. Do not serialize an opening probability,
+enable fixture ingress, or change canonical SSR from this experiment. Next
+work must restore reliable competition identity and improve/calibrate the
+female segment on a new untouched temporal holdout.

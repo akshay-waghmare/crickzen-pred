@@ -50,8 +50,8 @@ Why this phase exists:
   is a live-predictor lookup and must not be represented as an opening model.
 
 Priority: High — prerequisite for the canonical SEO three-lifecycle cohort
-Status: In progress; Phase 0 source inventory complete, time-safe feature
-contract and leakage tests next
+Status: In progress; baseline and temporal-calibration proof complete,
+**shadow-only revise** before any public opening-model path
 
 Spec path:
 
@@ -70,6 +70,12 @@ Non-negotiable decision:
   `team_ratings.parquet` files are full-history aggregates with no as-of date.
   They must not be used in chronological OOF evaluation; see
   `specs/025-upcoming-opening-intelligence/research.md`.
+- The first T20 opening baseline has a true date-disjoint holdout: calibrated
+  overall Brier is `0.2258` on 1,491 final fixtures versus `0.2500` neutral
+  and `0.2444` historical-rate baselines. This is not enough to serve: female
+  holdout ECE is `0.0705` (gate `<= 0.050`) and competition metadata is
+  entirely unknown. The explicit decision is **shadow-only revise**; no
+  upcoming probability or SSR rollout is authorized.
 
 ## Execution Order
 

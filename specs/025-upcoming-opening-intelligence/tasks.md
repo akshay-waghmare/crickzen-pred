@@ -6,11 +6,20 @@ Status: `[ ]` queued, `[-]` in progress, `[x]` verified, `[!]` blocked by eviden
 
 - [x] T001 Inventory historical pre-start outcome fields and identity coverage.
   Evidence: `research.md`; raw T20 rows provide dated team-pair/outcome records.
-- [-] T002 Produce time-safe feature contract and leakage test cases.
-  Finding: existing `team_ratings.parquet` files have no as-of date and are
-  full-history aggregates, so they are prohibited from chronological OOF use.
-- [ ] T003 Implement chronological split and 0.50/historical-win-rate baselines.
-- [ ] T004 Define written promotion thresholds and required segment samples.
+- [x] T002 Produce time-safe feature contract and leakage test cases.
+  Evidence: `opening_baseline.py` ignores toss/ball state, canonicalizes the
+  fixture pair, scores all same-day fixtures before applying their outcomes,
+  and is covered by focused leakage tests. Existing `team_ratings.parquet`
+  files remain prohibited because they are full-history aggregates with no
+  as-of date.
+- [x] T003 Implement chronological split and 0.50/historical-win-rate baselines.
+  Evidence: date-disjoint calibration/final-holdout splitting plus neutral and
+  prior-only historical-rate comparisons in `scripts/evaluate_opening_baseline.py`.
+- [x] T004 Define written promotion thresholds and required segment samples.
+  Evidence: `assess_promotion_gate()` requires 1,000 overall holdout rows,
+  500 each for female/male, Brier improvement of at least 0.002 over neutral
+  and historical rate, lower log loss than both, ECE <= 0.050, and at least
+  one named-competition holdout segment.
 
 ## Phase 1
 
@@ -22,12 +31,26 @@ Status: `[ ]` queued, `[-]` in progress, `[x]` verified, `[!]` blocked by eviden
 
 ## Phase 2
 
-- [ ] T008 Implement a deterministic team-strength baseline using only as-of
+- [x] T008 Implement a deterministic team-strength baseline using only as-of
   historical inputs.
-- [ ] T009 Generate chronological OOF predictions and calibrate without leakage.
-- [ ] T010 Publish an offline report with overall and segment Brier/ECE/log loss
+  Evidence: expanding, smoothed per-team records use outcomes strictly before
+  each fixture date; no live or score fields enter the estimator.
+- [x] T009 Generate chronological OOF predictions and calibrate without leakage.
+  Evidence: Platt calibration fits only the older 3,444 eligible prediction
+  rows and is evaluated only on a date-disjoint 1,491-fixture final holdout.
+- [x] T010 Publish an offline report with overall and segment Brier/ECE/log loss
   plus coverage and baseline comparisons.
-- [ ] T011 Decide promote, revise, or stop using the written gate.
+  Evidence: `artifacts/opening-baseline/t20_all_v0.json` (generated, ignored)
+  and the durable results in `research.md`.
+- [x] T011 Decide promote, revise, or stop using the written gate.
+  Decision (2026-08-01): **shadow-only revise**. The calibrated overall and
+  male holdout metrics pass their comparisons, but female ECE is 0.070 > 0.050
+  and the raw source provides no named-competition segment. No public opening
+  probability, fixture ingress rollout, or SSR work is authorized from this
+  experiment.
+- [-] T011a Revise the experiment with reliable named-competition history and
+  a calibration approach that passes the female holdout gate before reopening
+  the public-serving phases.
 
 ## Phase 3
 
