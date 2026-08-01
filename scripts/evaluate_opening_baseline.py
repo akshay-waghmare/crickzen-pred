@@ -21,6 +21,7 @@ from src.bbl_pipeline.prematch.opening_baseline import (
     evaluate_by_segment,
     evaluate_predictions,
     fit_platt_calibrator,
+    generate_elo_opening_predictions,
     generate_opening_predictions,
     load_competition_by_match_id,
     split_predictions_chronologically,
@@ -31,6 +32,13 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--raw-dir", required=True, type=Path)
     parser.add_argument("--minimum-prior-matches", type=int, default=5)
+    parser.add_argument(
+        "--estimator",
+        choices=("smoothed_win_rate", "elo"),
+        default="smoothed_win_rate",
+        help="Time-safe opening candidate to evaluate; neither option serves public rows.",
+    )
+    parser.add_argument("--elo-k-factor", type=float, default=64.0)
     parser.add_argument("--holdout-fraction", type=float, default=0.2)
     parser.add_argument(
         "--cricsheet-json-dir",
@@ -53,10 +61,17 @@ def main() -> int:
         raw_frame,
         competition_by_match_id=competition_by_match_id,
     )
-    predictions = generate_opening_predictions(
-        fixtures,
-        minimum_prior_matches=args.minimum_prior_matches,
-    )
+    if args.estimator == "elo":
+        predictions = generate_elo_opening_predictions(
+            fixtures,
+            k_factor=args.elo_k_factor,
+            minimum_prior_matches=args.minimum_prior_matches,
+        )
+    else:
+        predictions = generate_opening_predictions(
+            fixtures,
+            minimum_prior_matches=args.minimum_prior_matches,
+        )
     eligible = evaluate_predictions(predictions)
     all_rows = evaluate_predictions(predictions, require_coverage_ready=False)
     split = split_predictions_chronologically(
@@ -108,6 +123,8 @@ def main() -> int:
     )
     report = {
         "fixture_count": len(fixtures),
+        "estimator": args.estimator,
+        "elo_k_factor": args.elo_k_factor if args.estimator == "elo" else None,
         "prediction_count": len(predictions),
         "minimum_prior_matches": args.minimum_prior_matches,
         "holdout_fraction": args.holdout_fraction,

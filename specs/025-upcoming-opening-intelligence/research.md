@@ -129,3 +129,35 @@ The corresponding male-only versions are also not a replacement: Platt ECE is
 reference, and make the next experiment a clearly specified feature/model
 revision followed by a new untouched temporal holdout rather than another
 calibrator swap.
+
+### Elo feature/model revision (2026-08-01)
+
+The next candidate replaces the expanding win-rate ratio with a prior-only Elo
+rating. It starts each team at 1500, scores the deterministic fixture pair from
+the rating difference before play, and applies its updates only after all
+fixtures on the same date have been scored. It retains the prior win-rate field
+solely as the unchanged comparison baseline. There is no toss, score,
+ball-by-ball, lineup, result-text, or future-date input.
+
+`K=64` was selected on an inner date-disjoint validation within the pre-holdout
+period because it had the lowest overall/female Brier and log loss among the
+pre-registered Elo K grid. The outer 1,491-fixture holdout beginning
+2025-01-22 was then evaluated once by `scripts/evaluate_opening_baseline.py
+--estimator elo --elo-k-factor 64`; its generated JSON remains ignored under
+`artifacts/opening-baseline/t20_all_elo64_v1.json`.
+
+| Evaluation | Rows | Brier | Log loss | ECE |
+| --- | ---: | ---: | ---: | ---: |
+| Final holdout, Elo raw | 1,491 | 0.2062 | 0.6005 | 0.0401 |
+| Final holdout, Elo + global Platt | 1,491 | 0.2058 | 0.5988 | 0.0180 |
+| Female, Elo + global Platt | 680 | 0.2040 | 0.5949 | 0.0340 |
+| Male, Elo + global Platt | 811 | 0.2074 | 0.6020 | 0.0460 |
+
+The calibrated candidate improves both Brier and log loss against neutral and
+the fixed prior-win-rate baseline, and clears the 0.050 ECE gate overall and
+for both gender slices. Focused leakage/regression tests pass (`13 passed`).
+This is an **offline promotion only**: it authorizes Phase 1 fixture ingress
+and a separately named opening-row contract, but does not itself publish a
+percentage, change the live selector, alter canonical SSR, or claim a live
+upcoming cohort. Those operations remain separately gated by exact identity,
+12–48-hour TTL, production parity, and current-fixture proof.

@@ -23,7 +23,7 @@ Status: `[ ]` queued, `[-]` in progress, `[x]` verified, `[!]` blocked by eviden
 
 ## Phase 1
 
-- [ ] T005 Add a bounded scraper `/prematch-candidates` endpoint.
+- [-] T005 Add a bounded scraper `/prematch-candidates` endpoint.
 - [ ] T006 Add contract tests for exact URL, 12–48-hour window, supported format,
   and no live-selector mutation.
 - [ ] T007 Add dashboard pre-match candidate status separate from live
@@ -49,11 +49,15 @@ Status: `[ ]` queued, `[-]` in progress, `[x]` verified, `[!]` blocked by eviden
   but the largest recent holdout event has only 49 fixtures, so these segments
   are informational rather than individual calibration gates. No public
   opening probability, fixture ingress rollout, or SSR work is authorized.
-- [-] T011a Specify and test a feature/model revision that passes the female
+- [x] T011a Specify and test a feature/model revision that passes the female
   holdout gate; retain exact event-name segments for reporting and define only
   adequately sized competition grouping before any competition-specific serving
-  claim. Rejected: female-only Platt (ECE 0.0675) and isotonic (ECE 0.0801)
-  on the existing final holdout.
+  claim. Evidence: date-safe Elo candidate (`K=64`) is selected on an inner
+  temporal validation and reports 1,491-row outer-holdout Brier 0.2058/log loss
+  0.5988/ECE 0.0180; female 680-row ECE 0.0340 and male 811-row ECE 0.0460.
+  Focused suite: 13 passed. This is offline promotion only. Rejected:
+  female-only Platt (ECE 0.0675) and isotonic (ECE 0.0801) on the prior
+  baseline.
 
 ## Phase 3
 

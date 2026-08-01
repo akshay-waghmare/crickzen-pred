@@ -275,6 +275,81 @@ def generate_opening_predictions(
     return predictions
 
 
+def generate_elo_opening_predictions(
+    fixtures: Iterable[FixtureOutcome],
+    *,
+    k_factor: float = 64.0,
+    rating_scale: float = 400.0,
+    initial_rating: float = 1500.0,
+    alpha: float = 2.0,
+    beta: float = 2.0,
+    minimum_prior_matches: int = 5,
+) -> list[OpeningPrediction]:
+    """Score fixtures with date-safe Elo strength and prior-only coverage.
+
+    Elo is deliberately a separate candidate from the smoothed win-rate
+    baseline. Ratings and win counts are updated only after every fixture on a
+    given date has been scored, so neither same-day nor future results can
+    affect an opening estimate. The historical win-rate field is retained only
+    for the fixed comparison baseline in :func:`evaluate_predictions`.
+    """
+
+    if k_factor <= 0 or rating_scale <= 0:
+        raise ValueError("k_factor and rating_scale must be positive")
+    if alpha <= 0 or beta <= 0:
+        raise ValueError("alpha and beta must be positive")
+    if minimum_prior_matches < 0:
+        raise ValueError("minimum_prior_matches must be non-negative")
+
+    ordered = sorted(fixtures, key=lambda item: (item.match_date, item.match_id))
+    ratings: dict[str, float] = defaultdict(lambda: initial_rating)
+    wins: dict[str, int] = defaultdict(int)
+    matches: dict[str, int] = defaultdict(int)
+    predictions: list[OpeningPrediction] = []
+    position = 0
+
+    while position < len(ordered):
+        fixture_date = ordered[position].match_date
+        end = position
+        while end < len(ordered) and ordered[end].match_date == fixture_date:
+            end += 1
+        same_day = ordered[position:end]
+
+        for fixture in same_day:
+            team_a_games = matches[fixture.team_a]
+            team_b_games = matches[fixture.team_b]
+            rating_difference = ratings[fixture.team_b] - ratings[fixture.team_a]
+            probability = 1.0 / (1.0 + 10.0 ** (rating_difference / rating_scale))
+            historical_win_rate = (wins[fixture.team_a] + alpha) / (team_a_games + alpha + beta)
+            predictions.append(
+                OpeningPrediction(
+                    fixture=fixture,
+                    team_a_probability=probability,
+                    team_a_historical_win_rate=historical_win_rate,
+                    team_a_prior_matches=team_a_games,
+                    team_b_prior_matches=team_b_games,
+                    coverage_ready=(
+                        team_a_games >= minimum_prior_matches
+                        and team_b_games >= minimum_prior_matches
+                    ),
+                )
+            )
+
+        for fixture in same_day:
+            rating_difference = ratings[fixture.team_b] - ratings[fixture.team_a]
+            expected_team_a_win = 1.0 / (1.0 + 10.0 ** (rating_difference / rating_scale))
+            actual_team_a_win = int(fixture.winner == fixture.team_a)
+            adjustment = k_factor * (actual_team_a_win - expected_team_a_win)
+            ratings[fixture.team_a] += adjustment
+            ratings[fixture.team_b] -= adjustment
+            matches[fixture.team_a] += 1
+            matches[fixture.team_b] += 1
+            wins[fixture.winner] += 1
+        position = end
+
+    return predictions
+
+
 def evaluate_predictions(
     predictions: Sequence[OpeningPrediction],
     *,

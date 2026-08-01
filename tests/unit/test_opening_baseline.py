@@ -12,6 +12,7 @@ from src.bbl_pipeline.prematch.opening_baseline import (
     evaluate_by_segment,
     evaluate_predictions,
     fit_platt_calibrator,
+    generate_elo_opening_predictions,
     generate_opening_predictions,
     load_competition_by_match_id,
     split_predictions_chronologically,
@@ -91,6 +92,20 @@ def test_same_day_results_are_not_available_to_each_other():
 
     assert predictions[1].team_a_prior_matches == predictions[2].team_a_prior_matches == 1
     assert predictions[1].team_a_probability == predictions[2].team_a_probability
+
+
+def test_elo_candidate_remains_safe_from_future_and_same_day_results():
+    prior = fixture("m1", date(2026, 1, 1), "A", "B", "A")
+    target = fixture("m2", date(2026, 1, 2), "A", "C", "A")
+    same_day = fixture("m3", date(2026, 1, 2), "B", "D", "B")
+    future = fixture("m4", date(2026, 1, 3), "A", "D", "D")
+
+    without_future = generate_elo_opening_predictions([prior, target, same_day], minimum_prior_matches=0)
+    with_future = generate_elo_opening_predictions([prior, target, same_day, future], minimum_prior_matches=0)
+
+    assert with_future[1].team_a_probability == without_future[1].team_a_probability
+    assert with_future[2].team_a_probability == without_future[2].team_a_probability
+    assert with_future[1].team_a_probability != 0.5
 
 
 def test_low_history_rows_are_not_coverage_ready():
