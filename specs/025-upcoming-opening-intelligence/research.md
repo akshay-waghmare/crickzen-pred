@@ -113,3 +113,19 @@ would need a separately justified grouping and material holdout size.
 The decision remains **shadow-only revise** solely because the female
 calibrated holdout ECE is 0.0705 over the 0.050 gate. Next work revises the
 calibration method and evaluates it again on an untouched temporal holdout.
+
+### Rejected calibration variants (2026-08-01)
+
+Two gender-specific calibration variants were tested only on the same original
+date-disjoint split; neither is promoted into the implementation. A female-only
+Platt fit used 1,244 older female rows and scored the 680-row female holdout at
+Brier 0.2264, log loss 0.6460, and ECE 0.0675. It improves the global-Platt
+female ECE only slightly and still fails the 0.050 gate. Female-only isotonic
+calibration scored Brier 0.2279, log loss 0.6926, and ECE 0.0801, so it is
+strictly worse for the intended probability-quality contract.
+
+The corresponding male-only versions are also not a replacement: Platt ECE is
+0.0584 and isotonic ECE is 0.0606. Keep the global Platt result as the current
+reference, and make the next experiment a clearly specified feature/model
+revision followed by a new untouched temporal holdout rather than another
+calibrator swap.

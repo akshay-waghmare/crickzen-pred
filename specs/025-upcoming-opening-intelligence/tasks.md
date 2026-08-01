@@ -49,9 +49,11 @@ Status: `[ ]` queued, `[-]` in progress, `[x]` verified, `[!]` blocked by eviden
   but the largest recent holdout event has only 49 fixtures, so these segments
   are informational rather than individual calibration gates. No public
   opening probability, fixture ingress rollout, or SSR work is authorized.
-- [-] T011a Revise the calibration approach to pass the female holdout gate;
-  retain exact event-name segments for reporting and define only adequately
-  sized competition grouping before any competition-specific serving claim.
+- [-] T011a Specify and test a feature/model revision that passes the female
+  holdout gate; retain exact event-name segments for reporting and define only
+  adequately sized competition grouping before any competition-specific serving
+  claim. Rejected: female-only Platt (ECE 0.0675) and isotonic (ECE 0.0801)
+  on the existing final holdout.
 
 ## Phase 3
 
