@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
-from datetime import date
+from datetime import date, datetime
 import math
 from pathlib import Path
 import re
@@ -106,11 +106,44 @@ class PromotionGateResult:
     reasons: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class EloRuntimeState:
+    """As-of-date ratings required to score a future opening fixture.
+
+    This compact state deliberately contains only team aggregate values learned
+    before ``as_of_date``. It is suitable for a versioned serving artifact,
+    unlike the full-history feature-store tables that were prohibited in the
+    chronological experiment.
+    """
+
+    as_of_date: date
+    ratings: Mapping[str, float]
+    matches: Mapping[str, int]
+    wins: Mapping[str, int]
+    k_factor: float
+    rating_scale: float
+    initial_rating: float
+
+
+@dataclass(frozen=True)
+class OpeningFixtureScore:
+    """A calibrated future-fixture estimate in the requested team order."""
+
+    first_team_probability: float
+    first_team_prior_matches: int
+    second_team_prior_matches: int
+    coverage_ready: bool
+
+
 def _clean_team(value: object) -> str:
     return str(value or "").strip()
 
 
 def _as_date(value: object) -> date | None:
+    # ``datetime`` subclasses ``date``. Check it first so pandas/Timestamp
+    # values cannot leak a midnight time component into date-window artifacts.
+    if isinstance(value, datetime):
+        return value.date()
     if isinstance(value, date):
         return value
     try:
@@ -348,6 +381,98 @@ def generate_elo_opening_predictions(
         position = end
 
     return predictions
+
+
+def build_elo_runtime_state(
+    fixtures: Iterable[FixtureOutcome],
+    *,
+    as_of_date: date | None = None,
+    k_factor: float = 64.0,
+    rating_scale: float = 400.0,
+    initial_rating: float = 1500.0,
+) -> EloRuntimeState:
+    """Build ratings using only outcomes on or before a fixed historical date.
+
+    ``as_of_date`` is recorded in the artifact and production callers must
+    reject fixtures scheduled on or before that date.  Grouped date updates
+    preserve the same no-same-day-leakage rule used in evaluation.
+    """
+    if k_factor <= 0 or rating_scale <= 0:
+        raise ValueError("k_factor and rating_scale must be positive")
+    ordered = sorted(fixtures, key=lambda item: (item.match_date, item.match_id))
+    if not ordered:
+        raise ValueError("At least one resolved fixture is required")
+    cutoff = as_of_date or ordered[-1].match_date
+    ratings: dict[str, float] = defaultdict(lambda: initial_rating)
+    wins: dict[str, int] = defaultdict(int)
+    matches: dict[str, int] = defaultdict(int)
+    position = 0
+
+    while position < len(ordered):
+        fixture_date = ordered[position].match_date
+        if fixture_date > cutoff:
+            break
+        end = position
+        while end < len(ordered) and ordered[end].match_date == fixture_date:
+            end += 1
+        same_day = ordered[position:end]
+        updates: list[tuple[FixtureOutcome, float]] = []
+        for fixture in same_day:
+            difference = ratings[fixture.team_b] - ratings[fixture.team_a]
+            expected_a = 1.0 / (1.0 + 10.0 ** (difference / rating_scale))
+            updates.append((fixture, expected_a))
+        for fixture, expected_a in updates:
+            actual_a = int(fixture.winner == fixture.team_a)
+            adjustment = k_factor * (actual_a - expected_a)
+            ratings[fixture.team_a] += adjustment
+            ratings[fixture.team_b] -= adjustment
+            matches[fixture.team_a] += 1
+            matches[fixture.team_b] += 1
+            wins[fixture.winner] += 1
+        position = end
+
+    return EloRuntimeState(
+        as_of_date=cutoff,
+        ratings=dict(ratings),
+        matches=dict(matches),
+        wins=dict(wins),
+        k_factor=k_factor,
+        rating_scale=rating_scale,
+        initial_rating=initial_rating,
+    )
+
+
+def score_elo_opening_fixture(
+    state: EloRuntimeState,
+    *,
+    first_team: str,
+    second_team: str,
+    calibrator: PlattCalibrator | None = None,
+    minimum_prior_matches: int = 5,
+) -> OpeningFixtureScore:
+    """Score a future fixture without updating the historical runtime state."""
+    if minimum_prior_matches < 0:
+        raise ValueError("minimum_prior_matches must be non-negative")
+    first = _clean_team(first_team)
+    second = _clean_team(second_team)
+    if not first or not second or first == second:
+        raise ValueError("Two distinct canonical teams are required")
+    first_rating = state.ratings.get(first, state.initial_rating)
+    second_rating = state.ratings.get(second, state.initial_rating)
+    probability = 1.0 / (1.0 + 10.0 ** ((second_rating - first_rating) / state.rating_scale))
+    if calibrator is not None:
+        probability = calibrator.transform(probability)
+    first_matches = int(state.matches.get(first, 0))
+    second_matches = int(state.matches.get(second, 0))
+    return OpeningFixtureScore(
+        first_team_probability=probability,
+        first_team_prior_matches=first_matches,
+        second_team_prior_matches=second_matches,
+        coverage_ready=(
+            first_matches >= minimum_prior_matches
+            and second_matches >= minimum_prior_matches
+        ),
+    )
 
 
 def evaluate_predictions(

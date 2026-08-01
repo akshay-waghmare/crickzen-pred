@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 import pandas as pd
 import pytest
@@ -8,6 +8,7 @@ from src.bbl_pipeline.prematch.opening_baseline import (
     EvaluationMetrics,
     assess_promotion_gate,
     apply_calibration,
+    build_elo_runtime_state,
     build_fixture_outcomes,
     evaluate_by_segment,
     evaluate_predictions,
@@ -15,6 +16,7 @@ from src.bbl_pipeline.prematch.opening_baseline import (
     generate_elo_opening_predictions,
     generate_opening_predictions,
     load_competition_by_match_id,
+    score_elo_opening_fixture,
     split_predictions_chronologically,
 )
 
@@ -43,6 +45,18 @@ def test_build_fixture_outcomes_uses_pair_not_toss_order_or_ball_state():
     assert original == altered
     assert original[0].team_a == "A"
     assert original[0].team_b == "B"
+
+
+def test_fixture_dates_drop_pandas_or_datetime_time_components():
+    outcomes = build_fixture_outcomes(pd.DataFrame({
+        "match_id": ["m1"],
+        "date": [datetime(2026, 1, 1, 23, 30)],
+        "batting_team_id": ["A"],
+        "bowling_team_id": ["B"],
+        "winner": ["A"],
+    }))
+
+    assert outcomes[0].match_date == date(2026, 1, 1)
 
 
 def test_unresolved_winner_is_excluded_from_binary_training_rows():
@@ -106,6 +120,28 @@ def test_elo_candidate_remains_safe_from_future_and_same_day_results():
     assert with_future[1].team_a_probability == without_future[1].team_a_probability
     assert with_future[2].team_a_probability == without_future[2].team_a_probability
     assert with_future[1].team_a_probability != 0.5
+
+
+def test_elo_runtime_state_scores_future_fixture_without_mutating_or_using_future_results():
+    fixtures = [
+        fixture("m1", date(2026, 1, 1), "A", "B", "A"),
+        fixture("m2", date(2026, 1, 2), "A", "C", "A"),
+        fixture("m3", date(2026, 1, 3), "B", "C", "C"),
+    ]
+    state = build_elo_runtime_state(fixtures, as_of_date=date(2026, 1, 2))
+    before = dict(state.ratings)
+
+    scored = score_elo_opening_fixture(
+        state,
+        first_team="A",
+        second_team="C",
+        minimum_prior_matches=2,
+    )
+
+    assert scored.first_team_probability > 0.5
+    assert scored.coverage_ready is False
+    assert state.ratings == before
+    assert "C" in state.ratings
 
 
 def test_low_history_rows_are_not_coverage_ready():
