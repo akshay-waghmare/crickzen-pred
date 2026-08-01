@@ -16,6 +16,7 @@ from typing import Any
 from urllib.parse import urlparse, urlunparse
 
 from app.config import get_project_root, get_settings
+from app.opening_predictions import OpeningArtifactStore, OpeningDecision
 from app.prediction_manager import PredictionManager, _state_has_result
 from app.routers.live import _enrich_detail_state
 
@@ -68,6 +69,7 @@ class PublicMatchSummary:
     batting_team: str | None = None
     bowling_team: str | None = None
     win_probability_pct: int | None = None
+    probability_team: str | None = None
     projection_label: str | None = None
     insight: str = "Model probability will appear once live ball data is available."
     updated_at: str | None = None
@@ -550,6 +552,40 @@ def _candidate_summary(candidate: dict[str, Any]) -> PublicMatchSummary:
     return summary
 
 
+def _opening_candidate_summary(candidate: dict[str, Any], decision: OpeningDecision) -> PublicMatchSummary:
+    """Serialize a ready opening decision without imitating a live state."""
+    first_display = str(candidate.get("team1_name") or candidate.get("team1Name") or decision.first_team or "Team 1")
+    second_display = str(candidate.get("team2_name") or candidate.get("team2Name") or decision.second_team or "Team 2")
+    title = f"{first_display} vs {second_display}"
+    url = str(candidate.get("url") or "")
+    league = str(candidate.get("match_format") or candidate.get("matchFormat") or "T20")
+    probability = decision.first_team_probability_pct
+    return PublicMatchSummary(
+        slug=slug_for_match(title, league, url),
+        title=title,
+        league=league,
+        status="upcoming",
+        win_probability_pct=probability,
+        probability_team=first_display,
+        projection_label="Opening model",
+        insight=(
+            f"Pre-match opening model gives {first_display} a {probability}% win probability "
+            f"from pre-start team-strength history."
+        ),
+        updated_at=decision.generated_at,
+        detail_url=f"/match/{slug_for_match(title, league, url)}",
+        match_url=url or None,
+        format_label="T20",
+        model_mode="Pre-match calibrated Elo",
+        model_source="opening_team_strength",
+        model_label=decision.model_label,
+        reasons=[
+            f"{decision.first_team} has {decision.first_team_prior_matches} prior T20 fixtures in the model history.",
+            f"{decision.second_team} has {decision.second_team_prior_matches} prior T20 fixtures in the model history.",
+        ],
+    )
+
+
 def serialize_prediction(
     *,
     prediction_id: str,
@@ -617,9 +653,25 @@ def serialize_prediction(
 class PublicMatchService:
     """Read-only service for public match summaries/details."""
 
-    def __init__(self, manager: PredictionManager | None = None, scheduler: Any = None):
+    def __init__(
+        self,
+        manager: PredictionManager | None = None,
+        scheduler: Any = None,
+        opening_store: OpeningArtifactStore | None = None,
+    ):
         self.manager = manager or PredictionManager.get_instance()
         self.scheduler = scheduler
+        settings = get_settings()
+        artifact_path = Path(get_project_root()) / getattr(
+            settings,
+            "OPENING_MODEL_ARTIFACT_PATH",
+            "artifacts/opening-baseline/t20_all_elo64_runtime_v1.json",
+        )
+        self.opening_store = opening_store or OpeningArtifactStore(
+            artifact_path,
+            ttl_seconds=getattr(settings, "OPENING_MODEL_ARTIFACT_TTL_SECONDS", 86_400),
+            max_as_of_age_days=getattr(settings, "OPENING_MODEL_MAX_AS_OF_AGE_DAYS", 14),
+        )
 
     def list_matches(self) -> list[PublicMatchSummary]:
         rows: list[PublicMatchSummary] = []
@@ -662,6 +714,7 @@ class PublicMatchService:
                 continue
             rows.append(_candidate_summary(candidate))
             seen_urls.add(normalize_match_url(url))
+        rows.extend(self._opening_rows(seen_urls))
         return _sort_public_rows(rows)
 
     def list_ipl_today(self) -> list[PublicMatchSummary]:
@@ -703,6 +756,10 @@ class PublicMatchService:
                 continue
             rows.append(_candidate_summary(candidate))
             seen_urls.add(normalize_match_url(url))
+        rows.extend(
+            row for row in self._opening_rows(seen_urls)
+            if str(row.league).upper() == "IPL"
+        )
         return _sort_public_rows(rows)
 
     def get_match(self, slug: str) -> PublicMatchDetail | None:
@@ -742,6 +799,14 @@ class PublicMatchService:
                     last_swings=[],
                     dashboard_url="/dashboard",
                 )
+        for summary in self._opening_rows(set()):
+            if summary.slug == target:
+                return PublicMatchDetail(
+                    **asdict(summary),
+                    venue=None,
+                    target=None,
+                    dashboard_url="/dashboard",
+                )
         return None
 
     def get_match_by_source_url(self, match_url: str) -> PublicMatchDetail | None:
@@ -755,6 +820,14 @@ class PublicMatchService:
             state = _enrich_detail_state(prediction.read_state(), prediction.output_json_path) if prediction else None
             if state:
                 return serialize_prediction(prediction_id=pred["id"], match_url=pred.get("match_url", ""), league=pred.get("league") or pred.get("league_code") or "Cricket", status=pred.get("status") or "running", state=state, detail=True)
+        for summary in self._opening_rows(set()):
+            if normalize_match_url(summary.match_url or "") == target:
+                return PublicMatchDetail(
+                    **asdict(summary),
+                    venue=None,
+                    target=None,
+                    dashboard_url="/dashboard",
+                )
         return self._completed_archive_detail_by_source_url(target)
 
     def _completed_archive_detail_by_source_url(self, target: str) -> PublicMatchDetail | None:
@@ -824,6 +897,30 @@ class PublicMatchService:
             return []
         candidates = status.get("last_candidates") or []
         return [c for c in candidates if isinstance(c, dict)]
+
+    def _opening_rows(self, seen_urls: set[str]) -> list[PublicMatchSummary]:
+        rows: list[PublicMatchSummary] = []
+        for candidate in self._scheduler_prematch_candidates():
+            url = str(candidate.get("url") or "")
+            normalized_url = normalize_match_url(url)
+            if not normalized_url or normalized_url in seen_urls:
+                continue
+            decision = self.opening_store.evaluate(candidate)
+            if decision.status != "ready":
+                continue
+            rows.append(_opening_candidate_summary(candidate, decision))
+            seen_urls.add(normalized_url)
+        return rows
+
+    def _scheduler_prematch_candidates(self) -> list[dict[str, Any]]:
+        if self.scheduler is None:
+            return []
+        try:
+            status = self.scheduler.status()
+        except Exception:
+            return []
+        candidates = status.get("last_prematch_candidates") or []
+        return [candidate for candidate in candidates if isinstance(candidate, dict)]
 
 
 def service_from_request(request: Any) -> PublicMatchService:

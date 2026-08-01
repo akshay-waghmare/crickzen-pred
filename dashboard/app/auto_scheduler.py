@@ -45,6 +45,10 @@ class MatchCandidate:
     source: str
     label: str = ""
     is_live: bool = False
+    scheduled_start_time: int | None = None
+    match_format: str | None = None
+    team1_name: str | None = None
+    team2_name: str | None = None
 
 
 class AutoPredictionScheduler:
@@ -89,6 +93,14 @@ class AutoPredictionScheduler:
                 "source": candidate.source,
                 "label": candidate.label,
                 "is_live": candidate.is_live,
+                **({"scheduled_start_time": candidate.scheduled_start_time}
+                   if candidate.scheduled_start_time is not None else {}),
+                **({"match_format": candidate.match_format}
+                   if candidate.match_format else {}),
+                **({"team1_name": candidate.team1_name}
+                   if candidate.team1_name else {}),
+                **({"team2_name": candidate.team2_name}
+                   if candidate.team2_name else {}),
             }
 
         return {
@@ -272,11 +284,20 @@ class AutoPredictionScheduler:
                 url = item.get("url") or item.get("matchUrl") or item.get("match_url")
                 is_live = bool(item.get("is_live", True))
                 label = str(item.get("label") or "")
+                scheduled_start_time = item.get("scheduled_start_time") or item.get("scheduledStartTime")
+                match_format = str(item.get("match_format") or item.get("matchFormat") or "").strip() or None
+                team1_name = str(item.get("team1_name") or item.get("team1Name") or "").strip() or None
+                team2_name = str(item.get("team2_name") or item.get("team2Name") or "").strip() or None
             else:
                 continue
+            if isinstance(item, str):
+                scheduled_start_time = None
+                match_format = None
+                team1_name = None
+                team2_name = None
             if not url:
                 continue
-            classification_text = f"{url} {label}"
+            classification_text = f"{url} {label} {match_format or ''}"
             league_key = (
                 detect_league_from_url(classification_text)
                 or detect_generic_format_from_url(classification_text)
@@ -303,6 +324,10 @@ class AutoPredictionScheduler:
                 source=source,
                 label=label or url,
                 is_live=is_live,
+                scheduled_start_time=int(scheduled_start_time) if str(scheduled_start_time or "").isdigit() else None,
+                match_format=match_format,
+                team1_name=team1_name,
+                team2_name=team2_name,
             ))
         return candidates
 

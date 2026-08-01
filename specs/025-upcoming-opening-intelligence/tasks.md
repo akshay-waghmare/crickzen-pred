@@ -68,10 +68,21 @@ Status: `[ ]` queued, `[-]` in progress, `[x]` verified, `[!]` blocked by eviden
 
 ## Phase 3
 
-- [ ] T012 Add the exact-source upcoming opening serializer, TTL, and explicit
+- [x] T012 Add the exact-source upcoming opening serializer, TTL, and explicit
   low-coverage/not-ready fallbacks.
-- [ ] T013 Add dashboard/public API contract tests; prove opening rows cannot be
+  Evidence: `OpeningArtifactStore` requires an exact source URL, T20 format,
+  scheduled timestamp, resolvable canonical teams, fresh artifact timestamp,
+  fixture date after its as-of date, no more than 14 days of historical gap,
+  and five prior fixtures per team. It returns named `not_ready` reasons and
+  never invents a neutral probability.
+- [x] T013 Add dashboard/public API contract tests; prove opening rows cannot be
   emitted as live rows.
+  Evidence: only a `ready` `last_prematch_candidates` row can enter the public
+  feed with status `upcoming`; tests reject `is_live`, stale, unresolved, and
+  too-old-history candidates. The live scheduler and retirement slate remain
+  independent. The current generated artifact ends at `2026-07-02`, so the
+  August Argentina/Canada fixture correctly returns
+  `opening_history_too_old_for_fixture` rather than a public row.
 - [ ] T014 Add canonical SSR rendering and stale rejection tests.
 - [ ] T015 Deploy one eligible fixture only; prove normal, Googlebot, and 390px
   browser parity; run `Assert-LiveMatchCohortReadiness.ps1`.

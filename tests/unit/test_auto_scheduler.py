@@ -207,6 +207,9 @@ def test_prematch_slate_is_visible_but_never_enters_live_start_or_retirement(mon
                     "url": "https://crex.com/cricket-live-score/arg-w-vs-can-w-4th-t20-match-updates-12YR",
                     "is_live": False,
                     "match_format": "T20",
+                    "scheduled_start_time": 1_785_211_200_000,
+                    "team1_name": "Argentina Women",
+                    "team2_name": "Canada Women",
                     "label": "Argentina Women vs Canada Women, 4th T20",
         }]
     }
@@ -262,6 +265,10 @@ def test_prematch_slate_is_visible_but_never_enters_live_start_or_retirement(mon
         "source": "scraper:prematch",
         "label": "Argentina Women vs Canada Women, 4th T20",
         "is_live": False,
+        "scheduled_start_time": 1_785_211_200_000,
+        "match_format": "T20",
+        "team1_name": "Argentina Women",
+        "team2_name": "Canada Women",
     }]
     assert manager.starts == []
     assert manager.stops == []

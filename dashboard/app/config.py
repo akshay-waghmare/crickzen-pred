@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     AUTO_DISCOVERY_URLS: str = ""
     AUTO_DISCOVER_FROM_CREX: bool = True
     AUTO_SCRAPER_URL: str = "http://127.0.0.1:5000"
+    OPENING_MODEL_ARTIFACT_PATH: str = "artifacts/opening-baseline/t20_all_elo64_runtime_v1.json"
+    OPENING_MODEL_ARTIFACT_TTL_SECONDS: int = 86400
+    OPENING_MODEL_MAX_AS_OF_AGE_DAYS: int = 14
     AUTO_DISCOVERY_RENDER_JS: bool = True
     PLAYWRIGHT_EXECUTABLE_PATH: str = ""
     AUTO_DISCOVERY_INTERVAL_SECONDS: int = 300

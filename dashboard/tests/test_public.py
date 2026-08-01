@@ -4,23 +4,44 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
 from app.prediction_manager import Prediction, PredictionManager
+from app.opening_predictions import OpeningArtifactStore
 from app.public import PublicMatchService, is_ipl_candidate, public_payload
 
 
 class FakeScheduler:
-    def __init__(self, candidates):
+    def __init__(self, candidates, prematch_candidates=None):
         self.candidates = candidates
+        self.prematch_candidates = prematch_candidates or []
 
     def status(self):
         return {
             "enabled": True,
             "running": True,
             "last_candidates": self.candidates,
+            "last_prematch_candidates": self.prematch_candidates,
         }
+
+
+def _opening_artifact(path: Path):
+    path.write_text(json.dumps({
+        "schema_version": 1,
+        "estimator": "elo",
+        "format": "T20",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "as_of_date": datetime.now(timezone.utc).date().isoformat(),
+        "minimum_prior_matches": 5,
+        "rating_scale": 400.0,
+        "calibrator": {"intercept": 0.0, "slope": 1.0},
+        "teams": {
+            "Argentina": {"rating": 1515.8, "matches": 44, "wins": 19},
+            "Canada": {"rating": 1602.5, "matches": 94, "wins": 50},
+        },
+    }), encoding="utf-8")
 
 
 def test_public_api_matches_no_auth(client):
@@ -97,6 +118,34 @@ def test_public_service_ipl_today_filters_candidates():
 
     assert len(matches) == 1
     assert "dc" in matches[0]["slug"]
+
+
+def test_public_service_emits_only_a_ready_upcoming_opening_row(tmp_path):
+    artifact_path = tmp_path / "opening.json"
+    _opening_artifact(artifact_path)
+    candidate = {
+        "url": "https://crex.com/cricket-live-score/arg-w-vs-can-w-4th-t20-match-updates-12YR",
+        "is_live": False,
+        "match_format": "T20",
+        "scheduled_start_time": int((datetime.now(timezone.utc) + timedelta(days=2)).timestamp() * 1000),
+        "team1_name": "Argentina Women",
+        "team2_name": "Canada Women",
+        "label": "Argentina Women vs Canada Women, 4th T20",
+    }
+    service = PublicMatchService(
+        manager=PredictionManager(),
+        scheduler=FakeScheduler([], [candidate]),
+        opening_store=OpeningArtifactStore(artifact_path),
+    )
+
+    matches = [public_payload(match) for match in service.list_matches()]
+
+    assert len(matches) == 1
+    assert matches[0]["status"] == "upcoming"
+    assert matches[0]["match_url"] == candidate["url"]
+    assert matches[0]["probability_team"] == "Argentina Women"
+    assert matches[0]["model_label"] == "T20 opening Elo v1"
+    assert matches[0]["win_probability_pct"] is not None
 
 
 def test_public_response_does_not_leak_premium_keys(client):
