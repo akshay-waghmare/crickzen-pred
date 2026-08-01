@@ -72,10 +72,11 @@ Non-negotiable decision:
   `specs/025-upcoming-opening-intelligence/research.md`.
 - The first T20 opening baseline has a true date-disjoint holdout: calibrated
   overall Brier is `0.2258` on 1,491 final fixtures versus `0.2500` neutral
-  and `0.2444` historical-rate baselines. This is not enough to serve: female
-  holdout ECE is `0.0705` (gate `<= 0.050`) and competition metadata is
-  entirely unknown. The explicit decision is **shadow-only revise**; no
-  upcoming probability or SSR rollout is authorized.
+  and `0.2444` historical-rate baselines. Exact-ID Cricsheet event metadata
+  restores 5,300 named competition rows, though no recent event segment is
+  large enough for its own calibration gate. This is not enough to serve:
+  female holdout ECE is `0.0705` (gate `<= 0.050`). The explicit decision is
+  **shadow-only revise**; no upcoming probability or SSR rollout is authorized.
 
 ## Execution Order
 

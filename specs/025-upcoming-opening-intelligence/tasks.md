@@ -44,13 +44,14 @@ Status: `[ ]` queued, `[-]` in progress, `[x]` verified, `[!]` blocked by eviden
   and the durable results in `research.md`.
 - [x] T011 Decide promote, revise, or stop using the written gate.
   Decision (2026-08-01): **shadow-only revise**. The calibrated overall and
-  male holdout metrics pass their comparisons, but female ECE is 0.070 > 0.050
-  and the raw source provides no named-competition segment. No public opening
-  probability, fixture ingress rollout, or SSR work is authorized from this
-  experiment.
-- [-] T011a Revise the experiment with reliable named-competition history and
-  a calibration approach that passes the female holdout gate before reopening
-  the public-serving phases.
+  male holdout metrics pass their comparisons, but female ECE is 0.070 > 0.050.
+  Exact-ID Cricsheet event metadata now supplies 5,300 named competition rows,
+  but the largest recent holdout event has only 49 fixtures, so these segments
+  are informational rather than individual calibration gates. No public
+  opening probability, fixture ingress rollout, or SSR work is authorized.
+- [-] T011a Revise the calibration approach to pass the female holdout gate;
+  retain exact event-name segments for reporting and define only adequately
+  sized competition grouping before any competition-specific serving claim.
 
 ## Phase 3
 

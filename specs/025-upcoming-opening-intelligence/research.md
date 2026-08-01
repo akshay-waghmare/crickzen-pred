@@ -86,10 +86,30 @@ each female and male segment, Brier improvement of at least 0.002 against both
 baselines, lower log loss against both, ECE at or below 0.050, and a named
 competition holdout segment. The calibrated male segment passes its measured
 gate (811 rows, Brier 0.2253, ECE 0.0486), but the female segment does not
-(680 rows, Brier 0.2265, ECE 0.0705). The raw T20 source also reports every
-league as `unknown`, so there is no competition-level evidence.
+(680 rows, Brier 0.2265, ECE 0.0705).
 
 Decision: **shadow-only revise**. Do not serialize an opening probability,
 enable fixture ingress, or change canonical SSR from this experiment. Next
-work must restore reliable competition identity and improve/calibrate the
-female segment on a new untouched temporal holdout.
+work must improve/calibrate the female segment on a new untouched temporal
+holdout.
+
+### Competition metadata recovery (2026-08-01)
+
+The raw parquet `league` column is still `unknown`, but it is not the final
+source of truth for a competition label. Every raw match ID was checked against
+the bundled Cricsheet archive, and `info.event.name` is pre-innings fixture
+metadata. The new exact-ID loader maps 5,300 of 5,363 raw match IDs (98.8%) to
+a non-empty event name; 63 source records have no usable event name. It never
+falls back to team-name inference or result data.
+
+The temporal holdout now reports 224 named event segments. They are not large
+enough for individual event-specific calibration: its largest segment, `ICC
+Men's T20 World Cup`, has 49 rows; other leading segments range from 41 to 20.
+They are retained as transparent diagnostic cuts (20-row reporting minimum),
+not promoted as independent quality gates. Competition identity is therefore
+no longer a blocker to reporting, but a public competition-specific model
+would need a separately justified grouping and material holdout size.
+
+The decision remains **shadow-only revise** solely because the female
+calibrated holdout ECE is 0.0705 over the 0.050 gate. Next work revises the
+calibration method and evaluates it again on an untouched temporal holdout.

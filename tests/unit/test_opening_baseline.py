@@ -13,6 +13,7 @@ from src.bbl_pipeline.prematch.opening_baseline import (
     evaluate_predictions,
     fit_platt_calibrator,
     generate_opening_predictions,
+    load_competition_by_match_id,
     split_predictions_chronologically,
 )
 
@@ -49,6 +50,24 @@ def test_unresolved_winner_is_excluded_from_binary_training_rows():
         "batting_team_id": ["A"], "bowling_team_id": ["B"], "winner": [""],
     })
     assert build_fixture_outcomes(frame) == []
+
+
+def test_exact_cricsheet_event_metadata_recovers_unknown_competition(tmp_path):
+    (tmp_path / "m1.json").write_text(
+        '{"info":{"event":{"name":"Example T20 Cup"},"outcome":{"winner":"A"}},"innings":[]}',
+        encoding="utf-8",
+    )
+    metadata = load_competition_by_match_id(tmp_path, ["m1", "missing"])
+    frame = pd.DataFrame({
+        "match_id": ["m1"], "date": ["2026-01-01"],
+        "batting_team_id": ["A"], "bowling_team_id": ["B"],
+        "winner": ["A"], "league": ["unknown"],
+    })
+
+    outcomes = build_fixture_outcomes(frame, competition_by_match_id=metadata)
+
+    assert metadata == {"m1": "Example T20 Cup"}
+    assert outcomes[0].league == "Example T20 Cup"
 
 
 def test_future_results_do_not_change_an_earlier_prediction():

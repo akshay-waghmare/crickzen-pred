@@ -22,6 +22,7 @@ from src.bbl_pipeline.prematch.opening_baseline import (
     evaluate_predictions,
     fit_platt_calibrator,
     generate_opening_predictions,
+    load_competition_by_match_id,
     split_predictions_chronologically,
 )
 
@@ -31,12 +32,27 @@ def main() -> int:
     parser.add_argument("--raw-dir", required=True, type=Path)
     parser.add_argument("--minimum-prior-matches", type=int, default=5)
     parser.add_argument("--holdout-fraction", type=float, default=0.2)
+    parser.add_argument(
+        "--cricsheet-json-dir",
+        type=Path,
+        help="Optional exact-ID Cricsheet archive used to recover info.event.name competition metadata",
+    )
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
     columns = sorted(REQUIRED_RAW_COLUMNS | {"league", "gender", "venue_id"})
     table = ds.dataset(args.raw_dir, format="parquet", partitioning="hive").to_table(columns=columns)
-    fixtures = build_fixture_outcomes(table.to_pandas())
+    raw_frame = table.to_pandas()
+    competition_by_match_id = {}
+    if args.cricsheet_json_dir:
+        competition_by_match_id = load_competition_by_match_id(
+            args.cricsheet_json_dir,
+            raw_frame["match_id"].astype(str).unique(),
+        )
+    fixtures = build_fixture_outcomes(
+        raw_frame,
+        competition_by_match_id=competition_by_match_id,
+    )
     predictions = generate_opening_predictions(
         fixtures,
         minimum_prior_matches=args.minimum_prior_matches,
@@ -55,14 +71,22 @@ def main() -> int:
         "raw": {
             attribute: {
                 key: metrics.__dict__
-                for key, metrics in evaluate_by_segment(split.holdout, attribute=attribute).items()
+                for key, metrics in evaluate_by_segment(
+                    split.holdout,
+                    attribute=attribute,
+                    minimum_samples=20 if attribute == "league" else 50,
+                ).items()
             }
             for attribute in ("gender", "league")
         },
         "platt_calibrated": {
             attribute: {
                 key: metrics.__dict__
-                for key, metrics in evaluate_by_segment(calibrated_holdout, attribute=attribute).items()
+                for key, metrics in evaluate_by_segment(
+                    calibrated_holdout,
+                    attribute=attribute,
+                    minimum_samples=20 if attribute == "league" else 50,
+                ).items()
             }
             for attribute in ("gender", "league")
         },
@@ -75,7 +99,11 @@ def main() -> int:
         },
         {
             key: metrics
-            for key, metrics in evaluate_by_segment(calibrated_holdout, attribute="league").items()
+            for key, metrics in evaluate_by_segment(
+                calibrated_holdout,
+                attribute="league",
+                minimum_samples=20,
+            ).items()
         },
     )
     report = {
@@ -83,6 +111,12 @@ def main() -> int:
         "prediction_count": len(predictions),
         "minimum_prior_matches": args.minimum_prior_matches,
         "holdout_fraction": args.holdout_fraction,
+        "competition_metadata": {
+            "source": str(args.cricsheet_json_dir) if args.cricsheet_json_dir else None,
+            "requested_match_id_count": len({str(value) for value in raw_frame["match_id"]}),
+            "named_competition_count": len(competition_by_match_id),
+            "not_named_competition_count": len({str(value) for value in raw_frame["match_id"]}) - len(competition_by_match_id),
+        },
         "eligible": eligible.__dict__,
         "all_rows": all_rows.__dict__,
         "segments": {
@@ -92,7 +126,11 @@ def main() -> int:
             },
             "league": {
                 key: metrics.__dict__
-                for key, metrics in evaluate_by_segment(predictions, attribute="league").items()
+                for key, metrics in evaluate_by_segment(
+                    predictions,
+                    attribute="league",
+                    minimum_samples=20,
+                ).items()
             },
         },
         "final_temporal_holdout": {

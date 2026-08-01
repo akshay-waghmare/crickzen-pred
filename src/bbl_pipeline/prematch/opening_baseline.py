@@ -10,10 +10,13 @@ been scored.  It is an offline experiment, never a public-serving path.
 from __future__ import annotations
 
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
 from datetime import date
 import math
-from typing import Iterable, Sequence
+from pathlib import Path
+import re
+from typing import Iterable, Mapping, Sequence
 
 
 REQUIRED_RAW_COLUMNS = {
@@ -23,6 +26,11 @@ REQUIRED_RAW_COLUMNS = {
     "bowling_team_id",
     "winner",
 }
+
+_EVENT_NAME_PATTERN = re.compile(
+    r'"event"\s*:\s*\{.{0,12000}?"name"\s*:\s*"([^"]+)"',
+    re.DOTALL,
+)
 
 
 @dataclass(frozen=True)
@@ -116,7 +124,11 @@ def _as_date(value: object) -> date | None:
         return None
 
 
-def build_fixture_outcomes(raw_frame: object) -> list[FixtureOutcome]:
+def build_fixture_outcomes(
+    raw_frame: object,
+    *,
+    competition_by_match_id: Mapping[str, str] | None = None,
+) -> list[FixtureOutcome]:
     """Collapse ball rows into resolved fixtures without using match-state data.
 
     ``batting_team_id`` and ``bowling_team_id`` are used solely to discover the
@@ -153,7 +165,10 @@ def build_fixture_outcomes(raw_frame: object) -> list[FixtureOutcome]:
                 team_a=team_a,
                 team_b=team_b,
                 winner=winner,
-                league=_optional_text(row.get("league")),
+                league=(
+                    _usable_competition(row.get("league"))
+                    or _usable_competition((competition_by_match_id or {}).get(str(row["match_id"])))
+                ),
                 gender=_optional_text(row.get("gender")),
                 venue=_optional_text(row.get("venue_id")),
             )
@@ -164,6 +179,40 @@ def build_fixture_outcomes(raw_frame: object) -> list[FixtureOutcome]:
 def _optional_text(value: object) -> str | None:
     text = _clean_team(value)
     return text or None
+
+
+def _usable_competition(value: object) -> str | None:
+    text = _optional_text(value)
+    return text if text and text.casefold() not in {"unknown", "none", "nan"} else None
+
+
+def load_competition_by_match_id(
+    json_dir: Path,
+    match_ids: Iterable[str],
+) -> dict[str, str]:
+    """Read exact Cricsheet ``info.event.name`` metadata for known matches.
+
+    ``event.name`` is in the top-level pre-innings `info` object, so it is
+    legitimate fixture metadata.  The source is joined only by exact match ID;
+    neither team labels nor results are used as a fallback.  A bounded header
+    read avoids parsing every ball from the archive during offline reporting.
+    """
+
+    requested_ids = sorted({str(match_id) for match_id in match_ids if str(match_id)})
+
+    def read_event_name(match_id: str) -> tuple[str, str | None]:
+        path = json_dir / f"{match_id}.json"
+        try:
+            with path.open("r", encoding="utf-8") as handle:
+                header = handle.read(64 * 1024)
+        except OSError:
+            return match_id, None
+        match = _EVENT_NAME_PATTERN.search(header)
+        return match_id, _usable_competition(match.group(1) if match else None)
+
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        pairs = list(executor.map(read_event_name, requested_ids))
+    return {match_id: name for match_id, name in pairs if name}
 
 
 def generate_opening_predictions(
