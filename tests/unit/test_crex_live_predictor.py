@@ -1,3 +1,4 @@
+import asyncio
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -13,6 +14,39 @@ from bbl_pipeline.inference.crex_live_predictor import MatchState as CrexMatchSt
 from bbl_pipeline.inference.predictor import Predictor
 from bbl_pipeline.inference.schema import MatchState as PredictorMatchState
 from bbl_pipeline.features.format_config import FormatConfig
+
+
+class _ClosableBrowser:
+    def __init__(self):
+        self.closed = False
+
+    async def close(self):
+        self.closed = True
+
+
+class _ClosablePlaywright:
+    def __init__(self):
+        self.stopped = False
+
+    async def stop(self):
+        self.stopped = True
+
+
+def test_stop_closes_browser_and_playwright_driver():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor._running = True
+    browser = _ClosableBrowser()
+    playwright = _ClosablePlaywright()
+    predictor.browser = browser
+    predictor._playwright = playwright
+
+    asyncio.run(predictor.stop())
+
+    assert predictor._running is False
+    assert browser.closed is True
+    assert playwright.stopped is True
+    assert predictor.browser is None
+    assert predictor._playwright is None
 
 
 def test_normalize_live_url_strips_info_suffixes():

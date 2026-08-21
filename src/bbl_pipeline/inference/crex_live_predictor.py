@@ -223,6 +223,10 @@ class CrexLivePredictor:
                 live_match_json = None
         self.live_match_json = live_match_json
         self.browser = None
+        # `async_playwright().start()` owns a separate driver process. Closing
+        # Chromium alone does not guarantee that driver exits when a predictor
+        # is retired by the dashboard scheduler, so retain it for shutdown.
+        self._playwright = None
         self.page = None
         self.match_state = MatchState()
         self.last_ball_number = ""
@@ -1646,9 +1650,9 @@ class CrexLivePredictor:
         print(f"[START] Starting Crex Live Predictor")
         print(f"   Match URL: {self.match_url}")
         
-        playwright = await async_playwright().start()
-        
-        self.browser = await playwright.chromium.launch(headless=self.headless)
+        self._playwright = await async_playwright().start()
+
+        self.browser = await self._playwright.chromium.launch(headless=self.headless)
         context = await self.browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             viewport={'width': 1920, 'height': 1080},
@@ -3741,6 +3745,14 @@ class CrexLivePredictor:
                 print(f"\n[WARN] Browser close failed (ignored): {e}")
             finally:
                 self.browser = None
+        if self._playwright:
+            try:
+                await self._playwright.stop()
+                print("[STOP] Playwright driver closed")
+            except Exception as e:
+                print(f"[WARN] Playwright driver close failed (ignored): {e}")
+            finally:
+                self._playwright = None
 
 
 async def main():
