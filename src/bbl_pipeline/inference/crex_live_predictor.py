@@ -1832,6 +1832,91 @@ class CrexLivePredictor:
         except Exception as e:
             print(f"[WARN] Error processing API data: {e}")
     
+    @staticmethod
+    def _extract_score_snapshot(
+        text: str,
+        preferred_team: str | None = None,
+    ) -> tuple[str, int, int, float] | None:
+        """Extract the current CREX score from title or visible score rows.
+
+        CREX normally publishes the score in ``document.title``. During a
+        client-side refresh, however, the title can briefly lag while the
+        visible score card already contains rows such as ``PD``, ``71-2``,
+        ``5.3``. Keep this parser independent of Playwright so both shapes are
+        covered by unit tests and so a transient title mismatch cannot publish
+        a default ``0/0`` state.
+        """
+        if not text:
+            return None
+
+        cleaned = str(text).replace("\u00a0", " ")
+        title_match = re.search(
+            r"(?m)^\s*(?P<team>[A-Za-z0-9][A-Za-z0-9&.'\- ]*?)\s+"
+            r"(?P<runs>\d{1,4})\s*[-/]\s*(?P<wickets>\d{1,2})\s*"
+            r"\(\s*(?P<overs>\d{1,3}(?:\.\d+)?)\s*\)",
+            cleaned,
+        )
+        candidates: list[tuple[str, int, int, float]] = []
+        if title_match:
+            candidates.append(
+                (
+                    title_match.group("team").strip(),
+                    int(title_match.group("runs")),
+                    int(title_match.group("wickets")),
+                    float(title_match.group("overs")),
+                )
+            )
+
+        # The hydrated score card is rendered as three adjacent text rows.
+        # Parse by line instead of flattening the whole page, which avoids
+        # mistaking commentary/history score lines for the current score.
+        lines = [re.sub(r"\s+", " ", line).strip() for line in cleaned.splitlines()]
+        for index in range(len(lines) - 2):
+            score_match = re.fullmatch(
+                r"(?P<runs>\d{1,4})\s*[-/]\s*(?P<wickets>\d{1,2})",
+                lines[index + 1],
+            )
+            overs_match = re.fullmatch(r"(?P<overs>\d{1,3}(?:\.\d+)?)", lines[index + 2])
+            team = lines[index]
+            if score_match and overs_match and team and len(team) <= 60:
+                candidates.append(
+                    (
+                        team,
+                        int(score_match.group("runs")),
+                        int(score_match.group("wickets")),
+                        float(overs_match.group("overs")),
+                    )
+                )
+
+        # Some CREX responses arrive as a compact text fragment rather than
+        # line-preserving innerText. Keep a conservative inline fallback.
+        compact_match = re.search(
+            r"(?P<team>[A-Za-z0-9][A-Za-z0-9&.'\- ]*?)\s+"
+            r"(?P<runs>\d{1,4})\s*[-/]\s*(?P<wickets>\d{1,2})\s*"
+            r"\(?\s*(?P<overs>\d{1,3}\.\d+)\s*\)?",
+            re.sub(r"\s+", " ", cleaned),
+        )
+        if compact_match:
+            candidates.append(
+                (
+                    compact_match.group("team").strip(),
+                    int(compact_match.group("runs")),
+                    int(compact_match.group("wickets")),
+                    float(compact_match.group("overs")),
+                )
+            )
+
+        if not candidates:
+            return None
+
+        preferred_key = re.sub(r"[^A-Z0-9]", "", (preferred_team or "").upper())
+        if preferred_key:
+            for candidate in candidates:
+                candidate_key = re.sub(r"[^A-Z0-9]", "", candidate[0].upper())
+                if candidate_key == preferred_key or candidate_key.startswith(preferred_key):
+                    return candidate
+        return candidates[0]
+
     async def _extract_match_info(self):
         """Extract match information from DOM using Crex selectors."""
         try:
@@ -1839,12 +1924,13 @@ class CrexLivePredictor:
             title = await self.page.title()
             # Title format: "PRS-W 66-1 (7.2) (Sophie Devine 0(0), Beth Mooney 22(14)) vs Sydney..."
             # Extract score first
-            title_match = re.match(r"^([A-Za-z0-9][A-Za-z0-9&.'\- ]*?)\s+(\d+)[-/](\d+)\s+\((\d+\.?\d*)\)", title)
-            if title_match:
-                current_batting_team = self._resolve_team_name(title_match.group(1))
-                self.match_state.total_runs = int(title_match.group(2))
-                self.match_state.wickets = int(title_match.group(3))
-                self.match_state.overs = float(title_match.group(4))
+            title_score = self._extract_score_snapshot(title)
+            if title_score:
+                title_team, title_runs, title_wickets, title_overs = title_score
+                current_batting_team = self._resolve_team_name(title_team)
+                self.match_state.total_runs = title_runs
+                self.match_state.wickets = title_wickets
+                self.match_state.overs = title_overs
                 
                 # Auto-detect ODI from current overs > 20 (can't be T20 if over 20 bowled)
                 current_overs = self.match_state.overs
@@ -1896,6 +1982,20 @@ class CrexLivePredictor:
             
             # Get page text to detect second innings and extract data
             page_text = await self.page.inner_text("body")
+            body_score = self._extract_score_snapshot(page_text)
+            if body_score and (
+                not title_score
+                or body_score[3] > self.match_state.overs
+                or body_score[1] > self.match_state.total_runs
+            ):
+                current_batting_team = self._resolve_team_name(body_score[0])
+                self.match_state.total_runs = body_score[1]
+                self.match_state.wickets = body_score[2]
+                self.match_state.overs = body_score[3]
+                title_score = body_score
+                if self.match_state.batting_team and self._normalize_team_key(self.match_state.batting_team) != self._normalize_team_key(current_batting_team):
+                    self.match_state.bowling_team = self.match_state.batting_team
+                self.match_state.batting_team = current_batting_team
             self._capture_first_innings_summary(page_text)
             try:
                 # Historical innings summaries may be present only in the SSR
@@ -1972,7 +2072,18 @@ class CrexLivePredictor:
             # Run once more after target/innings detection so a restarted
             # second-innings page can validate its first-innings summary.
             self._capture_first_innings_summary(f"{page_text}\n{page_html}")
-            await self._hydrate_inn1_from_crex_over_api()
+            # This is enrichment only. Do not block the first live state on a
+            # best-effort historical commentary API (the old loop could wait
+            # up to 12.5 minutes before publishing the already-parsed score).
+            try:
+                await asyncio.wait_for(
+                    self._hydrate_inn1_from_crex_over_api(),
+                    timeout=5.0,
+                )
+            except asyncio.TimeoutError:
+                logger.warning("CREX first-innings hydration timed out; continuing with live DOM state")
+            except Exception as exc:
+                logger.warning(f"CREX first-innings hydration skipped: {exc}")
             
             # Extract bowling team from page text if not already set
             if not self.match_state.bowling_team or self.match_state.bowling_team == self.match_state.batting_team:
@@ -2720,7 +2831,8 @@ class CrexLivePredictor:
 
         try:
             summaries = []
-            for over_number in range(50):
+            effective_overs = int(self._effective_total_overs or self.format_config.total_overs or 20)
+            for over_number in range(min(max(effective_overs, 1), 50)):
                 response = await self.page.request.post(
                     "https://content.crickapi.com/commentary/v3/getBallFeeds",
                     data={

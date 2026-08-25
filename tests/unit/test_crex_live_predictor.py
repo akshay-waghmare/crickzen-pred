@@ -70,6 +70,38 @@ def test_clean_team_text_removes_crex_section_labels():
     assert CrexLivePredictor._clean_team_text("Punjab Kings Team Form") == "Punjab Kings"
 
 
+def test_extract_score_snapshot_from_current_crex_title():
+    title = (
+        "PD 74-2 (6.0) (Dev Lakra 2(4), Aryan Gaur 33(16)) vs "
+        "East Delhi Riders 118-6 ((10.0)) 40th-Match | Delhi Premier T20 League 2026 - CREX"
+    )
+
+    assert CrexLivePredictor._extract_score_snapshot(title) == ("PD", 74, 2, 6.0)
+
+
+def test_extract_score_snapshot_falls_back_to_hydrated_score_rows():
+    body = """
+    Match Details
+    PD
+    71-2
+    5.3
+    1
+    CRR : 12.91
+    RRR : 10.67
+    PD need 48 runs in 27 balls
+    Commentary
+    Purani Dilli-6
+    69/2
+    """
+
+    assert CrexLivePredictor._extract_score_snapshot(body, preferred_team="PD") == (
+        "PD",
+        71,
+        2,
+        5.3,
+    )
+
+
 def test_capture_first_innings_summary_accepts_current_crex_slash_format():
     predictor = CrexLivePredictor.__new__(CrexLivePredictor)
     predictor.match_state = CrexMatchState(target=234, is_second_innings=True)
