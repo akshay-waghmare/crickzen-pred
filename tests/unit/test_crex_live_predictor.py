@@ -333,6 +333,28 @@ def test_repair_match_teams_replaces_a_valid_but_unrelated_page_snippet():
     assert predictor.match_state.bowling_team == "Jaffna Kings"
 
 
+def test_repair_match_teams_preserves_nep_a_live_batting_identity():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.local_storage = {}
+    predictor.league = "t20_all"
+    predictor.predictor = None
+    predictor.match_url = (
+        "https://crex.com/cricket-live-score/hyk-vs-nep-a-20th-match-top-end-"
+        "t20-series-2026-match-updates-13KJ"
+    )
+    predictor.original_match_url = predictor.match_url
+    predictor.match_state = type("State", (), {})()
+    predictor.match_state.batting_team = "NEP-A"
+    predictor.match_state.bowling_team = "Hyderabad Kingsmen Academy"
+
+    assert predictor._extract_teams_from_url() == ("HYK", "NEP-A")
+
+    predictor._repair_match_teams_from_url()
+
+    assert predictor.match_state.batting_team == "NEP-A"
+    assert predictor.match_state.bowling_team == "Hyderabad Kingsmen Academy"
+
+
 def test_clean_venue_text_removes_broadcast_tail():
     assert (
         CrexLivePredictor._clean_venue_text(

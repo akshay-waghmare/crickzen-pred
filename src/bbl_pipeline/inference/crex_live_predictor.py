@@ -367,7 +367,7 @@ class CrexLivePredictor:
         """Return normalized team codes that may appear in CREX URL slugs."""
         codes = {
             'mi', 'csk', 'rcb', 'kkr', 'srh', 'dc', 'pbks', 'pk', 'rr', 'gt', 'lsg',
-            'ind', 'aus', 'eng', 'nz', 'wi', 'sa', 'pak', 'sl', 'ban', 'afg', 'ck', 'jk',
+            'ind', 'aus', 'eng', 'nz', 'wi', 'sa', 'pak', 'sl', 'ban', 'afg', 'ck', 'jk', 'nep-a',
         }
         try:
             from bbl_pipeline.features.store import InMemoryFeatureStore
@@ -444,6 +444,7 @@ class CrexLivePredictor:
         batting_key = self._normalize_team_key(batting)
         team1_key = self._normalize_team_key(team1)
         team2_key = self._normalize_team_key(team2)
+        batting_matches_url = batting_key in {team1_key, team2_key}
 
         if not self._looks_like_valid_team_name(batting):
             self.match_state.batting_team = team1
@@ -466,7 +467,10 @@ class CrexLivePredictor:
                 self.match_state.bowling_team = team1
             else:
                 self.match_state.bowling_team = team2
-        elif self._normalize_team_key(bowling) not in {team1_key, team2_key}:
+        elif (
+            not batting_matches_url
+            and self._normalize_team_key(bowling) not in {team1_key, team2_key}
+        ):
             self.match_state.bowling_team = team2 if batting_key == team1_key else team1
 
     def _resolve_team_name(self, team_name: str) -> str:
