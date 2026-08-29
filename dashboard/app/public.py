@@ -18,6 +18,14 @@ from urllib.parse import urlparse, urlunparse
 from app.config import get_project_root, get_settings
 from app.opening_predictions import OpeningArtifactStore, OpeningDecision
 from app.prediction_manager import PredictionManager, _state_has_result
+from app.public_history import (
+    find_history_record_by_slug,
+    find_history_record_by_source_url,
+    history_summary,
+    public_history_record,
+    read_history_record,
+    read_history_records,
+)
 from app.routers.live import _enrich_detail_state
 
 
@@ -95,6 +103,10 @@ class PublicMatchSummary:
     prediction_history: list[PublicPredictionPoint] = field(default_factory=list)
     reasons: list[str] = field(default_factory=list)
     explanation_pack: dict[str, Any] = field(default_factory=dict)
+    historical_archive_id: str | None = None
+    historical_snapshot: bool = False
+    prediction_snapshot_at: str | None = None
+    final_winner: str | None = None
 
 
 @dataclass
@@ -650,6 +662,65 @@ def serialize_prediction(
     )
 
 
+def _serialize_history_record(record: dict[str, Any]) -> PublicMatchDetail:
+    """Turn an immutable public record into the normal share-card contract."""
+    prediction = record.get("prediction") or {}
+    outcome = record.get("outcome") or {}
+    aliases = record.get("public_slug_aliases") or []
+    source_url = str(record.get("match_url") or "")
+    league = str(record.get("league") or "Cricket")
+    title = str(record.get("match_label") or "Cricket match")
+    slug = str(aliases[0] if aliases else slug_for_match(title, league, source_url))
+    predicted_side = str(prediction.get("predicted_side") or "") or None
+    probability = as_float(prediction.get("predicted_probability_pct"))
+    probability_pct = int(round(probability)) if probability is not None else None
+    prediction_timestamp = str(prediction.get("timestamp") or "") or None
+    winner = str(outcome.get("winner") or "") or None
+    reasons = []
+    if prediction_timestamp:
+        reasons.append(f"First usable public forecast recorded at {prediction_timestamp}.")
+    if winner:
+        reasons.append(f"Final result recorded: {winner} won.")
+    summary = PublicMatchSummary(
+        slug=slug,
+        title=title,
+        league=league,
+        status="completed",
+        win_probability_pct=probability_pct,
+        probability_team=predicted_side,
+        projection_label="Historical forecast",
+        insight=(
+            f"The archived first public forecast gave {predicted_side} a {probability_pct}% chance; "
+            f"the recorded result was {winner}."
+            if predicted_side and probability_pct is not None and winner
+            else "Archived public forecast with a recorded final result."
+        ),
+        updated_at=prediction_timestamp,
+        detail_url=f"/match/{slug}",
+        match_url=source_url or None,
+        format_label=league,
+        model_mode="Historical public forecast",
+        model_source="immutable_public_archive",
+        model_label=str(prediction.get("model_label") or "") or None,
+        reasons=reasons,
+        explanation_pack={
+            "archive_id": record.get("archive_id"),
+            "outcome_evidence": outcome.get("evidence"),
+            "scope": "first usable public forecast for this completed match",
+        },
+        historical_archive_id=str(record.get("archive_id") or "") or None,
+        historical_snapshot=True,
+        prediction_snapshot_at=prediction_timestamp,
+        final_winner=winner,
+    )
+    return PublicMatchDetail(
+        **asdict(summary),
+        venue=None,
+        target=None,
+        dashboard_url="/dashboard",
+    )
+
+
 class PublicMatchService:
     """Read-only service for public match summaries/details."""
 
@@ -717,6 +788,16 @@ class PublicMatchService:
         rows.extend(self._opening_rows(seen_urls))
         return _sort_public_rows(rows)
 
+    def public_history_summary(self, league: str | None = None) -> dict[str, Any]:
+        return history_summary(league)
+
+    def public_history_records(self, league: str | None = None) -> list[dict[str, Any]]:
+        return [public_history_record(record) for record in read_history_records(league)]
+
+    def public_history_record(self, archive_id: str) -> dict[str, Any] | None:
+        record = read_history_record(archive_id)
+        return public_history_record(record) if record else None
+
     def list_ipl_today(self) -> list[PublicMatchSummary]:
         rows: list[PublicMatchSummary] = []
         seen_urls: set[str] = set()
@@ -781,6 +862,10 @@ class PublicMatchService:
             if detail.slug == target:
                 return detail
 
+        historical = find_history_record_by_slug(target)
+        if historical is not None:
+            return _serialize_history_record(historical)
+
         # Finished predictors leave the in-memory manager by design, but their
         # public-safe state and full history sidecars remain on disk. Direct
         # Match Intelligence routes must keep resolving those completed match
@@ -828,6 +913,9 @@ class PublicMatchService:
                     target=None,
                     dashboard_url="/dashboard",
                 )
+        historical = find_history_record_by_source_url(target)
+        if historical is not None:
+            return _serialize_history_record(historical)
         return self._completed_archive_detail_by_source_url(target)
 
     def _completed_archive_detail_by_source_url(self, target: str) -> PublicMatchDetail | None:
@@ -938,13 +1026,22 @@ def _sort_public_rows(rows: list[PublicMatchSummary]) -> list[PublicMatchSummary
 
 
 def _is_publicly_stale_prediction(prediction: Any, state: dict[str, Any] | None) -> bool:
-    latest_activity = None
+    activity_boundaries: list[datetime] = []
     if prediction is not None and hasattr(prediction, "latest_state_at"):
         latest_activity = prediction.latest_state_at()
-    if latest_activity is None and state:
-        latest_activity = _parse_timestamp(state.get("timestamp"))
-    if latest_activity is None:
+        if latest_activity is not None:
+            activity_boundaries.append(latest_activity)
+    if state:
+        for key in ("timestamp", "updated_at", "updatedAt", "last_updated", "lastUpdated"):
+            parsed = _parse_timestamp(state.get(key))
+            if parsed is not None:
+                activity_boundaries.append(parsed)
+                break
+    if not activity_boundaries:
         return False
+    # The oldest boundary wins. A rewritten JSON file must not make an
+    # unchanged/stale match snapshot publicly actionable.
+    latest_activity = min(activity_boundaries)
     age_seconds = (datetime.now(timezone.utc) - latest_activity).total_seconds()
     return age_seconds > max(30, get_settings().PUBLIC_MATCH_STALE_SECONDS)
 
@@ -954,6 +1051,14 @@ def _parse_timestamp(value: Any) -> datetime | None:
         return None
     if isinstance(value, datetime):
         return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    if isinstance(value, (int, float)):
+        try:
+            seconds = float(value)
+            if seconds > 100_000_000_000:
+                seconds /= 1000
+            return datetime.fromtimestamp(seconds, tz=timezone.utc)
+        except (OverflowError, OSError, ValueError):
+            return None
     if not isinstance(value, str):
         return None
     try:

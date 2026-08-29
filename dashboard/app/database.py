@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Generator
 
 from sqlalchemy import event
+from sqlalchemy.pool import NullPool
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from app.config import Settings, get_settings
@@ -22,7 +23,15 @@ def init_engine(settings: Settings | None = None):
     global _engine
     s = settings or get_settings()
     connect_args = {"check_same_thread": False}
-    _engine = create_engine(s.DATABASE_URL, connect_args=connect_args)
+    engine_kwargs = {"connect_args": connect_args}
+    if s.DATABASE_URL.startswith("sqlite"):
+        # SQLite is the dashboard's file-backed production store. The default
+        # QueuePool can exhaust under concurrent public requests because
+        # sessions are short-lived and the database is not a server pool.
+        # Opening a bounded connection per session avoids a stuck pool while
+        # WAL + busy_timeout still protect concurrent reads/writes.
+        engine_kwargs["poolclass"] = NullPool
+    _engine = create_engine(s.DATABASE_URL, **engine_kwargs)
 
     @event.listens_for(_engine, "connect")
     def _set_sqlite_pragma(dbapi_conn, connection_record):

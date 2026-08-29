@@ -27,6 +27,7 @@ from app.config import (
     get_settings,
 )
 from app.model_resolution import resolve_model_config
+from app.public_history import write_completed_prediction_archive
 
 logger = logging.getLogger(__name__)
 
@@ -85,14 +86,30 @@ class Prediction:
             self.set_status("finished" if code == 0 else "error")
 
     def latest_state_at(self) -> datetime | None:
-        """Return the latest output-file write time, if any."""
+        """Return the oldest known activity boundary for the state file.
+
+        A predictor can keep touching its JSON file while the embedded match
+        timestamp remains frozen. Treat the state payload as the freshness
+        contract and use the older of the file mtime and payload timestamp so
+        a rewritten stale payload is still recycled.
+        """
+        timestamps: list[datetime] = []
         try:
             path = Path(self.output_json_path)
-            if not path.exists():
-                return None
-            return datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+            if path.exists():
+                timestamps.append(datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc))
         except OSError:
-            return None
+            pass
+
+        state = self.read_state()
+        if state:
+            for key in ("timestamp", "updated_at", "updatedAt", "last_updated", "lastUpdated"):
+                parsed = _parse_state_timestamp(state.get(key))
+                if parsed is not None:
+                    timestamps.append(parsed)
+                    break
+
+        return min(timestamps) if timestamps else None
 
     def is_stale_running(self, now: datetime, settings: Settings) -> bool:
         """Return true for very old running predictions that should be cleared."""
@@ -299,6 +316,39 @@ class PredictionManager:
         pred.stop()
         return True
 
+    def archive_completed_prediction(self, prediction: Prediction) -> dict[str, Any] | None:
+        """Persist a completed prediction before its rolling state is retired.
+
+        The live JSON is intentionally short-lived.  The richer ``_livematch``
+        sidecar is preferred because it contains the first forecast history;
+        the writer itself validates that a winner can be proven before writing.
+        """
+        raw_state = prediction.read_state()
+        sidecar = Path(prediction.output_json_path).with_name(
+            f"{Path(prediction.output_json_path).stem}_livematch.json"
+        )
+        if sidecar.exists():
+            try:
+                sidecar_state = json.loads(sidecar.read_text(encoding="utf-8"))
+                if isinstance(sidecar_state, dict):
+                    raw_state = sidecar_state
+            except (OSError, json.JSONDecodeError):
+                logger.debug("Could not read completed sidecar for %s", prediction.id)
+        if not isinstance(raw_state, dict):
+            return None
+        try:
+            return write_completed_prediction_archive(
+                raw_state=raw_state,
+                match_url=prediction.match_url,
+                league=prediction.league_code or prediction.league_key,
+                prediction_id=prediction.id,
+            )
+        except Exception:
+            # A metrics/archive write must never take down live prediction
+            # cleanup. The next cleanup pass can retry the same immutable ID.
+            logger.exception("Failed to archive completed prediction %s", prediction.id)
+            return None
+
     def get_prediction(self, prediction_id: str) -> Prediction | None:
         pred = self._predictions.get(prediction_id)
         if pred is not None:
@@ -313,6 +363,7 @@ class PredictionManager:
         for pred in self._predictions.values():
             pred.refresh_status()
             if pred.status == "running" and pred.state_indicates_finished():
+                self.archive_completed_prediction(pred)
                 pred.set_status("finished")
                 continue
             if pred.is_stale_running(now, settings):
@@ -367,6 +418,7 @@ class PredictionManager:
 
                 if pred.status == "running" and pred.state_indicates_finished():
                     logger.info("Marking completed prediction %s as finished from state JSON", prediction_id)
+                    self.archive_completed_prediction(pred)
                     if pred.is_alive:
                         pred.stop()
                     pred.set_status("finished")
@@ -379,6 +431,8 @@ class PredictionManager:
                     pred.stop()
                     should_remove = True
                 elif pred.status in TERMINAL_STATUSES and now - pred.status_updated_at > finished_cutoff:
+                    if pred.status == "finished":
+                        self.archive_completed_prediction(pred)
                     should_remove = True
 
                 if should_remove:
@@ -407,6 +461,8 @@ class PredictionManager:
         if pred and pred.proc:
             pred.proc.wait()
             code = pred.proc.returncode
+            if code == 0:
+                self.archive_completed_prediction(pred)
             if pred.status == "running":
                 pred.set_status("finished" if code == 0 else "error")
             logger.info("Prediction %s exited (code %s)", prediction_id, code)
@@ -452,3 +508,24 @@ def _safe_int(value: Any, default: int | None = None) -> int | None:
         return int(float(value))
     except (TypeError, ValueError):
         return default
+
+
+def _parse_state_timestamp(value: Any) -> datetime | None:
+    """Parse ISO or Unix timestamps emitted by the predictor."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, (int, float)):
+        try:
+            seconds = float(value)
+            if seconds > 100_000_000_000:
+                seconds /= 1000
+            return datetime.fromtimestamp(seconds, tz=timezone.utc)
+        except (OverflowError, OSError, ValueError):
+            return None
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)

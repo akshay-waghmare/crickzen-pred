@@ -228,6 +228,36 @@ def test_public_service_skips_stale_running_prediction(tmp_path):
     assert rows == []
 
 
+def test_public_service_skips_rewritten_stale_payload(tmp_path):
+    manager = PredictionManager()
+    output = tmp_path / "rewritten-stale-public.json"
+    output.write_text(json.dumps({
+        "timestamp": (datetime.now(timezone.utc) - timedelta(minutes=8)).isoformat(),
+        "batting_team": "GC",
+        "bowling_team": "DG",
+        "score": 0,
+        "wickets": 0,
+        "overs": 0.0,
+        "bat_win_prob": 0.5,
+    }), encoding="utf-8")
+    # Simulate a hung predictor touching the file without receiving a new
+    # provider snapshot.
+    pred = Prediction(
+        prediction_id="rewritten-stale-public",
+        user_id="system:auto-scheduler",
+        match_url="https://crex.com/cricket-live-score/gc-vs-dg-match-updates-xyz",
+        league_key="T20",
+        league_code="t20_all",
+        output_json_path=str(output),
+        proc=_FakeProc(returncode=None),
+    )
+    manager._predictions[pred.id] = pred
+
+    rows = PublicMatchService(manager=manager).list_matches()
+
+    assert rows == []
+
+
 def test_completed_archive_rehydrates_nested_livematch_state(monkeypatch, tmp_path):
     state_dir = tmp_path / "dashboard_states"
     state_dir.mkdir()

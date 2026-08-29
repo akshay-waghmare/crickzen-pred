@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # Polling & state
     POLL_INTERVAL_MS: int = 3000
     STATE_DIR: str = "data/dashboard_states"
+    # Immutable, public-safe records written once when a prediction reaches a
+    # provable terminal result. This is separate from the rolling live state.
+    PUBLIC_HISTORY_DIR: str = "data/public_history"
 
     # Database
     DATABASE_URL: str = "sqlite:///./auth.db"
@@ -34,7 +37,10 @@ class Settings(BaseSettings):
     MAX_USER_MATCHES: int = 2
     MAX_TOTAL_MATCHES: int = 6
     FINISHED_MATCH_RETENTION_MINUTES: int = 30
-    STALE_RUNNING_MATCH_MINUTES: int = 30
+    # A predictor that has stopped receiving meaningful match updates must be
+    # recycled quickly enough for the scheduler to replace it on the next
+    # discovery pass. File writes alone are not proof of fresh model state.
+    STALE_RUNNING_MATCH_MINUTES: int = 10
     PUBLIC_MATCH_STALE_SECONDS: int = 300
 
     # Automatic match discovery/start
