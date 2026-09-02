@@ -206,6 +206,8 @@ class PredictionManager:
         user_id: str,
         match_url: str,
         league_key: str | None = None,
+        team1_name: str | None = None,
+        team2_name: str | None = None,
     ) -> Prediction:
         """Start a new crex_live_predictor for the given match.
 
@@ -213,6 +215,8 @@ class PredictionManager:
             user_id: Authenticated user ID.
             match_url: CREX match URL.
             league_key: Optional league key (auto-detected from URL if not given).
+            team1_name: Optional provider-authoritative first team name.
+            team2_name: Optional provider-authoritative second team name.
 
         Returns:
             The Prediction object.
@@ -271,6 +275,8 @@ class PredictionManager:
             ]
         if cfg.get("mc_only"):
             cmd.append("--mc-only")
+        if team1_name and team2_name:
+            cmd.extend(["--team1-name", team1_name, "--team2-name", team2_name])
 
         logger.info("Starting prediction %s: %s → %s", prediction_id, cfg["league"], match_url[:80])
 

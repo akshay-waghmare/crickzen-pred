@@ -140,6 +140,8 @@ class AutoPredictionScheduler:
                         user_id=SYSTEM_USER_ID,
                         match_url=candidate.url,
                         league_key=candidate.league_key,
+                        team1_name=candidate.team1_name,
+                        team2_name=candidate.team2_name,
                     )
                     started = {
                         "prediction_id": pred.id,

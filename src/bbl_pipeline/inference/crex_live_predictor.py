@@ -177,9 +177,15 @@ class CrexLivePredictor:
                  odm_model_dir: str = None,
                  use_ml_model: bool = False, record_states: bool = False, states_dir: str = None,
                  total_overs: int = None, revised_target: int = None, mc_only: bool = False,
-                 market_stack_model_dir: str = None):
+                 market_stack_model_dir: str = None, team1_name: str = None, team2_name: str = None):
         self.original_match_url = match_url
         self.match_url = self._normalize_live_url(match_url)
+        # The scraper/backend schedule is authoritative for the current
+        # provider match. URL abbreviations are not globally unique (DG is a
+        # valid code for Dhaka Gladiators in one competition and Dublin
+        # Guardians in another), so retain the explicit pair when supplied.
+        self._team1_name_hint = str(team1_name or '').strip()
+        self._team2_name_hint = str(team2_name or '').strip()
         self.model_dir = model_dir
         self.headless = headless
         self.feature_store_dir = feature_store_dir
@@ -406,6 +412,15 @@ class CrexLivePredictor:
 
     def _extract_teams_from_url(self) -> Optional[tuple[str, str]]:
         """Extract teams from CREX URL slugs like csk-vs-mi-33rd-match..."""
+        hinted_team1 = getattr(self, '_team1_name_hint', '')
+        hinted_team2 = getattr(self, '_team2_name_hint', '')
+        if (
+            self._looks_like_valid_team_name(hinted_team1)
+            and self._looks_like_valid_team_name(hinted_team2)
+            and self._normalize_team_key(hinted_team1) != self._normalize_team_key(hinted_team2)
+        ):
+            return hinted_team1, hinted_team2
+
         for url in (self.match_url, self.original_match_url):
             if not url:
                 continue
@@ -3941,6 +3956,16 @@ async def main():
         default=None,
         help="Optional IPL innings-2 market-stack candidate directory for dry-run overlay output.",
     )
+    parser.add_argument(
+        "--team1-name",
+        default=None,
+        help="Provider-authoritative first team name for this match.",
+    )
+    parser.add_argument(
+        "--team2-name",
+        default=None,
+        help="Provider-authoritative second team name for this match.",
+    )
     
     args = parser.parse_args()
     
@@ -3961,6 +3986,8 @@ async def main():
         revised_target=args.revised_target,
         mc_only=args.mc_only,
         market_stack_model_dir=args.market_stack_model_dir,
+        team1_name=args.team1_name,
+        team2_name=args.team2_name,
     )
     
     await predictor.run(poll_interval=args.poll_interval)

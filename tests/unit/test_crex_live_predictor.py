@@ -270,6 +270,22 @@ def test_extract_teams_from_crex_url_prefers_ipl_codes():
     assert predictor._extract_teams_from_url() == ("Chennai Super Kings", "Mumbai Indians")
 
 
+def test_extract_teams_from_crex_url_prefers_provider_authoritative_names():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.local_storage = {}
+    predictor.league = "t20_all"
+    predictor.predictor = None
+    predictor._team1_name_hint = "Dublin Guardians"
+    predictor._team2_name_hint = "Rotterdam Dockers"
+    predictor.match_url = (
+        "https://crex.com/cricket-live-score/dg-vs-rd-10th-match-"
+        "european-t20-premier-league-2026-match-updates-13F3"
+    )
+    predictor.original_match_url = predictor.match_url
+
+    assert predictor._extract_teams_from_url() == ("Dublin Guardians", "Rotterdam Dockers")
+
+
 def test_extract_teams_from_crex_url_resolves_women_t20i_suffixes():
     predictor = CrexLivePredictor.__new__(CrexLivePredictor)
     predictor.local_storage = {}

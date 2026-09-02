@@ -82,6 +82,7 @@ def test_label_date_matching_keeps_today_only():
 class _FakeManager:
     def __init__(self):
         self.calls: list[str] = []
+        self.started_names: tuple[str | None, str | None] | None = None
 
     def cleanup_expired(self, settings):
         self.calls.append("cleanup")
@@ -91,8 +92,9 @@ class _FakeManager:
         self.calls.append("find")
         return None
 
-    def start_match(self, user_id, match_url, league_key):
+    def start_match(self, user_id, match_url, league_key, team1_name=None, team2_name=None):
         self.calls.append("start")
+        self.started_names = (team1_name, team2_name)
 
         class _Pred:
             id = "auto-1"
@@ -109,6 +111,8 @@ class _TestScheduler(AutoPredictionScheduler):
                 source="test",
                 label="MI vs PBKS Live",
                 is_live=True,
+                team1_name="Mumbai Indians",
+                team2_name="Punjab Kings",
             )
         ]
 
@@ -123,3 +127,4 @@ def test_scheduler_cleans_stale_predictions_before_duplicate_check():
     asyncio.run(scheduler.check_once())
 
     assert manager.calls[:3] == ["cleanup", "find", "start"]
+    assert manager.started_names == ("Mumbai Indians", "Punjab Kings")
