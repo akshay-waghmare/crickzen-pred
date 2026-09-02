@@ -209,7 +209,12 @@ def _has_observed_ball(payload: dict[str, Any]) -> bool:
             return True
     except (TypeError, ValueError):
         pass
-    history = payload.get("ball_history") or payload.get("history")
+    last_ball = state.get("last_ball_number") or state.get("last_ball")
+    if _nonempty(last_ball) and str(last_ball).strip() not in {"0", "0.0"}:
+        return True
+    # ``history`` is the rolling probability history and is populated before
+    # the first legal ball. Only the explicit ball history proves progress.
+    history = payload.get("ball_history")
     return isinstance(history, list) and len(history) > 0
 
 
