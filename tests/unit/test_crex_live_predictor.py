@@ -286,6 +286,23 @@ def test_extract_teams_from_crex_url_prefers_provider_authoritative_names():
     assert predictor._extract_teams_from_url() == ("Dublin Guardians", "Rotterdam Dockers")
 
 
+def test_scorecard_team_label_uses_provider_pair_for_batting_orientation():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.local_storage = {"t_RD_name": "Dhaka Gladiators"}
+    predictor.league = "t20_all"
+    predictor.predictor = None
+    predictor._team1_name_hint = "Dublin Guardians"
+    predictor._team2_name_hint = "Rotterdam Dockers"
+    predictor.match_url = (
+        "https://crex.com/cricket-live-score/dg-vs-rd-10th-match-"
+        "european-t20-premier-league-2026-match-updates-13F3"
+    )
+    predictor.original_match_url = predictor.match_url
+
+    assert predictor._resolve_scorecard_team_from_provider_pair("RD") == "Rotterdam Dockers"
+    assert predictor._resolve_scorecard_team_from_provider_pair("DG") == "Dublin Guardians"
+
+
 def test_extract_teams_from_crex_url_resolves_women_t20i_suffixes():
     predictor = CrexLivePredictor.__new__(CrexLivePredictor)
     predictor.local_storage = {}

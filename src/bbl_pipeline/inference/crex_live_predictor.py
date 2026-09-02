@@ -618,6 +618,53 @@ class CrexLivePredictor:
                 return team1, team2
         return None
 
+    def _resolve_scorecard_team_from_provider_pair(self, raw_team: str) -> Optional[str]:
+        """Map a scorecard's current-team label onto the provider pair.
+
+        CREX short codes are not globally unique.  A local-storage or feature
+        store lookup can therefore resolve a scorecard label such as ``RD`` to
+        an unrelated team's display name.  When the scheduler supplied the
+        provider-authoritative pair, use the raw scorecard label plus the
+        canonical URL's two code positions to determine which side is batting
+        before consulting any global fallback map.
+        """
+        hinted_team1 = getattr(self, '_team1_name_hint', '')
+        hinted_team2 = getattr(self, '_team2_name_hint', '')
+        if not (
+            self._looks_like_valid_team_name(hinted_team1)
+            and self._looks_like_valid_team_name(hinted_team2)
+            and self._normalize_team_key(hinted_team1) != self._normalize_team_key(hinted_team2)
+        ):
+            return None
+
+        raw_key = self._normalize_team_key(self._clean_team_text(raw_team))
+        if not raw_key:
+            return None
+        team1_key = self._normalize_team_key(hinted_team1)
+        team2_key = self._normalize_team_key(hinted_team2)
+        if raw_key == team1_key:
+            return hinted_team1
+        if raw_key == team2_key:
+            return hinted_team2
+
+        for url in (self.match_url, self.original_match_url):
+            if not url:
+                continue
+            match = re.search(r'/([^/?#]*?-vs-[^/?#]*)', url, re.IGNORECASE)
+            if not match:
+                continue
+            slug = match.group(1).strip('/').lower()
+            if '-vs-' not in slug:
+                continue
+            left, right = slug.split('-vs-', 1)
+            left_code = self._match_known_code_suffix(left)
+            right_code = self._match_known_code_prefix(right)
+            if raw_key == self._normalize_team_key(left_code):
+                return hinted_team1
+            if raw_key == self._normalize_team_key(right_code):
+                return hinted_team2
+        return None
+
     @staticmethod
     def _extract_batter_pair(text: str) -> Optional[tuple[str, int, int, str, int, int]]:
         """Extract two live batters from CREX title/body text.
@@ -1946,7 +1993,10 @@ class CrexLivePredictor:
             title_score = self._extract_score_snapshot(title)
             if title_score:
                 title_team, title_runs, title_wickets, title_overs = title_score
-                current_batting_team = self._resolve_team_name(title_team)
+                current_batting_team = (
+                    self._resolve_scorecard_team_from_provider_pair(title_team)
+                    or self._resolve_team_name(title_team)
+                )
                 self.match_state.total_runs = title_runs
                 self.match_state.wickets = title_wickets
                 self.match_state.overs = title_overs
@@ -2007,7 +2057,10 @@ class CrexLivePredictor:
                 or body_score[3] > self.match_state.overs
                 or body_score[1] > self.match_state.total_runs
             ):
-                current_batting_team = self._resolve_team_name(body_score[0])
+                current_batting_team = (
+                    self._resolve_scorecard_team_from_provider_pair(body_score[0])
+                    or self._resolve_team_name(body_score[0])
+                )
                 self.match_state.total_runs = body_score[1]
                 self.match_state.wickets = body_score[2]
                 self.match_state.overs = body_score[3]
