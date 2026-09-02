@@ -728,8 +728,13 @@ class CrexLivePredictor:
             from pathlib import Path
             from bbl_pipeline.inference.match_state_logger import MatchStateLogger
             
-            # Extract match ID from URL (use last path segment)
-            match_id = self.match_url.split("/")[-2] if "/" in self.match_url else "unknown_match"
+            # Use the final non-empty provider URL segment.  The old ``[-2]``
+            # expression only worked for a trailing slash and otherwise
+            # produced ``cricket-live-score`` for every match in that feed.
+            url_parts = [part for part in self.match_url.split("/") if part]
+            match_id = url_parts[-1].split("?", 1)[0].split("#", 1)[0] if url_parts else "unknown_match"
+            if not match_id or match_id.lower() in {"live", "scoreboard", "info"}:
+                match_id = "unknown_match"
             
             # Determine states directory
             if self.states_dir:
