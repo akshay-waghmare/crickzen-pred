@@ -177,7 +177,8 @@ class CrexLivePredictor:
                  odm_model_dir: str = None,
                  use_ml_model: bool = False, record_states: bool = False, states_dir: str = None,
                  total_overs: int = None, revised_target: int = None, mc_only: bool = False,
-                 market_stack_model_dir: str = None, team1_name: str = None, team2_name: str = None):
+                 market_stack_model_dir: str = None, team1_name: str = None, team2_name: str = None,
+                 candidate_model_dir: str = None):
         self.original_match_url = match_url
         self.match_url = self._normalize_live_url(match_url)
         # The scraper/backend schedule is authoritative for the current
@@ -197,6 +198,13 @@ class CrexLivePredictor:
         self.venue_override = venue
         self.mc_only = mc_only  # Force MC-only mode even for 20-over matches
         self.market_stack_model_dir_override = market_stack_model_dir
+        self.candidate_model_dir = candidate_model_dir
+        self.candidate_predictor = None
+        self.last_candidate_prob = None
+        self.candidate_model_version = Path(candidate_model_dir).name if candidate_model_dir else ""
+        self.candidate_artifact_sha256 = ""
+        self.candidate_feature_order_sha256 = ""
+        self.candidate_source_revision = ""
 
         league_code = (league or "").lower()
         default_odm_model_dir = "models/odm_v1" if league_code in {"ipl", "psl"} and not mc_only else None
@@ -269,6 +277,7 @@ class CrexLivePredictor:
         self._last_market_update_at = None
         self._last_market_age_seconds = None
         self._load_market_stack_candidate()
+        self._load_candidate_model()
 
         # ODM (Odds Direction Model) advisory
         from bbl_pipeline.inference.odds_direction_model import OddsDirectionModel
@@ -459,7 +468,6 @@ class CrexLivePredictor:
         batting_key = self._normalize_team_key(batting)
         team1_key = self._normalize_team_key(team1)
         team2_key = self._normalize_team_key(team2)
-        batting_matches_url = batting_key in {team1_key, team2_key}
 
         if not self._looks_like_valid_team_name(batting):
             self.match_state.batting_team = team1
@@ -472,21 +480,22 @@ class CrexLivePredictor:
             self.match_state.batting_team = team1
             batting_key = team1_key
 
-        if (
-            not self._looks_like_valid_team_name(bowling)
-            or self._normalize_team_key(bowling) == batting_key
-        ):
-            if batting_key == team1_key:
-                self.match_state.bowling_team = team2
-            elif batting_key == team2_key:
+        # Once the provider pair is known, force a consistent two-team state.
+        # A globally resolved short code is not sufficient because codes such
+        # as DG are reused across competitions (Dublin Guardians vs Dhaka
+        # Gladiators).  The current batting side determines the other side.
+        if batting_key == team1_key:
+            self.match_state.bowling_team = team2
+        elif batting_key == team2_key:
+            # A live scorecard may expose the first team by its full display
+            # name while the URL only has its short code (for example HYK).
+            # Preserve that already-opposite, valid display name; the
+            # provider pair still remains the source of truth for identity.
+            if not self._looks_like_valid_team_name(bowling) or self._normalize_team_key(bowling) == batting_key:
                 self.match_state.bowling_team = team1
-            else:
-                self.match_state.bowling_team = team2
-        elif (
-            not batting_matches_url
-            and self._normalize_team_key(bowling) not in {team1_key, team2_key}
-        ):
-            self.match_state.bowling_team = team2 if batting_key == team1_key else team1
+        else:
+            self.match_state.batting_team = team1
+            self.match_state.bowling_team = team2
 
     def _resolve_team_name(self, team_name: str) -> str:
         """Resolve CREX team codes into displayable team names when possible."""
@@ -525,6 +534,15 @@ class CrexLivePredictor:
                 # an unrelated domestic game mentioned lower on the page.
                 'CK': 'Colombo Kaps',
                 'JK': 'Jaffna Kings',
+                # European T20 Premier League codes. DG is also used by the
+                # historical Dhaka Gladiators map, so competition-local
+                # resolution is mandatory here.
+                'DG': 'Dublin Guardians',
+                'BW': 'Belfast Wolves',
+                'ECR': 'Edinburgh Castle Rockers',
+                'RD': 'Rotterdam Dockers',
+                'GC': 'Glasgow Cosmic',
+                'AF': 'Amsterdam Flames',
             },
         }
         league_map = static_league_maps.get(league)
@@ -732,11 +750,64 @@ class CrexLivePredictor:
                 states_dir=states_dir,
                 model_version=model_version,
                 feature_store_version=feature_store_version,
+                match_url=self.match_url,
             )
             print(f"[RECORD] Match state recording enabled -> {states_dir}/{match_id}.parquet")
         except Exception as e:
             print(f"[WARN] Could not initialize match state logger: {e}")
             self.match_state_logger = None
+
+    def _load_candidate_model(self) -> None:
+        """Load an optional candidate model for shadow scoring only."""
+        if not self.candidate_model_dir or self.mc_only:
+            return
+        try:
+            candidate_dir = Path(self.candidate_model_dir)
+            manifest_path = candidate_dir / "candidate_manifest.json"
+            if manifest_path.exists():
+                from bbl_pipeline.analysis.candidate_manifest import validate_candidate_manifest
+
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                validated = validate_candidate_manifest(manifest, candidate_dir)
+                self.candidate_model_version = validated["candidate_id"]
+                self.candidate_artifact_sha256 = validated["model_artifact_sha256"]
+                self.candidate_feature_order_sha256 = validated["feature_order_sha256"]
+                self.candidate_source_revision = validated["source_revision"]
+
+            from bbl_pipeline.inference.predictor import Predictor
+
+            self.candidate_predictor = Predictor.load(
+                self.candidate_model_dir,
+                self.feature_store_dir,
+                league=self.league,
+            )
+            # The candidate must see exactly the same format configuration as
+            # the incumbent process, including reduced/ODI overrides.
+            self.candidate_predictor.format_config = self.format_config
+            self.candidate_predictor.feature_mapper.format_config = self.format_config
+            self.candidate_predictor.resource_calculator.config = self.format_config
+            self.candidate_model_version = Path(self.candidate_model_dir).name
+            print(f"[SHADOW] Candidate model loaded: {self.candidate_model_dir}")
+        except Exception as e:
+            logger.warning(f"Candidate model unavailable; continuing incumbent-only: {e}")
+            self.candidate_predictor = None
+
+    def _run_candidate_shadow(self, pred_state: Any, ball_history: list) -> Optional[float]:
+        """Score the same live state with the candidate without changing output."""
+        if self.candidate_predictor is None:
+            return None
+        try:
+            probability = self.candidate_predictor.predict(
+                pred_state,
+                debug=False,
+                ball_history=list(ball_history or []),
+            )
+            probability = float(probability)
+            if 0.0 <= probability <= 1.0:
+                return probability
+        except Exception as e:
+            logger.warning(f"Candidate shadow prediction failed: {e}")
+        return None
     
     def _load_model(self):
         """Load the trained prediction model."""
@@ -2557,6 +2628,7 @@ class CrexLivePredictor:
             # First check if match has a definitive result
             final_result = self._check_match_result()
             if final_result is not None:
+                self.last_candidate_prob = None
                 state = self.match_state
                 reason = "chase_complete" if final_result == 1.0 else "innings_complete"
                 if state.is_second_innings and state.wickets >= 10 and state.total_runs < (state.target or 0):
@@ -2583,6 +2655,7 @@ class CrexLivePredictor:
             # MC-only mode: reduced overs or explicit --mc-only flag
             effective_overs = self._effective_total_overs or self.format_config.total_overs
             if effective_overs < 20 or self.mc_only:
+                self.last_candidate_prob = None
                 return self._run_reduced_over_prediction()
             
             from bbl_pipeline.inference.schema import MatchState as PredictorMatchState
@@ -2711,7 +2784,12 @@ class CrexLivePredictor:
             if self.last_shadow_prob is not None and abs(self.last_shadow_prob - win_prob) > 0.002:
                 over_1b = pred_state.over + 1
                 print(f"[SHADOW] T=0.75 prod={win_prob:.1%} | seg-T shadow={self.last_shadow_prob:.1%} | inn={pred_state.innings} ov={over_1b}")
-             
+
+            # Candidate scoring is deliberately after incumbent guards and
+            # never replaces the live probability. Both models receive the
+            # same PredictorMatchState and ball-history snapshot.
+            self.last_candidate_prob = self._run_candidate_shadow(pred_state, ball_history)
+
             return float(win_prob)
             
         except Exception as e:
@@ -3432,13 +3510,22 @@ class CrexLivePredictor:
             # Finalize match state recording if enabled
             if self.match_state_logger:
                 try:
-                    # Determine if match is complete
-                    match_complete = self._is_match_complete()
+                    # Only the second innings result settles the match. An
+                    # innings-1 boundary must remain resumable and must not
+                    # create a completed metadata row with a false winner.
+                    final_result = self._check_match_result()
+                    match_complete = final_result is not None
                     
                     if match_complete:
                         # Match is finished - finalize with result
                         print("[RECORD] Match complete - finalizing recording")
-                        self.match_state_logger.finalize(result_type="completed")
+                        state = self.match_state
+                        winner = state.batting_team if final_result == 1.0 else state.bowling_team
+                        self.match_state_logger.finalize(
+                            winner=winner,
+                            result_type="completed",
+                            match_url=self.match_url,
+                        )
                     else:
                         # Match interrupted mid-play - DON'T call finalize()
                         # This allows recording to resume if predictor restarts
@@ -3653,7 +3740,7 @@ class CrexLivePredictor:
                 self._write_json_state(win_prob)
             
             # Record ball state if logger is enabled
-            if self.match_state_logger and self.predictor:
+            if self.match_state_logger:
                 try:
                     # Compute features for logger (same logic as _write_json_state)
                     over = int(state.overs)
@@ -3682,12 +3769,17 @@ class CrexLivePredictor:
                         **self._get_carryover_scraped_fields(),
                     }
                     
-                    feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
-                    feat_df = self._engineer_live_feature_dataframe(feat_df, scraped_data["innings_num"])
-                    features = {
-                        k: (float(v) if isinstance(v, (int, float)) else str(v))
-                        for k, v in feat_df.iloc[0].to_dict().items()
-                    }
+                    if self.predictor:
+                        feat_df = self.predictor.feature_mapper.create_feature_dataframe(scraped_data)
+                        feat_df = self._engineer_live_feature_dataframe(feat_df, scraped_data["innings_num"])
+                        features = {
+                            k: (float(v) if isinstance(v, (int, float)) else str(v))
+                            for k, v in feat_df.iloc[0].to_dict().items()
+                        }
+                    else:
+                        # MC-only matches still need an auditable state row;
+                        # the reduced feature snapshot is preferable to a gap.
+                        features = self._build_features() or {}
                     
                     # Assemble market odds dict
                     market_odds = {
@@ -3695,6 +3787,20 @@ class CrexLivePredictor:
                         "market_back_odds": state.market_back_odds,
                         "market_lay_odds": state.market_lay_odds,
                         "market_fav_prob": state.market_fav_prob,
+                        "market_source": "crex_live_market" if state.market_fav_prob else "",
+                        "market_age_seconds": self._last_market_age_seconds,
+                        "market_unavailable_reason": (
+                            "no_market_probability" if not state.market_fav_prob else ""
+                        ),
+                    }
+
+                    inference_context = {
+                        "source_state": scraped_data,
+                        "model_input_features": getattr(self.predictor, "_last_full_feature_dict", {}) if self.predictor else {},
+                        "feature_row": features,
+                        "ball_history_tail": (self._build_ball_history_for_mapper() or [])[-30:],
+                        "prediction_guard": getattr(self, "_prediction_guard", None),
+                        "terminal_clamp": getattr(self, "_last_terminal_clamp", None),
                     }
                     
                     # Record ball
@@ -3706,6 +3812,12 @@ class CrexLivePredictor:
                         ensemble_prob=getattr(self, '_last_ensemble_prob', None),
                         ensemble_alpha=getattr(self, '_last_ensemble_alpha', None),
                         ensemble_source=getattr(self, '_last_ensemble_source', None),
+                        candidate_prob=getattr(self, 'last_candidate_prob', None),
+                        candidate_model_version=getattr(self, 'candidate_model_version', ''),
+                        candidate_artifact_sha256=getattr(self, 'candidate_artifact_sha256', ''),
+                        candidate_feature_order_sha256=getattr(self, 'candidate_feature_order_sha256', ''),
+                        candidate_source_revision=getattr(self, 'candidate_source_revision', ''),
+                        inference_context=inference_context,
                     )
                 except Exception as e:
                     pass  # Logging errors are already handled in logger
@@ -4010,6 +4122,11 @@ async def main():
         help="Optional IPL innings-2 market-stack candidate directory for dry-run overlay output.",
     )
     parser.add_argument(
+        "--candidate-model-dir",
+        default=None,
+        help="Optional candidate model directory for seven-day shadow scoring; never used for live output.",
+    )
+    parser.add_argument(
         "--team1-name",
         default=None,
         help="Provider-authoritative first team name for this match.",
@@ -4041,6 +4158,7 @@ async def main():
         market_stack_model_dir=args.market_stack_model_dir,
         team1_name=args.team1_name,
         team2_name=args.team2_name,
+        candidate_model_dir=args.candidate_model_dir,
     )
     
     await predictor.run(poll_interval=args.poll_interval)

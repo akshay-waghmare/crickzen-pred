@@ -14,5 +14,17 @@ Primary class: StateAnalyzer
 """
 
 from bbl_pipeline.analysis.state_analyzer import StateAnalyzer
+from bbl_pipeline.analysis.market_promotion import (
+    build_promotion_review,
+    expected_calibration_error,
+    load_recorded_states,
+    write_promotion_review,
+)
 
-__all__ = ["StateAnalyzer"]
+__all__ = [
+    "StateAnalyzer",
+    "build_promotion_review",
+    "expected_calibration_error",
+    "load_recorded_states",
+    "write_promotion_review",
+]

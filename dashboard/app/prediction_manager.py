@@ -258,6 +258,9 @@ class PredictionManager:
         state_dir = project_root / settings.STATE_DIR
         state_dir.mkdir(parents=True, exist_ok=True)
         output_json = str(state_dir / f"{prediction_id}.json")
+        match_states_dir = project_root / settings.MATCH_STATES_DIR / str(cfg["league"])
+        if settings.RECORD_MATCH_STATES:
+            match_states_dir.mkdir(parents=True, exist_ok=True)
 
         # Build command (same structure as scripts/launcher.py MatchSlot.start)
         python_exe = get_python_executable()
@@ -269,6 +272,13 @@ class PredictionManager:
             "--league", cfg["league"],
             "--output-json", output_json,
         ]
+        if settings.RECORD_MATCH_STATES:
+            cmd.extend(["--record-states", "--states-dir", str(match_states_dir)])
+        if settings.SHADOW_CANDIDATE_MODEL_DIR.strip() and not cfg.get("mc_only"):
+            candidate_dir = Path(settings.SHADOW_CANDIDATE_MODEL_DIR.strip())
+            if not candidate_dir.is_absolute():
+                candidate_dir = project_root / candidate_dir
+            cmd.extend(["--candidate-model-dir", str(candidate_dir)])
         if cfg.get("feature_store_dir"):
             cmd[cmd.index("--league"):cmd.index("--league")] = [
                 "--feature-store-dir", str(project_root / cfg["feature_store_dir"])

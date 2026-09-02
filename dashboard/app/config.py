@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     # Polling & state
     POLL_INTERVAL_MS: int = 3000
     STATE_DIR: str = "data/dashboard_states"
+    # Operator-only per-ball evidence. This is separate from public rolling
+    # state and contains market/model/features used for evaluation.
+    MATCH_STATES_DIR: str = "data/match_states"
+    RECORD_MATCH_STATES: bool = True
+    SHADOW_CANDIDATE_MODEL_DIR: str = ""
     # Immutable, public-safe records written once when a prediction reaches a
     # provable terminal result. This is separate from the rolling live state.
     PUBLIC_HISTORY_DIR: str = "data/public_history"

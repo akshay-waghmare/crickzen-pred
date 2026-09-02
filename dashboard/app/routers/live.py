@@ -446,6 +446,10 @@ def _enrich_detail_state(state: dict[str, Any] | None, output_json_path: str | N
 class StartMatchRequest(BaseModel):
     match_url: str
     league: str | None = None  # auto-detected if omitted
+    # Optional provider-authoritative pair. Required for ambiguous short codes
+    # such as DG, whose meaning varies by competition.
+    team1_name: str | None = None
+    team2_name: str | None = None
 
 
 class MatchSummary(BaseModel):
@@ -489,6 +493,8 @@ def start_match(
             user_id=user.id,
             match_url=body.match_url,
             league_key=body.league,
+            team1_name=body.team1_name,
+            team2_name=body.team2_name,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

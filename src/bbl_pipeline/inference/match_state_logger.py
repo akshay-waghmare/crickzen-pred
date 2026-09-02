@@ -17,7 +17,10 @@ Primary class: MatchStateLogger
 
 from dataclasses import dataclass
 from datetime import datetime
+import json
+import math
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -33,6 +36,48 @@ from bbl_pipeline.inference.match_state_schema import (
 )
 
 logger = structlog.get_logger(__name__)
+
+
+def _json_safe(value: Any) -> Any:
+    """Convert feature/state values into deterministic, finite JSON data."""
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        return value if math.isfinite(value) else None
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_json_safe(item) for item in value]
+    if hasattr(value, "item"):
+        try:
+            return _json_safe(value.item())
+        except Exception:
+            pass
+    return str(value)
+
+
+def _json_dump(value: Any) -> str:
+    return json.dumps(_json_safe(value), sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+
+
+def _numeric_or_none(value: Any) -> Optional[float]:
+    """Return a finite numeric value, including values held by mocks, or None."""
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    return numeric if math.isfinite(numeric) else None
+
+
+def _first_numeric(source: Any, *names: str) -> Optional[float]:
+    """Read the first finite numeric attribute from a predictor/version variant."""
+    for name in names:
+        value = _numeric_or_none(getattr(source, name, None))
+        if value is not None:
+            return value
+    return None
 
 
 class MatchStateLogger:
@@ -58,6 +103,7 @@ class MatchStateLogger:
         states_dir: Path,
         model_version: str,
         feature_store_version: str,
+        match_url: str = "",
     ):
         """
         Initialize match state logger.
@@ -74,6 +120,7 @@ class MatchStateLogger:
         self.states_dir = Path(states_dir)
         self.model_version = model_version
         self.feature_store_version = feature_store_version
+        self.match_url = match_url or ""
         
         # Create output directory
         self.states_dir.mkdir(parents=True, exist_ok=True)
@@ -85,6 +132,8 @@ class MatchStateLogger:
         self.previous_ball_state: Optional[Dict[str, Any]] = None
         self._seen_record_keys: set[tuple[int, int, int, int, int]] = set()
         self.match_file = self.states_dir / f"{self.match_id}.parquet"
+        # Backwards-compatible name used by older operational checks.
+        self.output_file = self.match_file
         
         # Logging
         self.log = logger.bind(match_id=match_id, league=league)
@@ -96,6 +145,11 @@ class MatchStateLogger:
     def _record_key(self, innings: int, over_number: int, ball_in_over: int, total_runs: int, wickets: int) -> tuple[int, int, int, int, int]:
         """Build stable key for one recorded ball state."""
         return (innings, over_number, ball_in_over, total_runs, wickets)
+
+    @staticmethod
+    def _normalize_team_key(team_name: str) -> str:
+        """Normalize team labels for the capture-time identity completeness flag."""
+        return "".join(char for char in str(team_name or "").upper() if char.isalnum())
 
     def _load_existing_record_keys(self) -> None:
         """Load existing match parquet keys so recording can resume without duplicates."""
@@ -279,9 +333,9 @@ class MatchStateLogger:
             (batting_team_prob, bowling_team_prob)
         """
         if self._teams_match(market_fav_team, batting_team):
-            return (market_fav_prob, 1.0 - market_fav_prob)
+            return (market_fav_prob, round(1.0 - market_fav_prob, 10))
         elif self._teams_match(market_fav_team, bowling_team):
-            return (1.0 - market_fav_prob, market_fav_prob)
+            return (round(1.0 - market_fav_prob, 10), market_fav_prob)
         else:
             # Market favorite doesn't match either team (shouldn't happen)
             self.log.warning(
@@ -311,11 +365,18 @@ class MatchStateLogger:
             (deviation, deviation_abs, deviation_bucket, deviation_direction)
             All None if market_batting_team_prob is None
         """
-        if market_batting_team_prob is None:
+        if model_prob is None or market_batting_team_prob is None:
             return (None, None, None, None)
-        
-        deviation = model_prob - market_batting_team_prob
-        deviation_abs = abs(deviation)
+        try:
+            model_prob = float(model_prob)
+            market_batting_team_prob = float(market_batting_team_prob)
+        except (TypeError, ValueError):
+            return (None, None, None, None)
+        if not (math.isfinite(model_prob) and math.isfinite(market_batting_team_prob)):
+            return (None, None, None, None)
+
+        deviation = round(model_prob - market_batting_team_prob, 10)
+        deviation_abs = round(abs(deviation), 10)
         deviation_bucket = get_deviation_bucket(deviation_abs)
         deviation_direction = get_deviation_direction(deviation)
         
@@ -330,6 +391,12 @@ class MatchStateLogger:
         ensemble_prob: Optional[float] = None,
         ensemble_alpha: Optional[float] = None,
         ensemble_source: Optional[str] = None,
+        candidate_prob: Optional[float] = None,
+        candidate_model_version: Optional[str] = None,
+        candidate_artifact_sha256: Optional[str] = None,
+        candidate_feature_order_sha256: Optional[str] = None,
+        candidate_source_revision: Optional[str] = None,
+        inference_context: Optional[Dict[str, Any]] = None,
     ) -> None:
         """
         Record one ball state to buffer.
@@ -361,12 +428,50 @@ class MatchStateLogger:
             ensemble_source: Source label (optional)
         """
         try:
+            if isinstance(match_state, dict):
+                # Keep the logger compatible with older callers/tests that
+                # provide the scraper's dictionary shape rather than the live
+                # predictor dataclass.
+                state_data = dict(match_state)
+                if "over" in state_data and "ball" in state_data:
+                    try:
+                        over_value = int(float(state_data["over"]))
+                        ball_value = int(float(state_data["ball"]))
+                        # Normal feeds use 1-6 within an over.  Older callers
+                        # sometimes pass a monotonically increasing ball
+                        # counter; fold that counter into valid over.ball
+                        # notation so it remains uniquely recordable.
+                        if ball_value > 6:
+                            over_value += (ball_value - 1) // 6
+                            ball_value = ((ball_value - 1) % 6) + 1
+                        state_data["overs"] = float(over_value) + (ball_value / 10.0)
+                    except (TypeError, ValueError):
+                        pass
+                state_data.setdefault("overs", state_data.get("bat_team_overs", 0.0))
+                state_data.setdefault("total_runs", state_data.get("bat_team_runs", 0))
+                state_data.setdefault("wickets", state_data.get("bat_team_wickets", 0))
+                state_data.setdefault("is_second_innings", state_data.get("innings", 1) == 2)
+                state_data.setdefault("batsman1_name", "")
+                state_data.setdefault("batsman2_name", "")
+                state_data.setdefault("bowler1_name", "")
+                state_data.setdefault("bowler1_overs", 0.0)
+                state_data.setdefault("bowler1_runs", 0)
+                state_data.setdefault("bowler1_wickets", 0)
+                state_data.setdefault("current_run_rate", 0.0)
+                state_data.setdefault("required_run_rate", 0.0)
+                state_data.setdefault("target", None)
+                state_data.setdefault("venue", "")
+                state_data.setdefault("toss_winner", "")
+                state_data.setdefault("toss_decision", "")
+                match_state = SimpleNamespace(**state_data)
+            market_odds = market_odds or {}
             # Deduplicate: skip if match state hasn't changed since last record
             overs_val = getattr(match_state, 'overs', 0.0) or 0.0
             runs_val = getattr(match_state, 'total_runs', 0)
             wkts_val = getattr(match_state, 'wickets', 0)
             inn_val = 2 if getattr(match_state, 'is_second_innings', False) else 1
-            state_key = (inn_val, overs_val, runs_val, wkts_val)
+            state_marker = getattr(match_state, "ball", None)
+            state_key = (inn_val, overs_val, runs_val, wkts_val, state_marker)
             if hasattr(self, '_last_state_key') and self._last_state_key == state_key:
                 self.log.debug("duplicate_state_skipped", overs=overs_val, runs=runs_val)
                 return
@@ -433,18 +538,51 @@ class MatchStateLogger:
                 market_batting_prob, market_bowling_prob = None, None
             
             # Get calibration chain from predictor
-            model_raw_prob = getattr(predictor, 'last_raw_prob', None)
-            model_smoothed_prob = getattr(predictor, 'last_smoothed_prob', None)
-            model_calibrated_combined = getattr(predictor, 'last_calibrated_combined', None)
-            model_calibrated_innings = getattr(predictor, 'last_calibrated_innings', None)
-            model_calibrated_phase = getattr(predictor, 'last_calibrated_phase', None)
-            model_calibrated_per_over = getattr(predictor, 'last_calibrated_per_over', None)
-            model_league_calibrated = getattr(predictor, 'last_league_calibrated', None)
-            model_post_calibrated = getattr(predictor, 'last_post_model_calibration_prob', None)
-            model_post_calibration_rule = getattr(predictor, 'last_post_model_calibration_rule', None)
+            model_raw_prob = _first_numeric(predictor, 'last_raw_prob', 'raw_pred')
+            model_smoothed_prob = _first_numeric(predictor, 'last_smoothed_prob')
+            model_calibrated_combined = _first_numeric(
+                predictor, 'last_calibrated_combined', 'combined_calibrated'
+            )
+            model_calibrated_innings = _first_numeric(
+                predictor, 'last_calibrated_innings', 'innings_calibrated'
+            )
+            model_calibrated_phase = _first_numeric(
+                predictor, 'last_calibrated_phase', 'phase_calibrated'
+            )
+            model_calibrated_per_over = _first_numeric(
+                predictor, 'last_calibrated_per_over', 'perover_calibrated'
+            )
+            model_league_calibrated = _first_numeric(
+                predictor, 'last_league_calibrated', 'league_calibrated'
+            )
+            model_post_calibrated = _first_numeric(
+                predictor, 'last_post_model_calibration_prob'
+            )
+            raw_calibration_rule = getattr(predictor, 'last_post_model_calibration_rule', None)
+            model_post_calibration_rule = (
+                raw_calibration_rule if isinstance(raw_calibration_rule, str) else None
+            )
             
             # Final probability (what predictor returns)
-            model_final_prob = predictor.last_prediction if hasattr(predictor, 'last_prediction') else model_calibrated_per_over
+            model_final_prob = _first_numeric(
+                predictor, 'last_prediction', 'final_win_prob', 'league_calibrated'
+            )
+            if model_final_prob is None:
+                model_final_prob = model_calibrated_per_over
+
+            candidate_prob = _numeric_or_none(candidate_prob)
+            ensemble_prob = _numeric_or_none(ensemble_prob)
+            ensemble_alpha = _numeric_or_none(ensemble_alpha)
+
+            candidate_minus_market, candidate_absolute_gap, _, _ = self._compute_deviation(
+                candidate_prob, market_batting_prob
+            )
+            candidate_minus_incumbent = None
+            try:
+                if candidate_prob is not None and model_final_prob is not None:
+                    candidate_minus_incumbent = round(float(candidate_prob) - float(model_final_prob), 10)
+            except (TypeError, ValueError):
+                candidate_minus_incumbent = None
             
             # Compute deviation
             deviation, deviation_abs, deviation_bucket, deviation_direction = self._compute_deviation(
@@ -458,9 +596,10 @@ class MatchStateLogger:
                 prev_model_prob = self.previous_ball_state.get('model_final_prob')
                 prev_market_prob = self.previous_ball_state.get('market_batting_team_prob')
                 if prev_model_prob is not None:
-                    model_prob_delta = model_final_prob - prev_model_prob
+                    if model_final_prob is not None:
+                        model_prob_delta = round(model_final_prob - prev_model_prob, 10)
                 if prev_market_prob is not None and market_batting_prob is not None:
-                    market_prob_delta = market_batting_prob - prev_market_prob
+                    market_prob_delta = round(market_batting_prob - prev_market_prob, 10)
             
             # Compute team tiers
             batting_team_wr = features_dict.get('batting_team_win_rate', 0.5)
@@ -478,6 +617,35 @@ class MatchStateLogger:
                 prev_bowler_name = (self.previous_ball_state.get('bowler_name') or '').strip()
                 if prev_innings == innings and prev_bowler_name:
                     bowler_name = prev_bowler_name
+
+            state_key = f"inn{innings}:over{over_number}:ball{ball_in_over}:runs{int(runs_val)}:wickets{int(wkts_val)}"
+            market_status = "available" if market_batting_prob is not None else "unavailable"
+            market_unavailable_reason = None if market_batting_prob is not None else (
+                market_odds.get("market_unavailable_reason") or "market_probability_unavailable"
+            )
+            context = inference_context or {
+                "match_state": {
+                    "batting_team": getattr(match_state, "batting_team", ""),
+                    "bowling_team": getattr(match_state, "bowling_team", ""),
+                    "striker": getattr(match_state, "batsman1_name", ""),
+                    "non_striker": getattr(match_state, "batsman2_name", ""),
+                    "bowler": bowler_name,
+                    "runs": getattr(match_state, "total_runs", 0),
+                    "wickets": getattr(match_state, "wickets", 0),
+                    "overs": overs_float,
+                    "target": getattr(match_state, "target", None),
+                    "venue": getattr(match_state, "venue", ""),
+                },
+                "features": features_dict,
+            }
+            team_identity_complete = bool(
+                getattr(match_state, "batting_team", "")
+                and getattr(match_state, "bowling_team", "")
+                and self._normalize_team_key(getattr(match_state, "batting_team", ""))
+                != self._normalize_team_key(getattr(match_state, "bowling_team", ""))
+            )
+            model_probability_valid = model_final_prob is not None and 0.0 <= model_final_prob <= 1.0
+            market_probability_valid = market_batting_prob is not None and 0.0 <= market_batting_prob <= 1.0
             
             # Assemble complete record
             record = {
@@ -485,17 +653,24 @@ class MatchStateLogger:
                 'match_id': self.match_id,
                 'league': self.league,
                 'timestamp': datetime.now(),
-                'innings': innings,
-                'over_number': over_number,
-                'ball_in_over': ball_in_over,
-                'match_phase': match_phase,
+                 'innings': innings,
+                 'over_number': over_number,
+                 'ball_in_over': ball_in_over,
+                 # Legacy aliases retained for existing consumers/tests.
+                 'over': over_number,
+                 'ball': ball_in_over,
+                 'match_phase': match_phase,
+                'match_url': self.match_url,
+                'state_key': state_key,
                 
                 # Raw match state
                 'batting_team': match_state.batting_team,
                 'bowling_team': match_state.bowling_team,
                 'total_runs': getattr(match_state, 'total_runs', 0),
-                'wickets': getattr(match_state, 'wickets', 0),
-                'overs': overs_float,
+                 'wickets': getattr(match_state, 'wickets', 0),
+                 'overs': overs_float,
+                 'total_overs': getattr(match_state, 'total_overs', 20),
+                 'revised_target': getattr(match_state, 'revised_target', None),
                 'current_run_rate': getattr(match_state, 'current_run_rate', 0.0),
                 'required_run_rate': getattr(match_state, 'required_run_rate', 0.0),
                 'target': getattr(match_state, 'target', None),
@@ -506,6 +681,11 @@ class MatchStateLogger:
                 'batsman2_runs': getattr(match_state, 'batsman2_runs', 0),
                 'batsman2_balls': getattr(match_state, 'batsman2_balls', 0),
                 'bowler_name': bowler_name,
+                'striker_name': getattr(match_state, 'batsman1_name', ""),
+                'non_striker_name': getattr(match_state, 'batsman2_name', ""),
+                'bowler_overs': getattr(match_state, 'bowler1_overs', 0.0),
+                'bowler_runs': getattr(match_state, 'bowler1_runs', 0),
+                'bowler_wickets': getattr(match_state, 'bowler1_wickets', 0),
                 'venue': match_state.venue,
                 'toss_winner': match_state.toss_winner if hasattr(match_state, 'toss_winner') else "",
                 'toss_decision': match_state.toss_decision if hasattr(match_state, 'toss_decision') else "",
@@ -526,17 +706,31 @@ class MatchStateLogger:
                     'bowler_venue_sr', 'bowler_vs_team_econ',
                 ]},
                 
+                'features_json': _json_dump(features_dict),
+                'inference_context_json': _json_dump(context),
+                'features_complete': bool(features_dict),
+                'team_identity_complete': team_identity_complete,
+                'model_probability_valid': model_probability_valid,
+                'market_probability_valid': market_probability_valid,
+
                 # Calibration chain
-                'model_raw_prob': model_raw_prob,
-                'model_smoothed_prob': model_smoothed_prob,
-                'model_calibrated_combined': model_calibrated_combined,
-                'model_calibrated_innings': model_calibrated_innings,
-                'model_calibrated_phase': model_calibrated_phase,
-                'model_calibrated_per_over': model_calibrated_per_over,
-                'model_league_calibrated': model_league_calibrated,
-                'model_post_calibrated': model_post_calibrated,
-                'model_post_calibration_rule': model_post_calibration_rule,
-                'model_final_prob': model_final_prob,
+                 'model_raw_prob': model_raw_prob,
+                 'model_prob_raw': model_raw_prob,
+                 'model_smoothed_prob': model_smoothed_prob,
+                 'model_calibrated_combined': model_calibrated_combined,
+                 'model_prob_combined': model_calibrated_combined,
+                 'model_calibrated_innings': model_calibrated_innings,
+                 'model_prob_innings': model_calibrated_innings,
+                 'model_calibrated_phase': model_calibrated_phase,
+                 'model_prob_phase': model_calibrated_phase,
+                 'model_calibrated_per_over': model_calibrated_per_over,
+                 'model_prob_perover': model_calibrated_per_over,
+                 'model_league_calibrated': model_league_calibrated,
+                 'model_prob_league': model_league_calibrated,
+                 'model_post_calibrated': model_post_calibrated,
+                 'model_post_calibration_rule': model_post_calibration_rule,
+                 'model_final_prob': model_final_prob,
+                 'model_prob_final': model_final_prob,
                 
                 # Market odds
                 'market_fav_team': market_fav_team,
@@ -545,6 +739,10 @@ class MatchStateLogger:
                 'market_fav_prob': market_fav_prob,
                 'market_batting_team_prob': market_batting_prob,
                 'market_bowling_team_prob': market_bowling_prob,
+                'market_source': market_odds.get('market_source') or "",
+                'market_age_seconds': market_odds.get('market_age_seconds'),
+                'market_status': market_status,
+                'market_unavailable_reason': market_unavailable_reason or "",
                 
                 # Deviation metrics
                 'deviation': deviation,
@@ -553,6 +751,14 @@ class MatchStateLogger:
                 'deviation_direction': deviation_direction,
                 'model_prob_delta': model_prob_delta,
                 'market_prob_delta': market_prob_delta,
+                'candidate_batting_team_prob': candidate_prob,
+                'candidate_model_version': candidate_model_version or "",
+                'candidate_artifact_sha256': candidate_artifact_sha256 or "",
+                'candidate_feature_order_sha256': candidate_feature_order_sha256 or "",
+                'candidate_source_revision': candidate_source_revision or "",
+                'candidate_minus_market': candidate_minus_market,
+                'candidate_absolute_gap': candidate_absolute_gap,
+                'candidate_minus_incumbent': candidate_minus_incumbent,
                 
                 # Team strength tier
                 'batting_team_tier': batting_team_tier,
@@ -647,6 +853,7 @@ class MatchStateLogger:
         team_a_score: Optional[str] = None,
         team_b_score: Optional[str] = None,
         result_type: str = "in_progress",
+        match_url: Optional[str] = None,
     ) -> None:
         """
         Finalize match recording and write metadata.
@@ -701,7 +908,7 @@ class MatchStateLogger:
             
             metadata_record = {
                 'match_id': self.match_id,
-                'match_url': "",  # Populated by caller if available
+                'match_url': match_url or self.match_url,
                 'league': self.league,
                 'date': self.recording_start,
                 'venue': venue or "",
@@ -734,7 +941,27 @@ class MatchStateLogger:
             
             if metadata_file.exists():
                 existing_metadata = pq.read_table(metadata_file)
-                combined_metadata = pa.concat_tables([existing_metadata, metadata_table])
+                existing_metadata_df = existing_metadata.to_pandas()
+                existing_match_ids = existing_metadata_df.get(
+                    "match_id", pd.Series(dtype=str)
+                ).astype(str)
+                existing_versions = existing_metadata_df.get(
+                    "model_version", pd.Series(dtype=str)
+                ).astype(str)
+                existing_results = existing_metadata_df.get(
+                    "result_type", pd.Series(dtype=str)
+                ).astype(str)
+                duplicate_completion = (
+                    (existing_match_ids == str(self.match_id))
+                    & (existing_versions == str(self.model_version))
+                    & (existing_results == "completed")
+                ).any()
+                if duplicate_completion and result_type == "completed":
+                    self.log.info("metadata_completion_already_recorded", file=str(metadata_file))
+                    return
+                combined_metadata = pa.concat_tables(
+                    [existing_metadata, metadata_table], promote_options="permissive"
+                )
                 pq.write_table(combined_metadata, metadata_file)
                 self.log.info("metadata_appended", file=str(metadata_file))
             else:

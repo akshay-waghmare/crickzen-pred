@@ -24,6 +24,8 @@ BALL_STATE_SCHEMA = pa.schema([
     ('over_number', pa.int8()),
     ('ball_in_over', pa.int8()),
     ('match_phase', pa.string()),  # "powerplay" / "middle" / "death"
+    ('match_url', pa.string()),
+    ('state_key', pa.string()),
     
     # Raw Match State
     ('batting_team', pa.string()),
@@ -41,6 +43,11 @@ BALL_STATE_SCHEMA = pa.schema([
     ('batsman2_runs', pa.int16()),
     ('batsman2_balls', pa.int16()),
     ('bowler_name', pa.string()),
+    ('striker_name', pa.string()),
+    ('non_striker_name', pa.string()),
+    ('bowler_overs', pa.float32()),
+    ('bowler_runs', pa.int16()),
+    ('bowler_wickets', pa.int8()),
     ('venue', pa.string()),
     ('toss_winner', pa.string()),
     ('toss_decision', pa.string()),
@@ -85,6 +92,14 @@ BALL_STATE_SCHEMA = pa.schema([
     ('bowler_venue_econ', pa.float32()),
     ('bowler_venue_sr', pa.float32()),
     ('bowler_vs_team_econ', pa.float32()),
+    # Full, version-tolerant inference context. These JSON strings retain
+    # feature keys that are not yet promoted to typed columns.
+    ('features_json', pa.string()),
+    ('inference_context_json', pa.string()),
+    ('features_complete', pa.bool_()),
+    ('team_identity_complete', pa.bool_()),
+    ('model_probability_valid', pa.bool_()),
+    ('market_probability_valid', pa.bool_()),
     
     # Calibration Chain (all float32)
     ('model_raw_prob', pa.float32()),
@@ -105,6 +120,10 @@ BALL_STATE_SCHEMA = pa.schema([
     ('market_fav_prob', pa.float32()),
     ('market_batting_team_prob', pa.float32()),  # nullable
     ('market_bowling_team_prob', pa.float32()),  # nullable
+    ('market_source', pa.string()),
+    ('market_age_seconds', pa.float32()),
+    ('market_status', pa.string()),
+    ('market_unavailable_reason', pa.string()),
     
     # Deviation Metrics
     ('deviation', pa.float32()),  # nullable
@@ -113,6 +132,14 @@ BALL_STATE_SCHEMA = pa.schema([
     ('deviation_direction', pa.string()),  # nullable
     ('model_prob_delta', pa.float32()),  # nullable
     ('market_prob_delta', pa.float32()),  # nullable
+    ('candidate_batting_team_prob', pa.float32()),  # nullable
+    ('candidate_model_version', pa.string()),
+    ('candidate_artifact_sha256', pa.string()),
+    ('candidate_feature_order_sha256', pa.string()),
+    ('candidate_source_revision', pa.string()),
+    ('candidate_minus_market', pa.float32()),  # nullable
+    ('candidate_absolute_gap', pa.float32()),  # nullable
+    ('candidate_minus_incumbent', pa.float32()),  # nullable
     
     # Team Strength Tier
     ('batting_team_tier', pa.string()),

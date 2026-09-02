@@ -106,6 +106,12 @@
         <form x-show="manualOpen" @submit.prevent="startMatch()" class="mt-4 space-y-3">
           <input type="url" x-model="newMatchUrl" required @input.debounce.500ms="autoDetectLeague()"
                  class="input-field w-full text-sm" placeholder="https://crex.com/cricket-live-score/..." />
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" x-model="newMatchTeam1" class="input-field w-full text-sm"
+                   placeholder="Team 1 (optional)" />
+            <input type="text" x-model="newMatchTeam2" class="input-field w-full text-sm"
+                   placeholder="Team 2 (optional)" />
+          </div>
           <div class="flex gap-2">
             <select x-model="newMatchLeague" class="input-field min-w-0 flex-1 text-sm">
               <option value="">Auto-detect</option>
@@ -329,6 +335,8 @@ function dashboardPage() {
     manualOpen: false,
     newMatchUrl: '',
     newMatchLeague: '',
+    newMatchTeam1: '',
+    newMatchTeam2: '',
     startingMatch: false,
     startError: null,
     pollTimers: {},
@@ -546,13 +554,20 @@ function dashboardPage() {
         const match = await czFetch('/api/matches/start', {
           method: 'POST',
           token,
-          body: { match_url: this.newMatchUrl, league: this.newMatchLeague || null },
+          body: {
+            match_url: this.newMatchUrl,
+            league: this.newMatchLeague || null,
+            team1_name: this.newMatchTeam1.trim() || null,
+            team2_name: this.newMatchTeam2.trim() || null,
+          },
         });
         this.matches.push({ ...match, state: null });
         this.selectedMatchId = match.id;
         this.startPolling(match.id);
         this.newMatchUrl = '';
         this.newMatchLeague = '';
+        this.newMatchTeam1 = '';
+        this.newMatchTeam2 = '';
       } catch (e) {
         this.startError = e.message || 'Failed to start prediction';
       } finally {
