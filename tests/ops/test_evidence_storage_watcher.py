@@ -85,7 +85,7 @@ def _config(tmp_path: Path) -> WatcherConfig:
         match_states_dir=tmp_path / "match_states",
         report_path=tmp_path / "model_reviews" / "evidence_watcher.json",
         events_path=tmp_path / "model_reviews" / "evidence_watcher_events.jsonl",
-        dashboard_active_seconds=600,
+        dashboard_active_seconds=120,
         evidence_grace_seconds=180,
         evidence_stale_seconds=300,
     )
@@ -139,15 +139,25 @@ def test_audit_raises_critical_when_active_evidence_is_missing(tmp_path: Path) -
     now = datetime(2026, 9, 3, 12, 0, tzinfo=timezone.utc)
     config = _config(tmp_path)
     _write_dashboard(config.dashboard_dir, now)
-    # Make the active state older than the flush grace window.
+    # Keep the dashboard state fresh enough to be an active prediction, but
+    # older than the shortened test grace window.
     payload_path = config.dashboard_dir / "prediction-1.json"
     payload = json.loads(payload_path.read_text(encoding="utf-8"))
-    payload["timestamp"] = (now - timedelta(seconds=240)).isoformat()
+    payload["timestamp"] = (now - timedelta(seconds=100)).isoformat()
     payload_path.write_text(json.dumps(payload), encoding="utf-8")
     sidecar_path = config.dashboard_dir / "prediction-1_livematch.json"
     sidecar_path.write_text(json.dumps(payload), encoding="utf-8")
     os.utime(payload_path, (now.timestamp(), now.timestamp()))
     os.utime(sidecar_path, (now.timestamp(), now.timestamp()))
+    config = WatcherConfig(
+        dashboard_dir=config.dashboard_dir,
+        match_states_dir=config.match_states_dir,
+        report_path=config.report_path,
+        events_path=config.events_path,
+        dashboard_active_seconds=120,
+        evidence_grace_seconds=90,
+        evidence_stale_seconds=180,
+    )
 
     report = audit_evidence_storage(config, now=now)
 
@@ -173,7 +183,7 @@ def test_audit_does_not_flag_pre_match_prediction_before_first_ball(tmp_path: Pa
     _write_dashboard(config.dashboard_dir, now)
     for path in (config.dashboard_dir / "prediction-1.json", config.dashboard_dir / "prediction-1_livematch.json"):
         payload = json.loads(path.read_text(encoding="utf-8"))
-        payload["timestamp"] = (now - timedelta(seconds=240)).isoformat()
+        payload["timestamp"] = (now - timedelta(seconds=30)).isoformat()
         payload["state"].update({"score": 0, "overs": 0.0})
         payload.pop("ball_history", None)
         path.write_text(json.dumps(payload), encoding="utf-8")
@@ -183,3 +193,19 @@ def test_audit_does_not_flag_pre_match_prediction_before_first_ball(tmp_path: Pa
 
     assert report["status"] == "healthy"
     assert report["matches"][0]["phase"] == "pre_match"
+
+
+def test_audit_ignores_stale_dashboard_fixture(tmp_path: Path) -> None:
+    now = datetime(2026, 9, 3, 12, 0, tzinfo=timezone.utc)
+    config = _config(tmp_path)
+    _write_dashboard(config.dashboard_dir, now)
+    for path in (config.dashboard_dir / "prediction-1.json", config.dashboard_dir / "prediction-1_livematch.json"):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["timestamp"] = (now - timedelta(seconds=240)).isoformat()
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        os.utime(path, (now.timestamp(), now.timestamp()))
+
+    report = audit_evidence_storage(config, now=now)
+
+    assert report["status"] == "healthy"
+    assert report["active_prediction_count"] == 0

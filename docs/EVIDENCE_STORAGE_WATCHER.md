@@ -18,6 +18,9 @@ subjects.
   probability, and explicit market status fields.
 - The file has no duplicate `state_key`, mixed match IDs, mixed source URLs, or
   implicit market availability.
+- Only a dashboard state fresh within 120 seconds is treated as an active
+  prediction. Older/test fixtures are ignored by this storage watcher and are
+  handled by the existing stale-predictor operations path.
 - Persisted evidence is not more than 180 seconds behind the live state and is
   not more than 300 seconds old. The normal logger flushes its buffer every 30
   records, so the 180-second grace window covers an ordinary flush without
