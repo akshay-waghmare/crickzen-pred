@@ -111,6 +111,7 @@ class DashboardMatch:
     sidecar_path: str | None
     match_url: str
     league: str
+    match_format: str
     payload_timestamp: str | None
     activity_at: datetime
     payload: dict[str, Any]
@@ -193,6 +194,49 @@ def _is_terminal(payload: dict[str, Any]) -> bool:
     except (TypeError, ValueError):
         pass
     return False
+
+
+def _has_observed_ball(payload: dict[str, Any]) -> bool:
+    """Return whether the live state has progressed past the pre-match snapshot."""
+    state = _state_payload(payload)
+    try:
+        if float(state.get("overs") or 0) > 0:
+            return True
+    except (TypeError, ValueError):
+        pass
+    try:
+        if float(state.get("ball") or 0) > 0:
+            return True
+    except (TypeError, ValueError):
+        pass
+    history = payload.get("ball_history") or payload.get("history")
+    return isinstance(history, list) and len(history) > 0
+
+
+def classify_match_format(match_url: str, payload: dict[str, Any]) -> str:
+    """Classify the formats supported by the prediction service.
+
+    The prediction scope is deliberately limited to T20 and one-day/ODI
+    matches. Test/first-class fixtures and unknown formats are out of scope and
+    must not create missing-evidence alerts.
+    """
+    text = f"{match_url} {payload.get('league', '')}".lower()
+    if re.search(r"test[- ]?(match|series|cricket)?|first[- ]class|four[- ]day", text):
+        return "test"
+    state = _state_payload(payload)
+    try:
+        total_overs = float(state.get("total_overs"))
+        if total_overs > 20:
+            return "odi"
+        if total_overs > 0:
+            return "t20" if total_overs <= 20 else "unknown"
+    except (TypeError, ValueError):
+        pass
+    if re.search(r"(^|[^a-z])t20([^a-z]|$)|twenty20|t20i", text):
+        return "t20"
+    if re.search(r"(^|[^a-z])odi([^a-z]|$)|one[- ]day|50[- ]over", text):
+        return "odi"
+    return "unknown"
 
 
 def _normalise_url(url: str) -> str:
@@ -282,6 +326,9 @@ def discover_dashboard_matches(
         if not match_url:
             errors.append(f"active dashboard state has no match_url: {base_path.name}")
             continue
+        match_format = classify_match_format(match_url, payload)
+        if match_format not in {"t20", "odi"}:
+            continue
         if _is_terminal(payload):
             continue
         matches.append(
@@ -291,6 +338,7 @@ def discover_dashboard_matches(
                 sidecar_path=str(sidecar_path) if sidecar_path.exists() else None,
                 match_url=match_url,
                 league=league,
+                match_format=match_format,
                 payload_timestamp=(
                     _iso(_payload_timestamp(payload)) if _payload_timestamp(payload) is not None else None
                 ),
@@ -325,6 +373,20 @@ def _nonempty(value: Any) -> bool:
 def _evidence_audit(path: Path, match: DashboardMatch, *, now: datetime, config: WatcherConfig) -> dict[str, Any]:
     issues: list[dict[str, str]] = []
     expected_path = _expected_evidence_path(config.match_states_dir, match)
+    if not _has_observed_ball(match.payload):
+        return {
+            "prediction_id": match.prediction_id,
+            "match_url": match.match_url,
+            "league": match.league,
+            "format": match.match_format,
+            "dashboard_age_seconds": round(max(0.0, (now - match.activity_at).total_seconds()), 1),
+            "evidence_path": str(expected_path),
+            "evidence_exists": path.exists(),
+            "row_count": 0,
+            "phase": "pre_match",
+            "issues": issues,
+            "status": "healthy",
+        }
     if not path.exists():
         age = max(0.0, (now - match.activity_at).total_seconds())
         severity = "critical" if age >= config.evidence_grace_seconds else "warning"
@@ -337,6 +399,7 @@ def _evidence_audit(path: Path, match: DashboardMatch, *, now: datetime, config:
             "prediction_id": match.prediction_id,
             "match_url": match.match_url,
             "league": match.league,
+            "format": match.match_format,
             "dashboard_age_seconds": round(max(0.0, (now - match.activity_at).total_seconds()), 1),
             "evidence_path": str(expected_path),
             "evidence_exists": False,
@@ -474,6 +537,7 @@ def _evidence_audit(path: Path, match: DashboardMatch, *, now: datetime, config:
         "prediction_id": match.prediction_id,
         "match_url": match.match_url,
         "league": match.league,
+        "format": match.match_format,
         "dashboard_age_seconds": round(max(0.0, (now - match.activity_at).total_seconds()), 1),
         "evidence_path": str(path),
         "evidence_exists": True,

@@ -5,6 +5,10 @@ per-ball Parquet record while a match is active. It is an operational guard for
 the seven-day market/model review; it does not restart predictors, alter public
 probabilities, delete evidence, or promote a model.
 
+The prediction scope is T20 and one-day/ODI only. Test/first-class and unknown
+format fixtures are ignored by the watcher because they are not prediction
+subjects.
+
 ## What it checks
 
 - A fresh dashboard prediction has a separate expected file at
@@ -48,4 +52,3 @@ the watcher.
 Exit codes for a one-shot audit are `0` healthy, `1` warning, and `2` critical.
 The watcher intentionally remains alive in continuous mode so the next cycle
 can observe recovery and record the transition.
-

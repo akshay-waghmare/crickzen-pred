@@ -11,6 +11,7 @@ import pyarrow.parquet as pq
 from bbl_pipeline.ops.evidence_storage_watcher import (
     WatcherConfig,
     audit_evidence_storage,
+    classify_match_format,
     match_slug_from_url,
 )
 
@@ -95,6 +96,29 @@ def test_match_slug_handles_trailing_slash_and_query() -> None:
     assert match_slug_from_url(f"{MATCH_URL}/?tab=scorecard") == "dg-vs-rd-ntb-t20-blast-2026-match-updates-13F3"
 
 
+def test_classify_match_format_only_allows_t20_and_odi() -> None:
+    assert classify_match_format(MATCH_URL, {"state": {"total_overs": 20}}) == "t20"
+    assert classify_match_format("https://crex.com/cricket-live-score/a-vs-b-odi-match-test", {"state": {"total_overs": 50}}) == "test"
+    assert classify_match_format("https://crex.com/cricket-live-score/a-vs-b-3rd-odi", {"state": {"total_overs": 50}}) == "odi"
+
+
+def test_audit_ignores_test_match_dashboard_state(tmp_path: Path) -> None:
+    now = datetime(2026, 9, 3, 12, 0, tzinfo=timezone.utc)
+    config = _config(tmp_path)
+    _write_dashboard(config.dashboard_dir, now)
+    for path in (config.dashboard_dir / "prediction-1.json", config.dashboard_dir / "prediction-1_livematch.json"):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["match_url"] = "https://crex.com/cricket-live-score/a-vs-b-test-match-2026"
+        payload["state"]["total_overs"] = 90
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        os.utime(path, (now.timestamp(), now.timestamp()))
+
+    report = audit_evidence_storage(config, now=now)
+
+    assert report["status"] == "healthy"
+    assert report["active_prediction_count"] == 0
+
+
 def test_audit_is_healthy_and_event_is_transition_only(tmp_path: Path) -> None:
     now = datetime(2026, 9, 3, 12, 0, tzinfo=timezone.utc)
     config = _config(tmp_path)
@@ -141,3 +165,21 @@ def test_audit_catches_duplicate_ball_keys(tmp_path: Path) -> None:
 
     assert report["status"] == "critical"
     assert any(issue["code"] == "duplicate_state_keys" for issue in report["issues"])
+
+
+def test_audit_does_not_flag_pre_match_prediction_before_first_ball(tmp_path: Path) -> None:
+    now = datetime(2026, 9, 3, 12, 0, tzinfo=timezone.utc)
+    config = _config(tmp_path)
+    _write_dashboard(config.dashboard_dir, now)
+    for path in (config.dashboard_dir / "prediction-1.json", config.dashboard_dir / "prediction-1_livematch.json"):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["timestamp"] = (now - timedelta(seconds=240)).isoformat()
+        payload["state"].update({"score": 0, "overs": 0.0})
+        payload.pop("ball_history", None)
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        os.utime(path, (now.timestamp(), now.timestamp()))
+
+    report = audit_evidence_storage(config, now=now)
+
+    assert report["status"] == "healthy"
+    assert report["matches"][0]["phase"] == "pre_match"
