@@ -280,6 +280,13 @@ class MatchStateLogger:
             "RCBW": "ROYAL CHALLENGERS BENGALURU W",
             "DCW": "DELHI CAPITALS W", "MIW": "MUMBAI INDIANS W",
             "GGW": "GUJARAT GIANTS W", "UPWW": "UP WARRIORZ W",
+            # CREX domestic/European competitions. These codes are not
+            # globally resolvable through the historical feature-store maps,
+            # but the live market feed uses the provider display names.
+            "KAS": "KASHI RUDRAS", "NOI": "NOIDA KINGS",
+            "DG": "DUBLIN GUARDIANS", "BW": "BELFAST WOLVES",
+            "ECR": "EDINBURGH CASTLE ROCKERS", "RD": "ROTTERDAM DOCKERS",
+            "GC": "GLASGOW COSMIC", "AF": "AMSTERDAM FLAMES",
         }
         # Build reverse map: full name → code
         reverse_franchise = {}

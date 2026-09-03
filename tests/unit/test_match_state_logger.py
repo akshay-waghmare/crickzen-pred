@@ -212,6 +212,34 @@ class TestMapMarketProbs:
         assert batting_prob == 0.30
         assert bowling_prob == 0.70
 
+    def test_provider_code_matches_market_display_name(self, temp_states_dir):
+        """CREX short codes map to the competition's market display names."""
+        logger = MatchStateLogger("1234567", "t20_all", temp_states_dir, "v1", "fs_v1")
+
+        batting_prob, bowling_prob = logger._map_market_probs(
+            market_fav_team="Kashi Rudras",
+            market_fav_prob=2 / 3,
+            batting_team="KAS",
+            bowling_team="NOI",
+        )
+
+        assert batting_prob == 2 / 3
+        assert bowling_prob == round(1 - (2 / 3), 10)
+
+    def test_european_provider_code_matches_market_display_name(self, temp_states_dir):
+        """Competition-local DG resolves to Dublin Guardians for CREX markets."""
+        logger = MatchStateLogger("1234567", "t20_all", temp_states_dir, "v1", "fs_v1")
+
+        batting_prob, bowling_prob = logger._map_market_probs(
+            market_fav_team="Dublin Guardians",
+            market_fav_prob=0.62,
+            batting_team="DG",
+            bowling_team="BW",
+        )
+
+        assert batting_prob == 0.62
+        assert bowling_prob == 0.38
+
 
 class TestComputeDeviation:
     """Test _compute_deviation method."""
