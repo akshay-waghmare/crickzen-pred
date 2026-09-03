@@ -303,6 +303,41 @@ def test_scorecard_team_label_uses_provider_pair_for_batting_orientation():
     assert predictor._resolve_scorecard_team_from_provider_pair("DG") == "Dublin Guardians"
 
 
+def test_first_innings_summary_does_not_flip_current_innings_for_same_team():
+    assert not CrexLivePredictor._second_innings_is_supported(
+        current_team="Jalandhar Warriors",
+        current_runs=205,
+        first_innings_team="Jalandhar Warriors",
+        first_innings_runs=205,
+    )
+
+
+def test_first_innings_summary_supports_chase_for_other_team():
+    assert CrexLivePredictor._second_innings_is_supported(
+        current_team="Bathinda Royals",
+        current_runs=10,
+        first_innings_team="Jalandhar Warriors",
+        first_innings_runs=205,
+    )
+
+
+def test_explicit_chase_text_is_authoritative_even_without_team_resolution():
+    assert CrexLivePredictor._second_innings_is_supported(
+        current_team="Unknown",
+        current_runs=0,
+        first_innings_team="",
+        first_innings_runs=-1,
+        has_needs_runs=True,
+    )
+
+
+def test_rejects_first_innings_summary_as_current_bowler():
+    assert not CrexLivePredictor._current_bowler_is_valid(
+        "st innings over", 205, 10, 19.3
+    )
+    assert CrexLivePredictor._current_bowler_is_valid("S Sharma", 0, 39, 3.2)
+
+
 def test_extract_teams_from_crex_url_resolves_women_t20i_suffixes():
     predictor = CrexLivePredictor.__new__(CrexLivePredictor)
     predictor.local_storage = {}

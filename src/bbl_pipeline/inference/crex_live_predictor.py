@@ -721,6 +721,74 @@ class CrexLivePredictor:
             self.match_state.batsman2_runs,
             self.match_state.batsman2_balls,
         ) = pair
+
+    @staticmethod
+    def _second_innings_is_supported(
+        current_team: str,
+        current_runs: int,
+        first_innings_team: str,
+        first_innings_runs: int,
+        has_needs_runs: bool = False,
+        has_required_run_rate: bool = False,
+    ) -> bool:
+        """Require evidence that the scorecard has moved to the chase.
+
+        CREX pages can show the completed-innings summary as ``vs TEAM
+        205-10`` while the first innings is still on the live scorecard.  The
+        old ``first_innings_match`` check treated that summary alone as an
+        innings change and emitted rows with the first-innings team in the
+        batting slot.  Explicit chase text is authoritative; otherwise the
+        current score must belong to the other provider team and still be
+        below the completed first-innings score.
+        """
+        if has_needs_runs or has_required_run_rate:
+            return True
+        if not first_innings_team or first_innings_runs < 0:
+            return False
+
+        normalize = lambda value: re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
+        current_key = normalize(current_team)
+        first_key = normalize(first_innings_team)
+        if current_key and first_key and current_key == first_key:
+            return False
+        return int(current_runs or 0) < int(first_innings_runs)
+
+    @staticmethod
+    def _current_bowler_is_valid(name: str, wickets: int, runs: int, overs: float) -> bool:
+        """Reject score-summary text accidentally captured as a bowler.
+
+        A hydrated CREX page may expose the completed first-innings summary
+        through the same broad CSS selector used by older layouts.  Values
+        such as ``st innings over 10-205 (19.3)`` are not a player/figure
+        record and must never reach inference or the evidence trail.
+        """
+        clean_name = str(name or "").strip()
+        if not clean_name or re.search(r"\b(?:innings?|over|score|target|need|rate)\b", clean_name, re.IGNORECASE):
+            return False
+        try:
+            wickets_value = int(wickets)
+            runs_value = int(runs)
+            overs_value = float(overs)
+        except (TypeError, ValueError):
+            return False
+        return (
+            0 <= wickets_value <= 10
+            and 0 <= runs_value <= 1000
+            and 0 <= overs_value <= 50
+        )
+
+    def _clear_invalid_current_bowler(self) -> None:
+        if self._current_bowler_is_valid(
+            self.match_state.bowler1_name,
+            self.match_state.bowler1_wickets,
+            self.match_state.bowler1_runs,
+            self.match_state.bowler1_overs,
+        ):
+            return
+        self.match_state.bowler1_name = ""
+        self.match_state.bowler1_overs = 0.0
+        self.match_state.bowler1_runs = 0
+        self.match_state.bowler1_wickets = 0
     
     def _init_match_state_logger(self):
         """Initialize match state logger if recording is enabled."""
@@ -2084,20 +2152,36 @@ class CrexLivePredictor:
                     self._update_total_overs(50)
                 
                 # Auto-detect ODI from first innings overs in title: "vs Team 259-7 ((42.0))"
-                first_inn_title = re.search(r'vs\s+[A-Za-z\s]+\s+(\d+)-\d+\s+\(\(([\d.]+)\)\)', title)
+                first_inn_title = re.search(
+                    r'vs\s+(?P<team>[A-Za-z0-9&.\'\- ]+)\s+'
+                    r'(?P<runs>\d+)-\d+\s+\(\((?P<overs>[\d.]+)\)\)',
+                    title,
+                )
                 if first_inn_title:
-                    first_inn_overs = float(first_inn_title.group(2))
-                    first_inn_score = int(first_inn_title.group(1))
+                    first_inn_team = (
+                        self._resolve_scorecard_team_from_provider_pair(first_inn_title.group("team"))
+                        or self._resolve_team_name(first_inn_title.group("team"))
+                    )
+                    first_inn_overs = float(first_inn_title.group("overs"))
+                    first_inn_score = int(first_inn_title.group("runs"))
                     if first_inn_overs > 20.0 and (self._effective_total_overs is None or self._effective_total_overs <= 20):
                         logger.info(f"Auto-detected ODI format from title: first innings {first_inn_overs} overs (score: {first_inn_score})")
                         self._update_total_overs(50)
                     # Also set second innings info
-                    if not self.match_state.is_second_innings:
+                    if (
+                        not self.match_state.is_second_innings
+                        and self._second_innings_is_supported(
+                            current_batting_team,
+                            self.match_state.total_runs,
+                            first_inn_team,
+                            first_inn_score,
+                        )
+                    ):
                         logger.info("Innings change detected from title (first innings score found)")
                         self.match_state.is_second_innings = True
-                    if self.match_state.target is None:
-                        self.match_state.target = first_inn_score + 1
-                        logger.info(f"Set target from title: {first_inn_score} + 1 = {self.match_state.target}")
+                        if self.match_state.target is None:
+                            self.match_state.target = first_inn_score + 1
+                            logger.info(f"Set target from title: {first_inn_score} + 1 = {self.match_state.target}")
                 
                 # If batting team changed, update bowling team accordingly
                 if self.match_state.batting_team and self._normalize_team_key(self.match_state.batting_team) != self._normalize_team_key(current_batting_team):
@@ -2185,17 +2269,38 @@ class CrexLivePredictor:
             
             # Also try to extract the first innings total from "vs Team XXX-Y" or "((overs))" pattern
             # Pattern: "vs Sydney Sixers 113-5 ((11.0))" -> target = 114
-            first_innings_match = re.search(r'vs\s+[A-Za-z\s]+\s+(\d+)-\d+\s+\(\(([\d.]+)\)\)', page_text)
+            first_innings_match = re.search(
+                r'vs\s+(?P<team>[A-Za-z0-9&.\'\- ]+)\s+'
+                r'(?P<runs>\d+)-\d+\s+\(\((?P<overs>[\d.]+)\)\)',
+                page_text,
+            )
             
             # Auto-detect ODI format from first innings overs (e.g. ((42.0)) means > 20 overs = ODI)
             if first_innings_match:
-                first_inn_overs = float(first_innings_match.group(2))
+                first_inn_overs = float(first_innings_match.group("overs"))
                 if first_inn_overs > 20 and (self._effective_total_overs is None or self._effective_total_overs <= 20):
                     detected_total = 50  # Standard ODI
                     logger.info(f"Auto-detected ODI format from first innings overs: {first_inn_overs} -> {detected_total} overs")
                     self._update_total_overs(detected_total)
             
-            if needs_runs_match or rrr_match or first_innings_match:
+            first_inn_team = ""
+            first_inn_score = -1
+            if first_innings_match:
+                first_inn_team = (
+                    self._resolve_scorecard_team_from_provider_pair(first_innings_match.group("team"))
+                    or self._resolve_team_name(first_innings_match.group("team"))
+                )
+                first_inn_score = int(first_innings_match.group("runs"))
+            second_innings_supported = self._second_innings_is_supported(
+                current_batting_team=self.match_state.batting_team,
+                current_runs=self.match_state.total_runs,
+                first_innings_team=first_inn_team,
+                first_innings_runs=first_inn_score,
+                has_needs_runs=bool(needs_runs_match),
+                has_required_run_rate=bool(rrr_match),
+            )
+
+            if second_innings_supported:
                 # Note: We do NOT clear balls_data here anymore!
                 # The _build_ball_history_for_mapper function handles innings filtering
                 # by detecting the innings boundary (over number reset)
@@ -2210,9 +2315,8 @@ class CrexLivePredictor:
                     self.match_state.target = self.match_state.total_runs + runs_needed
                 # Otherwise, set target from first innings score (if not already set)
                 elif first_innings_match and self.match_state.target is None:
-                    first_innings_score = int(first_innings_match.group(1))
-                    self.match_state.target = first_innings_score + 1  # Target = first innings + 1
-                    logger.info(f"Set target from first innings score: {first_innings_score} + 1 = {self.match_state.target}")
+                    self.match_state.target = first_inn_score + 1  # Target = first innings + 1
+                    logger.info(f"Set target from first innings score: {first_inn_score} + 1 = {self.match_state.target}")
                     
                 if rrr_match:
                     self.match_state.required_run_rate = float(rrr_match.group(1))
@@ -2304,6 +2408,8 @@ class CrexLivePredictor:
                     except:
                         pass
 
+            self._clear_invalid_current_bowler()
+
             # Fallback DOM selectors (legacy layouts)
             if not self.match_state.bowler1_name:
                 bowler_row = await self.page.query_selector(".bowler-row, .bowl-row")
@@ -2334,6 +2440,8 @@ class CrexLivePredictor:
                         except:
                             pass
 
+            self._clear_invalid_current_bowler()
+
             # Fallback from active player card text (current CREX layout)
             if not self.match_state.bowler1_name:
                 active_card = await self.page.query_selector(".player-active, .player-card, .player-profile")
@@ -2349,6 +2457,8 @@ class CrexLivePredictor:
                             self.match_state.bowler1_overs = float(card_match.group(4))
                         except:
                             pass
+
+            self._clear_invalid_current_bowler()
             # Note: If DOM selectors fail, fallback regex patterns below will attempt extraction
             
             # Fallback: Try to extract bowler from page text patterns
@@ -2379,6 +2489,8 @@ class CrexLivePredictor:
                         title_bowler = re.search(r'-\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+[\d.]+-\d+-\d+-\d+', title)
                         if title_bowler:
                             self.match_state.bowler1_name = title_bowler.group(1).strip()
+
+            self._clear_invalid_current_bowler()
                         
         except Exception as e:
             print(f"[WARN] Error extracting match info: {e}")
