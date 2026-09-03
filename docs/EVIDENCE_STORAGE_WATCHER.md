@@ -49,8 +49,9 @@ python -m bbl_pipeline.ops.evidence_storage_watcher watch --interval-seconds 60
 The production compose file runs this as the independent
 `crickzen-evidence-watcher` container with `restart: unless-stopped`. A critical
 status makes that container unhealthy and leaves a machine-readable report plus
-an operator-visible container log. A warning is visible but does not restart
-the watcher.
+an operator-visible container log. A warning is visible but does not mark the
+watcher process unhealthy or restart it; the healthcheck is implemented by
+`src/bbl_pipeline/ops/evidence_watcher_healthcheck.py`.
 
 Exit codes for a one-shot audit are `0` healthy, `1` warning, and `2` critical.
 The watcher intentionally remains alive in continuous mode so the next cycle

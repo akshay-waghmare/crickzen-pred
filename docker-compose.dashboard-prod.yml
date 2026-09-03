@@ -54,15 +54,7 @@ services:
       - ./src:/app/src:ro
     restart: unless-stopped
     healthcheck:
-      test:
-        - CMD
-        - python
-        - -c
-        - >-
-          import json, pathlib, sys;
-          p=pathlib.Path('/app/data/model_reviews/evidence_watcher.json');
-          d=json.loads(p.read_text()) if p.exists() else {};
-          sys.exit(0 if d.get('status') in ('healthy','warning') else 1)
+      test: ["CMD", "python", "/app/src/bbl_pipeline/ops/evidence_watcher_healthcheck.py"]
       interval: 60s
       timeout: 10s
       start_period: 30s
