@@ -137,6 +137,55 @@ def test_poll_crex_market_odds_reads_direct_s_v3_payload():
     assert predictor.match_state.market_back_odds == "48"
 
 
+def test_extract_authoritative_bowler_accepts_shared_bowler_data_shapes():
+    payload = {
+        "bowler_data": {
+            "name": "K Siddhu",
+            "score": "8",
+            "ballsBowled": "6",
+            "wicketsTaken": "0",
+        }
+    }
+
+    assert CrexLivePredictor._extract_authoritative_bowler(payload) == {
+        "name": "K Siddhu",
+        "overs": 1.0,
+        "runs": 8,
+        "wickets": 0,
+    }
+
+
+def test_hydrate_current_bowler_from_shared_snapshot_populates_match_state():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.page = _MarketPage({
+        "bowler_data": [{
+            "name": "K Siddhu",
+            "score": "8",
+            "ballsBowled": "6",
+            "wicketsTaken": "0",
+        }]
+    })
+    predictor.match_url = (
+        "https://crex.com/cricket-live-score/kas-vs-noi-eliminator-"
+        "uttar-pradesh-t20-league-2026-match-updates-133R"
+    )
+    predictor.original_match_url = predictor.match_url
+    predictor.match_state = CrexMatchState()
+    predictor._last_bowler_api_fetch_at = None
+
+    asyncio.run(predictor._hydrate_current_bowler_from_shared_snapshot())
+
+    assert predictor.page.request.urls == [
+        "https://www.crickzen.com/api/cricket-data/last-updated-data?url="
+        "https%3A%2F%2Fcrex.com%2Fcricket-live-score%2Fkas-vs-noi-eliminator-"
+        "uttar-pradesh-t20-league-2026-match-updates-133R"
+    ]
+    assert predictor.match_state.bowler1_name == "K Siddhu"
+    assert predictor.match_state.bowler1_overs == pytest.approx(1.0)
+    assert predictor.match_state.bowler1_runs == 8
+    assert predictor.match_state.bowler_data_source == "crickzen_shared_live_snapshot"
+
+
 def test_build_sidecar_paths_are_feed_specific():
     output_json = "data/ipl_live_ml.json"
 

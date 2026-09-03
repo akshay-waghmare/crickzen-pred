@@ -356,6 +356,31 @@ class TestRecordBall:
         assert record["model_version"] == "v1"
         assert record["feature_store_version"] == "fs_v1"
 
+    def test_record_ball_persists_bowler_identity_and_figures(
+        self, temp_states_dir, sample_match_state, sample_features,
+        mock_predictor, sample_market_odds
+    ):
+        logger = MatchStateLogger("1234567", "test", temp_states_dir, "v1", "fs_v1")
+        state = sample_match_state.copy()
+        state.update({
+            "bowler1_name": "K Siddhu",
+            "bowler1_overs": 1.0,
+            "bowler1_runs": 8,
+            "bowler1_wickets": 0,
+        })
+
+        logger.record_ball(state, sample_features, mock_predictor, sample_market_odds)
+
+        record = logger.buffer[0]
+        assert record["bowler_name"] == "K Siddhu"
+        assert record["bowler_overs"] == 1.0
+        assert record["bowler_runs"] == 8
+        assert record["bowler_wickets"] == 0
+
+        logger.flush()
+        parquet = pd.read_parquet(temp_states_dir / "1234567.parquet")
+        assert parquet.iloc[0]["bowler_name"] == "K Siddhu"
+
     def test_record_ball_buffer_auto_flush(
         self, temp_states_dir, sample_match_state, sample_features,
         mock_predictor, sample_market_odds

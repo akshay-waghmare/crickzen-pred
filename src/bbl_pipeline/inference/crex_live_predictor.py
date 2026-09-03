@@ -16,6 +16,7 @@ from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Tuple
+from urllib.parse import quote
 
 # Force UTF-8 stdout on Windows to avoid charmap encoding crashes with emoji
 if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
@@ -97,6 +98,7 @@ class MatchState:
     bowler1_overs: float = 0.0
     bowler1_runs: int = 0
     bowler1_wickets: int = 0
+    bowler_data_source: str = ""
     venue: str = ""
     toss_winner: str = ""
     toss_decision: str = ""
@@ -277,6 +279,7 @@ class CrexLivePredictor:
         self._last_market_update_at = None
         self._last_market_age_seconds = None
         self._last_market_api_fetch_at = None
+        self._last_bowler_api_fetch_at = None
         self._load_market_stack_candidate()
         self._load_candidate_model()
 
@@ -1972,6 +1975,143 @@ class CrexLivePredictor:
             # leave the row explicitly unavailable rather than stop inference.
             logger.debug("market_odds_api_poll_failed", key=api_key, error=str(exc))
 
+    @staticmethod
+    def _extract_authoritative_bowler(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Extract the current bowler from CrickZen's shared live snapshot.
+
+        The live hero and predictor dashboard consume the shared
+        ``last-updated-data`` contract. CREX-backed payloads have appeared with
+        ``bowler_data`` as either a one-item list or a single object, while
+        commentary consistently carries ``bowlerName`` and text such as
+        ``Name to Batter``. Keep this parser version-tolerant and conservative:
+        an empty/placeholder name is never promoted into MatchState.
+        """
+        if not isinstance(payload, dict):
+            return None
+
+        def clean_name(value: Any) -> str:
+            name = re.sub(r"\s+", " ", str(value or "")).strip()
+            if not name or name.lower() in {"unknown", "-", "n/a", "na", "bowler"}:
+                return ""
+            if re.search(r"\b(?:innings?|over|score|target|need|rate)\b", name, re.IGNORECASE):
+                return ""
+            return name
+
+        def numeric(entry: Dict[str, Any], *keys: str) -> Optional[float]:
+            for key in keys:
+                value = entry.get(key)
+                if value is None or isinstance(value, bool):
+                    continue
+                match = re.search(r"-?\d+(?:\.\d+)?", str(value))
+                if match:
+                    try:
+                        return float(match.group(0))
+                    except ValueError:
+                        continue
+            return None
+
+        raw_bowler_data = payload.get("bowler_data")
+        if raw_bowler_data is None:
+            raw_bowler_data = payload.get("bowlerData")
+        if isinstance(raw_bowler_data, dict) and isinstance(raw_bowler_data.get("data"), (dict, list)):
+            raw_bowler_data = raw_bowler_data["data"]
+        if isinstance(raw_bowler_data, dict):
+            bowler_entries = [raw_bowler_data]
+        elif isinstance(raw_bowler_data, list):
+            bowler_entries = [entry for entry in raw_bowler_data if isinstance(entry, dict)]
+        else:
+            bowler_entries = []
+
+        for entry in bowler_entries:
+            name = clean_name(
+                entry.get("name")
+                or entry.get("bowlerName")
+                or entry.get("bowler_name")
+                or entry.get("playerName")
+                or entry.get("player_name")
+            )
+            if not name:
+                continue
+            overs = numeric(entry, "overs", "oversBowled", "bowlerOvers")
+            balls_bowled = numeric(entry, "ballsBowled", "balls_bowled")
+            if overs is None and balls_bowled is not None:
+                overs = balls_bowled / 6.0
+            runs = numeric(entry, "runs", "runsConceded", "bowlerRuns", "score")
+            wickets = numeric(entry, "wickets", "wicketsTaken", "bowlerWickets")
+            return {
+                "name": name,
+                "overs": overs if overs is not None else 0.0,
+                "runs": int(runs) if runs is not None else 0,
+                "wickets": int(wickets) if wickets is not None else 0,
+            }
+
+        raw_commentary = payload.get("commentary") or payload.get("latest_commentary")
+        if isinstance(raw_commentary, dict):
+            commentary_entries = [raw_commentary]
+        elif isinstance(raw_commentary, list):
+            commentary_entries = [entry for entry in raw_commentary if isinstance(entry, dict)]
+        else:
+            commentary_entries = []
+
+        for entry in commentary_entries:
+            name = clean_name(entry.get("bowlerName") or entry.get("bowler_name"))
+            if not name:
+                text = str(entry.get("text") or entry.get("commentary") or "")
+                match = re.match(r"\s*(.+?)\s+to\s+", text, re.IGNORECASE)
+                name = clean_name(match.group(1) if match else "")
+            if name:
+                return {"name": name, "overs": 0.0, "runs": 0, "wickets": 0}
+
+        return None
+
+    async def _hydrate_current_bowler_from_shared_snapshot(self) -> None:
+        """Bridge the shared live bowler payload into the predictor state.
+
+        Direct CREX DOM extraction remains the first path. This bounded
+        fallback uses the same backend snapshot already consumed by the live
+        hero, so evidence and public display can no longer disagree merely
+        because the predictor's page selectors missed the current row.
+        """
+        if not self.page:
+            return
+
+        now = asyncio.get_running_loop().time()
+        last_fetch = getattr(self, "_last_bowler_api_fetch_at", None)
+        if last_fetch is not None and now - last_fetch < 5.0:
+            return
+        self._last_bowler_api_fetch_at = now
+
+        endpoint = os.getenv(
+            "CRICKZEN_BOWLER_DATA_ENDPOINT",
+            "https://www.crickzen.com/api/cricket-data/last-updated-data",
+        ).strip()
+        if not endpoint:
+            return
+        source_url = self.match_url or self.original_match_url
+        if not source_url:
+            return
+        separator = "&" if "?" in endpoint else "?"
+        request_url = f"{endpoint}{separator}url={quote(source_url, safe='')}"
+
+        try:
+            response = await self.page.request.get(request_url, timeout=5_000)
+            if not response.ok:
+                logger.debug("shared_bowler_snapshot_non_2xx", status=response.status)
+                return
+            payload = await response.json()
+            bowler = self._extract_authoritative_bowler(payload)
+            if not bowler:
+                return
+            self.match_state.bowler1_name = bowler["name"]
+            self.match_state.bowler1_overs = bowler["overs"]
+            self.match_state.bowler1_runs = bowler["runs"]
+            self.match_state.bowler1_wickets = bowler["wickets"]
+            self.match_state.bowler_data_source = "crickzen_shared_live_snapshot"
+        except Exception as exc:
+            # Bowler enrichment is optional. A transient backend failure must
+            # not stop inference or erase a direct CREX value.
+            logger.debug("shared_bowler_snapshot_failed", error=str(exc))
+
     def _process_api_data(self, data: Dict[str, Any]):
         """Process sV3 API data into match state."""
         try:
@@ -2467,6 +2607,7 @@ class CrexLivePredictor:
                     except:
                         pass
 
+            await self._hydrate_current_bowler_from_shared_snapshot()
             self._clear_invalid_current_bowler()
 
             # Fallback DOM selectors (legacy layouts)
@@ -3938,6 +4079,7 @@ class CrexLivePredictor:
                         'batsman1_name': state.batsman1_name,
                         'batsman2_name': state.batsman2_name,
                         'bowler1_name': state.bowler1_name,
+                        'bowler_data_source': state.bowler_data_source,
                         'current_batsman': state.batsman1_name,
                         'non_striker': state.batsman2_name,
                         'batsman1_balls': state.batsman1_balls,
@@ -4052,6 +4194,7 @@ class CrexLivePredictor:
                         'batsman1_name': state.batsman1_name,
                         'batsman2_name': state.batsman2_name,
                         'bowler1_name': state.bowler1_name,
+                        'bowler_data_source': state.bowler_data_source,
                         'current_batsman': state.batsman1_name,
                         'non_striker': state.batsman2_name,
                         'batsman1_balls': state.batsman1_balls,
