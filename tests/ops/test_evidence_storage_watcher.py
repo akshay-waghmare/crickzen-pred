@@ -159,10 +159,13 @@ def test_audit_raises_critical_when_active_evidence_is_missing(tmp_path: Path) -
         evidence_stale_seconds=180,
     )
 
+    first = audit_evidence_storage(config, now=now - timedelta(seconds=100))
     report = audit_evidence_storage(config, now=now)
 
+    assert first["status"] == "warning"
     assert report["status"] == "critical"
     assert any(issue["code"] == "evidence_missing" for issue in report["issues"])
+    assert report["matches"][0]["missing_age_seconds"] >= 100
 
 
 def test_audit_catches_duplicate_ball_keys(tmp_path: Path) -> None:

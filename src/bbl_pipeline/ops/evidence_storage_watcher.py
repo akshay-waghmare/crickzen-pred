@@ -375,7 +375,14 @@ def _nonempty(value: Any) -> bool:
     return value is not None and str(value).strip() != ""
 
 
-def _evidence_audit(path: Path, match: DashboardMatch, *, now: datetime, config: WatcherConfig) -> dict[str, Any]:
+def _evidence_audit(
+    path: Path,
+    match: DashboardMatch,
+    *,
+    now: datetime,
+    config: WatcherConfig,
+    previous_match: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     issues: list[dict[str, str]] = []
     expected_path = _expected_evidence_path(config.match_states_dir, match)
     if not _has_observed_ball(match.payload):
@@ -393,7 +400,11 @@ def _evidence_audit(path: Path, match: DashboardMatch, *, now: datetime, config:
             "status": "healthy",
         }
     if not path.exists():
-        age = max(0.0, (now - match.activity_at).total_seconds())
+        previous_missing_since = _parse_timestamp(
+            (previous_match or {}).get("missing_since")
+        )
+        missing_since = previous_missing_since or now
+        age = max(0.0, (now - missing_since).total_seconds())
         severity = "critical" if age >= config.evidence_grace_seconds else "warning"
         issues.append({
             "severity": severity,
@@ -409,6 +420,8 @@ def _evidence_audit(path: Path, match: DashboardMatch, *, now: datetime, config:
             "evidence_path": str(expected_path),
             "evidence_exists": False,
             "row_count": 0,
+            "missing_since": _iso(missing_since),
+            "missing_age_seconds": round(age, 1),
             "issues": issues,
         }
 
@@ -617,6 +630,18 @@ def _append_transition_event(path: Path, report: dict[str, Any], previous: dict[
 def audit_evidence_storage(config: WatcherConfig, *, now: datetime | None = None) -> dict[str, Any]:
     """Run one bounded storage audit and persist its machine-readable report."""
     now = now or _utc_now()
+    previous: dict[str, Any] | None = None
+    try:
+        if config.report_path.exists():
+            raw_previous = json.loads(config.report_path.read_text(encoding="utf-8"))
+            previous = raw_previous if isinstance(raw_previous, dict) else None
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        previous = None
+    previous_matches = {
+        str(match.get("prediction_id")): match
+        for match in (previous or {}).get("matches", [])
+        if isinstance(match, dict) and match.get("prediction_id")
+    }
     matches, discovery_errors = discover_dashboard_matches(
         config.dashboard_dir,
         now=now,
@@ -629,7 +654,13 @@ def audit_evidence_storage(config: WatcherConfig, *, now: datetime | None = None
     for match in matches:
         expected = _expected_evidence_path(config.match_states_dir, match)
         path = exact_paths.get(expected.resolve(), expected)
-        audit = _evidence_audit(path, match, now=now, config=config)
+        audit = _evidence_audit(
+            path,
+            match,
+            now=now,
+            config=config,
+            previous_match=previous_matches.get(match.prediction_id),
+        )
         audits.append(audit)
 
     issues: list[dict[str, str]] = [
@@ -668,11 +699,7 @@ def audit_evidence_storage(config: WatcherConfig, *, now: datetime | None = None
         "issues": issues,
         "matches": audits,
     }
-    previous: dict[str, Any] | None = None
     try:
-        if config.report_path.exists():
-            raw_previous = json.loads(config.report_path.read_text(encoding="utf-8"))
-            previous = raw_previous if isinstance(raw_previous, dict) else None
         _append_transition_event(config.events_path, report, previous)
         _atomic_write_json(config.report_path, report)
     except Exception as exc:
