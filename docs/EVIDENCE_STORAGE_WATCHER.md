@@ -22,9 +22,9 @@ subjects.
   prediction. Older/test fixtures are ignored by this storage watcher and are
   handled by the existing stale-predictor operations path.
 - Persisted evidence is not more than 180 seconds behind the live state and is
-  not more than 300 seconds old. The normal logger flushes its buffer every 30
-  records, so the 180-second grace window covers an ordinary flush without
-  hiding a broken writer.
+  not more than 300 seconds old. The logger flushes its buffer every 30 records
+  or 30 seconds, so a predictor that starts mid-match still exposes valid rows
+  before the watcher grace window expires.
 - Feature completeness is at least 95%; team identity must be complete for all
   stored rows. Missing market data remains valid only when it is recorded as
   `market_status=unavailable` with a reason.

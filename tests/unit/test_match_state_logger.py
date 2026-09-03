@@ -8,6 +8,7 @@ deviation computation, market probability mapping, and team tier classification.
 import pytest
 import pandas as pd
 import pyarrow.parquet as pq
+from datetime import timedelta
 from pathlib import Path
 from unittest.mock import Mock, MagicMock
 from src.bbl_pipeline.inference.match_state_logger import MatchStateLogger
@@ -350,6 +351,23 @@ class TestRecordBall:
         # Verify 30 rows written
         df = pd.read_parquet(parquet_file)
         assert len(df) == 30
+
+    def test_record_ball_time_flushes_short_match_buffer(
+        self, temp_states_dir, sample_match_state, sample_features,
+        mock_predictor, sample_market_odds
+    ):
+        """A valid short/mid-match run becomes visible before finalization."""
+        logger = MatchStateLogger("1234567", "test", temp_states_dir, "v1", "fs_v1")
+        logger._last_flush_at -= timedelta(seconds=31)
+
+        logger.record_ball(
+            sample_match_state, sample_features, mock_predictor, sample_market_odds
+        )
+
+        parquet_file = temp_states_dir / "1234567.parquet"
+        assert parquet_file.exists()
+        assert len(logger.buffer) == 0
+        assert len(pd.read_parquet(parquet_file)) == 1
 
     def test_record_ball_with_missing_market_odds(
         self, temp_states_dir, sample_match_state, sample_features, mock_predictor

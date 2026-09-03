@@ -7,7 +7,8 @@ live predictions and persists to per-match Parquet files.
 
 Key features:
 - Error isolation: all public methods wrapped in try/except (FR-009)
-- Buffered writes: flushes at innings break, match end, or every 30 records
+- Buffered writes: flushes at innings break, match end, every 30 records, or
+  after a bounded time interval so short/mid-match runs are visible on disk
 - Deviation computation: model-market gap with bucket/direction classification
 - Team tier classification: top/mid/bottom based on feature store win rates
 - Schema validation: uses PyArrow schemas for type safety
@@ -104,6 +105,7 @@ class MatchStateLogger:
         model_version: str,
         feature_store_version: str,
         match_url: str = "",
+        flush_interval_seconds: Optional[float] = 30.0,
     ):
         """
         Initialize match state logger.
@@ -114,6 +116,8 @@ class MatchStateLogger:
             states_dir: Root directory for match states (e.g., data/match_states/<league>/)
             model_version: Model directory basename (e.g., "t20_male_v2")
             feature_store_version: Feature store directory basename
+            flush_interval_seconds: Maximum age of a non-empty buffer before it
+                is flushed. ``None`` disables the time-based trigger.
         """
         self.match_id = match_id
         self.league = league
@@ -128,6 +132,8 @@ class MatchStateLogger:
         # Initialize buffer
         self.buffer: List[Dict[str, Any]] = []
         self.recording_start = datetime.now()
+        self.flush_interval_seconds = flush_interval_seconds
+        self._last_flush_at = self.recording_start
         self.current_innings = 1
         self.previous_ball_state: Optional[Dict[str, Any]] = None
         self._seen_record_keys: set[tuple[int, int, int, int, int]] = set()
@@ -785,9 +791,24 @@ class MatchStateLogger:
                 self.flush()
                 self.current_innings = innings
             
-            # Auto-flush at 30 records
-            if len(self.buffer) >= 30:
-                self.log.info("auto_flush_triggered", buffer_size=len(self.buffer))
+            # Flush on size or age. A predictor can start after an innings is
+            # already underway and then finish before collecting 30 distinct
+            # states; without the age trigger those valid rows remain only in
+            # memory and the storage watcher cannot see them.
+            elapsed_since_flush = (
+                datetime.now() - self._last_flush_at
+            ).total_seconds()
+            time_flush_due = (
+                self.flush_interval_seconds is not None
+                and elapsed_since_flush >= float(self.flush_interval_seconds)
+            )
+            if len(self.buffer) >= 30 or time_flush_due:
+                self.log.info(
+                    "buffer_flush_triggered",
+                    buffer_size=len(self.buffer),
+                    reason="size" if len(self.buffer) >= 30 else "time",
+                    elapsed_seconds=round(elapsed_since_flush, 3),
+                )
                 self.flush()
             
             self.log.debug("ball_recorded", buffer_size=len(self.buffer))
@@ -842,6 +863,7 @@ class MatchStateLogger:
             
             # Clear buffer
             self.buffer = []
+            self._last_flush_at = datetime.now()
             
         except Exception as e:
             self.log.error("flush_failed", error=str(e), buffer_size=len(self.buffer), exc_info=True)
