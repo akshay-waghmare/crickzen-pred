@@ -351,7 +351,17 @@ def discover_dashboard_matches(
                 payload=payload,
             )
         )
-    return matches, errors
+    # A scheduler restart can briefly leave the previous prediction JSON
+    # alongside a replacement for the same provider match.  The URL is the
+    # durable identity, so audit only the freshest active prediction instead
+    # of double-counting one match or producing duplicate alerts.
+    freshest_by_url: dict[str, DashboardMatch] = {}
+    for match in matches:
+        key = _normalise_url(match.match_url)
+        previous = freshest_by_url.get(key)
+        if previous is None or match.activity_at > previous.activity_at:
+            freshest_by_url[key] = match
+    return list(freshest_by_url.values()), errors
 
 
 def _evidence_paths(root: Path, max_files: int) -> list[Path]:

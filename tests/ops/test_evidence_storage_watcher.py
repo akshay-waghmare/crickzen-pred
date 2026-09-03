@@ -135,6 +135,29 @@ def test_audit_is_healthy_and_event_is_transition_only(tmp_path: Path) -> None:
     assert len(config.events_path.read_text(encoding="utf-8").splitlines()) == 1
 
 
+def test_audit_deduplicates_restarted_predictions_for_same_match(tmp_path: Path) -> None:
+    now = datetime(2026, 9, 3, 12, 0, tzinfo=timezone.utc)
+    config = _config(tmp_path)
+    _write_dashboard(config.dashboard_dir, now, prediction_id="prediction-old")
+    _write_dashboard(config.dashboard_dir, now, prediction_id="prediction-new")
+
+    for path in (
+        config.dashboard_dir / "prediction-old.json",
+        config.dashboard_dir / "prediction-old_livematch.json",
+    ):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["timestamp"] = (now - timedelta(seconds=60)).isoformat()
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        os.utime(path, ((now - timedelta(seconds=60)).timestamp(),) * 2)
+    _write_evidence(config.match_states_dir, now)
+
+    report = audit_evidence_storage(config, now=now)
+
+    assert report["status"] == "healthy"
+    assert report["active_prediction_count"] == 1
+    assert report["matches"][0]["prediction_id"] == "prediction-new"
+
+
 def test_audit_raises_critical_when_active_evidence_is_missing(tmp_path: Path) -> None:
     now = datetime(2026, 9, 3, 12, 0, tzinfo=timezone.utc)
     config = _config(tmp_path)
