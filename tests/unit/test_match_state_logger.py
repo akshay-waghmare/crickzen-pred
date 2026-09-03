@@ -367,6 +367,7 @@ class TestRecordBall:
             "bowler1_overs": 1.0,
             "bowler1_runs": 8,
             "bowler1_wickets": 0,
+            "bowler_data_source": "crickzen_shared_live_snapshot",
         })
 
         logger.record_ball(state, sample_features, mock_predictor, sample_market_odds)
@@ -376,10 +377,12 @@ class TestRecordBall:
         assert record["bowler_overs"] == 1.0
         assert record["bowler_runs"] == 8
         assert record["bowler_wickets"] == 0
+        assert record["bowler_data_source"] == "crickzen_shared_live_snapshot"
 
         logger.flush()
         parquet = pd.read_parquet(temp_states_dir / "1234567.parquet")
         assert parquet.iloc[0]["bowler_name"] == "K Siddhu"
+        assert parquet.iloc[0]["bowler_data_source"] == "crickzen_shared_live_snapshot"
 
     def test_record_ball_buffer_auto_flush(
         self, temp_states_dir, sample_match_state, sample_features,

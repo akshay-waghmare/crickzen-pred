@@ -699,6 +699,7 @@ class MatchStateLogger:
                 'bowler_overs': getattr(match_state, 'bowler1_overs', 0.0),
                 'bowler_runs': getattr(match_state, 'bowler1_runs', 0),
                 'bowler_wickets': getattr(match_state, 'bowler1_wickets', 0),
+                'bowler_data_source': getattr(match_state, 'bowler_data_source', ''),
                 'venue': match_state.venue,
                 'toss_winner': match_state.toss_winner if hasattr(match_state, 'toss_winner') else "",
                 'toss_decision': match_state.toss_decision if hasattr(match_state, 'toss_decision') else "",

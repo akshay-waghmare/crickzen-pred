@@ -48,6 +48,7 @@ BALL_STATE_SCHEMA = pa.schema([
     ('bowler_overs', pa.float32()),
     ('bowler_runs', pa.int16()),
     ('bowler_wickets', pa.int8()),
+    ('bowler_data_source', pa.string()),
     ('venue', pa.string()),
     ('toss_winner', pa.string()),
     ('toss_decision', pa.string()),
