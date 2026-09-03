@@ -276,6 +276,7 @@ class CrexLivePredictor:
         }
         self._last_market_update_at = None
         self._last_market_age_seconds = None
+        self._last_market_api_fetch_at = None
         self._load_market_stack_candidate()
         self._load_candidate_model()
 
@@ -1912,7 +1913,65 @@ class CrexLivePredictor:
                 self._process_api_data(data)
         except Exception:
             pass
-    
+
+    @staticmethod
+    def _extract_crex_api_key(match_url: str) -> str:
+        """Extract the provider match key used by CREX's sV3 endpoint."""
+        value = (match_url or "").strip()
+        query_match = re.search(r"(?:[?&])key=([A-Za-z0-9]+)", value, re.IGNORECASE)
+        if query_match:
+            return query_match.group(1)
+
+        slug_match = re.search(
+            r"match-updates-([A-Za-z0-9]+)(?:/[^/?#]*)?/?(?:[?#].*)?$",
+            value,
+            re.IGNORECASE,
+        )
+        return slug_match.group(1) if slug_match else ""
+
+    async def _poll_crex_market_odds(self) -> None:
+        """Read current market odds directly from CREX's public sV3 API.
+
+        CREX may render the odds without exposing the XHR through the page
+        response listener. The direct request keeps market evidence complete
+        while retaining the page listener as a fallback. This is intentionally
+        throttled because the main predictor loop runs more frequently.
+        """
+        if not self.page:
+            return
+
+        now = asyncio.get_running_loop().time()
+        last_fetch = getattr(self, "_last_market_api_fetch_at", None)
+        if last_fetch is not None and now - last_fetch < 5.0:
+            return
+        self._last_market_api_fetch_at = now
+
+        api_key = self._extract_crex_api_key(self.match_url or self.original_match_url)
+        if not api_key:
+            return
+
+        try:
+            response = await self.page.request.get(
+                f"https://api-v1.com/v10/sV3.php?key={api_key}",
+                headers={
+                    "Origin": "https://crex.com",
+                    "Referer": "https://crex.com/",
+                },
+                timeout=10_000,
+            )
+            if not response.ok:
+                logger.debug("market_odds_api_poll_non_2xx", status=response.status, key=api_key)
+                return
+
+            data = await response.json()
+            if isinstance(data, dict):
+                self.api_data = data
+                self._process_api_data(data)
+        except Exception as exc:
+            # Market data is optional. A transient provider/API failure must
+            # leave the row explicitly unavailable rather than stop inference.
+            logger.debug("market_odds_api_poll_failed", key=api_key, error=str(exc))
+
     def _process_api_data(self, data: Dict[str, Any]):
         """Process sV3 API data into match state."""
         try:
@@ -1979,10 +2038,10 @@ class CrexLivePredictor:
             # Extract market odds from API (fields F and R)
             # F = Favorite team code, R = Odds in format "back+diff"
             # CREX uses t_H_name / t_M_name in localStorage where H=first-team and M=second-team.
-            fav_team_code = data.get("F", "").replace("^", "")
+            fav_team_code = str(data.get("F") or "").replace("^", "").strip()
             r_raw = data.get("R", "")
             if fav_team_code or r_raw:
-                self.log.debug(
+                logger.debug(
                     "market_odds_received",
                     F=data.get("F"), fav_code=fav_team_code, R=r_raw,
                     ls_lookup=self.local_storage.get(f"t_{fav_team_code}_name"),
@@ -2536,6 +2595,11 @@ class CrexLivePredictor:
         
         try:
             self._poll_count += 1
+
+            # CREX's live page does not consistently expose sV3 through the
+            # Playwright response listener. Poll the public provider endpoint
+            # directly so market evidence is available for the same state.
+            await self._poll_crex_market_odds()
 
             # Refresh localStorage every 10 polls so team/player codes get populated
             # even if they were not ready when start() loaded the page.

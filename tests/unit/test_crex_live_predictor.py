@@ -32,6 +32,32 @@ class _ClosablePlaywright:
         self.stopped = True
 
 
+class _MarketResponse:
+    ok = True
+    status = 200
+
+    def __init__(self, payload):
+        self.payload = payload
+
+    async def json(self):
+        return self.payload
+
+
+class _MarketRequest:
+    def __init__(self, payload):
+        self.payload = payload
+        self.urls = []
+
+    async def get(self, url, **kwargs):
+        self.urls.append(url)
+        return _MarketResponse(self.payload)
+
+
+class _MarketPage:
+    def __init__(self, payload):
+        self.request = _MarketRequest(payload)
+
+
 def test_stop_closes_browser_and_playwright_driver():
     predictor = CrexLivePredictor.__new__(CrexLivePredictor)
     predictor._running = True
@@ -56,6 +82,59 @@ def test_normalize_live_url_strips_info_suffixes():
     assert CrexLivePredictor._normalize_live_url(base_url + "/match-scorecard") == base_url
     assert CrexLivePredictor._normalize_live_url(base_url + "/scorecard") == base_url
     assert CrexLivePredictor._normalize_live_url(base_url) == base_url
+
+
+def test_extract_crex_api_key_from_match_url():
+    url = (
+        "https://crex.com/cricket-live-score/kas-vs-noi-eliminator-"
+        "uttar-pradesh-t20-league-2026-match-updates-133R"
+    )
+
+    assert CrexLivePredictor._extract_crex_api_key(url) == "133R"
+    assert CrexLivePredictor._extract_crex_api_key(url + "?key=11UK") == "11UK"
+
+
+def test_process_api_data_records_crex_market_odds_without_instance_log():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.local_storage = {"t_SK_name": "Kashi Rudras"}
+    predictor.match_state = CrexMatchState(
+        batting_team="Kashi Rudras",
+        bowling_team="Noida Kings",
+    )
+    predictor._last_market_update_at = None
+    predictor._last_market_age_seconds = None
+
+    predictor._process_api_data({"F": "^SK", "R": "48+5"})
+
+    assert predictor.match_state.market_fav_team == "Kashi Rudras"
+    assert predictor.match_state.market_back_odds == "48"
+    assert predictor.match_state.market_lay_odds == "53"
+    assert predictor.match_state.market_fav_prob == pytest.approx(100 / 148)
+    assert predictor._last_market_update_at is not None
+
+
+def test_poll_crex_market_odds_reads_direct_s_v3_payload():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.page = _MarketPage({"F": "^SK", "R": "48+5"})
+    predictor.match_url = (
+        "https://crex.com/cricket-live-score/kas-vs-noi-eliminator-"
+        "uttar-pradesh-t20-league-2026-match-updates-133R"
+    )
+    predictor.original_match_url = predictor.match_url
+    predictor.local_storage = {"t_SK_name": "Kashi Rudras"}
+    predictor.match_state = CrexMatchState(
+        batting_team="Kashi Rudras",
+        bowling_team="Noida Kings",
+    )
+    predictor._last_market_api_fetch_at = None
+    predictor._last_market_update_at = None
+    predictor._last_market_age_seconds = None
+
+    asyncio.run(predictor._poll_crex_market_odds())
+
+    assert predictor.page.request.urls == ["https://api-v1.com/v10/sV3.php?key=133R"]
+    assert predictor.match_state.market_fav_team == "Kashi Rudras"
+    assert predictor.match_state.market_back_odds == "48"
 
 
 def test_build_sidecar_paths_are_feed_specific():
