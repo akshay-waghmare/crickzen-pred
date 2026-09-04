@@ -186,6 +186,47 @@ def test_hydrate_current_bowler_from_shared_snapshot_populates_match_state():
     assert predictor.match_state.bowler_data_source == "crickzen_shared_live_snapshot"
 
 
+def test_poll_and_predict_rehydrates_missing_bowler_before_prediction(monkeypatch):
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.page = object()
+    predictor._poll_count = 0
+    predictor.model = None
+    predictor.mc_only = True
+    predictor._effective_total_overs = 20
+    predictor.format_config = FormatConfig.t20()
+    predictor.match_state = CrexMatchState(
+        batting_team="St Lucia Kings",
+        bowling_team="St Kitts & Nevis Patriots",
+    )
+    predictor._team1_name_hint = "St Kitts & Nevis Patriots"
+    predictor._team2_name_hint = "St Lucia Kings"
+    hydrate_calls = []
+
+    async def no_op_market_poll():
+        return None
+
+    async def no_op_dom_extract():
+        return None
+
+    async def hydrate(*, force=False):
+        hydrate_calls.append(force)
+        predictor.match_state.bowler1_name = "J Louis"
+        predictor.match_state.bowler1_overs = 1.0
+        predictor.match_state.bowler1_runs = 4
+        predictor.match_state.bowler1_wickets = 1
+        predictor.match_state.bowler_data_source = "crickzen_shared_live_snapshot"
+
+    monkeypatch.setattr(predictor, "_poll_crex_market_odds", no_op_market_poll)
+    monkeypatch.setattr(predictor, "_extract_match_info", no_op_dom_extract)
+    monkeypatch.setattr(predictor, "_hydrate_current_bowler_from_shared_snapshot", hydrate)
+    monkeypatch.setattr(predictor, "_run_prediction", lambda: 0.5)
+
+    assert asyncio.run(predictor.poll_and_predict()) == 0.5
+    assert hydrate_calls == [True]
+    assert predictor.match_state.bowler1_name == "J Louis"
+    assert predictor.match_state.bowler_data_source == "crickzen_shared_live_snapshot"
+
+
 def test_shared_snapshot_batting_team_forces_authoritative_opposing_team():
     predictor = CrexLivePredictor.__new__(CrexLivePredictor)
     predictor.local_storage = {}

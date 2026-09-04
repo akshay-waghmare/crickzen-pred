@@ -2805,6 +2805,20 @@ class CrexLivePredictor:
 
             # Refresh match state from DOM
             await self._extract_match_info()
+
+            # Make role enrichment a pre-persistence invariant.  The DOM
+            # extraction path is deliberately best-effort and may catch a
+            # transient page error after it has already parsed the score.  A
+            # final shared-snapshot attempt here prevents that partial state
+            # from reaching inference/evidence when the authoritative payload
+            # is available.
+            if (
+                not self.match_state.bowler1_name
+                or not self.match_state.bowler_data_source
+            ):
+                await self._hydrate_current_bowler_from_shared_snapshot(force=True)
+            self._clear_invalid_current_bowler()
+            self._repair_match_teams_from_url()
             
             # Run prediction if model is loaded or MC-only mode
             effective_overs = self._effective_total_overs or self.format_config.total_overs
