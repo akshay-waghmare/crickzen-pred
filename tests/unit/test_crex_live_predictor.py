@@ -186,6 +186,52 @@ def test_hydrate_current_bowler_from_shared_snapshot_populates_match_state():
     assert predictor.match_state.bowler_data_source == "crickzen_shared_live_snapshot"
 
 
+def test_shared_snapshot_batting_team_forces_authoritative_opposing_team():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.local_storage = {}
+    predictor.league = "t20_all"
+    predictor.predictor = None
+    predictor._team1_name_hint = "St Kitts & Nevis Patriots"
+    predictor._team2_name_hint = "St Lucia Kings"
+    predictor.match_url = (
+        "https://crex.com/cricket-live-score/sknp-vs-slk-25th-match-"
+        "caribbean-premier-league-2026-match-updates-11UK"
+    )
+    predictor.original_match_url = predictor.match_url
+    predictor.match_state = CrexMatchState(
+        batting_team="St Lucia Kings",
+        bowling_team="A Nedd",
+    )
+
+    predictor._apply_authoritative_snapshot_teams({"batting_team": "SLK"})
+
+    assert predictor.match_state.batting_team == "St Lucia Kings"
+    assert predictor.match_state.bowling_team == "St Kitts & Nevis Patriots"
+
+
+def test_repair_match_teams_does_not_preserve_player_as_opposing_team():
+    predictor = CrexLivePredictor.__new__(CrexLivePredictor)
+    predictor.local_storage = {}
+    predictor.league = "t20_all"
+    predictor.predictor = None
+    predictor._team1_name_hint = "St Kitts & Nevis Patriots"
+    predictor._team2_name_hint = "St Lucia Kings"
+    predictor.match_url = (
+        "https://crex.com/cricket-live-score/sknp-vs-slk-25th-match-"
+        "caribbean-premier-league-2026-match-updates-11UK"
+    )
+    predictor.original_match_url = predictor.match_url
+    predictor.match_state = CrexMatchState(
+        batting_team="St Lucia Kings",
+        bowling_team="A Nedd",
+    )
+
+    predictor._repair_match_teams_from_url()
+
+    assert predictor.match_state.batting_team == "St Lucia Kings"
+    assert predictor.match_state.bowling_team == "St Kitts & Nevis Patriots"
+
+
 def test_build_sidecar_paths_are_feed_specific():
     output_json = "data/ipl_live_ml.json"
 

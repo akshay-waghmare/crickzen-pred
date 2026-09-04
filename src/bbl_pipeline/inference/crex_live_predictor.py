@@ -464,6 +464,13 @@ class CrexLivePredictor:
         if not teams:
             return
         team1, team2 = teams
+        hinted_team1 = getattr(self, '_team1_name_hint', '')
+        hinted_team2 = getattr(self, '_team2_name_hint', '')
+        has_authoritative_team_hints = (
+            self._looks_like_valid_team_name(hinted_team1)
+            and self._looks_like_valid_team_name(hinted_team2)
+            and self._normalize_team_key(hinted_team1) != self._normalize_team_key(hinted_team2)
+        )
         self._team1 = team1
         self._team2 = team2
 
@@ -491,15 +498,42 @@ class CrexLivePredictor:
         if batting_key == team1_key:
             self.match_state.bowling_team = team2
         elif batting_key == team2_key:
-            # A live scorecard may expose the first team by its full display
+            # Explicit scheduler team hints are authoritative; player names
+            # must not replace the opposing team in model state.
             # name while the URL only has its short code (for example HYK).
             # Preserve that already-opposite, valid display name; the
             # provider pair still remains the source of truth for identity.
-            if not self._looks_like_valid_team_name(bowling) or self._normalize_team_key(bowling) == batting_key:
+            if has_authoritative_team_hints or not self._looks_like_valid_team_name(bowling) or self._normalize_team_key(bowling) == batting_key:
                 self.match_state.bowling_team = team1
         else:
             self.match_state.batting_team = team1
             self.match_state.bowling_team = team2
+
+    def _apply_authoritative_snapshot_teams(self, payload: Dict[str, Any]) -> None:
+        """Apply the shared live snapshot's batting side to the provider pair."""
+        if not isinstance(payload, dict):
+            return
+        raw_batting_team = payload.get("batting_team") or payload.get("battingTeam")
+        if not raw_batting_team:
+            return
+        teams = self._extract_teams_from_url()
+        if not teams:
+            return
+        team1, team2 = teams
+        resolved = (
+            self._resolve_scorecard_team_from_provider_pair(str(raw_batting_team))
+            or self._resolve_team_name(str(raw_batting_team))
+        )
+        raw_key = self._normalize_team_key(str(raw_batting_team))
+        resolved_key = self._normalize_team_key(resolved)
+        team1_key = self._normalize_team_key(team1)
+        team2_key = self._normalize_team_key(team2)
+        if resolved_key == team1_key or raw_key == team1_key:
+            self.match_state.batting_team = team1
+            self.match_state.bowling_team = team2
+        elif resolved_key == team2_key or raw_key == team2_key:
+            self.match_state.batting_team = team2
+            self.match_state.bowling_team = team1
 
     def _resolve_team_name(self, team_name: str) -> str:
         """Resolve CREX team codes into displayable team names when possible."""
@@ -2064,7 +2098,7 @@ class CrexLivePredictor:
 
         return None
 
-    async def _hydrate_current_bowler_from_shared_snapshot(self) -> None:
+    async def _hydrate_current_bowler_from_shared_snapshot(self, force: bool = False) -> None:
         """Bridge the shared live bowler payload into the predictor state.
 
         Direct CREX DOM extraction remains the first path. This bounded
@@ -2077,7 +2111,7 @@ class CrexLivePredictor:
 
         now = asyncio.get_running_loop().time()
         last_fetch = getattr(self, "_last_bowler_api_fetch_at", None)
-        if last_fetch is not None and now - last_fetch < 5.0:
+        if not force and last_fetch is not None and now - last_fetch < 5.0:
             return
         self._last_bowler_api_fetch_at = now
 
@@ -2099,6 +2133,7 @@ class CrexLivePredictor:
                 logger.debug("shared_bowler_snapshot_non_2xx", status=response.status)
                 return
             payload = await response.json()
+            self._apply_authoritative_snapshot_teams(payload)
             bowler = self._extract_authoritative_bowler(payload)
             if not bowler:
                 return
@@ -2691,7 +2726,19 @@ class CrexLivePredictor:
                             self.match_state.bowler1_name = title_bowler.group(1).strip()
 
             self._clear_invalid_current_bowler()
-                        
+
+            # Retry after DOM fallbacks when the first shared request was
+            # transiently unavailable. The final state written for this ball
+            # should still use the authoritative shared snapshot when it is
+            # available.
+            if (
+                not self.match_state.bowler1_name
+                or not self.match_state.bowler_data_source
+            ):
+                await self._hydrate_current_bowler_from_shared_snapshot(force=True)
+            self._clear_invalid_current_bowler()
+            self._repair_match_teams_from_url()
+
         except Exception as e:
             print(f"[WARN] Error extracting match info: {e}")
     
